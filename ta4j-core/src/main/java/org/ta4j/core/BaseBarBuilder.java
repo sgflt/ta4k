@@ -63,7 +63,7 @@ public class BaseBarBuilder implements BarBuilder {
     }
 
     @Override
-    public BaseBarBuilder endTime(Instant endTime) {
+    public BaseBarBuilder endTime(final Instant endTime) {
         this.endTime = endTime;
         return this;
     }
@@ -194,11 +194,25 @@ public class BaseBarBuilder implements BarBuilder {
         return this;
     }
 
-    @Override
-    public BaseBar build() {
-        return new BaseBar(this.timePeriod, this.endTime, this.openPrice, this.highPrice, this.lowPrice,
-                this.closePrice, this.volume, this.amount, this.trades);
-    }
+
+  @Override
+  public BaseBar build() {
+        final var baseBar = new BaseBar(this.timePeriod, this.endTime, this.openPrice, this.highPrice, this.lowPrice,
+            this.closePrice, this.volume, this.amount, this.trades
+        );
+
+        this.endTime = null;
+        this.openPrice = null;
+        this.highPrice = null;
+        this.lowPrice = null;
+        this.closePrice = null;
+        this.volume = null;
+        this.amount = null;
+        this.trades = 0;
+
+        return baseBar;
+  }
+
 
     @Override
     public void add() {

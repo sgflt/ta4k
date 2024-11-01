@@ -25,8 +25,15 @@ package org.ta4j.core;
 
 class BaseBarBuilderFactory implements BarBuilderFactory {
 
+    private BaseBarBuilder baseBarBuilder;
+
+
     @Override
-    public BaseBarBuilder createBarBuilder(BarSeries series) {
-        return new BaseBarBuilder(series.numFactory()).bindTo(series);
+    public BaseBarBuilder createBarBuilder(final BarSeries series) {
+        if (this.baseBarBuilder == null) {
+            this.baseBarBuilder = new BaseBarBuilder(series.numFactory()).bindTo(series);
+        }
+
+        return this.baseBarBuilder;
     }
 }

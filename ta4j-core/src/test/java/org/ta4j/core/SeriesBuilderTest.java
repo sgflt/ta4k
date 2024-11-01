@@ -37,28 +37,29 @@ import org.ta4j.core.num.DoubleNumFactory;
 
 public class SeriesBuilderTest {
 
-    private final BaseBarSeriesBuilder seriesBuilder = new BaseBarSeriesBuilder()
-            .withNumFactory(DecimalNumFactory.getInstance());
-
     @Test
     public void testBuilder() {
 
         // build a new empty unnamed bar series
-        BarSeries defaultSeries = seriesBuilder.build();
+        final var defaultSeries = new BaseBarSeriesBuilder().withNumFactory(DecimalNumFactory.getInstance()).build();
 
         // build a new empty bar series using BigDecimal as delegate
-        BarSeries defaultSeriesName = seriesBuilder.withName("default").build();
+        final var defaultSeriesName = new BaseBarSeriesBuilder().withNumFactory(DecimalNumFactory.getInstance())
+                .withName("default")
+                .build();
 
-        BarSeries doubleSeries = seriesBuilder.withMaxBarCount(100)
+        final var doubleSeries = new BaseBarSeriesBuilder().withNumFactory(DecimalNumFactory.getInstance())
+                .withMaxBarCount(100)
                 .withNumFactory(DoubleNumFactory.getInstance())
                 .withName("useDoubleNum")
                 .build();
-        BarSeries precisionSeries = seriesBuilder.withMaxBarCount(100)
+        final var precisionSeries = new BaseBarSeriesBuilder().withNumFactory(DecimalNumFactory.getInstance())
+                .withMaxBarCount(100)
                 .withNumFactory(DecimalNumFactory.getInstance())
                 .withName("usePrecisionNum")
                 .build();
 
-        var now = Instant.now();
+        final var now = Instant.now();
         for (int i = 1000; i >= 0; i--) {
             defaultSeries.barBuilder()
                     .timePeriod(Duration.ofDays(1))
@@ -107,13 +108,17 @@ public class SeriesBuilderTest {
 
     @Test
     public void testNumFunctions() {
-        BarSeries series = seriesBuilder.withNumFactory(DoubleNumFactory.getInstance()).build();
+        final var series = new BaseBarSeriesBuilder().withNumFactory(DecimalNumFactory.getInstance())
+                .withNumFactory(DoubleNumFactory.getInstance())
+                .build();
         assertNumEquals(series.numFactory().numOf(12), DoubleNum.valueOf(12));
     }
 
     @Test
     public void testWrongNumType() {
-        BarSeries series = seriesBuilder.withNumFactory(DecimalNumFactory.getInstance()).build();
+        final var series = new BaseBarSeriesBuilder().withNumFactory(DecimalNumFactory.getInstance())
+                .withNumFactory(DecimalNumFactory.getInstance())
+                .build();
         assertNumEquals(series.numFactory().numOf(12), DecimalNum.valueOf(12));
     }
 }
