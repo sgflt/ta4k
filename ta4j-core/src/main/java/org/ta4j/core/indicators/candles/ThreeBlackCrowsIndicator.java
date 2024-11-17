@@ -23,13 +23,12 @@
  */
 package org.ta4j.core.indicators.candles;
 
-import java.time.Instant;
-
 import org.ta4j.core.Bar;
-import org.ta4j.core.BarSeries;
-import org.ta4j.core.indicators.SeriesRelatedBooleanIndicator;
+import org.ta4j.core.indicators.bool.BooleanIndicator;
 import org.ta4j.core.indicators.helpers.previous.PreviousNumericValueIndicator;
+import org.ta4j.core.indicators.numeric.NumericIndicator;
 import org.ta4j.core.num.Num;
+import org.ta4j.core.num.NumFactory;
 import org.ta4j.core.utils.CircularBarArray;
 import org.ta4j.core.utils.CircularIndicatorArray;
 
@@ -39,7 +38,7 @@ import org.ta4j.core.utils.CircularIndicatorArray;
  * @see <a href="http://www.investopedia.com/terms/t/three_black_crows.asp">
  *     http://www.investopedia.com/terms/t/three_black_crows.asp</a>
  */
-public class ThreeBlackCrowsIndicator extends SeriesRelatedBooleanIndicator {
+public class ThreeBlackCrowsIndicator extends BooleanIndicator {
 
   /** Lower shadow. */
   private final CircularIndicatorArray lowerShadows = new CircularIndicatorArray(3);
@@ -51,31 +50,29 @@ public class ThreeBlackCrowsIndicator extends SeriesRelatedBooleanIndicator {
   private final Num factor;
 
   private final CircularBarArray bars = new CircularBarArray(4);
-  private Instant currentTick = Instant.EPOCH;
   private Boolean value;
 
 
   /**
    * Constructor.
    *
-   * @param series the bar series
+   * @param numFactory the bar numFactory
    * @param barCount the number of bars used to calculate the average lower shadow
    * @param factor the factor used when checking if a candle has a very short
    *     lower shadow
    */
-  public ThreeBlackCrowsIndicator(final BarSeries series, final int barCount, final double factor) {
-    super(series);
-    final var lowerShadowIndicator = new LowerShadowIndicator(series);
+  public ThreeBlackCrowsIndicator(final NumFactory numFactory, final int barCount, final double factor) {
+    final var lowerShadowIndicator = NumericIndicator.lowerShadow();
     this.lowerShadows.addLast(lowerShadowIndicator.previous(3));
     this.lowerShadows.addLast(lowerShadowIndicator.previous(2));
     this.lowerShadows.addLast(lowerShadowIndicator.previous());
     this.averageLowerShadowInd = lowerShadowIndicator.sma(barCount).previous(4);
-    this.factor = series.numFactory().numOf(factor);
+    this.factor = numFactory.numOf(factor);
   }
 
 
-  protected Boolean calculate() {
-    this.bars.addLast(getBarSeries().getBar());
+  protected Boolean calculate(final Bar bar) {
+    this.bars.addLast(bar);
 
     if (this.bars.isNotFull()) {
       // We need 4 candles: 1 white, 3 black
@@ -145,20 +142,10 @@ public class ThreeBlackCrowsIndicator extends SeriesRelatedBooleanIndicator {
 
 
   @Override
-  public Boolean getValue() {
-    return this.value;
-  }
-
-
-  @Override
-  public void refresh(final Instant tick) {
-    if (tick.isAfter(this.currentTick)) {
-      this.averageLowerShadowInd.refresh(tick);
-      this.lowerShadows.refresh(tick);
-      this.value = calculate();
-
-      this.currentTick = tick;
-    }
+  public void updateState(final Bar bar) {
+    this.averageLowerShadowInd.onBar(bar);
+    this.lowerShadows.refresh(bar);
+    this.value = calculate(bar);
   }
 
 

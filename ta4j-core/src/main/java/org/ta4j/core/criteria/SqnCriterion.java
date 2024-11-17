@@ -1,4 +1,4 @@
-/**
+/*
  * The MIT License (MIT)
  *
  * Copyright (c) 2017-2023 Ta4j Organization & respective
@@ -26,98 +26,105 @@ package org.ta4j.core.criteria;
 import org.ta4j.core.AnalysisCriterion;
 import org.ta4j.core.Position;
 import org.ta4j.core.TradingRecord;
-import org.ta4j.core.backtest.BacktestBarSeries;
 import org.ta4j.core.criteria.helpers.StandardDeviationCriterion;
 import org.ta4j.core.criteria.pnl.ProfitLossCriterion;
 import org.ta4j.core.num.Num;
+import org.ta4j.core.num.NumFactoryProvider;
 
 /**
  * The SQN ("System Quality Number") Criterion.
  *
  * @see <a href=
- *      "https://indextrader.com.au/van-tharps-sqn/">https://indextrader.com.au/van-tharps-sqn/</a>
+ *     "https://indextrader.com.au/van-tharps-sqn/">https://indextrader.com.au/van-tharps-sqn/</a>
  */
 public class SqnCriterion extends AbstractAnalysisCriterion {
 
-    private final AnalysisCriterion criterion;
-    private final StandardDeviationCriterion standardDeviationCriterion;
-    private final NumberOfPositionsCriterion numberOfPositionsCriterion = new NumberOfPositionsCriterion();
+  private final AnalysisCriterion criterion;
+  private final StandardDeviationCriterion standardDeviationCriterion;
+  private final NumberOfPositionsCriterion numberOfPositionsCriterion = new NumberOfPositionsCriterion();
 
-    /**
-     * The number to be used for the part of {@code √(numberOfPositions)} within the
-     * SQN-Formula when there are more than 100 trades. If this value is
-     * {@code null}, then the number of positions calculated by
-     * {@link #numberOfPositionsCriterion} is used instead.
-     */
-    private final Integer nPositions;
+  /**
+   * The number to be used for the part of {@code √(numberOfPositions)} within the
+   * SQN-Formula when there are more than 100 trades. If this value is
+   * {@code null}, then the number of positions calculated by
+   * {@link #numberOfPositionsCriterion} is used instead.
+   */
+  private final Integer nPositions;
 
-    /**
-     * Constructor with {@code criterion} = {@link ProfitLossCriterion}.
-     */
-    public SqnCriterion() {
-        this(new ProfitLossCriterion());
+
+  /**
+   * Constructor with {@code criterion} = {@link ProfitLossCriterion}.
+   */
+  public SqnCriterion() {
+    this(new ProfitLossCriterion());
+  }
+
+
+  /**
+   * Constructor.
+   *
+   * @param criterion the Criterion (e.g. ProfitLossCriterion or
+   *     ExpectancyCriterion)
+   */
+  public SqnCriterion(final AnalysisCriterion criterion) {
+    this(criterion, null);
+  }
+
+
+  /**
+   * Constructor.
+   *
+   * @param criterion the Criterion (e.g. ProfitLossCriterion or
+   *     ExpectancyCriterion)
+   * @param nPositions the {@link #nPositions} (optional)
+   */
+  public SqnCriterion(final AnalysisCriterion criterion, final Integer nPositions) {
+    this.criterion = criterion;
+    this.nPositions = nPositions;
+    this.standardDeviationCriterion = new StandardDeviationCriterion(criterion);
+  }
+
+
+  @Override
+  public Num calculate(final Position position) {
+    final Num stdDevPnl = this.standardDeviationCriterion.calculate(position);
+    if (stdDevPnl.isZero()) {
+      return NumFactoryProvider.getDefaultNumFactory().zero();
+    }
+    // SQN = (Average (PnL) / StdDev(PnL)) * SquareRoot(NumberOfTrades)
+    final Num numberOfPositions = this.numberOfPositionsCriterion.calculate(position);
+    final Num pnl = this.criterion.calculate(position);
+    final Num avgPnl = pnl.dividedBy(numberOfPositions);
+    return avgPnl.dividedBy(stdDevPnl).multipliedBy(numberOfPositions.sqrt());
+  }
+
+
+  @Override
+  public Num calculate(final TradingRecord tradingRecord) {
+    if (tradingRecord.getPositions().isEmpty()) {
+      return NumFactoryProvider.getDefaultNumFactory().zero();
+    }
+    final Num stdDevPnl = this.standardDeviationCriterion.calculate(tradingRecord);
+    if (stdDevPnl.isZero()) {
+      return NumFactoryProvider.getDefaultNumFactory().zero();
     }
 
-    /**
-     * Constructor.
-     *
-     * @param criterion the Criterion (e.g. ProfitLossCriterion or
-     *                  ExpectancyCriterion)
-     */
-    public SqnCriterion(AnalysisCriterion criterion) {
-        this(criterion, null);
+    Num numberOfPositions = this.numberOfPositionsCriterion.calculate(tradingRecord);
+    final Num pnl = this.criterion.calculate(tradingRecord);
+    final Num avgPnl = pnl.dividedBy(numberOfPositions);
+    if (this.nPositions != null && numberOfPositions.isGreaterThan(NumFactoryProvider.getDefaultNumFactory()
+        .hundred())) {
+      numberOfPositions = NumFactoryProvider.getDefaultNumFactory().numOf(this.nPositions);
     }
+    // SQN = (Average (PnL) / StdDev(PnL)) * SquareRoot(NumberOfTrades)
+    return avgPnl.dividedBy(stdDevPnl).multipliedBy(numberOfPositions.sqrt());
+  }
 
-    /**
-     * Constructor.
-     *
-     * @param criterion  the Criterion (e.g. ProfitLossCriterion or
-     *                   ExpectancyCriterion)
-     * @param nPositions the {@link #nPositions} (optional)
-     */
-    public SqnCriterion(AnalysisCriterion criterion, Integer nPositions) {
-        this.criterion = criterion;
-        this.nPositions = nPositions;
-        this.standardDeviationCriterion = new StandardDeviationCriterion(criterion);
-    }
 
-    @Override
-    public Num calculate(BacktestBarSeries series, Position position) {
-        Num stdDevPnl = standardDeviationCriterion.calculate(series, position);
-        if (stdDevPnl.isZero()) {
-            return series.numFactory().zero();
-        }
-        // SQN = (Average (PnL) / StdDev(PnL)) * SquareRoot(NumberOfTrades)
-        Num numberOfPositions = numberOfPositionsCriterion.calculate(series, position);
-        Num pnl = criterion.calculate(series, position);
-        Num avgPnl = pnl.dividedBy(numberOfPositions);
-        return avgPnl.dividedBy(stdDevPnl).multipliedBy(numberOfPositions.sqrt());
-    }
-
-    @Override
-    public Num calculate(BacktestBarSeries series, TradingRecord tradingRecord) {
-        if (tradingRecord.getPositions().isEmpty()) {
-            return series.numFactory().zero();
-        }
-        Num stdDevPnl = standardDeviationCriterion.calculate(series, tradingRecord);
-        if (stdDevPnl.isZero()) {
-            return series.numFactory().zero();
-        }
-
-        Num numberOfPositions = numberOfPositionsCriterion.calculate(series, tradingRecord);
-        Num pnl = criterion.calculate(series, tradingRecord);
-        Num avgPnl = pnl.dividedBy(numberOfPositions);
-        if (nPositions != null && numberOfPositions.isGreaterThan(series.numFactory().hundred())) {
-            numberOfPositions = series.numFactory().numOf(nPositions);
-        }
-        // SQN = (Average (PnL) / StdDev(PnL)) * SquareRoot(NumberOfTrades)
-        return avgPnl.dividedBy(stdDevPnl).multipliedBy(numberOfPositions.sqrt());
-    }
-
-    /** The higher the criterion value, the better. */
-    @Override
-    public boolean betterThan(Num criterionValue1, Num criterionValue2) {
-        return criterionValue1.isGreaterThan(criterionValue2);
-    }
+  /** The higher the criterion value, the better. */
+  @Override
+  public boolean betterThan(final Num criterionValue1, final Num criterionValue2) {
+    return criterionValue1.isGreaterThan(criterionValue2);
+  }
 
 }

@@ -23,8 +23,7 @@
  */
 package org.ta4j.core.indicators.helpers;
 
-import java.time.Instant;
-
+import org.ta4j.core.Bar;
 import org.ta4j.core.indicators.bool.BooleanIndicator;
 import org.ta4j.core.indicators.helpers.previous.PreviousNumericValueIndicator;
 import org.ta4j.core.indicators.numeric.NumericIndicator;
@@ -44,8 +43,6 @@ public class CrossIndicator extends BooleanIndicator {
   private final NumericIndicator low;
   private final PreviousNumericValueIndicator previousUp;
   private final PreviousNumericValueIndicator previousLow;
-  private Boolean value;
-  private Instant currentTick = Instant.EPOCH;
 
 
   /**
@@ -69,21 +66,12 @@ public class CrossIndicator extends BooleanIndicator {
 
 
   @Override
-  public Boolean getValue() {
-    return this.value;
-  }
-
-
-  @Override
-  public void refresh(final Instant tick) {
-    if (tick.isAfter(this.currentTick)) {
-      this.low.refresh(tick);
-      this.up.refresh(tick);
-      this.previousUp.refresh(tick);
-      this.previousLow.refresh(tick);
-      this.value = calculate();
-      this.currentTick = tick;
-    }
+  public void updateState(final Bar bar) {
+    this.low.onBar(bar);
+    this.up.onBar(bar);
+    this.previousUp.onBar(bar);
+    this.previousLow.onBar(bar);
+    this.value = calculate();
   }
 
 

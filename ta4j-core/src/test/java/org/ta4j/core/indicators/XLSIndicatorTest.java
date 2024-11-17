@@ -23,11 +23,12 @@
  */
 package org.ta4j.core.indicators;
 
+import java.util.List;
+
 import org.ta4j.core.ExternalIndicatorTest;
-import org.ta4j.core.TestIndicator;
 import org.ta4j.core.XlsTestsUtils;
-import org.ta4j.core.backtest.BacktestBarSeries;
-import org.ta4j.core.num.Num;
+import org.ta4j.core.events.MarketEvent;
+import org.ta4j.core.mocks.MockIndicator;
 import org.ta4j.core.num.NumFactory;
 
 public class XLSIndicatorTest implements ExternalIndicatorTest {
@@ -35,7 +36,7 @@ public class XLSIndicatorTest implements ExternalIndicatorTest {
   private final Class<?> clazz;
   private final String fileName;
   private final int column;
-  private BacktestBarSeries cachedSeries = null;
+  private List<MarketEvent> cachedSeries = null;
   private final NumFactory numFactory;
 
 
@@ -59,15 +60,14 @@ public class XLSIndicatorTest implements ExternalIndicatorTest {
    *
    * @return BarSeries from the file
    *
-   * @throws Exception if getSeries throws IOException or DataFormatException
+   * @throws Exception if getMarketEvents throws IOException or DataFormatException
    */
   @Override
-  public BacktestBarSeries getSeries() throws Exception {
+  public List<MarketEvent> getMarketEvents() throws Exception {
     if (this.cachedSeries == null) {
-      this.cachedSeries = XlsTestsUtils.getSeries(this.clazz, this.fileName, this.numFactory);
+      this.cachedSeries = XlsTestsUtils.getMarketEvents(this.clazz, this.fileName);
     }
 
-    this.cachedSeries.rewind();
     return this.cachedSeries;
   }
 
@@ -82,16 +82,13 @@ public class XLSIndicatorTest implements ExternalIndicatorTest {
    * @throws Exception if getIndicator throws IOException or DataFormatException
    */
   @Override
-  public TestIndicator<Num> getIndicator(final Object... params) throws Exception {
-    return new TestIndicator<>(
-        getSeries(),
-        XlsTestsUtils.getIndicator(
-            this.clazz,
-            this.fileName,
-            this.column,
-            getSeries().numFactory(),
-            params
-        )
+  public MockIndicator getIndicator(final Object... params) throws Exception {
+    return XlsTestsUtils.getIndicator(
+        this.clazz,
+        this.fileName,
+        this.column,
+        this.numFactory,
+        params
     );
   }
 

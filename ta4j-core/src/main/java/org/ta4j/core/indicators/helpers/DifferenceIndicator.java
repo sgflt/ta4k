@@ -23,8 +23,7 @@
  */
 package org.ta4j.core.indicators.helpers;
 
-import java.time.Instant;
-
+import org.ta4j.core.Bar;
 import org.ta4j.core.indicators.numeric.NumericIndicator;
 import org.ta4j.core.num.Num;
 
@@ -38,8 +37,6 @@ import org.ta4j.core.num.Num;
 public class DifferenceIndicator extends NumericIndicator {
   private final NumericIndicator indicator;
   private Num previousValue;
-  private Instant currentTick = Instant.EPOCH;
-  private Num value;
 
 
   /**
@@ -54,18 +51,9 @@ public class DifferenceIndicator extends NumericIndicator {
 
 
   @Override
-  public Num getValue() {
-    return this.value;
-  }
-
-
-  @Override
-  public void refresh(final Instant tick) {
-    if (tick.isAfter(this.currentTick)) {
-      this.indicator.refresh(tick);
-      this.value = calculate();
-      this.currentTick = tick;
-    }
+  public void updateState(final Bar bar) {
+    this.indicator.onBar(bar);
+    this.value = calculate();
   }
 
 

@@ -50,7 +50,7 @@
 //    @Test
 //    public void calculateOnlyWithGainPositions() {
 //        series = new MockBarSeriesBuilder().withNumFactory(numFactory)
-//                .withData(100d, 105d, 106d, 107d, 108d, 115d)
+//                .withCandleClosePrices(100d, 105d, 106d, 107d, 108d, 115d)
 //                .build();
 //        TradingRecord tradingRecord = new BackTestTradingRecord(Trade.buyAt(0, series), Trade.sellAt(2, series),
 //                Trade.buyAt(3, series), Trade.sellAt(5, series));
@@ -61,7 +61,7 @@
 //    @Test
 //    public void calculateWithASimplePosition() {
 //        series = new MockBarSeriesBuilder().withNumFactory(numFactory)
-//                .withData(100d, 104d, 90d, 100d, 95d, 105d)
+//                .withCandleClosePrices(100d, 104d, 90d, 100d, 95d, 105d)
 //                .build();
 //        TradingRecord tradingRecord = new BackTestTradingRecord(Trade.buyAt(0, series), Trade.sellAt(2, series));
 //        AnalysisCriterion varCriterion = getCriterion();
@@ -70,7 +70,7 @@
 //
 //    @Test
 //    public void calculateOnlyWithLossPositions() {
-//        series = new MockBarSeriesBuilder().withNumFactory(numFactory).withData(100d, 95d, 100d, 80d, 85d, 70d).build();
+//        series = new MockBarSeriesBuilder().withNumFactory(numFactory).withCandleClosePrices(100d, 95d, 100d, 80d, 85d, 70d).build();
 //        TradingRecord tradingRecord = new BackTestTradingRecord(Trade.buyAt(0, series), Trade.sellAt(1, series),
 //                Trade.buyAt(2, series), Trade.sellAt(5, series));
 //        AnalysisCriterion varCriterion = getCriterion();
@@ -79,14 +79,14 @@
 //
 //    @Test
 //    public void calculateWithNoBarsShouldReturn0() {
-//        series = new MockBarSeriesBuilder().withNumFactory(numFactory).withData(100d, 95d, 100d, 80d, 85d, 70d).build();
+//        series = new MockBarSeriesBuilder().withNumFactory(numFactory).withCandleClosePrices(100d, 95d, 100d, 80d, 85d, 70d).build();
 //        AnalysisCriterion varCriterion = getCriterion();
 //        assertNumEquals(numFactory.numOf(0), varCriterion.calculate(series, new BackTestTradingRecord()));
 //    }
 //
 //    @Test
 //    public void calculateWithBuyAndHold() {
-//        series = new MockBarSeriesBuilder().withNumFactory(numFactory).withData(100d, 99d).build();
+//        series = new MockBarSeriesBuilder().withNumFactory(numFactory).withCandleClosePrices(100d, 99d).build();
 //        Position position = new Position(Trade.buyAt(0, series), Trade.sellAt(1, series));
 //        AnalysisCriterion varCriterion = getCriterion();
 //        assertNumEquals(numFactory.numOf(Math.log(99d / 100)), varCriterion.calculate(series, position));

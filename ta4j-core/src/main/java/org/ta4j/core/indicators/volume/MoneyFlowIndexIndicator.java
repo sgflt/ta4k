@@ -83,11 +83,11 @@
 //
 //            Num rawMoneyFlowValue = currentTypicalPriceValue.multipliedBy(currentVolume);
 //
-//            // If the typical price is increasing, we add to the positive flow
+//            // If the typical price is increasing, we onCandle to the positive flow
 //            if (currentTypicalPriceValue.isGreaterThan(previousTypicalPriceValue)) {
 //                sumOfPositiveMoneyFlowVolume = sumOfPositiveMoneyFlowVolume.plus(rawMoneyFlowValue);
 //            }
-//            // If the typical price is decreasing, we add to the negative flow
+//            // If the typical price is decreasing, we onCandle to the negative flow
 //            else if (currentTypicalPriceValue.isLessThan(previousTypicalPriceValue)) {
 //                sumOfNegativeMoneyFlowVolume = sumOfNegativeMoneyFlowVolume.plus(rawMoneyFlowValue);
 //            }

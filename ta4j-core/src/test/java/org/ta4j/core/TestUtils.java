@@ -1,4 +1,4 @@
-/**
+/*
  * The MIT License (MIT)
  *
  * Copyright (c) 2017-2023 Ta4j Organization & respective
@@ -32,9 +32,9 @@ import java.math.BigDecimal;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.ta4j.core.backtest.BacktestBarSeries;
 import org.ta4j.core.indicators.Indicator;
 import org.ta4j.core.indicators.numeric.NumericIndicator;
+import org.ta4j.core.mocks.MockIndicator;
 import org.ta4j.core.num.DecimalNum;
 import org.ta4j.core.num.NaN;
 import org.ta4j.core.num.Num;
@@ -50,34 +50,34 @@ public class TestUtils {
   private static final Logger log = LoggerFactory.getLogger(TestUtils.class);
 
 
-  public static void fastForward(final BacktestBarSeries data, final int bars) {
+  public static void fastForward(final TestContext context, final int bars) {
     for (int i = 0; i < bars - 1; i++) {
-      data.advance();
+      context.advance();
     }
   }
 
 
-  public static void assertNextNaN(final BacktestBarSeries data, final NumericIndicator indicator) {
-    data.advance();
+  public static void assertNextNaN(final TestContext context, final NumericIndicator indicator) {
+    context.advance();
     assertNumEquals(NaN.NaN, indicator.getValue());
   }
 
 
-  public static void assertNext(final BacktestBarSeries data, final double expected, final NumericIndicator indicator) {
-    data.advance();
-    assertNumEquals(expected, indicator.getValue());
+  public static void assertNext(final TestContext context, final double expected) {
+    context.advance();
+    assertNumEquals(expected, context.getNumericIndicator(0).getValue());
   }
 
 
-  public static void assertNextFalse(final BacktestBarSeries series, final Indicator<Boolean> indicator) {
-    series.advance();
-    assertFalse(indicator.getValue());
+  public static void assertNextFalse(final TestContext context) {
+    context.advance();
+    assertFalse(context.getBooleanIndicator(0).getValue());
   }
 
 
-  public static void assertNextTrue(final BacktestBarSeries series, final Indicator<Boolean> indicator) {
-    series.advance();
-    assertTrue(indicator.getValue());
+  public static void assertNextTrue(final TestContext context) {
+    context.advance();
+    assertTrue(context.getBooleanIndicator(0).getValue());
   }
 
 
@@ -186,21 +186,16 @@ public class TestUtils {
    * @param actual indicator of actual values
    */
   public static void assertIndicatorEquals(
-      final TestIndicator<Num> expected,
-      final TestIndicator<Num> actual
+      TestContext context,
+      final MockIndicator expected,
+      final MockIndicator actual
   ) {
-    assertEquals(
-        "Size does not match,",
-        expected.getBarSeries().getBarCount(),
-        actual.getBarSeries().getBarCount()
-    );
-
-    while (expected.getBarSeries().advance()) {
-      advanceIfTwoSeries(expected, actual);
+    while (context.advance()) {
 
       if (actual.isStable()) {
         assertEquals(
-            String.format("Failed at index %s: %s",
+            String.format(
+                "Failed at index %s: %s",
                 expected.getBarSeries().getCurrentIndex(), actual
             ),
             expected.getValue().doubleValue(), actual.getValue().doubleValue(), GENERAL_OFFSET
@@ -326,7 +321,8 @@ public class TestUtils {
         if (actString.length() > minLen) {
           actString = actString.substring(0, minLen) + "..";
         }
-        throw new AssertionError(String.format("Failed at index %s: expected %s but actual was %s",
+        throw new AssertionError(String.format(
+            "Failed at index %s: expected %s but actual was %s",
             expected.getBarSeries().getCurrentIndex(), expString, actString
         ));
       }

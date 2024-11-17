@@ -23,10 +23,8 @@
  */
 package org.ta4j.core.indicators;
 
-import java.time.Instant;
-
+import org.ta4j.core.Bar;
 import org.ta4j.core.BarSeries;
-import org.ta4j.core.indicators.helpers.MedianPriceIndicator;
 import org.ta4j.core.indicators.numeric.NumericIndicator;
 import org.ta4j.core.indicators.numeric.average.SMAIndicator;
 import org.ta4j.core.indicators.numeric.oscilators.AwesomeOscillatorIndicator;
@@ -39,8 +37,6 @@ public class AccelerationDecelerationIndicator extends NumericIndicator {
 
   private final AwesomeOscillatorIndicator awesome;
   private final SMAIndicator sma;
-  private Instant currentTick = Instant.EPOCH;
-  private Num value;
 
 
   /**
@@ -52,8 +48,8 @@ public class AccelerationDecelerationIndicator extends NumericIndicator {
    */
   public AccelerationDecelerationIndicator(final BarSeries series, final int shortBarCount, final int longBarCount) {
     super(series.numFactory());
-    this.awesome = new AwesomeOscillatorIndicator(new MedianPriceIndicator(series), shortBarCount, longBarCount);
-    this.sma = new SMAIndicator(this.awesome, shortBarCount);
+    this.awesome = NumericIndicator.awesomeOscillator(shortBarCount, longBarCount);
+    this.sma = this.awesome.sma(shortBarCount);
   }
 
 
@@ -73,19 +69,10 @@ public class AccelerationDecelerationIndicator extends NumericIndicator {
 
 
   @Override
-  public Num getValue() {
-    return this.value;
-  }
-
-
-  @Override
-  public void refresh(final Instant tick) {
-    if (tick.isAfter(this.currentTick)) {
-      this.awesome.refresh(tick);
-      this.sma.refresh(tick);
-      this.value = calculate();
-      this.currentTick = tick;
-    }
+  public void updateState(final Bar bar) {
+    this.awesome.onBar(bar);
+    this.sma.onBar(bar);
+    this.value = calculate();
   }
 
 

@@ -1,7 +1,7 @@
-/**
+/*
  * The MIT License (MIT)
  *
- * Copyright (c) 2017-2023 Ta4j Organization & respective
+ * Copyright (c) 2017-2024 Ta4j Organization & respective
  * authors (see AUTHORS)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
@@ -23,13 +23,20 @@
  */
 package org.ta4j.core.backtest;
 
+import java.util.Comparator;
 import java.util.List;
 
+import org.ta4j.core.Strategy;
+import org.ta4j.core.StrategyFactory;
 import org.ta4j.core.Trade;
-import org.ta4j.core.analysis.cost.CostModel;
-import org.ta4j.core.analysis.cost.ZeroCostModel;
+import org.ta4j.core.events.CandleReceived;
+import org.ta4j.core.events.MarketEvent;
+import org.ta4j.core.events.NewsReceived;
+import org.ta4j.core.events.TickReceived;
+import org.ta4j.core.indicators.IndicatorContext;
 import org.ta4j.core.num.Num;
 import org.ta4j.core.reports.TradingStatement;
+import org.ta4j.core.reports.TradingStatementGenerator;
 
 /**
  * Allows backtesting multiple strategies and comparing them to find out which
@@ -37,119 +44,143 @@ import org.ta4j.core.reports.TradingStatement;
  */
 public class BacktestExecutor {
 
-    /** The managed bar series */
-    private final BacktestBarSeries barSeries;
+  private final BacktestConfiguration configuration;
 
-    /** The trading cost models */
-    private final CostModel transactionCostModel;
-    private final CostModel holdingCostModel;
 
-    /** The trade execution model to use */
-    private final TradeExecutionModel tradeExecutionModel;
+  BacktestExecutor(final BacktestConfiguration configuration) {
+    this.configuration = configuration;
+  }
 
-    /**
-     * Constructor.
-     *
-     * @param series the bar series
-     */
-    public BacktestExecutor(final BacktestBarSeries series) {
-        this(series, new ZeroCostModel(), new ZeroCostModel(), new TradeOnCurrentCloseModel());
+
+  /**
+   * Executes given strategies with specified trade type to open the position and
+   * return the trading statements.
+   *
+   * @param strategyFactories that creates strategies to test
+   * @param amount the amount used to open/close the position
+   * @param tradeType the {@link Trade.TradeType} used to open the position
+   *
+   * @return a list of TradingStatements
+   */
+  public List<TradingStatement> execute(
+      final List<StrategyFactory> strategyFactories,
+      final List<MarketEvent> marketEvents,
+      final Number amount,
+      final Trade.TradeType tradeType
+  ) {
+    final var indicatorContext = IndicatorContext.empty();
+    final var series = new BacktestBarSeriesBuilder()
+        .withIndicatorContext(indicatorContext)
+        .build();
+
+    final var runtimeContext =
+        new DefaultRuntimeContext(series, strategyFactories, this.configuration.numFactory().numOf(amount));
+
+    replay(
+        marketEvents,
+        runtimeContext
+    );
+
+    return runtimeContext.getTradintStatements();
+  }
+
+
+  private void replay(
+      final List<MarketEvent> marketEvents,
+      final RuntimeContext runtimeContext
+  ) {
+
+    marketEvents.stream()
+        .sorted(Comparator.comparing(MarketEvent::beginTime))
+        .forEach(marketEvent -> {
+              switch (marketEvent) {
+                case final CandleReceived c -> runtimeContext.onCandle(c);
+                case final NewsReceived n -> runtimeContext.onNews(n);
+                case final TickReceived t -> runtimeContext.onTick(t);
+                default -> throw new IllegalStateException("Unexpected value: " + marketEvent);
+              }
+            }
+        );
+  }
+
+
+  private class DefaultRuntimeContext implements RuntimeContext {
+
+    private final BacktestBarSeries series;
+    private final Num amount;
+    private final List<Strategy> strategies;
+
+
+    public DefaultRuntimeContext(
+        final BacktestBarSeries series,
+        final List<StrategyFactory> strategyFactories,
+        final Num amount
+    ) {
+      this.series = series;
+      this.strategies =
+          strategyFactories.stream()
+              .map(s -> {
+                    final Strategy strategy = s.createStrategy(series);
+                    ((BacktestStrategy) strategy).register(new BackTestTradingRecord(
+                            BacktestExecutor.this.configuration.transactionCostModel(),
+                            BacktestExecutor.this.configuration.holdingCostModel()
+                        )
+                    );
+                    return strategy;
+                  }
+              )
+              .toList();
+      this.amount = amount;
     }
 
-    /**
-     * Constructor.
-     *
-     * @param series               the bar series
-     * @param transactionCostModel the cost model for transactions of the asset
-     * @param holdingCostModel     the cost model for holding the asset (e.g.
-     *                             borrowing)
-     */
-    // TODO builder
-    public BacktestExecutor(final BacktestBarSeries series, final CostModel transactionCostModel,
-            final CostModel holdingCostModel, final TradeExecutionModel tradeExecutionModel) {
-        this.barSeries = series;
-        this.transactionCostModel = transactionCostModel;
-        this.holdingCostModel = holdingCostModel;
-        this.tradeExecutionModel = tradeExecutionModel;
+
+    @Override
+    public void onCandle(final CandleReceived event) {
+      this.series.barBuilder()
+          .endTime(event.beginTime())  // FIXME
+          .openPrice(event.openPrice())
+          .highPrice(event.highPrice())
+          .lowPrice(event.lowPrice())
+          .closePrice(event.closePrice())
+          .volume(event.volume())
+          .add()
+      ;
+
+      reevaluate(this.series, this.amount);
     }
 
-    /**
-     * Executes given strategies and returns trading statements with
-     * {@code tradeType} (to open the position) = BUY.
-     *
-     * @return a list of TradingStatements
-     */
-    public List<TradingStatement> execute(final BacktestStrategy strategy) {
-        return execute(strategy, this.barSeries.numFactory().one(), Trade.TradeType.BUY);
+
+    private void reevaluate(final BacktestBarSeries barSeries, final Num amount) {
+      this.strategies.forEach(strategy -> {
+
+        if (((BacktestStrategy) strategy).shouldOperate()) {
+          BacktestExecutor.this.configuration.tradeExecutionModel().execute(
+              barSeries.getCurrentIndex(),
+              ((BacktestStrategy) strategy).getTradeRecord(),
+              barSeries,
+              amount
+          );
+        }
+      });
     }
 
-    /**
-     * Executes given strategies and returns trading statements with
-     * {@code tradeType} (to open the position) = BUY.
-     *
-     * @return a list of TradingStatements
-     */
-    public List<TradingStatement> execute(final List<BacktestStrategy> strategies, final Trade.TradeType tradeType) {
-        return execute(strategies, this.barSeries.numFactory().one(), tradeType);
+
+    @Override
+    public void onTick(final TickReceived event) {
+      // TODO
     }
 
-    /**
-     * Executes given strategies and returns trading statements with
-     * {@code tradeType} (to open the position) = BUY.
-     *
-     * @return a list of TradingStatements
-     */
-    public List<TradingStatement> execute(final BacktestStrategy strategy, final Trade.TradeType tradeType) {
-        return execute(strategy, this.barSeries.numFactory().one(), tradeType);
+
+    @Override
+    public void onNews(final NewsReceived event) {
+      // TODO
     }
 
-    /**
-     * Executes given strategies and returns trading statements with
-     * {@code tradeType} (to open the position) = BUY.
-     *
-     * @param strategies strategies to test
-     * @param amount     the amount used to open/close the position
-     *
-     * @return a list of TradingStatements
-     */
-    public List<TradingStatement> execute(final List<BacktestStrategy> strategies, final Num amount) {
-        return execute(strategies, amount, Trade.TradeType.BUY);
-    }
 
-    /**
-     * Executes given strategies with specified trade type to open the position and
-     * return the trading statements.
-     *
-     * @param strategy  to test
-     * @param amount    the amount used to open/close the position
-     * @param tradeType the {@link Trade.TradeType} used to open the position
-     *
-     * @return a list of TradingStatements
-     */
-    public List<TradingStatement> execute(final BacktestStrategy strategy, final Num amount,
-            final Trade.TradeType tradeType) {
-        return execute(List.of(strategy), amount, tradeType);
+    public List<TradingStatement> getTradintStatements() {
+      return this.strategies.stream()
+          .map(strategy -> new TradingStatementGenerator().generate((BacktestStrategy) strategy))
+          .toList();
     }
-
-    /**
-     * Executes given strategies with specified trade type to open the position and
-     * return the trading statements.
-     *
-     * @param strategies strategies to test
-     * @param amount     the amount used to open/close the position
-     * @param tradeType  the {@link Trade.TradeType} used to open the position
-     *
-     * @return a list of TradingStatements
-     */
-    public List<TradingStatement> execute(final List<BacktestStrategy> strategies, final Num amount,
-            final Trade.TradeType tradeType) {
-        this.barSeries.replaceStrategies(strategies);
-        this.barSeries.rewind();
-        return this.barSeries.replay(this.tradeExecutionModel, tradeType, amount, this.transactionCostModel,
-                this.holdingCostModel);
-    }
-
-    public BacktestBarSeries getBarSeries() {
-        return this.barSeries;
-    }
+  }
 }

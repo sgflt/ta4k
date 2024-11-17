@@ -23,8 +23,10 @@
  */
 package org.ta4j.core;
 
-import org.ta4j.core.backtest.BacktestBarSeries;
-import org.ta4j.core.num.Num;
+import java.util.List;
+
+import org.ta4j.core.events.MarketEvent;
+import org.ta4j.core.mocks.MockIndicator;
 
 public interface ExternalIndicatorTest {
 
@@ -34,7 +36,7 @@ public interface ExternalIndicatorTest {
      * @return BarSeries from the external indicator calculator
      * @throws Exception if the external calculator throws an Exception
      */
-    BacktestBarSeries getSeries() throws Exception;
+    List<MarketEvent> getMarketEvents() throws Exception;
 
     /**
      * Sends indicator parameters to an external indicator calculator and returns
@@ -44,6 +46,6 @@ public interface ExternalIndicatorTest {
      * @return Indicator<Num> from the external indicator calculator
      * @throws Exception if the external calculator throws an Exception
      */
-    TestIndicator<Num> getIndicator(Object... params) throws Exception;
+    MockIndicator getIndicator(Object... params) throws Exception;
 
 }

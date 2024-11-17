@@ -1,4 +1,4 @@
-/**
+/*
  * The MIT License (MIT)
  *
  * Copyright (c) 2017-2023 Ta4j Organization & respective
@@ -24,7 +24,6 @@
 package org.ta4j.core.reports;
 
 import org.ta4j.core.TradingRecord;
-import org.ta4j.core.backtest.BacktestBarSeries;
 import org.ta4j.core.criteria.NumberOfBreakEvenPositionsCriterion;
 import org.ta4j.core.criteria.NumberOfLosingPositionsCriterion;
 import org.ta4j.core.criteria.NumberOfWinningPositionsCriterion;
@@ -36,11 +35,11 @@ import org.ta4j.core.num.Num;
  */
 public class PositionStatsReportGenerator implements ReportGenerator<PositionStatsReport> {
 
-    @Override
-    public PositionStatsReport generate(TradingRecord tradingRecord, BacktestBarSeries series) {
-        final Num winningPositions = new NumberOfWinningPositionsCriterion().calculate(series, tradingRecord);
-        final Num losingPositions = new NumberOfLosingPositionsCriterion().calculate(series, tradingRecord);
-        final Num breakEvenPositions = new NumberOfBreakEvenPositionsCriterion().calculate(series, tradingRecord);
-        return new PositionStatsReport(winningPositions, losingPositions, breakEvenPositions);
-    }
+  @Override
+  public PositionStatsReport generate(final TradingRecord tradingRecord) {
+    final Num winningPositions = new NumberOfWinningPositionsCriterion().calculate(tradingRecord);
+    final Num losingPositions = new NumberOfLosingPositionsCriterion().calculate(tradingRecord);
+    final Num breakEvenPositions = new NumberOfBreakEvenPositionsCriterion().calculate(tradingRecord);
+    return new PositionStatsReport(winningPositions, losingPositions, breakEvenPositions);
+  }
 }

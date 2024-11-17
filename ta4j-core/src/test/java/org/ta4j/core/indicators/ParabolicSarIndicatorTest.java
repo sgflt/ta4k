@@ -64,35 +64,35 @@
 //                .closePrice(75.9)
 //                .highPrice(76.030000)
 //                .lowPrice(74.640000)
-//                .add();
+//                .onCandle();
 //        mockBarSeries.barBuilder()
 //                .endTime(now.plusSeconds(2))
 //                .openPrice(79.99)
 //                .closePrice(75.24)
 //                .highPrice(76.269900)
 //                .lowPrice(75.060000)
-//                .add();
+//                .onCandle();
 //        mockBarSeries.barBuilder()
 //                .endTime(now.plusSeconds(3))
 //                .openPrice(75.30)
 //                .closePrice(75.17)
 //                .highPrice(75.280000)
 //                .lowPrice(74.500000)
-//                .add();
+//                .onCandle();
 //        mockBarSeries.barBuilder()
 //                .endTime(now.plusSeconds(4))
 //                .openPrice(75.16)
 //                .closePrice(74.6)
 //                .highPrice(75.310000)
 //                .lowPrice(74.540000)
-//                .add();
+//                .onCandle();
 //        mockBarSeries.barBuilder()
 //                .endTime(now.plusSeconds(5))
 //                .openPrice(74.58)
 //                .closePrice(74.1)
 //                .highPrice(75.467000)
 //                .lowPrice(74.010000)
-//                .add();
+//                .onCandle();
 //
 //        var sar = new ParabolicSarIndicator(mockBarSeries);
 //
@@ -116,21 +116,21 @@
 //                .closePrice(175.1)
 //                .highPrice(180.10)
 //                .lowPrice(170.1)
-//                .add();
+//                .onCandle();
 //        mockBarSeries.barBuilder()
 //                .endTime(now.plusSeconds(2))
 //                .openPrice(175.1)
 //                .closePrice(185.1)
 //                .highPrice(190.20)
 //                .lowPrice(180.2)
-//                .add();
+//                .onCandle();
 //        mockBarSeries.barBuilder()
 //                .endTime(now.plusSeconds(3))
 //                .openPrice(185.1)
 //                .closePrice(195.1)
 //                .highPrice(200.30)
 //                .lowPrice(190.3)
-//                .add();
+//                .onCandle();
 //
 //        mockBarSeries.setMaximumBarCount(21);
 //
@@ -140,147 +140,147 @@
 //                .closePrice(75.1)
 //                .highPrice(75.11)
 //                .lowPrice(74.06)
-//                .add();
+//                .onCandle();
 //        mockBarSeries.barBuilder()
 //                .endTime(now.plusSeconds(5))
 //                .openPrice(75.09)
 //                .closePrice(75.9)
 //                .highPrice(76.030000)
 //                .lowPrice(74.640000)
-//                .add();
+//                .onCandle();
 //        mockBarSeries.barBuilder()
 //                .endTime(now.plusSeconds(6))
 //                .openPrice(79.99)
 //                .closePrice(75.24)
 //                .highPrice(76.269900)
 //                .lowPrice(75.060000)
-//                .add();
+//                .onCandle();
 //        mockBarSeries.barBuilder()
 //                .endTime(now.plusSeconds(7))
 //                .openPrice(75.30)
 //                .closePrice(75.17)
 //                .highPrice(75.280000)
 //                .lowPrice(74.500000)
-//                .add();
+//                .onCandle();
 //        mockBarSeries.barBuilder()
 //                .endTime(now.plusSeconds(8))
 //                .openPrice(75.16)
 //                .closePrice(74.6)
 //                .highPrice(75.310000)
 //                .lowPrice(74.540000)
-//                .add();
+//                .onCandle();
 //        mockBarSeries.barBuilder()
 //                .endTime(now.plusSeconds(9))
 //                .openPrice(74.58)
 //                .closePrice(74.1)
 //                .highPrice(75.467000)
 //                .lowPrice(74.010000)
-//                .add();
+//                .onCandle();
 //        mockBarSeries.barBuilder()
 //                .endTime(now.plusSeconds(10))
 //                .openPrice(74.01)
 //                .closePrice(73.740000)
 //                .highPrice(74.700000)
 //                .lowPrice(73.546000)
-//                .add();
+//                .onCandle();
 //        mockBarSeries.barBuilder()
 //                .endTime(now.plusSeconds(11))
 //                .openPrice(73.71)
 //                .closePrice(73.390000)
 //                .highPrice(73.830000)
 //                .lowPrice(72.720000)
-//                .add();
+//                .onCandle();
 //        mockBarSeries.barBuilder()
 //                .endTime(now.plusSeconds(12))
 //                .openPrice(73.35)
 //                .closePrice(73.25)
 //                .highPrice(73.890000)
 //                .lowPrice(72.86)
-//                .add();
+//                .onCandle();
 //        mockBarSeries.barBuilder()
 //                .endTime(now.plusSeconds(13))
 //                .openPrice(73.24)
 //                .closePrice(74.36)
 //                .highPrice(74.410000)
 //                .lowPrice(73)
-//                .add();
+//                .onCandle();
 //        mockBarSeries.barBuilder()
 //                .endTime(now.plusSeconds(14))
 //                .openPrice(74.36)
 //                .closePrice(76.510000)
 //                .highPrice(76.830000)
 //                .lowPrice(74.820000)
-//                .add();
+//                .onCandle();
 //        mockBarSeries.barBuilder()
 //                .endTime(now.plusSeconds(15))
 //                .openPrice(76.5)
 //                .closePrice(75.590000)
 //                .highPrice(76.850000)
 //                .lowPrice(74.540000)
-//                .add();
+//                .onCandle();
 //        mockBarSeries.barBuilder()
 //                .endTime(now.plusSeconds(16))
 //                .openPrice(75.60)
 //                .closePrice(75.910000)
 //                .highPrice(76.960000)
 //                .lowPrice(75.510000)
-//                .add();
+//                .onCandle();
 //        mockBarSeries.barBuilder()
 //                .endTime(now.plusSeconds(17))
 //                .openPrice(75.82)
 //                .closePrice(74.610000)
 //                .highPrice(77.070000)
 //                .lowPrice(74.560000)
-//                .add();
+//                .onCandle();
 //        mockBarSeries.barBuilder()
 //                .endTime(now.plusSeconds(18))
 //                .openPrice(74.75)
 //                .closePrice(75.330000)
 //                .highPrice(75.530000)
 //                .lowPrice(74.010000)
-//                .add();
+//                .onCandle();
 //        mockBarSeries.barBuilder()
 //                .endTime(now.plusSeconds(19))
 //                .openPrice(75.33)
 //                .closePrice(75.010000)
 //                .highPrice(75.500000)
 //                .lowPrice(74.510000)
-//                .add();
+//                .onCandle();
 //        mockBarSeries.barBuilder()
 //                .endTime(now.plusSeconds(20))
 //                .openPrice(75.0)
 //                .closePrice(75.620000)
 //                .highPrice(76.210000)
 //                .lowPrice(75.250000)
-//                .add();
+//                .onCandle();
 //        mockBarSeries.barBuilder()
 //                .endTime(now.plusSeconds(21))
 //                .openPrice(75.63)
 //                .closePrice(76.040000)
 //                .highPrice(76.460000)
 //                .lowPrice(75.092800)
-//                .add();
+//                .onCandle();
 //        mockBarSeries.barBuilder()
 //                .endTime(now.plusSeconds(22))
 //                .openPrice(76.0)
 //                .closePrice(76.450000)
 //                .highPrice(76.450000)
 //                .lowPrice(75.435000)
-//                .add();
+//                .onCandle();
 //        mockBarSeries.barBuilder()
 //                .endTime(now.plusSeconds(23))
 //                .openPrice(76.45)
 //                .closePrice(76.260000)
 //                .highPrice(76.470000)
 //                .lowPrice(75.840000)
-//                .add();
+//                .onCandle();
 //        mockBarSeries.barBuilder()
 //                .endTime(now.plusSeconds(24))
 //                .openPrice(76.30)
 //                .closePrice(76.850000)
 //                .highPrice(77.000000)
 //                .lowPrice(76.190000)
-//                .add();
+//                .onCandle();
 //
 //        var sar = new ParabolicSarIndicator(mockBarSeries);
 //
@@ -310,7 +310,7 @@
 //    @Test
 //    public void startWithDownAndUpTrendTest() {
 //        final var series = new MockBarSeriesBuilder().withNumFactory(numFactory).build();
-//        series.barBuilder().openPrice(4261.48).closePrice(4285.08).highPrice(4485.39).lowPrice(4200.74).add(); // The
+//        series.barBuilder().openPrice(4261.48).closePrice(4285.08).highPrice(4485.39).lowPrice(4200.74).onCandle(); // The
 //                                                                                                               // first
 //                                                                                                               // daily
 //                                                                                                               // candle
@@ -319,22 +319,22 @@
 //                                                                                                               // in
 //        // the Binance cryptocurrency exchange.
 //        // 17 Aug 2017
-//        series.barBuilder().openPrice(4285.08).closePrice(4108.37).highPrice(4371.52).lowPrice(3938.77).add(); // starting
+//        series.barBuilder().openPrice(4285.08).closePrice(4108.37).highPrice(4371.52).lowPrice(3938.77).onCandle(); // starting
 //                                                                                                               // with
 //                                                                                                               // down
 //                                                                                                               // trend
-//        series.barBuilder().openPrice(4108.37).closePrice(4139.98).highPrice(4184.69).lowPrice(3850.00).add(); // hold
+//        series.barBuilder().openPrice(4108.37).closePrice(4139.98).highPrice(4184.69).lowPrice(3850.00).onCandle(); // hold
 //                                                                                                               // trend...
-//        series.barBuilder().openPrice(4120.98).closePrice(4086.29).highPrice(4211.08).lowPrice(4032.62).add();
-//        series.barBuilder().openPrice(4069.13).closePrice(4016.00).highPrice(4119.62).lowPrice(3911.79).add();
-//        series.barBuilder().openPrice(4016.00).closePrice(4040.00).highPrice(4104.82).lowPrice(3400.00).add();
-//        series.barBuilder().openPrice(4040.00).closePrice(4114.01).highPrice(4265.80).lowPrice(4013.89).add();
-//        series.barBuilder().openPrice(4147.00).closePrice(4316.01).highPrice(4371.68).lowPrice(4085.01).add(); // switch
+//        series.barBuilder().openPrice(4120.98).closePrice(4086.29).highPrice(4211.08).lowPrice(4032.62).onCandle();
+//        series.barBuilder().openPrice(4069.13).closePrice(4016.00).highPrice(4119.62).lowPrice(3911.79).onCandle();
+//        series.barBuilder().openPrice(4016.00).closePrice(4040.00).highPrice(4104.82).lowPrice(3400.00).onCandle();
+//        series.barBuilder().openPrice(4040.00).closePrice(4114.01).highPrice(4265.80).lowPrice(4013.89).onCandle();
+//        series.barBuilder().openPrice(4147.00).closePrice(4316.01).highPrice(4371.68).lowPrice(4085.01).onCandle(); // switch
 //                                                                                                               // to up
 //                                                                                                               // trend
-//        series.barBuilder().openPrice(4316.01).closePrice(4280.68).highPrice(4453.91).lowPrice(4247.48).add(); // hold
+//        series.barBuilder().openPrice(4316.01).closePrice(4280.68).highPrice(4453.91).lowPrice(4247.48).onCandle(); // hold
 //                                                                                                               // trend
-//        series.barBuilder().openPrice(4280.71).closePrice(4337.44).highPrice(4367.00).lowPrice(4212.41).add();
+//        series.barBuilder().openPrice(4280.71).closePrice(4337.44).highPrice(4367.00).lowPrice(4212.41).onCandle();
 //
 //        var sar = new ParabolicSarIndicator(series);
 //
@@ -353,16 +353,16 @@
 //    @Test
 //    public void testSameValueForSameIndex() {
 //        final var series = new MockBarSeriesBuilder().withNumFactory(numFactory).build();
-//        series.barBuilder().openPrice(4261.48).closePrice(4285.08).highPrice(4485.39).lowPrice(4200.74).add();
-//        series.barBuilder().openPrice(4285.08).closePrice(4108.37).highPrice(4371.52).lowPrice(3938.77).add();
-//        series.barBuilder().openPrice(4108.37).closePrice(4139.98).highPrice(4184.69).lowPrice(3850.00).add();
-//        series.barBuilder().openPrice(4120.98).closePrice(4086.29).highPrice(4211.08).lowPrice(4032.62).add();
-//        series.barBuilder().openPrice(4069.13).closePrice(4016.00).highPrice(4119.62).lowPrice(3911.79).add();
-//        series.barBuilder().openPrice(4016.00).closePrice(4040.00).highPrice(4104.82).lowPrice(3400.00).add();
-//        series.barBuilder().openPrice(4040.00).closePrice(4114.01).highPrice(4265.80).lowPrice(4013.89).add();
-//        series.barBuilder().openPrice(4147.00).closePrice(4316.01).highPrice(4371.68).lowPrice(4085.01).add();
-//        series.barBuilder().openPrice(4316.01).closePrice(4280.68).highPrice(4453.91).lowPrice(4247.48).add();
-//        series.barBuilder().openPrice(4280.71).closePrice(4337.44).highPrice(4367.00).lowPrice(4212.41).add();
+//        series.barBuilder().openPrice(4261.48).closePrice(4285.08).highPrice(4485.39).lowPrice(4200.74).onCandle();
+//        series.barBuilder().openPrice(4285.08).closePrice(4108.37).highPrice(4371.52).lowPrice(3938.77).onCandle();
+//        series.barBuilder().openPrice(4108.37).closePrice(4139.98).highPrice(4184.69).lowPrice(3850.00).onCandle();
+//        series.barBuilder().openPrice(4120.98).closePrice(4086.29).highPrice(4211.08).lowPrice(4032.62).onCandle();
+//        series.barBuilder().openPrice(4069.13).closePrice(4016.00).highPrice(4119.62).lowPrice(3911.79).onCandle();
+//        series.barBuilder().openPrice(4016.00).closePrice(4040.00).highPrice(4104.82).lowPrice(3400.00).onCandle();
+//        series.barBuilder().openPrice(4040.00).closePrice(4114.01).highPrice(4265.80).lowPrice(4013.89).onCandle();
+//        series.barBuilder().openPrice(4147.00).closePrice(4316.01).highPrice(4371.68).lowPrice(4085.01).onCandle();
+//        series.barBuilder().openPrice(4316.01).closePrice(4280.68).highPrice(4453.91).lowPrice(4247.48).onCandle();
+//        series.barBuilder().openPrice(4280.71).closePrice(4337.44).highPrice(4367.00).lowPrice(4212.41).onCandle();
 //
 //        final ParabolicSarIndicator parabolicSarIndicator = new ParabolicSarIndicator(series);
 //

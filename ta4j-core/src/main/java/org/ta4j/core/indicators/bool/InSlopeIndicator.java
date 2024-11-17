@@ -24,8 +24,7 @@ package org.ta4j.core.indicators.bool;
 
 import static org.ta4j.core.num.NaN.NaN;
 
-import java.time.Instant;
-
+import org.ta4j.core.Bar;
 import org.ta4j.core.indicators.Indicator;
 import org.ta4j.core.indicators.helpers.CombineIndicator;
 import org.ta4j.core.indicators.helpers.previous.PreviousNumericValueIndicator;
@@ -48,8 +47,6 @@ public class InSlopeIndicator extends BooleanIndicator {
   /** The maximum slope between ref and prev. */
   private final Num maxSlope;
   private final CombineIndicator diff;
-  private Boolean value;
-  private Instant currentTick = Instant.EPOCH;
 
 
   /**
@@ -118,18 +115,9 @@ public class InSlopeIndicator extends BooleanIndicator {
 
 
   @Override
-  public Boolean getValue() {
-    return this.value;
-  }
-
-
-  @Override
-  public void refresh(final Instant tick) {
-    if (tick.isAfter(this.currentTick)) {
-      this.diff.refresh(tick);
+  public void updateState(final Bar bar) {
+      this.diff.onBar(bar);
       this.value = calculate();
-      this.currentTick = tick;
-    }
   }
 
 

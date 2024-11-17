@@ -112,7 +112,7 @@ public class CsvTradesLoader {
         final Instant tradeTimeStamp = Instant.ofEpochMilli(Long.parseLong(tradeLine[0]) * 1000);
         // if the trade happened during the bar
         if (bar.inPeriod(tradeTimeStamp)) {
-          // add the trade to the bar
+          // onCandle the trade to the bar
           final Num tradePrice = series.numFactory().numOf(Double.parseDouble(tradeLine[1]));
           final Num tradeVolume = series.numFactory().numOf(Double.parseDouble(tradeLine[2]));
           bar.addTrade(tradeVolume, tradePrice);
@@ -123,7 +123,7 @@ public class CsvTradesLoader {
           break;
         }
       } while (iterator.hasNext());
-      // if the bar has any trades add it to the bars list
+      // if the bar has any trades onCandle it to the bars list
       // this is where the break drops to
       if (bar.getTrades() > 0) {
         series.addBar(bar);

@@ -23,37 +23,35 @@
  */
 package org.ta4j.core.indicators.candles.price;
 
-import static junit.framework.TestCase.assertEquals;
-
-import org.junit.Before;
-import org.junit.Test;
-import org.ta4j.core.backtest.BacktestBarSeries;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.ta4j.core.TestContext;
 import org.ta4j.core.indicators.AbstractIndicatorTest;
-import org.ta4j.core.mocks.MockBarSeriesBuilder;
+import org.ta4j.core.indicators.numeric.NumericIndicator;
 import org.ta4j.core.num.Num;
 import org.ta4j.core.num.NumFactory;
 
-public class HighPriceIndicatorTest extends AbstractIndicatorTest<Num> {
-    private HighPriceIndicator highPriceIndicator;
+class HighPriceIndicatorTest extends AbstractIndicatorTest<Num> {
+  private TestContext context;
 
-    private BacktestBarSeries barSeries;
 
-    public HighPriceIndicatorTest(final NumFactory numFactory) {
-        super(numFactory);
+  HighPriceIndicatorTest(final NumFactory numFactory) {
+    super(numFactory);
+  }
+
+
+  @BeforeEach
+  void setUp() {
+    this.context = new TestContext().withDefaultMarketEvents();
+
+    this.context.withIndicator(NumericIndicator.highPrice());
+  }
+
+
+  @Test
+  void indicatorShouldRetrieveBarHighPrice() {
+    for (int i = 0; i < 10; i++) {
+      this.context.assertNext(i + 2);
     }
-
-    @Before
-    public void setUp() {
-        this.barSeries = new MockBarSeriesBuilder().withNumFactory(this.numFactory).withDefaultData().build();
-        this.highPriceIndicator = new HighPriceIndicator(this.barSeries);
-
-    }
-
-    @Test
-    public void indicatorShouldRetrieveBarHighPrice() {
-        for (int i = 0; i < 10; i++) {
-            this.barSeries.advance();
-            assertEquals(this.highPriceIndicator.getValue(), this.barSeries.getBar().highPrice());
-        }
-    }
+  }
 }

@@ -22,8 +22,7 @@
  */
 package org.ta4j.core.indicators.numeric.statistics;
 
-import java.time.Instant;
-
+import org.ta4j.core.Bar;
 import org.ta4j.core.indicators.numeric.NumericIndicator;
 import org.ta4j.core.indicators.numeric.average.SMAIndicator;
 import org.ta4j.core.num.Num;
@@ -37,8 +36,6 @@ public class SigmaIndicator extends NumericIndicator {
 
   private final SMAIndicator mean;
   private final StandardDeviationIndicator sd;
-  private Instant currentTick = Instant.EPOCH;
-  private Num value;
 
 
   /**
@@ -66,20 +63,11 @@ public class SigmaIndicator extends NumericIndicator {
 
 
   @Override
-  public Num getValue() {
-    return this.value;
-  }
-
-
-  @Override
-  public void refresh(final Instant tick) {
-    if (tick.isAfter(this.currentTick)) {
-      this.ref.refresh(tick);
-      this.mean.refresh(tick);
-      this.sd.refresh(tick);
-      this.value = calculate();
-      this.currentTick = tick;
-    }
+  public void updateState(final Bar bar) {
+    this.ref.onBar(bar);
+    this.mean.onBar(bar);
+    this.sd.onBar(bar);
+    this.value = calculate();
   }
 
 

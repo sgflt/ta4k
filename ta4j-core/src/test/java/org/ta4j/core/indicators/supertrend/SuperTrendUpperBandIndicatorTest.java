@@ -42,21 +42,21 @@
 //    public void setUp() {
 //        data = new MockBarSeriesBuilder().withNumFactory(numFactory).build();
 //
-//        data.barBuilder().openPrice(23.17).closePrice(21.48).highPrice(23.39).lowPrice(21.35).add();
-//        data.barBuilder().openPrice(21.25).closePrice(19.94).highPrice(21.29).lowPrice(20.07).add();
-//        data.barBuilder().openPrice(20.08).closePrice(21.97).highPrice(24.30).lowPrice(20.01).add();
-//        data.barBuilder().openPrice(22.17).closePrice(20.87).highPrice(22.64).lowPrice(20.78).add();
-//        data.barBuilder().openPrice(21.67).closePrice(21.65).highPrice(22.80).lowPrice(21.59).add();
-//        data.barBuilder().openPrice(21.47).closePrice(22.14).highPrice(22.26).lowPrice(20.96).add();
-//        data.barBuilder().openPrice(22.25).closePrice(21.44).highPrice(22.31).lowPrice(21.36).add();
-//        data.barBuilder().openPrice(21.83).closePrice(21.67).highPrice(22.40).lowPrice(21.59).add();
-//        data.barBuilder().openPrice(23.09).closePrice(22.90).highPrice(23.76).lowPrice(22.73).add();
-//        data.barBuilder().openPrice(22.93).closePrice(22.01).highPrice(23.27).lowPrice(21.94).add();
-//        data.barBuilder().openPrice(19.89).closePrice(19.20).highPrice(20.47).lowPrice(18.91).add();
-//        data.barBuilder().openPrice(21.56).closePrice(18.83).highPrice(21.80).lowPrice(18.83).add();
-//        data.barBuilder().openPrice(19.00).closePrice(18.35).highPrice(19.41).lowPrice(18.01).add();
-//        data.barBuilder().openPrice(19.89).closePrice(6.36).highPrice(20.22).lowPrice(6.21).add();
-//        data.barBuilder().openPrice(19.28).closePrice(10.34).highPrice(20.58).lowPrice(10.11).add();
+//        data.barBuilder().openPrice(23.17).closePrice(21.48).highPrice(23.39).lowPrice(21.35).onCandle();
+//        data.barBuilder().openPrice(21.25).closePrice(19.94).highPrice(21.29).lowPrice(20.07).onCandle();
+//        data.barBuilder().openPrice(20.08).closePrice(21.97).highPrice(24.30).lowPrice(20.01).onCandle();
+//        data.barBuilder().openPrice(22.17).closePrice(20.87).highPrice(22.64).lowPrice(20.78).onCandle();
+//        data.barBuilder().openPrice(21.67).closePrice(21.65).highPrice(22.80).lowPrice(21.59).onCandle();
+//        data.barBuilder().openPrice(21.47).closePrice(22.14).highPrice(22.26).lowPrice(20.96).onCandle();
+//        data.barBuilder().openPrice(22.25).closePrice(21.44).highPrice(22.31).lowPrice(21.36).onCandle();
+//        data.barBuilder().openPrice(21.83).closePrice(21.67).highPrice(22.40).lowPrice(21.59).onCandle();
+//        data.barBuilder().openPrice(23.09).closePrice(22.90).highPrice(23.76).lowPrice(22.73).onCandle();
+//        data.barBuilder().openPrice(22.93).closePrice(22.01).highPrice(23.27).lowPrice(21.94).onCandle();
+//        data.barBuilder().openPrice(19.89).closePrice(19.20).highPrice(20.47).lowPrice(18.91).onCandle();
+//        data.barBuilder().openPrice(21.56).closePrice(18.83).highPrice(21.80).lowPrice(18.83).onCandle();
+//        data.barBuilder().openPrice(19.00).closePrice(18.35).highPrice(19.41).lowPrice(18.01).onCandle();
+//        data.barBuilder().openPrice(19.89).closePrice(6.36).highPrice(20.22).lowPrice(6.21).onCandle();
+//        data.barBuilder().openPrice(19.28).closePrice(10.34).highPrice(20.58).lowPrice(10.11).onCandle();
 //
 //    }
 //

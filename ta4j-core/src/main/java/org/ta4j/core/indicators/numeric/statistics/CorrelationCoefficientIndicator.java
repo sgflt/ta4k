@@ -23,8 +23,7 @@
  */
 package org.ta4j.core.indicators.numeric.statistics;
 
-import java.time.Instant;
-
+import org.ta4j.core.Bar;
 import org.ta4j.core.indicators.numeric.NumericIndicator;
 import org.ta4j.core.num.Num;
 
@@ -40,8 +39,6 @@ public class CorrelationCoefficientIndicator extends NumericIndicator {
   private final VarianceIndicator variance1;
   private final VarianceIndicator variance2;
   private final CovarianceIndicator covariance;
-  private Instant currentTick = Instant.EPOCH;
-  private Num value;
 
 
   /**
@@ -57,9 +54,9 @@ public class CorrelationCoefficientIndicator extends NumericIndicator {
       final int barCount
   ) {
     super(indicator1.getNumFactory());
-    this.variance1 = new VarianceIndicator(indicator1, barCount);
-    this.variance2 = new VarianceIndicator(indicator2, barCount);
-    this.covariance = new CovarianceIndicator(indicator1, indicator2, barCount);
+    this.variance1 = indicator1.variance(barCount);
+    this.variance2 = indicator2.variance(barCount);
+    this.covariance = indicator1.covariance(indicator2, barCount);
   }
 
 
@@ -73,20 +70,11 @@ public class CorrelationCoefficientIndicator extends NumericIndicator {
 
 
   @Override
-  public Num getValue() {
-    return this.value;
-  }
-
-
-  @Override
-  public void refresh(final Instant tick) {
-    if (tick.isAfter(this.currentTick)) {
-      this.variance1.refresh(tick);
-      this.variance2.refresh(tick);
-      this.covariance.refresh(tick);
-      this.value = calculate();
-      this.currentTick = tick;
-    }
+  public void updateState(final Bar bar) {
+    this.variance1.onBar(bar);
+    this.variance2.onBar(bar);
+    this.covariance.onBar(bar);
+    this.value = calculate();
   }
 
 

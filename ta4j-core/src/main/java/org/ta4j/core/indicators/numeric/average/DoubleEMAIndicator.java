@@ -23,8 +23,7 @@
  */
 package org.ta4j.core.indicators.numeric.average;
 
-import java.time.Instant;
-
+import org.ta4j.core.Bar;
 import org.ta4j.core.indicators.numeric.NumericIndicator;
 import org.ta4j.core.num.Num;
 
@@ -39,8 +38,6 @@ public class DoubleEMAIndicator extends NumericIndicator {
 
   private final EMAIndicator ema;
   private final EMAIndicator emaEma;
-  private Instant currentTick = Instant.EPOCH;
-  private Num value;
 
 
   /**
@@ -51,25 +48,16 @@ public class DoubleEMAIndicator extends NumericIndicator {
    */
   public DoubleEMAIndicator(final NumericIndicator indicator, final int barCount) {
     super(indicator.getNumFactory());
-    this.ema = new EMAIndicator(indicator, barCount);
-    this.emaEma = new EMAIndicator(this.ema, barCount);
+    this.ema = indicator.ema(barCount);
+    this.emaEma = this.ema.ema(barCount);
   }
 
 
   @Override
-  public Num getValue() {
-    return this.value;
-  }
-
-
-  @Override
-  public void refresh(final Instant tick) {
-    if (tick.isAfter(this.currentTick)) {
-      this.ema.refresh(tick);
-      this.emaEma.refresh(tick);
-      this.value = calculate();
-      this.currentTick = tick;
-    }
+  public void updateState(final Bar bar) {
+    this.ema.onBar(bar);
+    this.emaEma.onBar(bar);
+    this.value = calculate();
   }
 
 

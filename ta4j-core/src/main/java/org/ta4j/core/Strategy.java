@@ -23,8 +23,6 @@
  */
 package org.ta4j.core;
 
-import java.time.Instant;
-
 /**
  * A {@code Strategy} (also called "trading strategy") is a pair of
  * complementary (entry and exit) {@link Rule rules}. It may recommend to enter
@@ -47,19 +45,6 @@ public interface Strategy {
    * @return the exit rule
    */
   Rule getExitRule();
-
-  /**
-   * Refreshes state of internal {@link org.ta4j.core.indicators.IndicatorContext} based on last bar.
-   *
-   * Called when new bar is added to BarSeries
-   *
-   * Backtesting may rewind time to past
-   *
-   * @param tick current time
-   *
-   * @see org.ta4j.core.indicators.IndicatorContext
-   */
-  void refresh(Instant tick);
 
   /**
    * @return true if this strategy is stable at current moment, false otherwise

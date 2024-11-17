@@ -1,4 +1,4 @@
-/**
+/*
  * The MIT License (MIT)
  *
  * Copyright (c) 2017-2024 Ta4j Organization & respective
@@ -23,11 +23,9 @@
  */
 package org.ta4j.core.indicators.candles.price;
 
-import java.time.Instant;
-
-import org.ta4j.core.BarSeries;
+import org.ta4j.core.Bar;
 import org.ta4j.core.indicators.SeriesRelatedNumericIndicator;
-import org.ta4j.core.num.Num;
+import org.ta4j.core.num.NumFactory;
 
 /**
  * Low price indicator.
@@ -37,33 +35,24 @@ import org.ta4j.core.num.Num;
  */
 public class LowPriceIndicator extends SeriesRelatedNumericIndicator {
 
-    /**
-     * Constructor.
-     *
-     * @param series the bar series
-     */
-    public LowPriceIndicator(final BarSeries series) {
-        super(series);
-    }
-
-    @Override
-    public Num getValue() {
-        return getBarSeries().getBar().lowPrice();
-    }
-
-    @Override
-    public boolean isStable() {
-        return true;
-    }
-
-    @Override
-    public void refresh(final Instant tick) {
-        // NOOP
-    }
+  /**
+   * Constructor.
+   *
+   * @param series the bar series
+   */
+  public LowPriceIndicator(final NumFactory series) {
+    super(series);
+  }
 
 
-    @Override
-    public String toString() {
-        return String.format("Low() => %s", getValue());
-    }
+  @Override
+  public void updateState(final Bar bar) {
+    this.value = bar.lowPrice();
+  }
+
+
+  @Override
+  public String toString() {
+    return String.format("Low() => %s", getValue());
+  }
 }

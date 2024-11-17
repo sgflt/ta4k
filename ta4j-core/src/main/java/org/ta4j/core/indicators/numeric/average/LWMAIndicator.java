@@ -23,9 +23,9 @@
  */
 package org.ta4j.core.indicators.numeric.average;
 
-import java.time.Instant;
 import java.util.ArrayList;
 
+import org.ta4j.core.Bar;
 import org.ta4j.core.indicators.Indicator;
 import org.ta4j.core.indicators.numeric.NumericIndicator;
 import org.ta4j.core.num.Num;
@@ -45,8 +45,6 @@ public class LWMAIndicator extends NumericIndicator {
   private final CircularNumArray values;
   private final ArrayList<Num> weights;
   private final Num denominator;
-  private Instant currentTick = Instant.EPOCH;
-  private Num value;
 
 
   /**
@@ -90,18 +88,9 @@ public class LWMAIndicator extends NumericIndicator {
 
 
   @Override
-  public Num getValue() {
-    return this.value;
-  }
-
-
-  @Override
-  public void refresh(final Instant tick) {
-    if (tick.isAfter(this.currentTick)) {
-      this.indicator.refresh(tick);
-      this.value = calculate();
-      this.currentTick = tick;
-    }
+  public void updateState(final Bar bar) {
+    this.indicator.onBar(bar);
+    this.value = calculate();
   }
 
 

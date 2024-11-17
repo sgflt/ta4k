@@ -1,4 +1,4 @@
-/**
+/*
  * The MIT License (MIT)
  *
  * Copyright (c) 2017-2023 Ta4j Organization & respective
@@ -23,7 +23,6 @@
  */
 package org.ta4j.core.reports;
 
-import org.ta4j.core.backtest.BacktestBarSeries;
 import org.ta4j.core.backtest.BacktestStrategy;
 
 /**
@@ -32,34 +31,38 @@ import org.ta4j.core.backtest.BacktestStrategy;
  */
 public class TradingStatementGenerator {
 
-    private final PerformanceReportGenerator performanceReportGenerator;
-    private final PositionStatsReportGenerator positionStatsReportGenerator;
+  private final PerformanceReportGenerator performanceReportGenerator;
+  private final PositionStatsReportGenerator positionStatsReportGenerator;
 
-    /**
-     * Constructor with new {@link PerformanceReportGenerator} and new
-     * {@link PositionStatsReportGenerator}.
-     */
-    public TradingStatementGenerator() {
-        this(new PerformanceReportGenerator(), new PositionStatsReportGenerator());
-    }
 
-    /**
-     * Constructor.
-     *
-     * @param performanceReportGenerator   the {@link PerformanceReportGenerator}
-     * @param positionStatsReportGenerator the {@link PositionStatsReportGenerator}
-     */
-    public TradingStatementGenerator(PerformanceReportGenerator performanceReportGenerator,
-            PositionStatsReportGenerator positionStatsReportGenerator) {
-        this.performanceReportGenerator = performanceReportGenerator;
-        this.positionStatsReportGenerator = positionStatsReportGenerator;
-    }
+  /**
+   * Constructor with new {@link PerformanceReportGenerator} and new
+   * {@link PositionStatsReportGenerator}.
+   */
+  public TradingStatementGenerator() {
+    this(new PerformanceReportGenerator(), new PositionStatsReportGenerator());
+  }
 
-    public TradingStatement generate(BacktestStrategy strategy, BacktestBarSeries series) {
-        final PerformanceReport performanceReport = performanceReportGenerator.generate(strategy.getTradeRecord(),
-                series);
-        final PositionStatsReport positionStatsReport = positionStatsReportGenerator.generate(strategy.getTradeRecord(),
-                series);
-        return new TradingStatement(strategy, positionStatsReport, performanceReport);
-    }
+
+  /**
+   * Constructor.
+   *
+   * @param performanceReportGenerator the {@link PerformanceReportGenerator}
+   * @param positionStatsReportGenerator the {@link PositionStatsReportGenerator}
+   */
+  public TradingStatementGenerator(
+      final PerformanceReportGenerator performanceReportGenerator,
+      final PositionStatsReportGenerator positionStatsReportGenerator
+  ) {
+    this.performanceReportGenerator = performanceReportGenerator;
+    this.positionStatsReportGenerator = positionStatsReportGenerator;
+  }
+
+
+  public TradingStatement generate(final BacktestStrategy strategy) {
+    final PerformanceReport performanceReport = this.performanceReportGenerator.generate(strategy.getTradeRecord());
+    final PositionStatsReport positionStatsReport =
+        this.positionStatsReportGenerator.generate(strategy.getTradeRecord());
+    return new TradingStatement(strategy, positionStatsReport, performanceReport);
+  }
 }

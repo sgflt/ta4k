@@ -1,4 +1,4 @@
-/**
+/*
  * The MIT License (MIT)
  *
  * Copyright (c) 2017-2023 Ta4j Organization & respective
@@ -25,29 +25,33 @@ package org.ta4j.core.criteria;
 
 import org.ta4j.core.Position;
 import org.ta4j.core.TradingRecord;
-import org.ta4j.core.backtest.BacktestBarSeries;
 import org.ta4j.core.num.Num;
+import org.ta4j.core.num.NumFactoryProvider;
 
 /**
  * Number of closed losing positions criterion.
  */
 public class NumberOfLosingPositionsCriterion extends AbstractAnalysisCriterion {
 
-    @Override
-    public Num calculate(BacktestBarSeries series, Position position) {
-        return position.hasLoss() ? series.numFactory().one() : series.numFactory().zero();
-    }
+  @Override
+  public Num calculate(final Position position) {
+    return position.hasLoss()
+           ? NumFactoryProvider.getDefaultNumFactory().one()
+           : NumFactoryProvider.getDefaultNumFactory().zero();
+  }
 
-    @Override
-    public Num calculate(BacktestBarSeries series, TradingRecord tradingRecord) {
-        long numberOfLosingPositions = tradingRecord.getPositions().stream().filter(Position::hasLoss).count();
-        return series.numFactory().numOf(numberOfLosingPositions);
-    }
 
-    /** The lower the criterion value, the better. */
-    @Override
-    public boolean betterThan(Num criterionValue1, Num criterionValue2) {
-        return criterionValue1.isLessThan(criterionValue2);
-    }
+  @Override
+  public Num calculate(final TradingRecord tradingRecord) {
+    final long numberOfLosingPositions = tradingRecord.getPositions().stream().filter(Position::hasLoss).count();
+    return NumFactoryProvider.getDefaultNumFactory().numOf(numberOfLosingPositions);
+  }
+
+
+  /** The lower the criterion value, the better. */
+  @Override
+  public boolean betterThan(final Num criterionValue1, final Num criterionValue2) {
+    return criterionValue1.isLessThan(criterionValue2);
+  }
 
 }

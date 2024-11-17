@@ -23,8 +23,7 @@
  */
 package org.ta4j.core.indicators.numeric.adx;
 
-import java.time.Instant;
-
+import org.ta4j.core.Bar;
 import org.ta4j.core.BarSeries;
 import org.ta4j.core.indicators.numeric.NumericIndicator;
 import org.ta4j.core.num.Num;
@@ -39,8 +38,6 @@ public class DXIndicator extends NumericIndicator {
 
   private final PlusDIIndicator plusDIIndicator;
   private final MinusDIIndicator minusDIIndicator;
-  private Instant currentTick = Instant.EPOCH;
-  private Num value;
 
 
   /**
@@ -52,8 +49,8 @@ public class DXIndicator extends NumericIndicator {
    */
   public DXIndicator(final BarSeries series, final int barCount) {
     super(series.numFactory());
-    this.plusDIIndicator = new PlusDIIndicator(series, barCount);
-    this.minusDIIndicator = new MinusDIIndicator(series, barCount);
+    this.plusDIIndicator = NumericIndicator.plusDII(barCount);
+    this.minusDIIndicator = NumericIndicator.minusDII(barCount);
   }
 
 
@@ -71,19 +68,10 @@ public class DXIndicator extends NumericIndicator {
 
 
   @Override
-  public Num getValue() {
-    return this.value;
-  }
-
-
-  @Override
-  public void refresh(final Instant tick) {
-    if (tick.isAfter(this.currentTick) || tick.isBefore(this.currentTick)) {
-      this.plusDIIndicator.refresh(tick);
-      this.minusDIIndicator.refresh(tick);
-      this.value = calculate();
-      this.currentTick = tick;
-    }
+  public void updateState(final Bar bar) {
+    this.plusDIIndicator.onBar(bar);
+    this.minusDIIndicator.onBar(bar);
+    this.value = calculate();
   }
 
 

@@ -28,8 +28,7 @@ import static org.ta4j.core.TestUtils.assertNumEquals;
 
 import org.junit.Test;
 import org.ta4j.core.indicators.AbstractIndicatorTest;
-import org.ta4j.core.indicators.candles.price.ClosePriceIndicator;
-import org.ta4j.core.indicators.candles.price.OpenPriceIndicator;
+import org.ta4j.core.indicators.numeric.NumericIndicator;
 import org.ta4j.core.indicators.numeric.average.SMAIndicator;
 import org.ta4j.core.indicators.numeric.statistics.StandardDeviationIndicator;
 import org.ta4j.core.mocks.MockBarSeriesBuilder;
@@ -50,12 +49,13 @@ public class BollingerBandFacadeTest extends AbstractIndicatorTest<Num> {
         .build();
     final int barCount = 3;
 
-    final var bollingerBandFacade = new BollingerBandFacade(data, barCount, 2);
+    final var bollingerBandFacade = new BollingerBandFacade(barCount, 2);
 
     assertEquals(data.numFactory(), bollingerBandFacade.bandwidth().getNumFactory());
     assertEquals(data.numFactory(), bollingerBandFacade.middle().getNumFactory());
 
-    final var bollingerBandFacadeOfIndicator = new BollingerBandFacade(new OpenPriceIndicator(data),
+    final var bollingerBandFacadeOfIndicator = new BollingerBandFacade(
+        NumericIndicator.openPrice(),
         barCount, 2
     );
 
@@ -69,7 +69,7 @@ public class BollingerBandFacadeTest extends AbstractIndicatorTest<Num> {
     final var data = new MockBarSeriesBuilder().withNumFactory(this.numFactory)
         .withData(1, 2, 3, 4, 3, 4, 5, 4, 3, 3, 4, 3, 2)
         .build();
-    final var closePriceIndicator = new ClosePriceIndicator(data);
+    final var closePriceIndicator = NumericIndicator.closePrice();
     final int barCount = 3;
     final var sma = new SMAIndicator(closePriceIndicator, 3);
 
@@ -77,16 +77,16 @@ public class BollingerBandFacadeTest extends AbstractIndicatorTest<Num> {
     final var standardDeviation = new StandardDeviationIndicator(closePriceIndicator, barCount);
     final var lowerBB = new BollingerBandsLowerIndicator(middleBB, standardDeviation);
     final var upperBB = new BollingerBandsUpperIndicator(middleBB, standardDeviation);
-    final var pcb = new PercentBIndicator(new ClosePriceIndicator(data), 5, 2);
+    final var pcb = new PercentBIndicator(closePriceIndicator, 5, 2);
     final var widthBB = new BollingerBandWidthIndicator(upperBB, middleBB, lowerBB);
 
-    final var bollingerBandFacade = new BollingerBandFacade(data, barCount, 2);
+    final var bollingerBandFacade = new BollingerBandFacade(barCount, 2);
     final var middleBBNumeric = bollingerBandFacade.middle();
     final var lowerBBNumeric = bollingerBandFacade.lower();
     final var upperBBNumeric = bollingerBandFacade.upper();
     final var widthBBNumeric = bollingerBandFacade.bandwidth();
 
-    final var pcbNumeric = new BollingerBandFacade(data, 5, 2).percentB();
+    final var pcbNumeric = new BollingerBandFacade(5, 2).percentB();
 
     while (data.advance()) {
       assertNumEquals(pcb.getValue(), pcbNumeric.getValue());

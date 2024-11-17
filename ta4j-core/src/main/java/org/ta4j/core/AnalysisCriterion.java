@@ -23,12 +23,6 @@
  */
 package org.ta4j.core;
 
-import java.util.List;
-
-import org.ta4j.core.Trade.TradeType;
-import org.ta4j.core.backtest.BacktestBarSeries;
-import org.ta4j.core.backtest.BacktestExecutor;
-import org.ta4j.core.backtest.BacktestStrategy;
 import org.ta4j.core.num.Num;
 
 /**
@@ -50,20 +44,18 @@ public interface AnalysisCriterion {
   }
 
   /**
-   * @param series the bar series, not null
    * @param position the position, not null
    *
    * @return the criterion value for the position
    */
-  Num calculate(BacktestBarSeries series, Position position);
+  Num calculate(Position position);
 
   /**
-   * @param series the bar series, not null
    * @param tradingRecord the trading record, not null
    *
    * @return the criterion value for the positions
    */
-  Num calculate(BacktestBarSeries series, TradingRecord tradingRecord);
+  Num calculate(TradingRecord tradingRecord);
 
   /**
    * @param backtestExecutor the bar series backtestExecutor with entry type of
@@ -72,9 +64,9 @@ public interface AnalysisCriterion {
    * @return the best strategy (among the provided ones) according to the
    *     criterion
    */
-  default Strategy chooseBest(final BacktestExecutor backtestExecutor, final List<BacktestStrategy> strategies) {
-    return chooseBest(backtestExecutor, TradeType.BUY, strategies);
-  }
+  //  default Strategy chooseBest(final BacktestExecutor backtestExecutor, final List<BacktestStrategy> strategies) {
+  //    return chooseBest(backtestExecutor, TradeType.BUY, strategies);
+  //  }
 
   /**
    * @param backtestExecutor the bar series backtestExecutor
@@ -84,27 +76,28 @@ public interface AnalysisCriterion {
    * @return the best strategy (among the provided ones) according to the
    *     criterion
    */
-  default Strategy chooseBest(
-      final BacktestExecutor backtestExecutor, final TradeType tradeType,
-      final List<BacktestStrategy> strategies
-  ) {
-
-    final var tradingStatements = backtestExecutor.execute(strategies.getFirst(), tradeType);
-    BacktestStrategy bestStrategy = strategies.getFirst();
-    Num bestCriterionValue = calculate(backtestExecutor.getBarSeries(), bestStrategy.getTradeRecord());
-
-    for (final var tradingStatement : tradingStatements) {
-      final var currentStrategy = tradingStatement.getStrategy();
-      final var currentCriterionValue = calculate(backtestExecutor.getBarSeries(), currentStrategy.getTradeRecord());
-
-      if (betterThan(currentCriterionValue, bestCriterionValue)) {
-        bestStrategy = currentStrategy;
-        bestCriterionValue = currentCriterionValue;
-      }
-    }
-
-    return bestStrategy;
-  }
+  // TODO
+  //  default Strategy chooseBest(
+  //      final BacktestExecutor backtestExecutor, final TradeType tradeType,
+  //      final List<BacktestStrategy> strategies
+  //  ) {
+  //
+  //    final var tradingStatements = backtestExecutor.execute(strategies.getFirst(), tradeType);
+  //    BacktestStrategy bestStrategy = strategies.getFirst();
+  //    Num bestCriterionValue = calculate(backtestExecutor.getBarSeries(), bestStrategy.getTradeRecord());
+  //
+  //    for (final var tradingStatement : tradingStatements) {
+  //      final var currentStrategy = tradingStatement.getStrategy();
+  //      final var currentCriterionValue = calculate(backtestExecutor.getBarSeries(), currentStrategy.getTradeRecord());
+  //
+  //      if (betterThan(currentCriterionValue, bestCriterionValue)) {
+  //        bestStrategy = currentStrategy;
+  //        bestCriterionValue = currentCriterionValue;
+  //      }
+  //    }
+  //
+  //    return bestStrategy;
+  //  }
 
   /**
    * @param criterionValue1 the first value

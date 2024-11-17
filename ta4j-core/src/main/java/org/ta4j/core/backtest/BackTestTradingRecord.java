@@ -40,6 +40,7 @@ import org.ta4j.core.num.Num;
  */
 public class BackTestTradingRecord implements TradingRecord {
 
+  private final TradeType startingType;
   /** The name of the trading record. */
   private String name;
 
@@ -63,9 +64,6 @@ public class BackTestTradingRecord implements TradingRecord {
 
   /** The recorded exit trades. */
   private final List<Trade> exitTrades = new ArrayList<>();
-
-  /** The entry type (BUY or SELL) in the trading session. */
-  private final TradeType startingType;
 
   /** The recorded positions. */
   private final List<Position> positions = new ArrayList<>();

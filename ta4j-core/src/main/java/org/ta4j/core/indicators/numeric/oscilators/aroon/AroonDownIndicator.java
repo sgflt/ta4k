@@ -23,16 +23,16 @@
  */
 package org.ta4j.core.indicators.numeric.oscilators.aroon;
 
-import java.time.Instant;
 import java.util.ArrayList;
 
-import org.ta4j.core.BarSeries;
+import org.ta4j.core.Bar;
 import org.ta4j.core.indicators.Indicator;
 import org.ta4j.core.indicators.candles.price.LowPriceIndicator;
 import org.ta4j.core.indicators.helpers.LowestValueIndicator;
 import org.ta4j.core.indicators.numeric.NumericIndicator;
 import org.ta4j.core.num.NaN;
 import org.ta4j.core.num.Num;
+import org.ta4j.core.num.NumFactory;
 
 /**
  * Aroon down indicator.
@@ -46,10 +46,8 @@ public class AroonDownIndicator extends NumericIndicator {
   private final LowestValueIndicator lowestLowValueIndicator;
   private final Indicator<Num> lowIndicator;
 
-  private Instant currentTick = Instant.EPOCH;
   private int index;
   private final ArrayList<Num> previousValues;
-  private Num value;
 
 
   /**
@@ -59,8 +57,8 @@ public class AroonDownIndicator extends NumericIndicator {
    *     {@link LowPriceIndicator})
    * @param barCount the time frame
    */
-  public AroonDownIndicator(final BarSeries series, final NumericIndicator lowIndicator, final int barCount) {
-    super(series.numFactory());
+  public AroonDownIndicator(final NumFactory numFactory, final NumericIndicator lowIndicator, final int barCount) {
+    super(numFactory);
     this.barCount = barCount;
     this.previousValues = new ArrayList<>(barCount);
     for (int i = 0; i < barCount; i++) {
@@ -75,11 +73,11 @@ public class AroonDownIndicator extends NumericIndicator {
    * Default Constructor with {@code lowPriceIndicator} =
    * {@link LowPriceIndicator}.
    *
-   * @param series the bar series
+   * @param numFactory the bar numFactory
    * @param barCount the time frame
    */
-  public AroonDownIndicator(final BarSeries series, final int barCount) {
-    this(series, new LowPriceIndicator(series), barCount);
+  public AroonDownIndicator(final NumFactory numFactory, final int barCount) {
+    this(numFactory, NumericIndicator.lowPrice(), barCount);
   }
 
 
@@ -114,20 +112,11 @@ public class AroonDownIndicator extends NumericIndicator {
 
 
   @Override
-  public Num getValue() {
-    return this.value;
-  }
-
-
-  @Override
-  public void refresh(final Instant tick) {
-    if (tick.isAfter(this.currentTick)) {
-      ++this.index;
-      this.lowIndicator.refresh(tick);
-      this.lowestLowValueIndicator.refresh(tick);
-      this.value = calculate();
-      this.currentTick = tick;
-    }
+  public void updateState(final Bar bar) {
+    ++this.index;
+    this.lowIndicator.onBar(bar);
+    this.lowestLowValueIndicator.onBar(bar);
+    this.value = calculate();
   }
 
 

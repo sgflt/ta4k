@@ -24,7 +24,6 @@
 package org.ta4j.core.indicators.numeric.adx;
 
 import static org.junit.Assert.assertEquals;
-import static org.ta4j.core.TestUtils.assertIndicatorEquals;
 
 import org.junit.Test;
 import org.ta4j.core.ExternalIndicatorTest;
@@ -50,7 +49,7 @@ public class ADXIndicatorTest extends AbstractIndicatorTest<Num> {
 
   @Test
   public void externalData11() throws Exception {
-    final var series = this.xls.getSeries();
+    final var series = this.xls.getMarketEvents();
     final var actualIndicator = NumericIndicator.adx(series, 1, 1);
     final var expectedIndicator = this.xls.getIndicator(1, 1);
     series.replaceStrategy(new MockStrategy(expectedIndicator, actualIndicator));
@@ -62,7 +61,7 @@ public class ADXIndicatorTest extends AbstractIndicatorTest<Num> {
 
   @Test
   public void externalData32() throws Exception {
-    final var series = this.xls.getSeries();
+    final var series = this.xls.getMarketEvents();
     final var actualIndicator = NumericIndicator.adx(series, 3, 2);
     final var expectedIndicator = this.xls.getIndicator(3, 2);
     series.replaceStrategy(new MockStrategy(expectedIndicator, actualIndicator));
@@ -74,7 +73,7 @@ public class ADXIndicatorTest extends AbstractIndicatorTest<Num> {
 
   @Test
   public void externalData138() throws Exception {
-    final var series = this.xls.getSeries();
+    final var series = this.xls.getMarketEvents();
     final var actualIndicator = NumericIndicator.adx(series, 13, 8);
     final var expectedIndicator = this.xls.getIndicator(13, 8);
     series.replaceStrategy(new MockStrategy(expectedIndicator, actualIndicator));

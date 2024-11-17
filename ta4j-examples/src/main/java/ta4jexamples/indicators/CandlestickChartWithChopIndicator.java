@@ -113,7 +113,7 @@
 //        org.jfree.data.time.TimeSeries chartTimeSeries = new org.jfree.data.time.TimeSeries("Btc price");
 //        for (int i = 0; i < series.getBarCount(); i++) {
 //            Bar bar = series.getBar(i);
-//            chartTimeSeries.add(new Second(new Date(bar.endTime().toEpochSecond() * 1000)),
+//            chartTimeSeries.onCandle(new Second(new Date(bar.endTime().toEpochSecond() * 1000)),
 //                    indicator.getValue(i).doubleValue());
 //        }
 //        dataset.addSeries(chartTimeSeries);
@@ -128,7 +128,7 @@
 //            Bar bar = series.getBar(i);
 //            if (i < CHOP_INDICATOR_TIMEFRAME)
 //                continue;
-//            chartTimeSeries.add(new Second(new Date(bar.endTime().toEpochSecond() * 1000)),
+//            chartTimeSeries.onCandle(new Second(new Date(bar.endTime().toEpochSecond() * 1000)),
 //                    indicator.getValue(i).doubleValue());
 //        }
 //        dataset.addSeries(chartTimeSeries);
@@ -184,8 +184,8 @@
 //        combinedPlot.setDomainGridlinePaint(Color.GRAY);
 //        combinedPlot.setRangeGridlinePaint(Color.GRAY);
 //        combinedPlot.setOrientation(PlotOrientation.VERTICAL);
-//        combinedPlot.add(pricePlot, 70);
-//        combinedPlot.add(indicatorXYPlot, 30);
+//        combinedPlot.onCandle(pricePlot, 70);
+//        combinedPlot.onCandle(indicatorXYPlot, 30);
 //
 //        // Now create the chart that contains the combinedPlot
 //        combinedChart = new JFreeChart("Bitstamp BTC price with Chop indicator", null, combinedPlot, true);
@@ -229,7 +229,7 @@
 //         */
 //        TimeSeriesCollection xyDataset = createAdditionalDataset(series);
 //        /*
-//         * add the CHOP Indicator
+//         * onCandle the CHOP Indicator
 //         */
 //        TimeSeriesCollection chopSeries = createChopDataset(series);
 //        /*

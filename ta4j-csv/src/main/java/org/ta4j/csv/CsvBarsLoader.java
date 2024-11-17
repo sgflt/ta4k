@@ -28,41 +28,49 @@ import java.io.Reader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
+import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.opencsv.CSVParserBuilder;
 import com.opencsv.CSVReaderBuilder;
 import com.opencsv.exceptions.CsvValidationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.ta4j.core.backtest.BacktestBarSeries;
-import org.ta4j.core.backtest.BacktestBarSeriesBuilder;
+import org.ta4j.core.events.CandleReceived;
+import org.ta4j.core.num.NumFactoryProvider;
 
 /**
  * This class build a Ta4j bar series from a CSV file containing bars.
  */
-public class CsvBarsLoader {
+public final class CsvBarsLoader {
   private static final Logger LOG = LoggerFactory.getLogger(CsvBarsLoader.class);
 
   private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ISO_DATE_TIME;
 
 
-  public static BacktestBarSeries load(final Path filename) {
-    final var series = new BacktestBarSeriesBuilder().withName(filename.toString()).build();
+  private CsvBarsLoader() {
+    // utility class
+  }
+
+
+  public static List<CandleReceived> load(final Path filename) {
+    final var candles = new ArrayList<CandleReceived>();
 
     try (final var stream = Files.newBufferedReader(filename)) {
-      readCsv(stream, series);
+      readCsv(stream, candles);
     } catch (final IOException ioe) {
       LOG.error("Unable to load bars from CSV", ioe);
     } catch (final NumberFormatException nfe) {
       LOG.error("Error while parsing value", nfe);
     }
-    return series;
+    return candles;
   }
 
 
-  private static void readCsv(final Reader reader, final BacktestBarSeries series) throws IOException {
+  private static void readCsv(final Reader reader, final List<CandleReceived> candleEvents) throws IOException {
     try (
         final var csvReader = new CSVReaderBuilder(reader)
             .withCSVParser(new CSVParserBuilder().withSeparator(',').build())
@@ -78,19 +86,31 @@ public class CsvBarsLoader {
         final var close = Double.parseDouble(line[4]);
         final var volume = Double.parseDouble(line[5]);
 
-        series.barBuilder()
-            .timePeriod(Duration.ofDays(1))
-            .endTime(date)
-            .openPrice(open)
-            .closePrice(close)
-            .highPrice(high)
-            .lowPrice(low)
-            .volume(volume)
-            .amount(0)
-            .add();
+        candleEvents.add(createCandle(date, open, high, low, close, volume));
       }
     } catch (final CsvValidationException e) {
       LOG.error("Unable to load bars from CSV. File is not valid csv.", e);
     }
+  }
+
+
+  private static CandleReceived createCandle(
+      final Instant start,
+      final double open,
+      final double high,
+      final double low,
+      final double close,
+      final double volume
+  ) {
+    return new CandleReceived(
+        Duration.ofDays(1),
+        start,
+        NumFactoryProvider.getDefaultNumFactory().numOf(open),
+        NumFactoryProvider.getDefaultNumFactory().numOf(high),
+        NumFactoryProvider.getDefaultNumFactory().numOf(low),
+        NumFactoryProvider.getDefaultNumFactory().numOf(close),
+        NumFactoryProvider.getDefaultNumFactory().numOf(volume),
+        NumFactoryProvider.getDefaultNumFactory().zero()
+    );
   }
 }

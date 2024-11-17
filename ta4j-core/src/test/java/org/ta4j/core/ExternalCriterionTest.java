@@ -23,6 +23,9 @@
  */
 package org.ta4j.core;
 
+import java.util.List;
+
+import org.ta4j.core.events.MarketEvent;
 import org.ta4j.core.num.Num;
 
 public interface ExternalCriterionTest {
@@ -33,7 +36,7 @@ public interface ExternalCriterionTest {
      * @return BarSeries from the external criterion calculator
      * @throws Exception if the external calculator throws an Exception
      */
-    BarSeries getSeries() throws Exception;
+    List<MarketEvent> getMarketEvents() throws Exception;
 
     /**
      * Sends criterion parameters to an external criterion calculator and returns

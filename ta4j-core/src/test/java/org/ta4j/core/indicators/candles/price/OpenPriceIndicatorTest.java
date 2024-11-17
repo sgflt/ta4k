@@ -23,36 +23,36 @@
  */
 package org.ta4j.core.indicators.candles.price;
 
-import static junit.framework.TestCase.assertEquals;
-
 import org.junit.Before;
 import org.junit.Test;
-import org.ta4j.core.backtest.BacktestBarSeries;
+import org.ta4j.core.TestContext;
 import org.ta4j.core.indicators.AbstractIndicatorTest;
-import org.ta4j.core.mocks.MockBarSeriesBuilder;
+import org.ta4j.core.indicators.numeric.NumericIndicator;
 import org.ta4j.core.num.Num;
 import org.ta4j.core.num.NumFactory;
 
 public class OpenPriceIndicatorTest extends AbstractIndicatorTest<Num> {
-    private OpenPriceIndicator openPriceIndicator;
 
-    BacktestBarSeries barSeries;
+  private TestContext context;
 
-    public OpenPriceIndicatorTest(final NumFactory numFactory) {
-        super(numFactory);
+
+  public OpenPriceIndicatorTest(final NumFactory numFactory) {
+    super(numFactory);
+  }
+
+
+  @Before
+  public void setUp() {
+    this.context = new TestContext().withDefaultMarketEvents();
+
+    this.context.withIndicator(NumericIndicator.openPrice());
+  }
+
+
+  @Test
+  public void indicatorShouldRetrieveBarOpenPrice() {
+    for (int i = 0; i < 10; i++) {
+      this.context.assertNext(i);
     }
-
-    @Before
-    public void setUp() {
-        this.barSeries = new MockBarSeriesBuilder().withNumFactory(this.numFactory).withDefaultData().build();
-        this.openPriceIndicator = new OpenPriceIndicator(this.barSeries);
-    }
-
-    @Test
-    public void indicatorShouldRetrieveBarOpenPrice() {
-        for (int i = 0; i < 10; i++) {
-            this.barSeries.advance();
-            assertEquals(this.openPriceIndicator.getValue(), this.barSeries.getBar().openPrice());
-        }
-    }
+  }
 }

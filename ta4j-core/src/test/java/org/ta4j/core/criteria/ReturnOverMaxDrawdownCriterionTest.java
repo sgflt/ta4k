@@ -55,7 +55,7 @@
 //    @Test
 //    public void rewardRiskRatioCriterion() {
 //        var series = new MockBarSeriesBuilder().withNumFactory(numFactory)
-//                .withData(100, 105, 95, 100, 90, 95, 80, 120)
+//                .withCandleClosePrices(100, 105, 95, 100, 90, 95, 80, 120)
 //                .build();
 //        TradingRecord tradingRecord = new BackTestTradingRecord(Trade.buyAt(0, series), Trade.sellAt(1, series),
 //                Trade.buyAt(2, series), Trade.sellAt(4, series), Trade.buyAt(5, series), Trade.sellAt(7, series));
@@ -69,7 +69,7 @@
 //
 //    @Test
 //    public void rewardRiskRatioCriterionOnlyWithGain() {
-//        var series = new MockBarSeriesBuilder().withNumFactory(numFactory).withData(1, 2, 3, 6, 8, 20, 3).build();
+//        var series = new MockBarSeriesBuilder().withNumFactory(numFactory).withCandleClosePrices(1, 2, 3, 6, 8, 20, 3).build();
 //        TradingRecord tradingRecord = new BackTestTradingRecord(Trade.buyAt(0, series), Trade.sellAt(1, series),
 //                Trade.buyAt(2, series), Trade.sellAt(5, series));
 //        assertTrue(rrc.calculate(series, tradingRecord).isNaN());
@@ -77,14 +77,14 @@
 //
 //    @Test
 //    public void rewardRiskRatioCriterionWithNoPositions() {
-//        var series = new MockBarSeriesBuilder().withNumFactory(numFactory).withData(1, 2, 3, 6, 8, 20, 3).build();
+//        var series = new MockBarSeriesBuilder().withNumFactory(numFactory).withCandleClosePrices(1, 2, 3, 6, 8, 20, 3).build();
 //        assertTrue(rrc.calculate(series, new BackTestTradingRecord()).isNaN());
 //    }
 //
 //    @Test
 //    public void withOnePosition() {
 //        var series = new MockBarSeriesBuilder().withNumFactory(numFactory)
-//                .withData(100, 95, 95, 100, 90, 95, 80, 120)
+//                .withCandleClosePrices(100, 95, 95, 100, 90, 95, 80, 120)
 //                .build();
 //        Position position = new Position(Trade.buyAt(0, series), Trade.sellAt(1, series));
 //
@@ -102,7 +102,7 @@
 //    @Test
 //    public void testNoDrawDownForTradingRecord() {
 //        final var series = new MockBarSeriesBuilder().withNumFactory(numFactory)
-//                .withData(100, 105, 95, 100, 90, 95, 80, 120)
+//                .withCandleClosePrices(100, 105, 95, 100, 90, 95, 80, 120)
 //                .build();
 //        final TradingRecord tradingRecord = new BackTestTradingRecord(Trade.buyAt(0, series), Trade.sellAt(1, series),
 //                Trade.buyAt(2, series), Trade.sellAt(3, series));
@@ -115,7 +115,7 @@
 //    @Test
 //    public void testNoDrawDownForPosition() {
 //        final var series = new MockBarSeriesBuilder().withNumFactory(numFactory)
-//                .withData(100, 105, 95, 100, 90, 95, 80, 120)
+//                .withCandleClosePrices(100, 105, 95, 100, 90, 95, 80, 120)
 //                .build();
 //        final Position position = new Position(Trade.buyAt(0, series), Trade.sellAt(1, series));
 //

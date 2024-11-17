@@ -23,9 +23,14 @@
  */
 package org.ta4j.core.indicators.numeric;
 
+import java.time.Instant;
+
+import org.ta4j.core.Bar;
 import org.ta4j.core.BarSeries;
 import org.ta4j.core.indicators.Indicator;
 import org.ta4j.core.indicators.RSIIndicator;
+import org.ta4j.core.indicators.candles.LowerShadowIndicator;
+import org.ta4j.core.indicators.candles.RealBodyIndicator;
 import org.ta4j.core.indicators.candles.price.ClosePriceIndicator;
 import org.ta4j.core.indicators.candles.price.HighPriceIndicator;
 import org.ta4j.core.indicators.candles.price.LowPriceIndicator;
@@ -39,16 +44,26 @@ import org.ta4j.core.indicators.helpers.LossIndicator;
 import org.ta4j.core.indicators.helpers.LowestValueIndicator;
 import org.ta4j.core.indicators.helpers.MedianPriceIndicator;
 import org.ta4j.core.indicators.helpers.RunningTotalIndicator;
+import org.ta4j.core.indicators.helpers.TypicalPriceIndicator;
 import org.ta4j.core.indicators.helpers.VolumeIndicator;
 import org.ta4j.core.indicators.helpers.previous.PreviousNumericValueIndicator;
 import org.ta4j.core.indicators.numeric.adx.ADXIndicator;
+import org.ta4j.core.indicators.numeric.adx.MinusDIIndicator;
+import org.ta4j.core.indicators.numeric.adx.MinusDMIndicator;
+import org.ta4j.core.indicators.numeric.adx.PlusDIIndicator;
+import org.ta4j.core.indicators.numeric.adx.PlusDMIndicator;
 import org.ta4j.core.indicators.numeric.average.EMAIndicator;
 import org.ta4j.core.indicators.numeric.average.LWMAIndicator;
 import org.ta4j.core.indicators.numeric.average.MMAIndicator;
 import org.ta4j.core.indicators.numeric.average.SMAIndicator;
 import org.ta4j.core.indicators.numeric.average.TripleEMAIndicator;
+import org.ta4j.core.indicators.numeric.average.WMAIndicator;
 import org.ta4j.core.indicators.numeric.average.ZLEMAIndicator;
 import org.ta4j.core.indicators.numeric.channels.bollinger.BollingerBandFacade;
+import org.ta4j.core.indicators.numeric.oscilators.AwesomeOscillatorIndicator;
+import org.ta4j.core.indicators.numeric.oscilators.aroon.AroonDownIndicator;
+import org.ta4j.core.indicators.numeric.oscilators.aroon.AroonOscillatorIndicator;
+import org.ta4j.core.indicators.numeric.oscilators.aroon.AroonUpIndicator;
 import org.ta4j.core.indicators.numeric.statistics.CovarianceIndicator;
 import org.ta4j.core.indicators.numeric.statistics.MeanDeviationIndicator;
 import org.ta4j.core.indicators.numeric.statistics.SigmaIndicator;
@@ -58,6 +73,7 @@ import org.ta4j.core.indicators.numeric.statistics.StandardErrorIndicator;
 import org.ta4j.core.indicators.numeric.statistics.VarianceIndicator;
 import org.ta4j.core.num.Num;
 import org.ta4j.core.num.NumFactory;
+import org.ta4j.core.num.NumFactoryProvider;
 import org.ta4j.core.rules.OverIndicatorRule;
 import org.ta4j.core.rules.UnderIndicatorRule;
 
@@ -88,6 +104,8 @@ public abstract class NumericIndicator implements Indicator<Num> {
    * Factory used for creation of this indicator that will be propagated to child indicators.
    */
   private final NumFactory numFactory;
+  private Instant currentBeginTime = Instant.EPOCH;
+  protected Num value;
 
 
   protected NumericIndicator(final NumFactory numFactory) {
@@ -95,28 +113,63 @@ public abstract class NumericIndicator implements Indicator<Num> {
   }
 
 
-  public static ClosePriceIndicator closePrice(final BarSeries bs) {
-    return new ClosePriceIndicator(bs);
+  public static ClosePriceIndicator closePrice() {
+    return new ClosePriceIndicator(NumFactoryProvider.getDefaultNumFactory());
   }
 
 
-  public static OpenPriceIndicator openPrice(final BarSeries bs) {
-    return new OpenPriceIndicator(bs);
+  public static OpenPriceIndicator openPrice() {
+    return new OpenPriceIndicator(NumFactoryProvider.getDefaultNumFactory());
   }
 
 
-  public static LowPriceIndicator lowPrice(final BarSeries bs) {
-    return new LowPriceIndicator(bs);
+  public static LowPriceIndicator lowPrice() {
+    return new LowPriceIndicator(NumFactoryProvider.getDefaultNumFactory());
   }
 
 
-  public static HighPriceIndicator highPrice(final BarSeries bs) {
-    return new HighPriceIndicator(bs);
+  public static HighPriceIndicator highPrice() {
+    return new HighPriceIndicator(NumFactoryProvider.getDefaultNumFactory());
   }
 
 
-  public static BollingerBandFacade bollingerBands(final BarSeries bs, final int barCount, final Number k) {
-    return new BollingerBandFacade(bs, barCount, k);
+  public static TypicalPriceIndicator typicalPrice() {
+    return new TypicalPriceIndicator(NumFactoryProvider.getDefaultNumFactory());
+  }
+
+
+  public static BollingerBandFacade bollingerBands(final int barCount, final Number k) {
+    return new BollingerBandFacade(barCount, k);
+  }
+
+
+  public static NumericIndicator realBody() {
+    return new RealBodyIndicator(NumFactoryProvider.getDefaultNumFactory());
+  }
+
+
+  public static AroonOscillatorIndicator aroonOscillatpr(final int barCount) {
+    return new AroonOscillatorIndicator(NumFactoryProvider.getDefaultNumFactory(), barCount);
+  }
+
+
+  public static AroonUpIndicator aroonUp(final NumericIndicator highIndicator, final int barCount) {
+    return new AroonUpIndicator(NumFactoryProvider.getDefaultNumFactory(), highIndicator, barCount);
+  }
+
+
+  public static AroonUpIndicator aroonUp(final int barCount) {
+    return new AroonUpIndicator(NumFactoryProvider.getDefaultNumFactory(), barCount);
+  }
+
+
+  public static AroonDownIndicator aroonDown(final NumericIndicator highIndicator, final int barCount) {
+    return new AroonDownIndicator(NumFactoryProvider.getDefaultNumFactory(), highIndicator, barCount);
+  }
+
+
+  public static AroonDownIndicator aroonDown(final int barCount) {
+    return new AroonDownIndicator(NumFactoryProvider.getDefaultNumFactory(), barCount);
   }
 
 
@@ -140,8 +193,8 @@ public abstract class NumericIndicator implements Indicator<Num> {
   }
 
 
-  public static ATRIndicator atr(final BarSeries series, final int barCount) {
-    return new ATRIndicator(series, barCount);
+  public static ATRIndicator atr(final int barCount) {
+    return new ATRIndicator(NumFactoryProvider.getDefaultNumFactory(), barCount);
   }
 
 
@@ -150,13 +203,23 @@ public abstract class NumericIndicator implements Indicator<Num> {
   }
 
 
+  public static LowerShadowIndicator lowerShadow() {
+    return new LowerShadowIndicator(NumFactoryProvider.getDefaultNumFactory());
+  }
+
+
+  protected static AwesomeOscillatorIndicator awesomeOscillator(final int shortBarCount, final int longBarCount) {
+    return new AwesomeOscillatorIndicator(NumericIndicator.medianPrice(), shortBarCount, longBarCount);
+  }
+
+
   /**
    * Creates a fluent version of the VolumeIndicator.
    *
    * @return a NumericIndicator wrapped around a VolumeIndicator
    */
-  public static VolumeIndicator volume(final BarSeries bs) {
-    return new VolumeIndicator(bs);
+  public static VolumeIndicator volume() {
+    return new VolumeIndicator(NumFactoryProvider.getDefaultNumFactory());
   }
 
 
@@ -360,6 +423,31 @@ public abstract class NumericIndicator implements Indicator<Num> {
   }
 
 
+  public WMAIndicator wma(final int barCount) {
+    return new WMAIndicator(this, barCount);
+  }
+
+
+  protected static PlusDMIndicator plusDMI() {
+    return new PlusDMIndicator(NumFactoryProvider.getDefaultNumFactory());
+  }
+
+
+  protected static PlusDIIndicator plusDII(final int barCount) {
+    return new PlusDIIndicator(NumFactoryProvider.getDefaultNumFactory(), barCount);
+  }
+
+
+  protected static MinusDMIndicator minusDMI() {
+    return new MinusDMIndicator(NumFactoryProvider.getDefaultNumFactory());
+  }
+
+
+  protected static MinusDIIndicator minusDII(final int barCount) {
+    return new MinusDIIndicator(NumFactoryProvider.getDefaultNumFactory(), barCount);
+  }
+
+
   /**
    * @param barCount the time frame
    *
@@ -395,8 +483,8 @@ public abstract class NumericIndicator implements Indicator<Num> {
   }
 
 
-  public static MedianPriceIndicator medianPrice(final BarSeries series) {
-    return new MedianPriceIndicator(series);
+  public static MedianPriceIndicator medianPrice() {
+    return new MedianPriceIndicator(NumFactoryProvider.getDefaultNumFactory());
   }
 
 
@@ -573,4 +661,27 @@ public abstract class NumericIndicator implements Indicator<Num> {
   public SimpleLinearRegressionIndicator simpleLinearRegression(final int barCount) {
     return new SimpleLinearRegressionIndicator(this, barCount);
   }
+
+
+  @Override
+  public Num getValue() {
+    return this.value;
+  }
+
+
+  @Override
+  public final void onBar(final Bar bar) {
+    if (bar.beginTime().isAfter(this.currentBeginTime)) {
+      updateState(bar);
+      this.currentBeginTime = bar.beginTime();
+    }
+  }
+
+
+  /**
+   * Called by this class when it is the right time to update internal state.
+   *
+   * @param bar new {@link Bar} received
+   */
+  protected abstract void updateState(Bar bar);
 }

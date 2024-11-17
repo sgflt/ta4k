@@ -23,11 +23,13 @@
  */
 package org.ta4j.core.criteria;
 
+import org.ta4j.core.BarSeries;
 import org.ta4j.core.Position;
 import org.ta4j.core.Trade.TradeType;
 import org.ta4j.core.TradingRecord;
 import org.ta4j.core.backtest.BacktestBarSeries;
 import org.ta4j.core.num.Num;
+import org.ta4j.core.num.NumFactoryProvider;
 
 /**
  * Enter and hold criterion, returned in decimal format.
@@ -47,45 +49,50 @@ import org.ta4j.core.num.Num;
  */
 public class EnterAndHoldReturnCriterion extends AbstractAnalysisCriterion {
 
+  private final BarSeries series;
   private final TradeType tradeType;
 
 
-  public static EnterAndHoldReturnCriterion buy() {
-    return new EnterAndHoldReturnCriterion(TradeType.BUY);
+  public static EnterAndHoldReturnCriterion buy(final BarSeries series) {
+    return new EnterAndHoldReturnCriterion(series, TradeType.BUY);
   }
 
 
-  public static EnterAndHoldReturnCriterion sell() {
-    return new EnterAndHoldReturnCriterion(TradeType.SELL);
+  public static EnterAndHoldReturnCriterion sell(final BarSeries series) {
+    return new EnterAndHoldReturnCriterion(series, TradeType.SELL);
   }
 
 
   /**
    * Constructor.
    *
+   * @param series
    * @param tradeType the {@link TradeType} used to open the position
    */
-  EnterAndHoldReturnCriterion(final TradeType tradeType) {
+  EnterAndHoldReturnCriterion(final BarSeries series, final TradeType tradeType) {
+    this.series = series;
     this.tradeType = tradeType;
   }
 
 
   @Override
-  public Num calculate(final BacktestBarSeries series, final Position position) {
+  public Num calculate(final Position position) {
     final int beginIndex = position.getEntry().getIndex();
-    final int endIndex = series.getEndIndex();
-    return createEnterAndHoldTrade(series, beginIndex, endIndex).getGrossReturn(series);
+    final var backtestBarSeries = (BacktestBarSeries) this.series;  // TODO better typing
+    final int endIndex = backtestBarSeries.getEndIndex();
+    return createEnterAndHoldTrade(backtestBarSeries, beginIndex, endIndex).getGrossReturn(backtestBarSeries);
   }
 
 
   @Override
-  public Num calculate(final BacktestBarSeries series, final TradingRecord tradingRecord) {
-    if (series.isEmpty() || tradingRecord.isEmpty()) {
-      return series.numFactory().one();
+  public Num calculate(final TradingRecord tradingRecord) {
+    final var backtestBarSeries = (BacktestBarSeries) this.series;  // TODO better typing
+    if (backtestBarSeries.isEmpty() || tradingRecord.isEmpty()) {
+      return NumFactoryProvider.getDefaultNumFactory().one();
     }
     final int beginIndex = tradingRecord.getStartIndex();
     final int endIndex = tradingRecord.getEndIndex();
-    return createEnterAndHoldTrade(series, beginIndex, endIndex).getGrossReturn(series);
+    return createEnterAndHoldTrade(backtestBarSeries, beginIndex, endIndex).getGrossReturn(backtestBarSeries);
   }
 
 

@@ -1,4 +1,4 @@
-/**
+/*
  * The MIT License (MIT)
  *
  * Copyright (c) 2017-2023 Ta4j Organization & respective
@@ -25,9 +25,9 @@ package org.ta4j.core.criteria.pnl;
 
 import org.ta4j.core.Position;
 import org.ta4j.core.TradingRecord;
-import org.ta4j.core.backtest.BacktestBarSeries;
 import org.ta4j.core.criteria.AbstractAnalysisCriterion;
 import org.ta4j.core.num.Num;
+import org.ta4j.core.num.NumFactoryProvider;
 
 /**
  * Ratio gross profit and loss criterion = Average gross profit (includes
@@ -36,43 +36,46 @@ import org.ta4j.core.num.Num;
  */
 public class ProfitLossRatioCriterion extends AbstractAnalysisCriterion {
 
-    private final AverageProfitCriterion averageProfitCriterion = new AverageProfitCriterion();
-    private final AverageLossCriterion averageLossCriterion = new AverageLossCriterion();
+  private final AverageProfitCriterion averageProfitCriterion = new AverageProfitCriterion();
+  private final AverageLossCriterion averageLossCriterion = new AverageLossCriterion();
 
-    @Override
-    public Num calculate(BacktestBarSeries series, Position position) {
-        Num averageProfit = averageProfitCriterion.calculate(series, position);
-        if (averageProfit.isZero()) {
-            // only loosing positions means a ratio of 0
-            return series.numFactory().zero();
-        }
-        Num averageLoss = averageLossCriterion.calculate(series, position);
-        if (averageLoss.isZero()) {
-            // only winning positions means a ratio of 1
-            return series.numFactory().one();
-        }
-        return averageProfit.dividedBy(averageLoss).abs();
-    }
 
-    @Override
-    public Num calculate(BacktestBarSeries series, TradingRecord tradingRecord) {
-        Num averageProfit = averageProfitCriterion.calculate(series, tradingRecord);
-        if (averageProfit.isZero()) {
-            // only loosing positions means a ratio of 0
-            return series.numFactory().zero();
-        }
-        Num averageLoss = averageLossCriterion.calculate(series, tradingRecord);
-        if (averageLoss.isZero()) {
-            // only winning positions means a ratio of 1
-            return series.numFactory().one();
-        }
-        return averageProfit.dividedBy(averageLoss).abs();
+  @Override
+  public Num calculate(final Position position) {
+    final Num averageProfit = this.averageProfitCriterion.calculate(position);
+    if (averageProfit.isZero()) {
+      // only loosing positions means a ratio of 0
+      return NumFactoryProvider.getDefaultNumFactory().zero();
     }
+    final Num averageLoss = this.averageLossCriterion.calculate(position);
+    if (averageLoss.isZero()) {
+      // only winning positions means a ratio of 1
+      return NumFactoryProvider.getDefaultNumFactory().one();
+    }
+    return averageProfit.dividedBy(averageLoss).abs();
+  }
 
-    /** The higher the criterion value, the better. */
-    @Override
-    public boolean betterThan(Num criterionValue1, Num criterionValue2) {
-        return criterionValue1.isGreaterThan(criterionValue2);
+
+  @Override
+  public Num calculate(final TradingRecord tradingRecord) {
+    final Num averageProfit = this.averageProfitCriterion.calculate(tradingRecord);
+    if (averageProfit.isZero()) {
+      // only loosing positions means a ratio of 0
+      return NumFactoryProvider.getDefaultNumFactory().zero();
     }
+    final Num averageLoss = this.averageLossCriterion.calculate(tradingRecord);
+    if (averageLoss.isZero()) {
+      // only winning positions means a ratio of 1
+      return NumFactoryProvider.getDefaultNumFactory().one();
+    }
+    return averageProfit.dividedBy(averageLoss).abs();
+  }
+
+
+  /** The higher the criterion value, the better. */
+  @Override
+  public boolean betterThan(final Num criterionValue1, final Num criterionValue2) {
+    return criterionValue1.isGreaterThan(criterionValue2);
+  }
 
 }

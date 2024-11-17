@@ -23,8 +23,7 @@
  */
 package org.ta4j.core.indicators.helpers;
 
-import java.time.Instant;
-
+import org.ta4j.core.Bar;
 import org.ta4j.core.indicators.Indicator;
 import org.ta4j.core.indicators.helpers.previous.PreviousNumericValueIndicator;
 import org.ta4j.core.indicators.numeric.NumericIndicator;
@@ -43,8 +42,6 @@ public class LossIndicator extends NumericIndicator {
 
   private final NumericIndicator indicator;
   private final PreviousNumericValueIndicator previousValueIndicator;
-  private Num value;
-  private Instant currentTick = Instant.EPOCH;
 
 
   /**
@@ -63,6 +60,7 @@ public class LossIndicator extends NumericIndicator {
     if (!this.previousValueIndicator.isStable()) {
       return getNumFactory().zero();
     }
+
     final var actualValue = this.indicator.getValue();
     final var previousValue = this.previousValueIndicator.getValue();
     return actualValue.isLessThan(previousValue) ? previousValue.minus(actualValue)
@@ -71,19 +69,10 @@ public class LossIndicator extends NumericIndicator {
 
 
   @Override
-  public Num getValue() {
-    return this.value;
-  }
-
-
-  @Override
-  public void refresh(final Instant tick) {
-    if (tick.isAfter(this.currentTick)) {
-      this.indicator.refresh(tick);
-      this.previousValueIndicator.refresh(tick);
-      this.value = calculate();
-      this.currentTick = tick;
-    }
+  public void updateState(final Bar bar) {
+    this.indicator.onBar(bar);
+    this.previousValueIndicator.onBar(bar);
+    this.value = calculate();
   }
 
 

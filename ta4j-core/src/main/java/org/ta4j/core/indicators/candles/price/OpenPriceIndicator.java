@@ -23,11 +23,9 @@
  */
 package org.ta4j.core.indicators.candles.price;
 
-import java.time.Instant;
-
-import org.ta4j.core.BarSeries;
+import org.ta4j.core.Bar;
 import org.ta4j.core.indicators.SeriesRelatedNumericIndicator;
-import org.ta4j.core.num.Num;
+import org.ta4j.core.num.NumFactory;
 
 /**
  * Open price indicator.
@@ -37,33 +35,24 @@ import org.ta4j.core.num.Num;
  */
 public class OpenPriceIndicator extends SeriesRelatedNumericIndicator {
 
-    /**
-     * Constructor.
-     *
-     * @param series the bar series
-     */
-    public OpenPriceIndicator(final BarSeries series) {
-        super(series);
-    }
-
-    @Override
-    public Num getValue() {
-        return getBarSeries().getBar().openPrice();
-    }
-
-    @Override
-    public void refresh(final Instant tick) {
-        // NOOP
-    }
-
-    @Override
-    public boolean isStable() {
-        return true;
-    }
+  /**
+   * Constructor.
+   *
+   * @param numFactory the bar numFactory
+   */
+  public OpenPriceIndicator(final NumFactory numFactory) {
+    super(numFactory);
+  }
 
 
-    @Override
-    public String toString() {
-        return String.format("Open() => %s", getValue());
-    }
+  @Override
+  public void updateState(final Bar bar) {
+    this.value = bar.openPrice();
+  }
+
+
+  @Override
+  public String toString() {
+    return String.format("Open() => %s", getValue());
+  }
 }

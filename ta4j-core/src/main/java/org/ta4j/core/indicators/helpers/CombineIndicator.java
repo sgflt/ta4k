@@ -23,10 +23,10 @@
  */
 package org.ta4j.core.indicators.helpers;
 
-import java.time.Instant;
 import java.util.function.BinaryOperator;
 import java.util.function.Function;
 
+import org.ta4j.core.Bar;
 import org.ta4j.core.indicators.numeric.NumericIndicator;
 import org.ta4j.core.num.Num;
 
@@ -41,8 +41,6 @@ public class CombineIndicator extends NumericIndicator {
   private final NumericIndicator indicatorLeft;
   private final NumericIndicator indicatorRight;
   private final BinaryOperator<Num> combineFunction;
-  private Instant currentTick = Instant.EPOCH;
-  private Num value;
 
 
   /**
@@ -72,19 +70,10 @@ public class CombineIndicator extends NumericIndicator {
 
 
   @Override
-  public Num getValue() {
-    return this.value;
-  }
-
-
-  @Override
-  public void refresh(final Instant tick) {
-    if (tick.isAfter(this.currentTick)) {
-      this.indicatorLeft.refresh(tick);
-      this.indicatorRight.refresh(tick);
-      this.value = calculate();
-      this.currentTick = tick;
-    }
+  public void updateState(final Bar bar) {
+    this.indicatorLeft.onBar(bar);
+    this.indicatorRight.onBar(bar);
+    this.value = calculate();
   }
 
 

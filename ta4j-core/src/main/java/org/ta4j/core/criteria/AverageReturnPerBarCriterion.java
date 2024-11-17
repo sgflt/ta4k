@@ -25,9 +25,9 @@ package org.ta4j.core.criteria;
 
 import org.ta4j.core.Position;
 import org.ta4j.core.TradingRecord;
-import org.ta4j.core.backtest.BacktestBarSeries;
 import org.ta4j.core.criteria.pnl.ReturnCriterion;
 import org.ta4j.core.num.Num;
+import org.ta4j.core.num.NumFactoryProvider;
 
 /**
  * Calculates the average return per bar criterion, returned in decimal format.
@@ -47,22 +47,23 @@ public class AverageReturnPerBarCriterion extends AbstractAnalysisCriterion {
 
 
   @Override
-  public Num calculate(final BacktestBarSeries series, final Position position) {
-    final Num bars = this.numberOfBars.calculate(series, position);
+  public Num calculate(final Position position) {
+    final Num bars = this.numberOfBars.calculate(position);
     // If a simple division was used (grossreturn/bars), compounding would not be
     // considered, leading to inaccuracies in the calculation.
     // Therefore we need to use "pow" to accurately capture the compounding effect.
-    return bars.isZero() ? series.numFactory().one()
-                         : this.grossReturn.calculate(series, position).pow(series.numFactory().one().dividedBy(bars));
+    return bars.isZero() ? NumFactoryProvider.getDefaultNumFactory().one()
+                         : this.grossReturn.calculate(position)
+               .pow(NumFactoryProvider.getDefaultNumFactory().one().dividedBy(bars));
   }
 
 
   @Override
-  public Num calculate(final BacktestBarSeries series, final TradingRecord tradingRecord) {
-    final Num bars = this.numberOfBars.calculate(series, tradingRecord);
-    return bars.isZero() ? series.numFactory().one()
-                         : this.grossReturn.calculate(series, tradingRecord)
-               .pow(series.numFactory().one().dividedBy(bars));
+  public Num calculate(final TradingRecord tradingRecord) {
+    final Num bars = this.numberOfBars.calculate(tradingRecord);
+    return bars.isZero() ? NumFactoryProvider.getDefaultNumFactory().one()
+                         : this.grossReturn.calculate(tradingRecord)
+               .pow(NumFactoryProvider.getDefaultNumFactory().one().dividedBy(bars));
   }
 
 

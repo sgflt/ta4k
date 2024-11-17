@@ -22,6 +22,9 @@
  */
 package org.ta4j.core.indicators.bool;
 
+import java.time.Instant;
+
+import org.ta4j.core.Bar;
 import org.ta4j.core.BarSeries;
 import org.ta4j.core.indicators.Indicator;
 import org.ta4j.core.indicators.bool.chandelier.ChandelierExitLongIndicator;
@@ -30,6 +33,11 @@ import org.ta4j.core.indicators.helpers.previous.PreviousBooleanValueIndicator;
 import org.ta4j.core.rules.BooleanIndicatorRule;
 
 public abstract class BooleanIndicator implements Indicator<Boolean> {
+
+  private Instant currentBeginTime = Instant.EPOCH;
+
+  protected boolean value;
+
 
   public BooleanIndicatorRule toRule() {
     return new BooleanIndicatorRule(this);
@@ -57,4 +65,30 @@ public abstract class BooleanIndicator implements Indicator<Boolean> {
   ) {
     return new ChandelierExitShortIndicator(series, barCount, coefficient);
   }
+
+
+  @Override
+  public final Boolean getValue() {
+    return this.value;
+  }
+
+
+  @Override
+  public final void onBar(final Bar bar) {
+    if (bar.beginTime().isAfter(this.currentBeginTime)) {
+      updateState(bar);
+      this.currentBeginTime = bar.beginTime();
+    }
+  }
+
+
+  /**
+   * Updates internal stqte of indicator.
+   *
+   * If indicator depends on other indicators, it is required to call {@link #onBar(Bar)} on them to refresh their state
+   * before calculation
+   *
+   * @param bar that comes from exchange's stream
+   */
+  protected abstract void updateState(final Bar bar);
 }

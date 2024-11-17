@@ -138,13 +138,6 @@ public class BacktestStrategy implements Strategy {
   }
 
 
-  @Override
-  public void refresh(final Instant tick) {
-    this.indicatorContext.refresh(tick);
-    this.currentTick = tick;
-  }
-
-
   /**
    * Traces the {@code shouldEnter()} method calls.
    *

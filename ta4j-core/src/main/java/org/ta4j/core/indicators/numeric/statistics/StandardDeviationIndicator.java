@@ -23,8 +23,7 @@
  */
 package org.ta4j.core.indicators.numeric.statistics;
 
-import java.time.Instant;
-
+import org.ta4j.core.Bar;
 import org.ta4j.core.indicators.numeric.NumericIndicator;
 import org.ta4j.core.num.Num;
 
@@ -38,8 +37,6 @@ import org.ta4j.core.num.Num;
 public class StandardDeviationIndicator extends NumericIndicator {
 
   private final VarianceIndicator variance;
-  private Instant currentTick = Instant.EPOCH;
-  private Num value;
 
 
   /**
@@ -60,18 +57,9 @@ public class StandardDeviationIndicator extends NumericIndicator {
 
 
   @Override
-  public Num getValue() {
-    return this.value;
-  }
-
-
-  @Override
-  public void refresh(final Instant tick) {
-    if (tick.isAfter(this.currentTick)) {
-      this.variance.refresh(tick);
-      this.value = calculate();
-      this.currentTick = tick;
-    }
+  public void updateState(final Bar bar) {
+    this.variance.onBar(bar);
+    this.value = calculate();
   }
 
 

@@ -622,7 +622,7 @@
 //                    .highPrice(high)
 //                    .lowPrice(low)
 //                    .volume(volume)
-//                    .add();
+//                    .onCandle();
 //        }
 //
 //    }
@@ -823,7 +823,7 @@
 //                    .highPrice(high)
 //                    .lowPrice(low)
 //                    .volume(volume)
-//                    .add();
+//                    .onCandle();
 //        }
 //
 //    }
@@ -1007,7 +1007,7 @@
 //                    .lowPrice(low)
 //                    .closePrice(close)
 //                    .volume(volume)
-//                    .add();
+//                    .onCandle();
 //        }
 //
 //    }
@@ -1314,7 +1314,7 @@
 //                    .lowPrice(low)
 //                    .closePrice(close)
 //                    .volume(volume)
-//                    .add();
+//                    .onCandle();
 //        }
 //
 //    }

@@ -69,7 +69,7 @@
 //        int endIndex = series.getEndIndex();
 //
 //        // Adding the first begin index
-//        beginIndexes.add(beginIndex);
+//        beginIndexes.onCandle(beginIndex);
 //
 //        // Building the first interval before next split
 //        ZonedDateTime beginInterval = series.getFirstBar().endTime();
@@ -83,7 +83,7 @@
 //                if (!endInterval.isAfter(barTime)) {
 //                    // Bar after the interval
 //                    // --> Adding a new begin index
-//                    beginIndexes.add(i);
+//                    beginIndexes.onCandle(i);
 //                }
 //
 //                // Building the new interval before next split
@@ -148,7 +148,7 @@
 //
 //            List<Integer> beginIndexes = getSplitBeginIndexes(series, splitDuration);
 //            for (Integer subseriesBegin : beginIndexes) {
-//                subseries.add(subseries(series, subseriesBegin, sliceDuration));
+//                subseries.onCandle(subseries(series, subseriesBegin, sliceDuration));
 //            }
 //        }
 //        return subseries;

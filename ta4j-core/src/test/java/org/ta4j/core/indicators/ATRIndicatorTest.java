@@ -24,7 +24,6 @@
 package org.ta4j.core.indicators;
 
 import static org.junit.Assert.assertEquals;
-import static org.ta4j.core.TestUtils.assertIndicatorEquals;
 
 import org.junit.Test;
 import org.ta4j.core.ExternalIndicatorTest;
@@ -94,7 +93,7 @@ public class ATRIndicatorTest extends AbstractIndicatorTest<Num> {
         .amount(0)
         .trades(0)
         .add();
-    final var indicator = NumericIndicator.atr(series, 3);
+    final var indicator = NumericIndicator.atr(3);
     series.replaceStrategy(new MockStrategy(indicator));
 
     series.advance();
@@ -120,7 +119,7 @@ public class ATRIndicatorTest extends AbstractIndicatorTest<Num> {
 
   @Test
   public void testXls1() throws Exception {
-    final var xlsSeries = this.xls.getSeries();
+    final var xlsSeries = this.xls.getMarketEvents();
     final var indicator = NumericIndicator.atr(xlsSeries, 1);
     final var expected = this.xls.getIndicator(1);
     xlsSeries.replaceStrategy(new MockStrategy(expected, indicator));
@@ -132,7 +131,7 @@ public class ATRIndicatorTest extends AbstractIndicatorTest<Num> {
 
   @Test
   public void testXls3() throws Exception {
-    final var xlsSeries = this.xls.getSeries();
+    final var xlsSeries = this.xls.getMarketEvents();
     final var indicator = NumericIndicator.atr(xlsSeries, 3);
     final var expected = this.xls.getIndicator(3);
     xlsSeries.replaceStrategy(new MockStrategy(expected, indicator));
@@ -144,7 +143,7 @@ public class ATRIndicatorTest extends AbstractIndicatorTest<Num> {
 
   @Test
   public void testXls13() throws Exception {
-    final var xlsSeries = this.xls.getSeries();
+    final var xlsSeries = this.xls.getMarketEvents();
     final var indicator = NumericIndicator.atr(xlsSeries, 13);
     final var expected = this.xls.getIndicator(13);
     xlsSeries.replaceStrategy(new MockStrategy(expected, indicator));

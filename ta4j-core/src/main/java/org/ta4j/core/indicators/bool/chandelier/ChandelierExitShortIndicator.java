@@ -23,8 +23,7 @@
  */
 package org.ta4j.core.indicators.bool.chandelier;
 
-import java.time.Instant;
-
+import org.ta4j.core.Bar;
 import org.ta4j.core.BarSeries;
 import org.ta4j.core.indicators.bool.BooleanIndicator;
 import org.ta4j.core.indicators.candles.price.ClosePriceIndicator;
@@ -47,8 +46,6 @@ public class ChandelierExitShortIndicator extends BooleanIndicator {
   private final ATRIndicator atr;
   private final Num k;
   private final ClosePriceIndicator close;
-  private Instant currentTick = Instant.EPOCH;
-  private boolean value;
 
 
   /**
@@ -74,9 +71,9 @@ public class ChandelierExitShortIndicator extends BooleanIndicator {
    * @param k the K multiplier for ATR (usually 3.0)
    */
   public ChandelierExitShortIndicator(final BarSeries series, final int barCount, final double k) {
-    this.close = NumericIndicator.closePrice(series);
-    this.low = NumericIndicator.lowPrice(series).lowest(barCount);
-    this.atr = NumericIndicator.atr(series, barCount);
+    this.close = NumericIndicator.closePrice();
+    this.low = NumericIndicator.lowPrice().lowest(barCount);
+    this.atr = NumericIndicator.atr(barCount);
     this.k = series.numFactory().numOf(k);
   }
 
@@ -87,20 +84,11 @@ public class ChandelierExitShortIndicator extends BooleanIndicator {
 
 
   @Override
-  public Boolean getValue() {
-    return this.value;
-  }
-
-
-  @Override
-  public void refresh(final Instant tick) {
-    if (tick.isAfter(this.currentTick)) {
-      this.close.refresh(tick);
-      this.low.refresh(tick);
-      this.atr.refresh(tick);
-      this.value = calculate();
-      this.currentTick = tick;
-    }
+  public void updateState(final Bar bar) {
+    this.close.onBar(bar);
+    this.low.onBar(bar);
+    this.atr.onBar(bar);
+    this.value = calculate();
   }
 
 

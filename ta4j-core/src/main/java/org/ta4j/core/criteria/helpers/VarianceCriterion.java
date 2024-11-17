@@ -26,10 +26,10 @@ package org.ta4j.core.criteria.helpers;
 import org.ta4j.core.AnalysisCriterion;
 import org.ta4j.core.Position;
 import org.ta4j.core.TradingRecord;
-import org.ta4j.core.backtest.BacktestBarSeries;
 import org.ta4j.core.criteria.AbstractAnalysisCriterion;
 import org.ta4j.core.criteria.NumberOfPositionsCriterion;
 import org.ta4j.core.num.Num;
+import org.ta4j.core.num.NumFactoryProvider;
 
 /**
  * Variance criterion.
@@ -39,77 +39,82 @@ import org.ta4j.core.num.Num;
  */
 public class VarianceCriterion extends AbstractAnalysisCriterion {
 
-    /**
-     * If true, then the lower the criterion value the better, otherwise the higher
-     * the criterion value the better. This property is only used for
-     * {@link #betterThan(Num, Num)}.
-     */
-    private final boolean lessIsBetter;
+  /**
+   * If true, then the lower the criterion value the better, otherwise the higher
+   * the criterion value the better. This property is only used for
+   * {@link #betterThan(Num, Num)}.
+   */
+  private final boolean lessIsBetter;
 
-    private final AnalysisCriterion criterion;
-    private final NumberOfPositionsCriterion numberOfPositionsCriterion = new NumberOfPositionsCriterion();
+  private final AnalysisCriterion criterion;
+  private final NumberOfPositionsCriterion numberOfPositionsCriterion = new NumberOfPositionsCriterion();
 
-    /**
-     * Constructor with {@link #lessIsBetter} = false.
-     *
-     * @param criterion the criterion from which the "variance" is calculated
-     */
-    public VarianceCriterion(AnalysisCriterion criterion) {
-        this.criterion = criterion;
-        this.lessIsBetter = false;
+
+  /**
+   * Constructor with {@link #lessIsBetter} = false.
+   *
+   * @param criterion the criterion from which the "variance" is calculated
+   */
+  public VarianceCriterion(final AnalysisCriterion criterion) {
+    this.criterion = criterion;
+    this.lessIsBetter = false;
+  }
+
+
+  /**
+   * Constructor.
+   *
+   * @param criterion the criterion from which the "variance" is calculated
+   * @param lessIsBetter the {@link #lessIsBetter}
+   */
+  public VarianceCriterion(final AnalysisCriterion criterion, final boolean lessIsBetter) {
+    this.criterion = criterion;
+    this.lessIsBetter = lessIsBetter;
+  }
+
+
+  @Override
+  public Num calculate(final Position position) {
+    final Num criterionValue = this.criterion.calculate(position);
+    final Num numberOfPositions = this.numberOfPositionsCriterion.calculate(position);
+
+    Num variance = NumFactoryProvider.getDefaultNumFactory().zero();
+    final Num average = criterionValue.dividedBy(numberOfPositions);
+    final Num pow = this.criterion.calculate(position).minus(average).pow(2);
+    variance = variance.plus(pow);
+    variance = variance.dividedBy(numberOfPositions);
+    return variance;
+  }
+
+
+  @Override
+  public Num calculate(final TradingRecord tradingRecord) {
+    if (tradingRecord.getPositions().isEmpty()) {
+      return NumFactoryProvider.getDefaultNumFactory().zero();
     }
+    final Num criterionValue = this.criterion.calculate(tradingRecord);
+    final Num numberOfPositions = this.numberOfPositionsCriterion.calculate(tradingRecord);
 
-    /**
-     * Constructor.
-     *
-     * @param criterion    the criterion from which the "variance" is calculated
-     * @param lessIsBetter the {@link #lessIsBetter}
-     */
-    public VarianceCriterion(AnalysisCriterion criterion, boolean lessIsBetter) {
-        this.criterion = criterion;
-        this.lessIsBetter = lessIsBetter;
+    Num variance = NumFactoryProvider.getDefaultNumFactory().zero();
+    final Num average = criterionValue.dividedBy(numberOfPositions);
+
+    for (final Position position : tradingRecord.getPositions()) {
+      final Num pow = this.criterion.calculate(position).minus(average).pow(2);
+      variance = variance.plus(pow);
     }
+    variance = variance.dividedBy(numberOfPositions);
+    return variance;
+  }
 
-    @Override
-    public Num calculate(BacktestBarSeries series, Position position) {
-        Num criterionValue = criterion.calculate(series, position);
-        Num numberOfPositions = numberOfPositionsCriterion.calculate(series, position);
 
-        Num variance = series.numFactory().zero();
-        Num average = criterionValue.dividedBy(numberOfPositions);
-        Num pow = criterion.calculate(series, position).minus(average).pow(2);
-        variance = variance.plus(pow);
-        variance = variance.dividedBy(numberOfPositions);
-        return variance;
-    }
-
-    @Override
-    public Num calculate(BacktestBarSeries series, TradingRecord tradingRecord) {
-        if (tradingRecord.getPositions().isEmpty()) {
-            return series.numFactory().zero();
-        }
-        Num criterionValue = criterion.calculate(series, tradingRecord);
-        Num numberOfPositions = numberOfPositionsCriterion.calculate(series, tradingRecord);
-
-        Num variance = series.numFactory().zero();
-        Num average = criterionValue.dividedBy(numberOfPositions);
-
-        for (Position position : tradingRecord.getPositions()) {
-            Num pow = criterion.calculate(series, position).minus(average).pow(2);
-            variance = variance.plus(pow);
-        }
-        variance = variance.dividedBy(numberOfPositions);
-        return variance;
-    }
-
-    /**
-     * If {@link #lessIsBetter} == false, then the lower the criterion value, the
-     * better, otherwise the higher the criterion value the better.
-     */
-    @Override
-    public boolean betterThan(Num criterionValue1, Num criterionValue2) {
-        return lessIsBetter ? criterionValue1.isLessThan(criterionValue2)
-                : criterionValue1.isGreaterThan(criterionValue2);
-    }
+  /**
+   * If {@link #lessIsBetter} == false, then the lower the criterion value, the
+   * better, otherwise the higher the criterion value the better.
+   */
+  @Override
+  public boolean betterThan(final Num criterionValue1, final Num criterionValue2) {
+    return this.lessIsBetter ? criterionValue1.isLessThan(criterionValue2)
+                             : criterionValue1.isGreaterThan(criterionValue2);
+  }
 
 }

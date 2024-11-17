@@ -23,8 +23,7 @@
  */
 package org.ta4j.core.indicators;
 
-import java.time.Instant;
-
+import org.ta4j.core.Bar;
 import org.ta4j.core.BarSeries;
 
 /**
@@ -53,9 +52,9 @@ public interface Indicator<T> {
    * Backtesting may rewind time to past, this event should invalidate calculated
    * value.
    *
-   * @param tick current time
+   * @param bar current time
    */
-  void refresh(Instant tick);
+  void onBar(Bar bar);
 
   /**
    * @return true if indicator is stabilized
@@ -63,7 +62,7 @@ public interface Indicator<T> {
   boolean isStable();
 
   /**
-   * Wrapperd indicator that assigns name to this instance.
+   * Wrapper indicator that assigns name to this instance.
    *
    * @param name to assign
    *

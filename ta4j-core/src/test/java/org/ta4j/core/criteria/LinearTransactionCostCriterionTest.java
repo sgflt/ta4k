@@ -49,7 +49,7 @@
 //
 //    @Test
 //    public void externalData() throws Exception {
-//        BarSeries xlsSeries = xls.getSeries();
+//        BarSeries xlsSeries = xls.getMarketEvents();
 //        TradingRecord xlsTradingRecord = xls.getTradingRecord();
 //        Num value;
 //
@@ -65,7 +65,7 @@
 //    @Test
 //    public void dummyData() {
 //        var series = new MockBarSeriesBuilder().withNumFactory(numFactory)
-//                .withData(100, 150, 200, 100, 50, 100)
+//                .withCandleClosePrices(100, 150, 200, 100, 50, 100)
 //                .build();
 //        TradingRecord tradingRecord = new BackTestTradingRecord();
 //        Num criterion;
@@ -88,7 +88,7 @@
 //    @Test
 //    public void fixedCost() {
 //        var series = new MockBarSeriesBuilder().withNumFactory(numFactory)
-//                .withData(100, 105, 110, 100, 95, 105)
+//                .withCandleClosePrices(100, 105, 110, 100, 95, 105)
 //                .build();
 //        TradingRecord tradingRecord = new BackTestTradingRecord();
 //        Num criterion;
@@ -110,7 +110,7 @@
 //
 //    @Test
 //    public void fixedCostWithOnePosition() {
-//        var series = new MockBarSeriesBuilder().withNumFactory(numFactory).withData(100, 95, 100, 80, 85, 70).build();
+//        var series = new MockBarSeriesBuilder().withNumFactory(numFactory).withCandleClosePrices(100, 95, 100, 80, 85, 70).build();
 //        Position position = new Position();
 //        Num criterion;
 //

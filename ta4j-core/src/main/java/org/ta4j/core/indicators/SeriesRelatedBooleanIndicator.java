@@ -31,7 +31,7 @@ import org.ta4j.core.indicators.bool.BooleanIndicator;
  */
 public abstract class SeriesRelatedBooleanIndicator extends BooleanIndicator {
 
-
+  protected Boolean value;
   private final BarSeries series;
 
 

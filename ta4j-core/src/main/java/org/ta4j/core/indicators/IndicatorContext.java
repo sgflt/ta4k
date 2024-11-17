@@ -24,27 +24,29 @@
 
 package org.ta4j.core.indicators;
 
-import java.time.Instant;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
 
+import org.ta4j.core.Bar;
+
 /**
  * @author Lukáš Kvídera
  */
 public class IndicatorContext {
-  private final Set<Indicator<?>> indicators;
+  private final List<Indicator<?>> indicators;
   private final Set<IndicatorChangeListener> changeListeners = new HashSet<>();
 
 
   private IndicatorContext(final Indicator<?>... indicators) {
-    this.indicators = Set.of(indicators);
+    this.indicators = List.of(indicators);
   }
 
 
   private IndicatorContext() {
-    this.indicators = new HashSet<>();
+    this.indicators = new ArrayList<>();
   }
 
 
@@ -80,16 +82,21 @@ public class IndicatorContext {
   }
 
 
+  public Indicator<?> get(final int index) {
+    return this.indicators.get(index);
+  }
+
+
   public void addAll(final Indicator<?>... indicator) {
     this.indicators.addAll(List.of(indicator));
   }
 
 
-  public void refresh(final Instant tick) {
+  public void refresh(final Bar bar) {
     for (final var indicator : this.indicators) {
-      indicator.refresh(tick);
+      indicator.onBar(bar);
       for (final var changeListener : this.changeListeners) {
-        changeListener.accept(tick, indicator);
+        changeListener.accept(bar.beginTime(), indicator);
       }
     }
   }

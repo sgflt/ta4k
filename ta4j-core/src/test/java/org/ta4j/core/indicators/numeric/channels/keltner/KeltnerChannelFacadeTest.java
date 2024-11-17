@@ -89,7 +89,7 @@ public class KeltnerChannelFacadeTest extends AbstractIndicatorTest<Num> {
 
   @Test
   public void testCreation() {
-    final var facade = new KeltnerChannelFacade(this.data, 14, 14, 2);
+    final var facade = new KeltnerChannelFacade(14, 14, 2);
     assertEquals(this.data.numFactory(), facade.middle().getNumFactory());
   }
 
@@ -100,7 +100,7 @@ public class KeltnerChannelFacadeTest extends AbstractIndicatorTest<Num> {
     final var kl = new KeltnerChannelLowerIndicator(this.data, km, 2, 14);
     final var ku = new KeltnerChannelUpperIndicator(this.data, km, 2, 14);
 
-    final var facade = new KeltnerChannelFacade(this.data, 14, 14, 2);
+    final var facade = new KeltnerChannelFacade(14, 14, 2);
     final NumericIndicator middleNumeric = facade.middle();
     final NumericIndicator upperNumeric = facade.upper();
     final NumericIndicator lowerNumeric = facade.lower();

@@ -1,7 +1,7 @@
-/**
+/*
  * The MIT License (MIT)
  *
- * Copyright (c) 2017-2023 Ta4j Organization & respective
+ * Copyright (c) 2017-2024 Ta4j Organization & respective
  * authors (see AUTHORS)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
@@ -23,8 +23,6 @@
  */
 package org.ta4j.core.indicators.candles;
 
-import java.time.Instant;
-
 import org.ta4j.core.Bar;
 import org.ta4j.core.BarSeries;
 import org.ta4j.core.indicators.SeriesRelatedBooleanIndicator;
@@ -38,7 +36,6 @@ import org.ta4j.core.num.Num;
  */
 public class BullishHaramiIndicator extends SeriesRelatedBooleanIndicator {
 
-  private Instant currentTick = Instant.EPOCH;
   private Boolean value;
   private Bar previousBar;
 
@@ -53,43 +50,34 @@ public class BullishHaramiIndicator extends SeriesRelatedBooleanIndicator {
   }
 
 
-  protected Boolean calculate() {
+  protected Boolean calculate(final Bar bar) {
     if (this.value == null) {
-      this.previousBar = getBarSeries().getBar();
+      this.previousBar = bar;
       // Harami is a 2-candle pattern
       return false;
     }
 
     final Bar prevBar = this.previousBar;
-    final Bar currBar = getBarSeries().getBar();
-    this.previousBar = currBar;
+    this.previousBar = bar;
 
-    if (prevBar.isBearish() && currBar.isBullish()) {
+    if (prevBar.isBearish() && bar.isBullish()) {
       final Num prevOpenPrice = prevBar.openPrice();
       final Num prevClosePrice = prevBar.closePrice();
-      final Num currOpenPrice = currBar.openPrice();
-      final Num currClosePrice = currBar.closePrice();
+      final Num currOpenPrice = bar.openPrice();
+      final Num currClosePrice = bar.closePrice();
       return currOpenPrice.isLessThan(prevOpenPrice)
              && currOpenPrice.isGreaterThan(prevClosePrice)
              && currClosePrice.isLessThan(prevOpenPrice)
              && currClosePrice.isGreaterThan(prevClosePrice);
     }
+
     return false;
   }
 
 
   @Override
-  public Boolean getValue() {
-    return this.value;
-  }
-
-
-  @Override
-  public void refresh(final Instant tick) {
-    if (tick.isAfter(this.currentTick)) {
-      this.value = calculate();
-      this.currentTick = tick;
-    }
+  public void updateState(final Bar bar) {
+    this.value = calculate(bar);
   }
 
 

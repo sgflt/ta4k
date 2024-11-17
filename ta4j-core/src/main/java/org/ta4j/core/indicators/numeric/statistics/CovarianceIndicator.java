@@ -23,10 +23,10 @@
  */
 package org.ta4j.core.indicators.numeric.statistics;
 
-import java.time.Instant;
 import java.util.LinkedList;
 import java.util.Queue;
 
+import org.ta4j.core.Bar;
 import org.ta4j.core.indicators.numeric.NumericIndicator;
 import org.ta4j.core.num.Num;
 
@@ -42,8 +42,6 @@ public class CovarianceIndicator extends NumericIndicator {
   private Num sumXY;
   private Num sumY;
   private final int barCount;
-  private Instant currentTick = Instant.EPOCH;
-  private Num value;
 
 
   /**
@@ -102,21 +100,13 @@ public class CovarianceIndicator extends NumericIndicator {
 
 
   @Override
-  public Num getValue() {
-    return this.window.isEmpty()
-           ? getNumFactory().zero()
-           : this.value;
-  }
-
-
-  @Override
-  public void refresh(final Instant tick) {
-    if (tick.isAfter(this.currentTick)) {
-      this.indicator1.refresh(tick);
-      this.indicator2.refresh(tick);
-      this.value = calculate();
-      this.currentTick = tick;
-    }
+  public void updateState(final Bar bar) {
+    this.indicator1.onBar(bar);
+    this.indicator2.onBar(bar);
+    this.value = calculate();
+    this.value = this.window.isEmpty()
+                 ? getNumFactory().zero()
+                 : this.value;
   }
 
 

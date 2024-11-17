@@ -23,8 +23,7 @@
  */
 package org.ta4j.core.indicators.numeric.average;
 
-import java.time.Instant;
-
+import org.ta4j.core.Bar;
 import org.ta4j.core.indicators.Indicator;
 import org.ta4j.core.indicators.helpers.previous.PreviousNumericValueIndicator;
 import org.ta4j.core.indicators.numeric.NumericIndicator;
@@ -46,8 +45,6 @@ public class ZLEMAIndicator extends NumericIndicator {
   private final PreviousNumericValueIndicator lagPreviousValue;
   private final int lag;
   private int barsPassed;
-  private Num value;
-  private Instant currentTick = Instant.EPOCH;
 
 
   /**
@@ -89,20 +86,11 @@ public class ZLEMAIndicator extends NumericIndicator {
 
 
   @Override
-  public Num getValue() {
-    return this.value;
-  }
-
-
-  @Override
-  public void refresh(final Instant tick) {
-    if (tick.isAfter(this.currentTick)) {
-      ++this.barsPassed;
-      this.indicator.refresh(tick);
-      this.lagPreviousValue.refresh(tick);
-      this.value = calculate();
-      this.currentTick = tick;
-    }
+  public void updateState(final Bar bar) {
+    ++this.barsPassed;
+    this.indicator.onBar(bar);
+    this.lagPreviousValue.onBar(bar);
+    this.value = calculate();
   }
 
 

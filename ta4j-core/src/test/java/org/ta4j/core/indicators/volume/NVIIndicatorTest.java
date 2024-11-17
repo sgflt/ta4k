@@ -41,16 +41,16 @@
 //    @Test
 //    public void getValue() {
 //        var series = new MockBarSeriesBuilder().withNumFactory(numFactory).build();
-//        series.barBuilder().closePrice(1355.69).volume(2739.55).add();
-//        series.barBuilder().closePrice(1325.51).volume(3119.46).add();
-//        series.barBuilder().closePrice(1335.02).volume(3466.88).add();
-//        series.barBuilder().closePrice(1313.72).volume(2577.12).add();
-//        series.barBuilder().closePrice(1319.99).volume(2480.45).add();
-//        series.barBuilder().closePrice(1331.85).volume(2329.79).add();
-//        series.barBuilder().closePrice(1329.04).volume(2793.07).add();
-//        series.barBuilder().closePrice(1362.16).volume(3378.78).add();
-//        series.barBuilder().closePrice(1365.51).volume(2417.59).add();
-//        series.barBuilder().closePrice(1374.02).volume(1442.81).add();
+//        series.barBuilder().closePrice(1355.69).volume(2739.55).onCandle();
+//        series.barBuilder().closePrice(1325.51).volume(3119.46).onCandle();
+//        series.barBuilder().closePrice(1335.02).volume(3466.88).onCandle();
+//        series.barBuilder().closePrice(1313.72).volume(2577.12).onCandle();
+//        series.barBuilder().closePrice(1319.99).volume(2480.45).onCandle();
+//        series.barBuilder().closePrice(1331.85).volume(2329.79).onCandle();
+//        series.barBuilder().closePrice(1329.04).volume(2793.07).onCandle();
+//        series.barBuilder().closePrice(1362.16).volume(3378.78).onCandle();
+//        series.barBuilder().closePrice(1365.51).volume(2417.59).onCandle();
+//        series.barBuilder().closePrice(1374.02).volume(1442.81).onCandle();
 //
 //        var nvi = new NVIIndicator(series);
 //        assertNumEquals(1000, nvi.getValue(0));

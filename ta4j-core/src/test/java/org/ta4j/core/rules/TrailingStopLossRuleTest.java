@@ -66,7 +66,7 @@
 //    public void isSatisfiedForBuy() {
 //        BackTestTradingRecord tradingRecord = new BackTestTradingRecord(TradeType.BUY);
 //        ClosePriceIndicator closePrice = new ClosePriceIndicator(new MockBarSeriesBuilder().withNumFactory(numFactory)
-//                .withData(100, 110, 120, 130, 117.00, 130, 116.99)
+//                .withCandleClosePrices(100, 110, 120, 130, 117.00, 130, 116.99)
 //                .build());
 //
 //        // 10% trailing-stop-loss
@@ -93,7 +93,7 @@
 //    public void isSatisfiedForBuyForBarCount() {
 //        BackTestTradingRecord tradingRecord = new BackTestTradingRecord(TradeType.BUY);
 //        ClosePriceIndicator closePrice = new ClosePriceIndicator(new MockBarSeriesBuilder().withNumFactory(numFactory)
-//                .withData(100, 110, 120, 130, 120, 117.00, 117.00, 130, 116.99)
+//                .withCandleClosePrices(100, 110, 120, 130, 120, 117.00, 117.00, 130, 116.99)
 //                .build());
 //
 //        // 10% trailing-stop-loss
@@ -122,7 +122,7 @@
 //    public void isSatisfiedForSell() {
 //        BackTestTradingRecord tradingRecord = new BackTestTradingRecord(TradeType.SELL);
 //        ClosePriceIndicator closePrice = new ClosePriceIndicator(new MockBarSeriesBuilder().withNumFactory(numFactory)
-//                .withData(100, 90, 80, 70, 77.00, 120, 132.01)
+//                .withCandleClosePrices(100, 90, 80, 70, 77.00, 120, 132.01)
 //                .build());
 //
 //        // 10% trailing-stop-loss
@@ -150,7 +150,7 @@
 //    public void isSatisfiedForSellForBarCount() {
 //        BackTestTradingRecord tradingRecord = new BackTestTradingRecord(TradeType.SELL);
 //        ClosePriceIndicator closePrice = new ClosePriceIndicator(new MockBarSeriesBuilder().withNumFactory(numFactory)
-//                .withData(100, 90, 80, 70, 70, 73, 77.00, 90, 120, 132.01)
+//                .withCandleClosePrices(100, 90, 80, 70, 70, 73, 77.00, 90, 120, 132.01)
 //                .build());
 //
 //        // 10% trailing-stop-loss and 2 bars back

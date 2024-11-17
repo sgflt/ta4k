@@ -23,12 +23,10 @@
  */
 package org.ta4j.core.indicators.numeric.adx;
 
-import java.time.Instant;
-
 import org.ta4j.core.Bar;
-import org.ta4j.core.BarSeries;
-import org.ta4j.core.indicators.SeriesRelatedNumericIndicator;
+import org.ta4j.core.indicators.numeric.NumericIndicator;
 import org.ta4j.core.num.Num;
+import org.ta4j.core.num.NumFactory;
 
 /**
  * -DM indicator.
@@ -36,62 +34,46 @@ import org.ta4j.core.num.Num;
  * <p>
  * Part of the Directional Movement System.
  */
-public class MinusDMIndicator extends SeriesRelatedNumericIndicator {
+public class MinusDMIndicator extends NumericIndicator {
 
   private Bar previousBar;
-  private Num value;
-  private Instant currentTick = Instant.EPOCH;
   private boolean stable;
 
 
   /**
    * Constructor.
    *
-   * @param series the bar series
+   * @param numFactory the bar numFactory
    */
-  public MinusDMIndicator(final BarSeries series) {
-    super(series);
+  public MinusDMIndicator(final NumFactory numFactory) {
+    super(numFactory);
   }
 
 
-  protected Num calculate() {
+  protected Num calculate(final Bar bar) {
     if (this.previousBar == null) {
-      this.previousBar = getBarSeries().getBar();
-      return getBarSeries().numFactory().zero();
+      this.previousBar = bar;
+      return getNumFactory().zero();
     }
 
     this.stable = true;
     final Bar prevBar = this.previousBar;
-    final Bar currentBar = getBarSeries().getBar();
 
-    final Num upMove = currentBar.highPrice().minus(prevBar.highPrice());
-    final Num downMove = prevBar.lowPrice().minus(currentBar.lowPrice());
+    final Num upMove = bar.highPrice().minus(prevBar.highPrice());
+    final Num downMove = prevBar.lowPrice().minus(bar.lowPrice());
 
-    this.previousBar = currentBar;
-    if (downMove.isGreaterThan(upMove) && downMove.isGreaterThan(getBarSeries().numFactory().zero())) {
+    this.previousBar = bar;
+    if (downMove.isGreaterThan(upMove) && downMove.isGreaterThan(getNumFactory().zero())) {
       return downMove;
     }
 
-    return getBarSeries().numFactory().zero();
+    return getNumFactory().zero();
   }
 
 
   @Override
-  public Num getValue() {
-    return this.value;
-  }
-
-
-  @Override
-  public void refresh(final Instant tick) {
-    if (tick.isAfter(this.currentTick)) {
-      this.value = calculate();
-      this.currentTick = tick;
-    } else if (tick.isBefore(this.currentTick)) {
-      this.previousBar = null;
-      this.stable = false;
-      this.value = calculate();
-    }
+  public void updateState(final Bar bar) {
+    this.value = calculate(bar);
   }
 
 

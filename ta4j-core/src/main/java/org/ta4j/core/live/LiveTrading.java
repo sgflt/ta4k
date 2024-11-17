@@ -36,21 +36,24 @@ public class LiveTrading {
   private final BarSeries series;
   private Strategy strategy;
 
+
   public LiveTrading(final BarSeries series, final Strategy strategy) {
     this.series = series;
     this.strategy = strategy;
   }
 
+
   public BarBuilder barBuilder() {
     return this.series.barBuilder();
   }
+
 
   public Strategy getStrategy() {
     return this.strategy;
   }
 
+
   public void replaceStrategy(final Strategy strategy) {
-    this.series.replaceStrategy(strategy);
     this.strategy = strategy;
   }
 
@@ -58,6 +61,7 @@ public class LiveTrading {
   public boolean shouldEnter() {
     return this.strategy.shouldEnter();
   }
+
 
   public boolean shouldExit() {
     return this.strategy.shouldExit();

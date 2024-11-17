@@ -23,12 +23,11 @@
  */
 package org.ta4j.core.indicators.numeric.channels.keltner;
 
-import java.time.Instant;
-
-import org.ta4j.core.BarSeries;
+import org.ta4j.core.Bar;
 import org.ta4j.core.indicators.numeric.ATRIndicator;
 import org.ta4j.core.indicators.numeric.NumericIndicator;
 import org.ta4j.core.num.Num;
+import org.ta4j.core.num.NumFactory;
 
 /**
  * Keltner Channel (upper line) indicator.
@@ -42,8 +41,6 @@ public class KeltnerChannelUpperIndicator extends NumericIndicator {
   private final ATRIndicator averageTrueRangeIndicator;
   private final KeltnerChannelMiddleIndicator keltnerMiddleIndicator;
   private final Num ratio;
-  private Instant currentTick = Instant.EPOCH;
-  private Num value;
 
 
   /**
@@ -54,12 +51,12 @@ public class KeltnerChannelUpperIndicator extends NumericIndicator {
    * @param barCountATR the bar count for the {@link ATRIndicator}
    */
   public KeltnerChannelUpperIndicator(
-      final BarSeries series,
+      final NumFactory numFactory,
       final KeltnerChannelMiddleIndicator middle,
       final double ratio,
       final int barCountATR
   ) {
-    this(series, middle, new ATRIndicator(series, barCountATR), ratio);
+    this(numFactory, middle, new ATRIndicator(numFactory, barCountATR), ratio);
   }
 
 
@@ -71,12 +68,12 @@ public class KeltnerChannelUpperIndicator extends NumericIndicator {
    * @param ratio the {@link #ratio}
    */
   public KeltnerChannelUpperIndicator(
-      final BarSeries series,
+      final NumFactory numFactory,
       final KeltnerChannelMiddleIndicator middle,
       final ATRIndicator atr,
       final double ratio
   ) {
-    super(series.numFactory());
+    super(numFactory);
     this.keltnerMiddleIndicator = middle;
     this.averageTrueRangeIndicator = atr;
     this.ratio = getNumFactory().numOf(ratio);
@@ -90,19 +87,10 @@ public class KeltnerChannelUpperIndicator extends NumericIndicator {
 
 
   @Override
-  public Num getValue() {
-    return this.value;
-  }
-
-
-  @Override
-  public void refresh(final Instant tick) {
-    if (tick.isAfter(this.currentTick)) {
-      this.keltnerMiddleIndicator.refresh(tick);
-      this.averageTrueRangeIndicator.refresh(tick);
-      this.value = calculate();
-      this.currentTick = tick;
-    }
+  public void updateState(final Bar bar) {
+    this.keltnerMiddleIndicator.onBar(bar);
+    this.averageTrueRangeIndicator.onBar(bar);
+    this.value = calculate();
   }
 
 

@@ -23,8 +23,7 @@
  */
 package org.ta4j.core.indicators.numeric.adx;
 
-import java.time.Instant;
-
+import org.ta4j.core.Bar;
 import org.ta4j.core.BarSeries;
 import org.ta4j.core.indicators.numeric.NumericIndicator;
 import org.ta4j.core.indicators.numeric.average.MMAIndicator;
@@ -79,15 +78,15 @@ public class ADXIndicator extends NumericIndicator {
   }
 
 
-  @Override
-  public Num getValue() {
+  private Num calculate() {
     return this.averageDXIndicator.getValue();
   }
 
 
   @Override
-  public void refresh(final Instant tick) {
-    this.averageDXIndicator.refresh(tick);
+  public void updateState(final Bar bar) {
+    this.averageDXIndicator.onBar(bar);
+    this.value = calculate();
   }
 
 

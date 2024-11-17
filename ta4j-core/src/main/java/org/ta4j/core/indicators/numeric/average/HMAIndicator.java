@@ -23,8 +23,7 @@
  */
 package org.ta4j.core.indicators.numeric.average;
 
-import java.time.Instant;
-
+import org.ta4j.core.Bar;
 import org.ta4j.core.indicators.Indicator;
 import org.ta4j.core.indicators.helpers.CombineIndicator;
 import org.ta4j.core.indicators.helpers.TransformIndicator;
@@ -41,8 +40,6 @@ public class HMAIndicator extends NumericIndicator {
 
   private final int barCount;
   private final WMAIndicator sqrtWma;
-  private Instant currentTick = Instant.EPOCH;
-  private Num value;
 
 
   /**
@@ -55,14 +52,11 @@ public class HMAIndicator extends NumericIndicator {
     super(indicator.getNumFactory());
     this.barCount = barCount;
 
-    final var halfWma = new WMAIndicator(indicator, barCount / 2);
-    final var origWma = new WMAIndicator(indicator, barCount);
+    final var halfWma = indicator.wma(barCount / 2);
+    final var origWma = indicator.wma(barCount);
 
     final var indicatorForSqrtWma = CombineIndicator.minus(TransformIndicator.multiply(halfWma, 2), origWma);
-    this.sqrtWma = new WMAIndicator(
-        indicatorForSqrtWma,
-        getNumFactory().numOf(barCount).sqrt().intValue()
-    );
+    this.sqrtWma = indicatorForSqrtWma.wma(getNumFactory().numOf(barCount).sqrt().intValue());
   }
 
 
@@ -72,18 +66,9 @@ public class HMAIndicator extends NumericIndicator {
 
 
   @Override
-  public Num getValue() {
-    return this.value;
-  }
-
-
-  @Override
-  public void refresh(final Instant tick) {
-    if (tick.isAfter(this.currentTick)) {
-      this.sqrtWma.refresh(tick);
-      this.value = calculate();
-      this.currentTick = tick;
-    }
+  public void updateState(final Bar bar) {
+    this.sqrtWma.onBar(bar);
+    this.value = calculate();
   }
 
 

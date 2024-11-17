@@ -23,8 +23,7 @@
  */
 package org.ta4j.core.indicators.helpers;
 
-import java.time.Instant;
-
+import org.ta4j.core.Bar;
 import org.ta4j.core.indicators.helpers.previous.PreviousNumericValueIndicator;
 import org.ta4j.core.indicators.numeric.NumericIndicator;
 import org.ta4j.core.num.Num;
@@ -40,9 +39,7 @@ public class RunningTotalIndicator extends NumericIndicator {
   private final int barCount;
   private final PreviousNumericValueIndicator previousValue;
   private Num previousSum;
-  private Num value;
   private int processedBars;
-  private Instant currentTick = Instant.EPOCH;
 
 
   public RunningTotalIndicator(final NumericIndicator indicator, final int barCount) {
@@ -51,12 +48,6 @@ public class RunningTotalIndicator extends NumericIndicator {
     this.barCount = barCount;
     this.previousSum = getNumFactory().zero();
     this.previousValue = new PreviousNumericValueIndicator(indicator, barCount);
-  }
-
-
-  @Override
-  public Num getValue() {
-    return this.value;
   }
 
 
@@ -81,13 +72,10 @@ public class RunningTotalIndicator extends NumericIndicator {
 
 
   @Override
-  public void refresh(final Instant tick) {
-    if (tick.isAfter(this.currentTick)) {
-      ++this.processedBars;
-      this.previousValue.refresh(tick);
-      this.value = calculate();
-      this.currentTick = tick;
-    }
+  public void updateState(final Bar bar) {
+    ++this.processedBars;
+    this.previousValue.onBar(bar);
+    this.value = calculate();
   }
 
 

@@ -23,11 +23,10 @@
  */
 package org.ta4j.core.indicators.candles;
 
-import java.time.Instant;
-
-import org.ta4j.core.BarSeries;
+import org.ta4j.core.Bar;
 import org.ta4j.core.indicators.SeriesRelatedNumericIndicator;
 import org.ta4j.core.num.Num;
+import org.ta4j.core.num.NumFactory;
 
 /**
  * Lower shadow height indicator.
@@ -42,51 +41,32 @@ import org.ta4j.core.num.Num;
  */
 public class LowerShadowIndicator extends SeriesRelatedNumericIndicator {
 
-  private Instant currentTick = Instant.EPOCH;
-  private Num value;
-
-
   /**
    * Constructor.
    *
-   * @param series the bar series
+   * @param numFactory the bar numFactory
    */
-  public LowerShadowIndicator(final BarSeries series) {
-    super(series);
+  public LowerShadowIndicator(final NumFactory numFactory) {
+    super(numFactory);
   }
 
 
-  protected Num calculate() {
-    final var bar = getBarSeries().getBar();
+  protected Num calculate(final Bar bar) {
     final var openPrice = bar.openPrice();
     final var closePrice = bar.closePrice();
+
     if (closePrice.isGreaterThan(openPrice)) {
       // Bullish
       return openPrice.minus(bar.lowPrice());
-    } else {
-      // Bearish
-      return closePrice.minus(bar.lowPrice());
     }
+
+    // Bearish
+    return closePrice.minus(bar.lowPrice());
   }
 
 
   @Override
-  public Num getValue() {
-    return this.value;
-  }
-
-
-  @Override
-  public void refresh(final Instant tick) {
-    if (tick.isAfter(this.currentTick)) {
-      this.value = calculate();
-      this.currentTick = tick;
-    }
-  }
-
-
-  @Override
-  public boolean isStable() {
-    return this.value != null;
+  public void updateState(final Bar bar) {
+    this.value = calculate(bar);
   }
 }

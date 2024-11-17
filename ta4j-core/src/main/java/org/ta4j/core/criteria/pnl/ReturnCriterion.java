@@ -1,4 +1,4 @@
-/**
+/*
  * The MIT License (MIT)
  *
  * Copyright (c) 2017-2023 Ta4j Organization & respective
@@ -26,9 +26,9 @@ package org.ta4j.core.criteria.pnl;
 import org.ta4j.core.BarSeries;
 import org.ta4j.core.Position;
 import org.ta4j.core.TradingRecord;
-import org.ta4j.core.backtest.BacktestBarSeries;
 import org.ta4j.core.criteria.AbstractAnalysisCriterion;
 import org.ta4j.core.num.Num;
+import org.ta4j.core.num.NumFactoryProvider;
 
 /**
  * Return (in percentage) criterion (includes trading costs), returned in
@@ -40,59 +40,67 @@ import org.ta4j.core.num.Num;
  */
 public class ReturnCriterion extends AbstractAnalysisCriterion {
 
-    /**
-     * If true, then the base percentage of {@code 1} (equivalent to 100%) is added
-     * to the criterion value.
-     */
-    private final boolean addBase;
+  /**
+   * If true, then the base percentage of {@code 1} (equivalent to 100%) is added
+   * to the criterion value.
+   */
+  private final boolean addBase;
 
-    /**
-     * Constructor with {@link #addBase} == true.
-     */
-    public ReturnCriterion() {
-        this.addBase = true;
-    }
 
-    /**
-     * Constructor.
-     *
-     * @param addBase the {@link #addBase}
-     */
-    public ReturnCriterion(boolean addBase) {
-        this.addBase = addBase;
-    }
+  /**
+   * Constructor with {@link #addBase} == true.
+   */
+  public ReturnCriterion() {
+    this.addBase = true;
+  }
 
-    @Override
-    public Num calculate(BacktestBarSeries series, Position position) {
-        return calculateProfit(series, position);
-    }
 
-    @Override
-    public Num calculate(BacktestBarSeries series, TradingRecord tradingRecord) {
-        return tradingRecord.getPositions()
-                .stream()
-                .map(position -> calculateProfit(series, position))
-                .reduce(series.numFactory().one(), Num::multipliedBy)
-                .minus(addBase ? series.numFactory().zero() : series.numFactory().one());
-    }
+  /**
+   * Constructor.
+   *
+   * @param addBase the {@link #addBase}
+   */
+  public ReturnCriterion(final boolean addBase) {
+    this.addBase = addBase;
+  }
 
-    /** The higher the criterion value, the better. */
-    @Override
-    public boolean betterThan(Num criterionValue1, Num criterionValue2) {
-        return criterionValue1.isGreaterThan(criterionValue2);
-    }
 
-    /**
-     * Calculates the gross return of a position (Buy and sell).
-     *
-     * @param series   a bar series
-     * @param position a position
-     * @return the gross return of the position
-     */
-    private Num calculateProfit(BacktestBarSeries series, Position position) {
-        if (position.isClosed()) {
-            return position.getGrossReturn(series);
-        }
-        return addBase ? series.numFactory().one() : series.numFactory().zero();
+  @Override
+  public Num calculate(final Position position) {
+    return calculateProfit(position);
+  }
+
+
+  @Override
+  public Num calculate(final TradingRecord tradingRecord) {
+    return tradingRecord.getPositions()
+        .stream()
+        .map(position -> calculateProfit(position))
+        .reduce(NumFactoryProvider.getDefaultNumFactory().one(), Num::multipliedBy)
+        .minus(this.addBase
+               ? NumFactoryProvider.getDefaultNumFactory().zero() : NumFactoryProvider.getDefaultNumFactory().one());
+  }
+
+
+  /** The higher the criterion value, the better. */
+  @Override
+  public boolean betterThan(final Num criterionValue1, final Num criterionValue2) {
+    return criterionValue1.isGreaterThan(criterionValue2);
+  }
+
+
+  /**
+   * Calculates the gross return of a position (Buy and sell).
+   *
+   * @param position a position
+   *
+   * @return the gross return of the position
+   */
+  private Num calculateProfit(final Position position) {
+    if (position.isClosed()) {
+      return position.getGrossReturn();
     }
+    return this.addBase
+           ? NumFactoryProvider.getDefaultNumFactory().one() : NumFactoryProvider.getDefaultNumFactory().zero();
+  }
 }

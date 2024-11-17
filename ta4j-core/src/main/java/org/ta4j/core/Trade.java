@@ -269,7 +269,7 @@ public class Trade {
     this.cost = transactionCostModel.calculate(this.pricePerAsset, amount);
 
     final Num costPerAsset = this.cost.dividedBy(amount);
-    // add transaction costs to the pricePerAsset at the trade
+    // onCandle transaction costs to the pricePerAsset at the trade
     if (this.type.equals(TradeType.BUY)) {
       this.netPrice = this.pricePerAsset.plus(costPerAsset);
     } else {

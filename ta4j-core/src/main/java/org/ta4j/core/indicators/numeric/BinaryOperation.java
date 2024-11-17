@@ -23,9 +23,9 @@
  */
 package org.ta4j.core.indicators.numeric;
 
-import java.time.Instant;
 import java.util.function.BinaryOperator;
 
+import org.ta4j.core.Bar;
 import org.ta4j.core.num.Num;
 
 /**
@@ -41,8 +41,6 @@ public class BinaryOperation extends NumericIndicator {
   private final BinaryOperator<Num> operator;
   private final NumericIndicator left;
   private final NumericIndicator right;
-  private Instant currentTick = Instant.EPOCH;
-  private Num value;
 
 
   private BinaryOperation(
@@ -159,19 +157,10 @@ public class BinaryOperation extends NumericIndicator {
 
 
   @Override
-  public Num getValue() {
-    return this.value;
-  }
-
-
-  @Override
-  public void refresh(final Instant tick) {
-    if (tick.isAfter(this.currentTick)) {
-      this.left.refresh(tick);
-      this.right.refresh(tick);
-      this.value = calculate();
-      this.currentTick = tick;
-    }
+  public void updateState(final Bar bar) {
+    this.left.onBar(bar);
+    this.right.onBar(bar);
+    this.value = calculate();
   }
 
 

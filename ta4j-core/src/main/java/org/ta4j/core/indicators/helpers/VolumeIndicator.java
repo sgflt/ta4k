@@ -23,11 +23,9 @@
  */
 package org.ta4j.core.indicators.helpers;
 
-import java.time.Instant;
-
-import org.ta4j.core.BarSeries;
+import org.ta4j.core.Bar;
 import org.ta4j.core.indicators.SeriesRelatedNumericIndicator;
-import org.ta4j.core.num.Num;
+import org.ta4j.core.num.NumFactory;
 
 /**
  * Volume indicator.
@@ -40,27 +38,15 @@ public class VolumeIndicator extends SeriesRelatedNumericIndicator {
   /**
    * Constructor.
    *
-   * @param series the bar series
+   * @param numFactory the numFactory
    */
-  public VolumeIndicator(final BarSeries series) {
-    super(series);
+  public VolumeIndicator(final NumFactory numFactory) {
+    super(numFactory);
   }
 
 
   @Override
-  public Num getValue() {
-    return getBarSeries().getBar().volume();
-  }
-
-
-  @Override
-  public void refresh(final Instant tick) {
-    // NOOP
-  }
-
-
-  @Override
-  public boolean isStable() {
-    return true;
+  public void updateState(final Bar bar) {
+    this.value = bar.volume();
   }
 }

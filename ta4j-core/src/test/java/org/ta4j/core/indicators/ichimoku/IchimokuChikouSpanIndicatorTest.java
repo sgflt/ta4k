@@ -44,7 +44,7 @@
 //
 //    private BarSeries barSeries(int count) {
 //        return new MockBarSeriesBuilder().withNumFactory(numFactory)
-//                .withData(IntStream.range(0, count).mapToDouble(Double::valueOf).boxed().collect(toList()))
+//                .withCandleClosePrices(IntStream.range(0, count).mapToDouble(Double::valueOf).boxed().collect(toList()))
 //                .build();
 //    }
 //

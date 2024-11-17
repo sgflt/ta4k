@@ -131,7 +131,7 @@
 //        List<Integer> previousBars = new ArrayList<>();
 //
 //        if (timeLevel == TimeLevel.BARBASED) {
-//            previousBars.add(Math.max(0, index - 1));
+//            previousBars.onCandle(Math.max(0, index - 1));
 //            return previousBars;
 //        }
 //        if (index == 0) {
@@ -150,7 +150,7 @@
 //        while (index - 1 > getBarSeries().getBeginIndex()
 //                && getPeriod(getBarSeries().getBar(index - 1)) == previousPeriod) { // while bar-n in previous period
 //            index--;
-//            previousBars.add(index);
+//            previousBars.onCandle(index);
 //        }
 //        return previousBars;
 //    }

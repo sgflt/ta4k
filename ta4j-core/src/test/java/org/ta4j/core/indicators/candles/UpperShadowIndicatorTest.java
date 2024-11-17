@@ -44,11 +44,11 @@
 //    @Before
 //    public void setUp() {
 //        series = new MockBarSeriesBuilder().withNumFactory(numFactory).build();
-//        series.barBuilder().openPrice(10).closePrice(18).highPrice(20).lowPrice(10).add();
-//        series.barBuilder().openPrice(17).closePrice(20).highPrice(21).lowPrice(17).add();
-//        series.barBuilder().openPrice(15).closePrice(15).highPrice(16).lowPrice(14).add();
-//        series.barBuilder().openPrice(15).closePrice(11).highPrice(15).lowPrice(8).add();
-//        series.barBuilder().openPrice(11).closePrice(12).highPrice(12).lowPrice(10).add();
+//        series.barBuilder().openPrice(10).closePrice(18).highPrice(20).lowPrice(10).onCandle();
+//        series.barBuilder().openPrice(17).closePrice(20).highPrice(21).lowPrice(17).onCandle();
+//        series.barBuilder().openPrice(15).closePrice(15).highPrice(16).lowPrice(14).onCandle();
+//        series.barBuilder().openPrice(15).closePrice(11).highPrice(15).lowPrice(8).onCandle();
+//        series.barBuilder().openPrice(11).closePrice(12).highPrice(12).lowPrice(10).onCandle();
 //    }
 //
 //    @Test

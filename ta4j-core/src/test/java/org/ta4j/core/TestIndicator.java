@@ -1,7 +1,5 @@
 package org.ta4j.core;
 
-import java.time.Instant;
-
 import org.ta4j.core.backtest.BacktestBarSeries;
 import org.ta4j.core.indicators.Indicator;
 
@@ -26,8 +24,8 @@ public class TestIndicator<T> implements Indicator<T> {
 
 
   @Override
-  public void refresh(final Instant tick) {
-    this.indicator.refresh(tick);
+  public void onBar(final Bar bar) {
+    this.indicator.onBar(bar);
   }
 
 

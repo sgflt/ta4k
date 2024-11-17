@@ -33,6 +33,7 @@ import org.ta4j.core.num.DoubleNum;
 import org.ta4j.core.num.DoubleNumFactory;
 import org.ta4j.core.num.Num;
 import org.ta4j.core.num.NumFactory;
+import org.ta4j.core.num.NumFactoryProvider;
 
 /**
  * Abstract test class to extend BarSeries, Indicator an other test cases. The
@@ -64,6 +65,7 @@ public abstract class AbstractIndicatorTest<I> {
    */
   public AbstractIndicatorTest(final NumFactory numFactory) {
     this.numFactory = numFactory;
+    NumFactoryProvider.setDefaultNumFactory(numFactory);
   }
 
 

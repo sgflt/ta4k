@@ -1,4 +1,4 @@
-/**
+/*
  * The MIT License (MIT)
  *
  * Copyright (c) 2017-2024 Ta4j Organization & respective
@@ -23,8 +23,7 @@
  */
 package org.ta4j.core.indicators.helpers;
 
-import java.time.Instant;
-
+import org.ta4j.core.Bar;
 import org.ta4j.core.indicators.numeric.NumericIndicator;
 import org.ta4j.core.num.Num;
 
@@ -35,9 +34,6 @@ import org.ta4j.core.num.Num;
  * Returns a constant value for a bar.
  */
 public class ConstantNumericIndicator extends NumericIndicator {
-
-  private final Num value;
-
 
   /**
    * Constructor.
@@ -51,13 +47,7 @@ public class ConstantNumericIndicator extends NumericIndicator {
 
 
   @Override
-  public Num getValue() {
-    return this.value;
-  }
-
-
-  @Override
-  public void refresh(final Instant tick) {
+  public void updateState(final Bar bar) {
     // NOOP
   }
 

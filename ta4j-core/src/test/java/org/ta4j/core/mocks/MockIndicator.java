@@ -23,56 +23,48 @@
  */
 package org.ta4j.core.mocks;
 
-import java.time.Instant;
 import java.util.List;
 
-import org.ta4j.core.BarSeries;
+import org.ta4j.core.Bar;
 import org.ta4j.core.indicators.Indicator;
 import org.ta4j.core.num.Num;
 
+// FIXME isn't it FixedIndicator?
 public class MockIndicator implements Indicator<Num> {
 
-    private final BarSeries series;
-    private final List<Num> values;
-    private int currentIndex = -1;
+  private final List<Num> values;
+  private int currentIndex = -1;
 
-    /**
-     * Constructor.
-     *
-     * @param series BarSeries of the Indicator
-     * @param values Indicator values
-     */
-    public MockIndicator(final BarSeries series, final List<Num> values) {
-        this.series = series;
-        this.values = values;
-    }
 
-    /**
-     * Gets a value from the Indicator
-     *
-     * @return Num Indicator value at index
-     */
-    @Override
-    public Num getValue() {
-        return this.values.get(this.currentIndex);
-    }
+  /**
+   * Constructor.
+   *
+   * @param values Indicator values
+   */
+  public MockIndicator(final List<Num> values) {
+    this.values = values;
+  }
 
-    /**
-     * Gets the Indicator TimeSeries.
-     *
-     * @return TimeSeries of the Indicator
-     */
-    public BarSeries getBarSeries() {
-        return this.series;
-    }
 
-    @Override
-    public void refresh(final Instant tick) {
-        ++this.currentIndex;
-    }
+  /**
+   * Gets a value from the Indicator
+   *
+   * @return Num Indicator value at index
+   */
+  @Override
+  public Num getValue() {
+    return this.values.get(this.currentIndex);
+  }
 
-    @Override
-    public boolean isStable() {
-        return true;
-    }
+
+  @Override
+  public void onBar(final Bar bar) {
+    ++this.currentIndex;
+  }
+
+
+  @Override
+  public boolean isStable() {
+    return true;
+  }
 }

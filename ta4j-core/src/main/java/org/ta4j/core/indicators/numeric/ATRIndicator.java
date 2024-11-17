@@ -23,12 +23,11 @@
  */
 package org.ta4j.core.indicators.numeric;
 
-import java.time.Instant;
-
-import org.ta4j.core.BarSeries;
+import org.ta4j.core.Bar;
 import org.ta4j.core.indicators.helpers.TRIndicator;
 import org.ta4j.core.indicators.numeric.average.MMAIndicator;
 import org.ta4j.core.num.Num;
+import org.ta4j.core.num.NumFactory;
 
 /**
  * Average true range indicator.
@@ -41,36 +40,36 @@ public class ATRIndicator extends NumericIndicator {
   /**
    * Constructor.
    *
-   * @param series the bar series
+   * @param numFactory the {@link Num} provider
    * @param barCount the time frame
    */
-  public ATRIndicator(final BarSeries series, final int barCount) {
-    this(series, new TRIndicator(series), barCount);
+  public ATRIndicator(final NumFactory numFactory, final int barCount) {
+    this(numFactory, new TRIndicator(numFactory), barCount);
   }
 
 
   /**
    * Constructor.
    *
-   * @param series the series
+   * @param numFactory the numFactory
    * @param tr the {@link TRIndicator}
    * @param barCount the time frame
    */
-  public ATRIndicator(final BarSeries series, final NumericIndicator tr, final int barCount) {
-    super(series.numFactory());
+  public ATRIndicator(final NumFactory numFactory, final NumericIndicator tr, final int barCount) {
+    super(numFactory);
     this.averageTrueRangeIndicator = new MMAIndicator(tr, barCount);
   }
 
 
   @Override
-  public Num getValue() {
-    return this.averageTrueRangeIndicator.getValue();
+  public void updateState(final Bar bar) {
+    this.averageTrueRangeIndicator.onBar(bar);
+    this.value = calculate();
   }
 
 
-  @Override
-  public void refresh(final Instant tick) {
-    this.averageTrueRangeIndicator.refresh(tick);
+  private Num calculate() {
+    return this.averageTrueRangeIndicator.getValue();
   }
 
 

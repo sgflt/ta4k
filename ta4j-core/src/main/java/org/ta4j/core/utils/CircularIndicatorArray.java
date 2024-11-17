@@ -23,9 +23,9 @@
  */
 package org.ta4j.core.utils;
 
-import java.time.Instant;
 import java.util.Iterator;
 
+import org.ta4j.core.Bar;
 import org.ta4j.core.indicators.Indicator;
 import org.ta4j.core.num.Num;
 
@@ -89,10 +89,10 @@ public class CircularIndicatorArray extends CircularArray<Indicator<Num>> {
   }
 
 
-  public void refresh(final Instant tick) {
+  public void refresh(final Bar tick) {
     for (final var element : this.elements) {
       if (element != null) {
-        element.refresh(tick);
+        element.onBar(tick);
       }
     }
   }

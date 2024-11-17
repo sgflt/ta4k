@@ -23,11 +23,11 @@
  */
 package org.ta4j.core.indicators.numeric.oscilators.aroon;
 
-import java.time.Instant;
-
+import org.ta4j.core.Bar;
 import org.ta4j.core.BarSeries;
 import org.ta4j.core.indicators.numeric.NumericIndicator;
 import org.ta4j.core.num.Num;
+import org.ta4j.core.num.NumFactory;
 
 /**
  * Aroon Oscillator.
@@ -40,27 +40,25 @@ public class AroonOscillatorIndicator extends NumericIndicator {
 
   private final AroonUpIndicator aroonUpIndicator;
   private final AroonDownIndicator aroonDownIndicator;
-  private Instant currentTick = Instant.EPOCH;
-  private Num value;
 
 
   /**
    * Constructor.
    *
-   * @param series the bar series
+   * @param numFactory the bar numFactory
    * @param barCount the number of periods used for the indicators
    */
-  public AroonOscillatorIndicator(final BarSeries series, final int barCount) {
-    super(series.numFactory());
-    this.aroonUpIndicator = new AroonUpIndicator(series, barCount);
-    this.aroonDownIndicator = new AroonDownIndicator(series, barCount);
+  public AroonOscillatorIndicator(final NumFactory numFactory, final int barCount) {
+    super(numFactory);
+    this.aroonUpIndicator = NumericIndicator.aroonUp(barCount);
+    this.aroonDownIndicator = NumericIndicator.aroonDown(barCount);
   }
 
 
   public AroonOscillatorIndicator(final BarSeries series, final NumericIndicator indicator, final int barCount) {
     super(series.numFactory());
-    this.aroonUpIndicator = new AroonUpIndicator(series, indicator, barCount);
-    this.aroonDownIndicator = new AroonDownIndicator(series, indicator, barCount);
+    this.aroonUpIndicator = NumericIndicator.aroonUp(indicator, barCount);
+    this.aroonDownIndicator = NumericIndicator.aroonDown(indicator, barCount);
   }
 
 
@@ -88,19 +86,10 @@ public class AroonOscillatorIndicator extends NumericIndicator {
 
 
   @Override
-  public Num getValue() {
-    return this.value;
-  }
-
-
-  @Override
-  public void refresh(final Instant tick) {
-    if (tick.isAfter(this.currentTick)) {
-      this.aroonUpIndicator.refresh(tick);
-      this.aroonDownIndicator.refresh(tick);
-      this.value = calculate();
-      this.currentTick = tick;
-    }
+  public void updateState(final Bar bar) {
+    this.aroonUpIndicator.onBar(bar);
+    this.aroonDownIndicator.onBar(bar);
+    this.value = calculate();
   }
 
 

@@ -23,9 +23,9 @@
  */
 package org.ta4j.core.indicators.numeric;
 
-import java.time.Instant;
 import java.util.function.UnaryOperator;
 
+import org.ta4j.core.Bar;
 import org.ta4j.core.num.Num;
 
 /**
@@ -34,10 +34,6 @@ import org.ta4j.core.num.Num;
  * There may be other unary operations on Num that could be added here.
  */
 public class UnaryOperation extends NumericIndicator {
-
-  private Instant currentTick = Instant.EPOCH;
-  private Num value;
-
 
   /**
    * Returns an {@code Indicator} whose value is {@code √(operand)}.
@@ -86,18 +82,9 @@ public class UnaryOperation extends NumericIndicator {
 
 
   @Override
-  public Num getValue() {
-    return this.value;
-  }
-
-
-  @Override
-  public void refresh(final Instant tick) {
-    if (tick.isAfter(this.currentTick)) {
-      this.operand.refresh(tick);
-      this.value = calculate();
-      this.currentTick = tick;
-    }
+  public void updateState(final Bar bar) {
+    this.operand.onBar(bar);
+    this.value = calculate();
   }
 
 

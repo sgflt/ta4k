@@ -26,7 +26,8 @@ package org.ta4j.core.live;
 import org.ta4j.core.Bar;
 import org.ta4j.core.BarBuilderFactory;
 import org.ta4j.core.BarSeries;
-import org.ta4j.core.Strategy;
+import org.ta4j.core.events.CandleReceived;
+import org.ta4j.core.indicators.IndicatorContext;
 import org.ta4j.core.num.NumFactory;
 
 /**
@@ -43,7 +44,7 @@ class LiveBarSeries implements BarSeries {
   private final BarBuilderFactory barBuilderFactory;
 
   private Bar bar;
-  private Strategy strategy;
+  private IndicatorContext indicatorContext;
 
 
   LiveBarSeries(final String name, final NumFactory numFactory, final BarBuilderFactory barBuilderFactory) {
@@ -85,14 +86,27 @@ class LiveBarSeries implements BarSeries {
 
     this.bar = bar;
 
-    if (this.strategy != null) {
-      this.strategy.refresh(bar.endTime());
+    if (this.indicatorContext != null) {
+      this.indicatorContext.refresh(bar);
     }
   }
 
 
   @Override
-  public void replaceStrategy(final Strategy strategy) {
-    this.strategy = strategy;
+  public void onCandle(final CandleReceived event) {
+    barBuilder().
+        timePeriod(event.timePeriod())
+        .endTime(event.beginTime())
+        .openPrice(event.openPrice())
+        .highPrice(event.highPrice())
+        .lowPrice(event.lowPrice())
+        .closePrice(event.closePrice())
+        .volume(event.volume())
+        .add();
+  }
+
+
+  public void replaceIndicatorContext(final IndicatorContext indicatorContext) {
+    this.indicatorContext = indicatorContext;
   }
 }

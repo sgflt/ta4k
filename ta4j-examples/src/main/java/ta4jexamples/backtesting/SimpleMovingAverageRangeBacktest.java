@@ -26,17 +26,17 @@ package ta4jexamples.backtesting;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Function;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.ta4j.core.BarSeries;
+import org.ta4j.core.StrategyFactory;
 import org.ta4j.core.Trade;
-import org.ta4j.core.backtest.BacktestBarSeries;
-import org.ta4j.core.backtest.BacktestExecutor;
+import org.ta4j.core.backtest.BacktestExecutorBuilder;
 import org.ta4j.core.backtest.BacktestStrategy;
 import org.ta4j.core.indicators.IndicatorContext;
 import org.ta4j.core.indicators.numeric.NumericIndicator;
-import org.ta4j.core.num.DecimalNum;
+import org.ta4j.core.num.DoubleNumFactory;
 import org.ta4j.core.reports.PerformanceReport;
 import org.ta4j.core.reports.PositionStatsReport;
 import org.ta4j.core.reports.TradingStatement;
@@ -55,38 +55,42 @@ public class SimpleMovingAverageRangeBacktest {
     final int stop = 3;
     final int step = 5;
 
-    final var strategies = new ArrayList<Function<BacktestBarSeries, BacktestStrategy>>();
+
+    final var strategyFactories = new ArrayList<StrategyFactory>();
     for (int i = start; i <= stop; i += step) {
-      final var p = i;
-      final var series = CsvBarsLoader.load(Paths.get("./target/classes/appleinc_bars_from_20130101_usd.csv"));
-      final var closePrice = NumericIndicator.closePrice(series);
-      final var sma = closePrice.sma(p);
-      final var entryRule = new OverIndicatorRule(sma, closePrice);
-      final var exitRule = new UnderIndicatorRule(sma, closePrice);
-      strategies.add(x -> new BacktestStrategy(
-          "Sma(" + p + ")",
-          entryRule,
-          exitRule,
-          IndicatorContext.of(sma, closePrice)
-      ));
+      final int smaBarCount = i;
+      strategyFactories.add(s -> createStrategy(s, smaBarCount));
     }
 
-    final var series = CsvBarsLoader.load(Paths.get("./target/classes/appleinc_bars_from_20130101_usd.csv"));
-    final var backtestExecutor = new BacktestExecutor(series);
-    final var closePrice = NumericIndicator.closePrice(series);
-    final var sma = closePrice.sma(3);
-    final var entryRule = new OverIndicatorRule(sma, closePrice);
-    final var exitRule = new UnderIndicatorRule(sma, closePrice);
-
+    final var backtestExecutor = new BacktestExecutorBuilder().numFactory(DoubleNumFactory.getInstance()).build();
+    final var candleEvents = CsvBarsLoader.load(Paths.get("./target/classes/appleinc_bars_from_20130101_usd.csv"));
 
     final List<TradingStatement> tradingStatements =
         backtestExecutor.execute(
-            new BacktestStrategy("SMA", entryRule, exitRule, IndicatorContext.of(sma, closePrice)),
-            DecimalNum.valueOf(50),
+            strategyFactories,
+            List.copyOf(candleEvents),
+            50,
             Trade.TradeType.BUY
         );
 
     LOG.info(printReport(tradingStatements));
+  }
+
+
+  private static BacktestStrategy createStrategy(
+      final BarSeries series,
+      final int smaBarCount
+  ) {
+    final var closePrice = NumericIndicator.closePrice(series);
+    final var sma = closePrice.sma(smaBarCount);
+    final var entryRule = new OverIndicatorRule(sma, closePrice);
+    final var exitRule = new UnderIndicatorRule(sma, closePrice);
+    return new BacktestStrategy(
+        "Sma(" + smaBarCount + ")",
+        entryRule,
+        exitRule,
+        IndicatorContext.of(sma, closePrice)
+    );
   }
 
 

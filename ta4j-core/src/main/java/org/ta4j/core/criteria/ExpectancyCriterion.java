@@ -1,4 +1,4 @@
-/**
+/*
  * The MIT License (MIT)
  *
  * Copyright (c) 2017-2023 Ta4j Organization & respective
@@ -25,9 +25,9 @@ package org.ta4j.core.criteria;
 
 import org.ta4j.core.Position;
 import org.ta4j.core.TradingRecord;
-import org.ta4j.core.backtest.BacktestBarSeries;
 import org.ta4j.core.criteria.pnl.ProfitLossRatioCriterion;
 import org.ta4j.core.num.Num;
+import org.ta4j.core.num.NumFactoryProvider;
 
 /**
  * Expectancy criterion (also called "Kelly Criterion").
@@ -38,46 +38,52 @@ import org.ta4j.core.num.Num;
  * losing expectations.
  *
  * @see <a href=
- *      "https://www.straightforex.com/advanced-forex-course/money-management/two-important-things-to-be-considered/">https://www.straightforex.com/advanced-forex-course/money-management/two-important-things-to-be-considered/</a>
- *
+ *     "https://www.straightforex.com/advanced-forex-course/money-management/two-important-things-to-be-considered/">https://www.straightforex.com/advanced-forex-course/money-management/two-important-things-to-be-considered/</a>
  */
 public class ExpectancyCriterion extends AbstractAnalysisCriterion {
 
-    private final ProfitLossRatioCriterion profitLossRatioCriterion = new ProfitLossRatioCriterion();
-    private final NumberOfPositionsCriterion numberOfPositionsCriterion = new NumberOfPositionsCriterion();
-    private final NumberOfWinningPositionsCriterion numberOfWinningPositionsCriterion = new NumberOfWinningPositionsCriterion();
+  private final ProfitLossRatioCriterion profitLossRatioCriterion = new ProfitLossRatioCriterion();
+  private final NumberOfPositionsCriterion numberOfPositionsCriterion = new NumberOfPositionsCriterion();
+  private final NumberOfWinningPositionsCriterion numberOfWinningPositionsCriterion =
+      new NumberOfWinningPositionsCriterion();
 
-    @Override
-    public Num calculate(BacktestBarSeries series, Position position) {
-        Num profitLossRatio = profitLossRatioCriterion.calculate(series, position);
-        Num numberOfPositions = numberOfPositionsCriterion.calculate(series, position);
-        Num numberOfWinningPositions = numberOfWinningPositionsCriterion.calculate(series, position);
-        return calculate(series, profitLossRatio, numberOfWinningPositions, numberOfPositions);
-    }
 
-    @Override
-    public Num calculate(BacktestBarSeries series, TradingRecord tradingRecord) {
-        Num profitLossRatio = profitLossRatioCriterion.calculate(series, tradingRecord);
-        Num numberOfPositions = numberOfPositionsCriterion.calculate(series, tradingRecord);
-        Num numberOfWinningPositions = numberOfWinningPositionsCriterion.calculate(series, tradingRecord);
-        return calculate(series, profitLossRatio, numberOfWinningPositions, numberOfPositions);
-    }
+  @Override
+  public Num calculate(final Position position) {
+    final Num profitLossRatio = this.profitLossRatioCriterion.calculate(position);
+    final Num numberOfPositions = this.numberOfPositionsCriterion.calculate(position);
+    final Num numberOfWinningPositions = this.numberOfWinningPositionsCriterion.calculate(position);
+    return calculate(profitLossRatio, numberOfWinningPositions, numberOfPositions);
+  }
 
-    /** The higher the criterion value, the better. */
-    @Override
-    public boolean betterThan(Num criterionValue1, Num criterionValue2) {
-        return criterionValue1.isGreaterThan(criterionValue2);
-    }
 
-    private Num calculate(BacktestBarSeries series, Num profitLossRatio, Num numberOfWinningPositions,
-            Num numberOfAllPositions) {
-        if (numberOfAllPositions.isZero() || profitLossRatio.isZero()) {
-            return series.numFactory().zero();
-        }
-        // Expectancy = ((1 + AW/AL) * ProbabilityToWinOnePosition) - 1
-        Num one = series.numFactory().one();
-        Num probabiltyToWinOnePosition = numberOfWinningPositions.dividedBy(numberOfAllPositions);
-        return (one.plus(profitLossRatio)).multipliedBy(probabiltyToWinOnePosition).minus(one);
+  @Override
+  public Num calculate(final TradingRecord tradingRecord) {
+    final Num profitLossRatio = this.profitLossRatioCriterion.calculate(tradingRecord);
+    final Num numberOfPositions = this.numberOfPositionsCriterion.calculate(tradingRecord);
+    final Num numberOfWinningPositions = this.numberOfWinningPositionsCriterion.calculate(tradingRecord);
+    return calculate(profitLossRatio, numberOfWinningPositions, numberOfPositions);
+  }
+
+
+  /** The higher the criterion value, the better. */
+  @Override
+  public boolean betterThan(final Num criterionValue1, final Num criterionValue2) {
+    return criterionValue1.isGreaterThan(criterionValue2);
+  }
+
+
+  private Num calculate(
+      final Num profitLossRatio, final Num numberOfWinningPositions,
+      final Num numberOfAllPositions
+  ) {
+    if (numberOfAllPositions.isZero() || profitLossRatio.isZero()) {
+      return NumFactoryProvider.getDefaultNumFactory().zero();
     }
+    // Expectancy = ((1 + AW/AL) * ProbabilityToWinOnePosition) - 1
+    final Num one = NumFactoryProvider.getDefaultNumFactory().one();
+    final Num probabiltyToWinOnePosition = numberOfWinningPositions.dividedBy(numberOfAllPositions);
+    return (one.plus(profitLossRatio)).multipliedBy(probabiltyToWinOnePosition).minus(one);
+  }
 
 }

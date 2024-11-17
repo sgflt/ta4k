@@ -23,6 +23,7 @@
  */
 package org.ta4j.core;
 
+import org.ta4j.core.events.CandleReceived;
 import org.ta4j.core.indicators.Indicator;
 import org.ta4j.core.num.NumFactory;
 
@@ -67,8 +68,6 @@ public interface BarSeries {
      */
     void addBar(Bar bar);
 
-    /**
-     * @param strategy register new strategy and possibly replace the old one
-     */
-    void replaceStrategy(final Strategy strategy);
+
+    void onCandle(CandleReceived event);
 }

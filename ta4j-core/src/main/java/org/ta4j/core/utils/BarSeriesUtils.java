@@ -76,7 +76,7 @@
 //     * the right to make updates to finalized bars. This method finds and replaces
 //     * potential bar data that was changed afterwards by the marketdata provider. It
 //     * can also be uses to check bar data equality over different marketdata
-//     * providers. This method does <b>not</b> add missing bars but replaces an
+//     * providers. This method does <b>not</b> onCandle missing bars but replaces an
 //     * existing bar with its new bar.
 //     *
 //     * @param barSeries the barSeries
@@ -126,14 +126,14 @@
 //                if (nextBar != null) {
 //                    // market closing times are also treated as missing bars
 //                    while (nextBar.beginTime().minus(incDuration).isAfter(bar.endTime())) {
-//                        missingBars.add(bar.endTime().plus(incDuration).plus(duration));
+//                        missingBars.onCandle(bar.endTime().plus(incDuration).plus(duration));
 //                        incDuration = incDuration.plus(duration);
 //                    }
 //                }
 //            }
 //            boolean noFullData = bar.openPrice().isNaN() || bar.highPrice().isNaN() || bar.lowPrice().isNaN();
 //            if (noFullData) {
-//                missingBars.add(bar.endTime());
+//                missingBars.onCandle(bar.endTime());
 //            }
 //        }
 //        return missingBars;
@@ -169,7 +169,7 @@
 //                    .volume(bar.volume().getDelegate())
 //                    .amount(bar.getAmount().getDelegate())
 //                    .trades(bar.getTrades())
-//                    .add();
+//                    .onCandle();
 //        }
 //
 //        if (barSeries.getMaximumBarCount() > 0) {
@@ -197,7 +197,7 @@
 //            if (nextBar != null) {
 //                if (bar.endTime().isAfter(nextBar.beginTime())
 //                        || bar.beginTime().plus(period).isBefore(nextBar.beginTime())) {
-//                    overlappingBars.add(nextBar);
+//                    overlappingBars.onCandle(nextBar);
 //                }
 //            }
 //        }

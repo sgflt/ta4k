@@ -23,8 +23,7 @@
  */
 package org.ta4j.core.indicators.numeric.channels.keltner;
 
-import java.time.Instant;
-
+import org.ta4j.core.Bar;
 import org.ta4j.core.BarSeries;
 import org.ta4j.core.indicators.numeric.ATRIndicator;
 import org.ta4j.core.indicators.numeric.NumericIndicator;
@@ -42,8 +41,6 @@ public class KeltnerChannelLowerIndicator extends NumericIndicator {
   private final ATRIndicator averageTrueRangeIndicator;
   private final KeltnerChannelMiddleIndicator keltnerMiddleIndicator;
   private final Num ratio;
-  private Instant currentTick = Instant.EPOCH;
-  private Num value;
 
 
   /**
@@ -59,7 +56,7 @@ public class KeltnerChannelLowerIndicator extends NumericIndicator {
       final double ratio,
       final int barCountATR
   ) {
-    this(series, middle, new ATRIndicator(series, barCountATR), ratio);
+    this(series, middle, NumericIndicator.atr(barCountATR), ratio);
   }
 
 
@@ -90,19 +87,10 @@ public class KeltnerChannelLowerIndicator extends NumericIndicator {
 
 
   @Override
-  public Num getValue() {
-    return this.value;
-  }
-
-
-  @Override
-  public void refresh(final Instant tick) {
-    if (tick.isAfter(this.currentTick)) {
-      this.keltnerMiddleIndicator.refresh(tick);
-      this.averageTrueRangeIndicator.refresh(tick);
-      this.value = calculate();
-      this.currentTick = tick;
-    }
+  public void updateState(final Bar bar) {
+    this.keltnerMiddleIndicator.onBar(bar);
+    this.averageTrueRangeIndicator.onBar(bar);
+    this.value = calculate();
   }
 
 

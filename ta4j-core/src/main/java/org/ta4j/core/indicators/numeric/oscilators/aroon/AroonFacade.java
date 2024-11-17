@@ -25,6 +25,7 @@ package org.ta4j.core.indicators.numeric.oscilators.aroon;
 
 import org.ta4j.core.BarSeries;
 import org.ta4j.core.indicators.numeric.NumericIndicator;
+import org.ta4j.core.num.NumFactory;
 
 /**
  * A facade to create the two Aroon indicators. The Aroon Oscillator can also be
@@ -46,8 +47,8 @@ public class AroonFacade {
    * @param series the bar series
    * @param barCount the number of periods used for the indicators
    */
-  public AroonFacade(final BarSeries series, final int barCount) {
-    this.oscillator = new AroonOscillatorIndicator(series, barCount);
+  public AroonFacade(final NumFactory series, final int barCount) {
+    this.oscillator = NumericIndicator.aroonOscillatpr(barCount);
   }
 
 

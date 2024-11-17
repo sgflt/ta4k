@@ -23,11 +23,9 @@
  */
 package org.ta4j.core.indicators.numeric.channels.keltner;
 
-import java.time.Instant;
-
+import org.ta4j.core.Bar;
 import org.ta4j.core.BarSeries;
 import org.ta4j.core.indicators.Indicator;
-import org.ta4j.core.indicators.helpers.TypicalPriceIndicator;
 import org.ta4j.core.indicators.numeric.NumericIndicator;
 import org.ta4j.core.indicators.numeric.average.EMAIndicator;
 import org.ta4j.core.num.Num;
@@ -42,8 +40,6 @@ import org.ta4j.core.num.Num;
 public class KeltnerChannelMiddleIndicator extends NumericIndicator {
 
   private final EMAIndicator emaIndicator;
-  private Instant currentTick = Instant.EPOCH;
-  private Num value;
 
 
   /**
@@ -53,7 +49,7 @@ public class KeltnerChannelMiddleIndicator extends NumericIndicator {
    * @param barCountEMA the bar count for the {@link EMAIndicator}
    */
   public KeltnerChannelMiddleIndicator(final BarSeries series, final int barCountEMA) {
-    this(new TypicalPriceIndicator(series), barCountEMA);
+    this(NumericIndicator.typicalPrice(), barCountEMA);
   }
 
 
@@ -75,18 +71,9 @@ public class KeltnerChannelMiddleIndicator extends NumericIndicator {
 
 
   @Override
-  public Num getValue() {
-    return this.value;
-  }
-
-
-  @Override
-  public void refresh(final Instant tick) {
-    if (tick.isAfter(this.currentTick)) {
-      this.emaIndicator.refresh(tick);
-      this.value = calculate();
-      this.currentTick = tick;
-    }
+  public void updateState(final Bar bar) {
+    this.emaIndicator.onBar(bar);
+    this.value = calculate();
   }
 
 

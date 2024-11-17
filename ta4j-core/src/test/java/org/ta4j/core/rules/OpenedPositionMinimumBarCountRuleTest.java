@@ -48,7 +48,7 @@
 //    public void testAtLeastOneBarRuleForOpenedTrade() {
 //        final var rule = new OpenedPositionMinimumBarCountRule(1);
 //        final var series = new MockBarSeriesBuilder().withNumFactory(DecimalNumFactory.getInstance())
-//                .withData(1, 2, 3, 4)
+//                .withCandleClosePrices(1, 2, 3, 4)
 //                .build();
 //        final var tradingRecord = new BackTestTradingRecord(Trade.buyAt(0, series));
 //
@@ -62,7 +62,7 @@
 //    public void testAtLeastMoreThanOneBarRuleForOpenedTrade() {
 //        final var rule = new OpenedPositionMinimumBarCountRule(2);
 //        final var series = new MockBarSeriesBuilder().withNumFactory(DecimalNumFactory.getInstance())
-//                .withData(1, 2, 3, 4)
+//                .withCandleClosePrices(1, 2, 3, 4)
 //                .build();
 //        final var tradingRecord = new BackTestTradingRecord(Trade.buyAt(0, series));
 //
@@ -76,7 +76,7 @@
 //    public void testAtLeastBarCountRuleForClosedTradeShouldAlwaysReturnsFalse() {
 //        final var rule = new OpenedPositionMinimumBarCountRule(1);
 //        final var series = new MockBarSeriesBuilder().withNumFactory(DecimalNumFactory.getInstance())
-//                .withData(1, 2, 3, 4)
+//                .withCandleClosePrices(1, 2, 3, 4)
 //                .build();
 //        final var tradingRecord = new BackTestTradingRecord(Trade.buyAt(0, series), Trade.sellAt(1, series));
 //

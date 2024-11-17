@@ -23,8 +23,7 @@
  */
 package org.ta4j.core.indicators.numeric.average;
 
-import java.time.Instant;
-
+import org.ta4j.core.Bar;
 import org.ta4j.core.indicators.helpers.DifferenceIndicator;
 import org.ta4j.core.indicators.helpers.RunningTotalIndicator;
 import org.ta4j.core.indicators.helpers.TransformIndicator;
@@ -48,8 +47,6 @@ public class KAMAIndicator extends NumericIndicator {
   private final RunningTotalIndicator previousVolatilities;
   private final PreviousNumericValueIndicator priceAtStartOfRange;
   private int barsPassed;
-  private Instant currentTick = Instant.EPOCH;
-  private Num value;
 
 
   /**
@@ -127,21 +124,12 @@ public class KAMAIndicator extends NumericIndicator {
 
 
   @Override
-  public Num getValue() {
-    return this.value;
-  }
-
-
-  @Override
-  public void refresh(final Instant tick) {
-    if (tick.isAfter(this.currentTick)) {
-      ++this.barsPassed;
-      this.price.refresh(tick);
-      this.priceAtStartOfRange.refresh(tick);
-      this.previousVolatilities.refresh(tick);
-      this.value = calculate();
-      this.currentTick = tick;
-    }
+  public void updateState(final Bar bar) {
+    ++this.barsPassed;
+    this.price.onBar(bar);
+    this.priceAtStartOfRange.onBar(bar);
+    this.previousVolatilities.onBar(bar);
+    this.value = calculate();
   }
 
 

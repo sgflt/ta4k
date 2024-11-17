@@ -23,7 +23,6 @@
  */
 package org.ta4j.core.indicators.numeric.channels.keltner;
 
-import org.ta4j.core.BarSeries;
 import org.ta4j.core.indicators.numeric.NumericIndicator;
 import org.ta4j.core.indicators.numeric.average.EMAIndicator;
 
@@ -46,15 +45,14 @@ public class KeltnerChannelFacade {
   /**
    * Constructor.
    *
-   * @param series the bar series
    * @param emaCount the bar count for the {@code EmaIndicator}
    * @param atrCount the bar count for the {@code ATRIndicator}
    * @param k the multiplier for the {@link #upper} and {@link #lower}
    *     channel
    */
-  public KeltnerChannelFacade(final BarSeries series, final int emaCount, final int atrCount, final Number k) {
-    final var price = NumericIndicator.closePrice(series);
-    final var atr = NumericIndicator.atr(series, atrCount);
+  public KeltnerChannelFacade(final int emaCount, final int atrCount, final Number k) {
+    final var price = NumericIndicator.closePrice();
+    final var atr = NumericIndicator.atr(atrCount);
     this.middle = price.ema(emaCount);
     this.upper = this.middle.plus(atr.multipliedBy(k));
     this.lower = this.middle.minus(atr.multipliedBy(k));

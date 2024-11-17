@@ -1,4 +1,4 @@
-/**
+/*
  * The MIT License (MIT)
  *
  * Copyright (c) 2017-2023 Ta4j Organization & respective
@@ -26,9 +26,9 @@ package org.ta4j.core.criteria.pnl;
 import org.ta4j.core.BarSeries;
 import org.ta4j.core.Position;
 import org.ta4j.core.TradingRecord;
-import org.ta4j.core.backtest.BacktestBarSeries;
 import org.ta4j.core.criteria.AbstractAnalysisCriterion;
 import org.ta4j.core.num.Num;
+import org.ta4j.core.num.NumFactoryProvider;
 
 /**
  * Net Profit and loss criterion (absolute PnL, excludes trading costs).
@@ -38,23 +38,25 @@ import org.ta4j.core.num.Num;
  */
 public class ProfitLossCriterion extends AbstractAnalysisCriterion {
 
-    @Override
-    public Num calculate(BacktestBarSeries series, Position position) {
-        return position.getProfit();
-    }
+  @Override
+  public Num calculate(final Position position) {
+    return position.getProfit();
+  }
 
-    @Override
-    public Num calculate(BacktestBarSeries series, TradingRecord tradingRecord) {
-        return tradingRecord.getPositions()
-                .stream()
-                .filter(Position::isClosed)
-                .map(position -> calculate(series, position))
-                .reduce(series.numFactory().zero(), Num::plus);
-    }
 
-    /** The higher the criterion value, the better. */
-    @Override
-    public boolean betterThan(Num criterionValue1, Num criterionValue2) {
-        return criterionValue1.isGreaterThan(criterionValue2);
-    }
+  @Override
+  public Num calculate(final TradingRecord tradingRecord) {
+    return tradingRecord.getPositions()
+        .stream()
+        .filter(Position::isClosed)
+        .map(this::calculate)
+        .reduce(NumFactoryProvider.getDefaultNumFactory().zero(), Num::plus);
+  }
+
+
+  /** The higher the criterion value, the better. */
+  @Override
+  public boolean betterThan(final Num criterionValue1, final Num criterionValue2) {
+    return criterionValue1.isGreaterThan(criterionValue2);
+  }
 }

@@ -50,7 +50,7 @@
 //public class NumericIndicatorTest extends AbstractIndicatorTest<NumericIndicator, Num> {
 //
 //    private final BarSeries series = new MockBarSeriesBuilder().withNumFactory(numFactory)
-//            .withData(1, 2, 3, 4, 5, 6, 7, 8, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0, -1, -2)
+//            .withCandleClosePrices(1, 2, 3, 4, 5, 6, 7, 8, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0, -1, -2)
 //            .build();
 //    private final ClosePriceIndicator cp1 = new ClosePriceIndicator(series);
 //    private final EMAIndicator ema = new EMAIndicator(cp1, 3);

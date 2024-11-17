@@ -23,12 +23,10 @@
  */
 package org.ta4j.core.indicators.helpers;
 
-import java.time.Instant;
-
 import org.ta4j.core.Bar;
-import org.ta4j.core.BarSeries;
 import org.ta4j.core.indicators.SeriesRelatedNumericIndicator;
 import org.ta4j.core.num.Num;
+import org.ta4j.core.num.NumFactory;
 
 /**
  * Average high-low indicator.
@@ -42,43 +40,23 @@ import org.ta4j.core.num.Num;
  */
 public class MedianPriceIndicator extends SeriesRelatedNumericIndicator {
 
-  private Instant currentTick = Instant.EPOCH;
-  private Num value;
-
-
   /**
    * Constructor.
    *
-   * @param series the bar series
+   * @param numFactory the bar numFactory
    */
-  public MedianPriceIndicator(final BarSeries series) {
-    super(series);
+  public MedianPriceIndicator(final NumFactory numFactory) {
+    super(numFactory);
   }
 
 
-  protected Num calculate() {
-    final Bar bar = getBarSeries().getBar();
-    return bar.highPrice().plus(bar.lowPrice()).dividedBy(getBarSeries().numFactory().two());
-  }
-
-
-  @Override
-  public Num getValue() {
-    return this.value;
+  protected Num calculate(final Bar bar) {
+    return bar.highPrice().plus(bar.lowPrice()).dividedBy(getNumFactory().two());
   }
 
 
   @Override
-  public void refresh(final Instant tick) {
-    if (tick.isAfter(this.currentTick)) {
-      this.value = calculate();
-      this.currentTick = tick;
-    }
-  }
-
-
-  @Override
-  public boolean isStable() {
-    return true;
+  public void updateState(final Bar bar) {
+    this.value = calculate(bar);
   }
 }

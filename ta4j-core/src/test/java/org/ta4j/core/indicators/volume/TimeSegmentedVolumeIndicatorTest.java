@@ -48,13 +48,13 @@
 //    public void setUp() {
 //        series = new MockBarSeriesBuilder().withNumFactory(numFactory).build();
 //
-//        series.barBuilder().openPrice(10).closePrice(10).highPrice(10).lowPrice(10).volume(0).add();
-//        series.barBuilder().openPrice(9).closePrice(9).highPrice(9).lowPrice(9).volume(10).add();
-//        series.barBuilder().openPrice(10).closePrice(10).highPrice(10).lowPrice(10).volume(10).add();
-//        series.barBuilder().openPrice(11).closePrice(11).highPrice(11).lowPrice(11).volume(10).add();
-//        series.barBuilder().openPrice(12).closePrice(12).highPrice(12).lowPrice(12).volume(10).add();
-//        series.barBuilder().openPrice(11).closePrice(11).highPrice(11).lowPrice(11).volume(10).add();
-//        series.barBuilder().openPrice(11).closePrice(11).highPrice(11).lowPrice(11).volume(10).add();
+//        series.barBuilder().openPrice(10).closePrice(10).highPrice(10).lowPrice(10).volume(0).onCandle();
+//        series.barBuilder().openPrice(9).closePrice(9).highPrice(9).lowPrice(9).volume(10).onCandle();
+//        series.barBuilder().openPrice(10).closePrice(10).highPrice(10).lowPrice(10).volume(10).onCandle();
+//        series.barBuilder().openPrice(11).closePrice(11).highPrice(11).lowPrice(11).volume(10).onCandle();
+//        series.barBuilder().openPrice(12).closePrice(12).highPrice(12).lowPrice(12).volume(10).onCandle();
+//        series.barBuilder().openPrice(11).closePrice(11).highPrice(11).lowPrice(11).volume(10).onCandle();
+//        series.barBuilder().openPrice(11).closePrice(11).highPrice(11).lowPrice(11).volume(10).onCandle();
 //    }
 //
 //    @Test

@@ -77,7 +77,7 @@
 //            for (int longBarCount = shortBarCount
 //                    + barCountStep; longBarCount <= barCountStop; longBarCount += barCountStep) {
 //                String strategyName = String.format("Sma(%d) CrossOver Sma(%d)", shortBarCount, longBarCount);
-//                strategies.add(
+//                strategies.onCandle(
 //                        new BacktestStrategy(strategyName, createSmaCrossEntryRule(series, shortBarCount, longBarCount),
 //                                createSmaCrossExitRule(series, shortBarCount, longBarCount)));
 //            }
@@ -112,7 +112,7 @@
 //    private static String printReport(List<TradingStatement> tradingStatements) {
 //        StringJoiner resultJoiner = new StringJoiner(System.lineSeparator());
 //        for (TradingStatement statement : tradingStatements) {
-//            resultJoiner.add(printStatementReport(statement).toString());
+//            resultJoiner.onCandle(printStatementReport(statement).toString());
 //        }
 //
 //        return resultJoiner.toString();

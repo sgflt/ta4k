@@ -24,7 +24,6 @@
 package org.ta4j.core.reports;
 
 import org.ta4j.core.TradingRecord;
-import org.ta4j.core.backtest.BacktestBarSeries;
 import org.ta4j.core.criteria.pnl.LossCriterion;
 import org.ta4j.core.criteria.pnl.ProfitCriterion;
 import org.ta4j.core.criteria.pnl.ProfitLossCriterion;
@@ -37,12 +36,12 @@ import org.ta4j.core.num.Num;
  */
 public class PerformanceReportGenerator implements ReportGenerator<PerformanceReport> {
 
-    @Override
-    public PerformanceReport generate(TradingRecord tradingRecord, BacktestBarSeries series) {
-        final Num pnl = new ProfitLossCriterion().calculate(series, tradingRecord);
-        final Num pnlPercentage = new ProfitLossPercentageCriterion().calculate(series, tradingRecord);
-        final Num netProfit = new ProfitCriterion(false).calculate(series, tradingRecord);
-        final Num netLoss = new LossCriterion(false).calculate(series, tradingRecord);
-        return new PerformanceReport(pnl, pnlPercentage, netProfit, netLoss);
-    }
+  @Override
+  public PerformanceReport generate(final TradingRecord tradingRecord) {
+    final Num pnl = new ProfitLossCriterion().calculate(tradingRecord);
+    final Num pnlPercentage = new ProfitLossPercentageCriterion().calculate(tradingRecord);
+    final Num netProfit = new ProfitCriterion(false).calculate(tradingRecord);
+    final Num netLoss = new LossCriterion(false).calculate(tradingRecord);
+    return new PerformanceReport(pnl, pnlPercentage, netProfit, netLoss);
+  }
 }

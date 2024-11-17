@@ -57,13 +57,13 @@
 //        alwaysStrategy = new BacktestStrategy(BooleanRule.TRUE, BooleanRule.TRUE);
 //        buyAndHoldStrategy = new BacktestStrategy(new FixedRule(0), new FixedRule(4));
 //        strategies = new ArrayList<>();
-//        strategies.add(alwaysStrategy);
-//        strategies.add(buyAndHoldStrategy);
+//        strategies.onCandle(alwaysStrategy);
+//        strategies.onCandle(buyAndHoldStrategy);
 //    }
 //
 //    @Test
 //    public void bestShouldBeAlwaysOperateOnProfit() {
-//        var series = new MockBarSeriesBuilder().withNumFactory(numFactory).withData(6.0, 9.0, 6.0, 6.0).build();
+//        var series = new MockBarSeriesBuilder().withNumFactory(numFactory).withCandleClosePrices(6.0, 9.0, 6.0, 6.0).build();
 //        var manager = new BarSeriesManager(series);
 //        Strategy bestStrategy = getCriterion().chooseBest(manager, TradeType.BUY, strategies);
 //        assertEquals(alwaysStrategy, bestStrategy);
@@ -71,7 +71,7 @@
 //
 //    @Test
 //    public void bestShouldBeBuyAndHoldOnLoss() {
-//        var series = new MockBarSeriesBuilder().withNumFactory(numFactory).withData(6.0, 3.0, 6.0, 6.0).build();
+//        var series = new MockBarSeriesBuilder().withNumFactory(numFactory).withCandleClosePrices(6.0, 3.0, 6.0, 6.0).build();
 //        var manager = new BarSeriesManager(series, new TradeOnCurrentCloseModel());
 //        Strategy bestStrategy = getCriterion().chooseBest(manager, TradeType.BUY, strategies);
 //        assertEquals(buyAndHoldStrategy, bestStrategy);

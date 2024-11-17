@@ -25,8 +25,8 @@ package org.ta4j.core.criteria;
 
 import org.ta4j.core.Position;
 import org.ta4j.core.TradingRecord;
-import org.ta4j.core.backtest.BacktestBarSeries;
 import org.ta4j.core.num.Num;
+import org.ta4j.core.num.NumFactoryProvider;
 
 /**
  * Number of bars criterion.
@@ -37,23 +37,23 @@ import org.ta4j.core.num.Num;
 public class NumberOfBarsCriterion extends AbstractAnalysisCriterion {
 
   @Override
-  public Num calculate(final BacktestBarSeries series, final Position position) {
+  public Num calculate(final Position position) {
     if (position.isClosed()) {
       final int exitIndex = position.getExit().getIndex();
       final int entryIndex = position.getEntry().getIndex();
-      return series.numFactory().numOf(exitIndex - entryIndex + 1);
+      return NumFactoryProvider.getDefaultNumFactory().numOf(exitIndex - entryIndex + 1);
     }
-    return series.numFactory().zero();
+    return NumFactoryProvider.getDefaultNumFactory().zero();
   }
 
 
   @Override
-  public Num calculate(final BacktestBarSeries series, final TradingRecord tradingRecord) {
+  public Num calculate(final TradingRecord tradingRecord) {
     return tradingRecord.getPositions()
         .stream()
         .filter(Position::isClosed)
-        .map(t -> calculate(series, t))
-        .reduce(series.numFactory().zero(), Num::plus);
+        .map(this::calculate)
+        .reduce(NumFactoryProvider.getDefaultNumFactory().zero(), Num::plus);
   }
 
 

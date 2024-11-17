@@ -23,11 +23,9 @@
  */
 package org.ta4j.core.indicators.candles.price;
 
-import java.time.Instant;
-
-import org.ta4j.core.BarSeries;
+import org.ta4j.core.Bar;
 import org.ta4j.core.indicators.SeriesRelatedNumericIndicator;
-import org.ta4j.core.num.Num;
+import org.ta4j.core.num.NumFactory;
 
 /**
  * The high price indicator.
@@ -40,34 +38,21 @@ public class HighPriceIndicator extends SeriesRelatedNumericIndicator {
   /**
    * Constructor.
    *
-   * @param series the bar series
+   * @param numFactory the bar numFactory
    */
-  public HighPriceIndicator(final BarSeries series) {
-    super(series);
+  public HighPriceIndicator(final NumFactory numFactory) {
+    super(numFactory);
   }
 
 
   @Override
-  public Num getValue() {
-    return getBarSeries().getBar().highPrice();
-  }
-
-
-  /** @return {@code 0} */
-  @Override
-  public boolean isStable() {
-    return true;
-  }
-
-
-  @Override
-  public void refresh(final Instant tick) {
-    // NOOP
+  public void updateState(final Bar bar) {
+    this.value = bar.highPrice();
   }
 
 
   @Override
   public String toString() {
-    return String.format("High() => %s", getValue());
+    return "High() => %s".formatted(getValue());
   }
 }

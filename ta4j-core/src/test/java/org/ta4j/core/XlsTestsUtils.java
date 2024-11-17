@@ -40,9 +40,8 @@ import org.apache.poi.ss.usermodel.DateUtil;
 import org.apache.poi.ss.usermodel.FormulaEvaluator;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
-import org.ta4j.core.backtest.BacktestBarSeries;
-import org.ta4j.core.indicators.Indicator;
-import org.ta4j.core.mocks.MockBarSeriesBuilder;
+import org.ta4j.core.events.CandleReceived;
+import org.ta4j.core.events.MarketEvent;
 import org.ta4j.core.mocks.MockIndicator;
 import org.ta4j.core.mocks.MockTradingRecord;
 import org.ta4j.core.num.NaN;
@@ -118,17 +117,19 @@ public class XlsTestsUtils {
    *
    * @param clazz class containing the file resources
    * @param fileName file name of the file resource
-   * @param numFactory
    *
    * @return BarSeries of the data
    *
    * @throws IOException if getSheet throws IOException
-   * @throws DataFormatException if getSeries throws DataFormatException
+   * @throws DataFormatException if getMarketEvents throws DataFormatException
    */
-  public static BacktestBarSeries getSeries(final Class<?> clazz, final String fileName, final NumFactory numFactory)
+  public static List<MarketEvent> getMarketEvents(
+      final Class<?> clazz,
+      final String fileName
+  )
       throws IOException, DataFormatException {
     final Sheet sheet = getSheet(clazz, fileName);
-    return getSeries(sheet, numFactory);
+    return getMarketEvents(sheet);
   }
 
 
@@ -138,16 +139,15 @@ public class XlsTestsUtils {
    * file. Empty cells in the data are forbidden.
    *
    * @param sheet mutable Sheet
-   * @param numFactory
    *
    * @return BarSeries of the data
    *
    * @throws DataFormatException if getData throws DataFormatException or if the
    *     data contains empty cells
    */
-  private static BacktestBarSeries getSeries(final Sheet sheet, final NumFactory numFactory)
+  private static List<MarketEvent> getMarketEvents(final Sheet sheet)
       throws DataFormatException {
-    final var series = new MockBarSeriesBuilder().withNumFactory(numFactory).build();
+    final var candleEvents = new ArrayList<MarketEvent>();
     final FormulaEvaluator evaluator = sheet.getWorkbook().getCreationHelper().createFormulaEvaluator();
     final List<Row> rows = getData(sheet);
     int minInterval = Integer.MAX_VALUE;
@@ -170,25 +170,27 @@ public class XlsTestsUtils {
       for (int i = 0; i < 6; i++) {
         // empty cells in the data section are forbidden
         if (row.getCell(i) == null) {
-          throw new DataFormatException("empty cell in xls bar series data");
+          throw new DataFormatException("empty cell in xls bar candleEvents data");
         }
         cellValues[i] = evaluator.evaluate(row.getCell(i));
       }
-      // add a bar to the series
+      // add a bar to the candleEvents
       final Date endDate = DateUtil.getJavaDate(cellValues[0].getNumberValue());
       final Instant endDateTime = Instant.ofEpochMilli(endDate.getTime());
-      series.barBuilder()
-          .timePeriod(duration)
-          .endTime(endDateTime)
-          .openPrice(new BigDecimal(cellValues[1].formatAsString()))
-          .highPrice(new BigDecimal(cellValues[2].formatAsString()))
-          .lowPrice(new BigDecimal(cellValues[3].formatAsString()))
-          .closePrice(new BigDecimal(cellValues[4].formatAsString()))
-          .volume(new BigDecimal(cellValues[5].formatAsString()))
-          .amount(0)
-          .add();
+      candleEvents.add(
+          new CandleReceived(
+              duration,
+              endDateTime,
+              Double.parseDouble(cellValues[1].toString()), // open
+              Double.parseDouble(cellValues[2].toString()), // high
+              Double.parseDouble(cellValues[3].toString()), // low
+              Double.parseDouble(cellValues[4].toString()), // close
+              Double.parseDouble(cellValues[5].toString()), // volume
+              0.0 // amount
+          )
+      );
     }
-    return series;
+    return candleEvents;
   }
 
 
@@ -299,7 +301,7 @@ public class XlsTestsUtils {
       if (row.getCell(0) == null) {
         continue;
       }
-      // after the data section header is found, add all rows that don't
+      // after the data section header is found, onCandle all rows that don't
       // have "//" in the first cell
       if (!noHeader) {
         if (evaluator.evaluate(row.getCell(0)).formatAsString().compareTo("\"//\"") != 0) {
@@ -331,15 +333,18 @@ public class XlsTestsUtils {
    * @return Indicator<Num> as calculated by the XLS file given the parameters
    *
    * @throws IOException if getSheet throws IOException
-   * @throws DataFormatException if getSeries or getValues throws
+   * @throws DataFormatException if getMarketEvents or getValues throws
    *     DataFormatException
    */
-  public static Indicator<Num> getIndicator(
-      final Class<?> clazz, final String fileName, final int column, final NumFactory numFactory,
+  public static MockIndicator getIndicator(
+      final Class<?> clazz,
+      final String fileName,
+      final int column,
+      final NumFactory numFactory,
       final Object... params
   ) throws IOException, DataFormatException {
     final Sheet sheet = getSheet(clazz, fileName);
-    return new MockIndicator(getSeries(sheet, numFactory), getValues(sheet, column, numFactory, params));
+    return new MockIndicator(getValues(sheet, column, numFactory, params));
   }
 
 

@@ -173,12 +173,12 @@
 //            } else {
 //                strategyReturn = assetReturn.multipliedBy(minusOne);
 //            }
-//            values.add(strategyReturn);
+//            values.onCandle(strategyReturn);
 //            // update base price
 //            lastPrice = barSeries.getBar(i).closePrice();
 //        }
 //
-//        // add net return at exit position
+//        // onCandle net return at exit position
 //        Num exitPrice;
 //        if (position.getExit() != null) {
 //            exitPrice = position.getExit().getNetPrice();
@@ -193,7 +193,7 @@
 //        } else {
 //            strategyReturn = assetReturn.multipliedBy(minusOne);
 //        }
-//        values.add(strategyReturn);
+//        values.onCandle(strategyReturn);
 //    }
 //
 //    /**

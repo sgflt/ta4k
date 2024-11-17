@@ -64,7 +64,7 @@
 //                    .highPrice(i)
 //                    .lowPrice(i)
 //                    .volume(i)
-//                    .add();
+//                    .onCandle();
 //            defaultSeriesName.barBuilder()
 //                    .timePeriod(Duration.ofDays(1))
 //                    .endTime(ZonedDateTime.now().minusSeconds(i))
@@ -73,7 +73,7 @@
 //                    .highPrice(i)
 //                    .lowPrice(i)
 //                    .volume(i)
-//                    .add();
+//                    .onCandle();
 //            doubleSeries.barBuilder()
 //                    .timePeriod(Duration.ofDays(1))
 //                    .endTime(ZonedDateTime.now().minusSeconds(i))
@@ -82,7 +82,7 @@
 //                    .highPrice(i)
 //                    .lowPrice(i)
 //                    .volume(i)
-//                    .add();
+//                    .onCandle();
 //            precisionSeries.barBuilder()
 //                    .timePeriod(Duration.ofDays(1))
 //                    .endTime(ZonedDateTime.now().minusSeconds(i))
@@ -91,7 +91,7 @@
 //                    .highPrice(i)
 //                    .lowPrice(i)
 //                    .volume(i)
-//                    .add();
+//                    .onCandle();
 //        }
 //
 //        assertNumEquals(0, defaultSeries.getBar(1000).closePrice());

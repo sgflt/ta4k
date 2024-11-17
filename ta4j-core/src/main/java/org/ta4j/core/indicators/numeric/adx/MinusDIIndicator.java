@@ -23,13 +23,12 @@
  */
 package org.ta4j.core.indicators.numeric.adx;
 
-import java.time.Instant;
-
-import org.ta4j.core.BarSeries;
+import org.ta4j.core.Bar;
 import org.ta4j.core.indicators.numeric.ATRIndicator;
 import org.ta4j.core.indicators.numeric.NumericIndicator;
 import org.ta4j.core.indicators.numeric.average.MMAIndicator;
 import org.ta4j.core.num.Num;
+import org.ta4j.core.num.NumFactory;
 
 /**
  * -DI indicator.
@@ -38,61 +37,56 @@ import org.ta4j.core.num.Num;
  * Part of the Directional Movement System.
  *
  * @see <a href=
- *      "http://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:average_directional_index_adx">
- *      http://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:average_directional_index_adx</a>
+ *     "http://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:average_directional_index_adx">
+ *     http://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:average_directional_index_adx</a>
  * @see <a href=
- *      "https://www.investopedia.com/terms/a/adx.asp">https://www.investopedia.com/terms/a/adx.asp</a>
+ *     "https://www.investopedia.com/terms/a/adx.asp">https://www.investopedia.com/terms/a/adx.asp</a>
  */
 public class MinusDIIndicator extends NumericIndicator {
 
-    private final int barCount;
-    private final ATRIndicator atrIndicator;
-    private final MMAIndicator avgMinusDMIndicator;
-    private Num value;
-    private Instant currentTick = Instant.EPOCH;
+  private final int barCount;
+  private final ATRIndicator atrIndicator;
+  private final MMAIndicator avgMinusDMIndicator;
 
-    /**
-     * Constructor.
-     *
-     * @param series   the bar series
-     * @param barCount the bar count for {@link #atrIndicator} and
-     *                 {@link #avgMinusDMIndicator}
-     */
-    public MinusDIIndicator(final BarSeries series, final int barCount) {
-      super(series.numFactory());
-        this.barCount = barCount;
-        this.atrIndicator = new ATRIndicator(series, barCount);
-        this.avgMinusDMIndicator = new MMAIndicator(new MinusDMIndicator(series), barCount);
-    }
 
-    protected Num calculate() {
-        return this.avgMinusDMIndicator.getValue()
-                .dividedBy(this.atrIndicator.getValue())
-            .multipliedBy(getNumFactory().hundred());
-    }
+  /**
+   * Constructor.
+   *
+   * @param numFactory the bar numFactory
+   * @param barCount the bar count for {@link #atrIndicator} and
+   *     {@link #avgMinusDMIndicator}
+   */
+  public MinusDIIndicator(final NumFactory numFactory, final int barCount) {
+    super(numFactory);
+    this.barCount = barCount;
+    this.atrIndicator = NumericIndicator.atr(barCount);
+    this.avgMinusDMIndicator = NumericIndicator.minusDMI().mma(barCount);
+  }
 
-    @Override
-    public String toString() {
-        return getClass().getSimpleName() + " barCount: " + this.barCount;
-    }
 
-    @Override
-    public Num getValue() {
-        return this.value;
-    }
+  protected Num calculate() {
+    return this.avgMinusDMIndicator.getValue()
+        .dividedBy(this.atrIndicator.getValue())
+        .multipliedBy(getNumFactory().hundred());
+  }
 
-    @Override
-    public void refresh(final Instant tick) {
-        if (tick.isAfter(this.currentTick)) {
-            this.atrIndicator.refresh(tick);
-            this.avgMinusDMIndicator.refresh(tick);
-            this.value = calculate();
-            this.currentTick = tick;
-        }
-    }
 
-    @Override
-    public boolean isStable() {
-        return this.atrIndicator.isStable() && this.avgMinusDMIndicator.isStable();
-    }
+  @Override
+  public void updateState(final Bar bar) {
+    this.atrIndicator.onBar(bar);
+    this.avgMinusDMIndicator.onBar(bar);
+    this.value = calculate();
+  }
+
+
+  @Override
+  public boolean isStable() {
+    return this.atrIndicator.isStable() && this.avgMinusDMIndicator.isStable();
+  }
+
+
+  @Override
+  public String toString() {
+    return getClass().getSimpleName() + " barCount: " + this.barCount;
+  }
 }

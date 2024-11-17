@@ -23,12 +23,10 @@
  */
 package org.ta4j.core.indicators.helpers;
 
-import java.time.Instant;
-
 import org.ta4j.core.Bar;
-import org.ta4j.core.BarSeries;
-import org.ta4j.core.indicators.SeriesRelatedNumericIndicator;
+import org.ta4j.core.indicators.numeric.NumericIndicator;
 import org.ta4j.core.num.Num;
+import org.ta4j.core.num.NumFactory;
 
 /**
  * True range indicator.
@@ -37,62 +35,44 @@ import org.ta4j.core.num.Num;
  * TrueRange = MAX(high - low, high - previousClose, previousClose - low)
  * </pre>
  */
-public class TRIndicator extends SeriesRelatedNumericIndicator {
+public class TRIndicator extends NumericIndicator {
 
-    private Bar previousBar;
-    private Num value;
-    private Instant currentTick = Instant.EPOCH;
-    private boolean stable;
+  private Bar previousBar;
+  private boolean stable;
 
-    /**
-     * Constructor.
-     *
-     * @param series the bar series
-     */
-    public TRIndicator(final BarSeries series) {
-        super(series);
+
+  public TRIndicator(final NumFactory numFactory) {
+    super(numFactory);
+  }
+
+
+  protected Num calculate(final Bar bar) {
+    final Num high = bar.highPrice();
+    final Num low = bar.lowPrice();
+    final Num hl = high.minus(low);
+
+    if (this.previousBar == null) {
+      this.previousBar = bar;
+      return hl.abs();
     }
 
-    protected Num calculate() {
-        final Bar bar = getBarSeries().getBar();
-        final Num high = bar.highPrice();
-        final Num low = bar.lowPrice();
-        final Num hl = high.minus(low);
+    this.stable = true;
+    final Num previousClose = this.previousBar.closePrice();
+    final Num hc = high.minus(previousClose);
+    final Num cl = previousClose.minus(low);
+    this.previousBar = bar;
+    return hl.abs().max(hc.abs()).max(cl.abs());
+  }
 
-        if (this.previousBar == null) {
-            this.previousBar = bar;
-            return hl.abs();
-        }
 
-        this.stable = true;
-        final Num previousClose = this.previousBar.closePrice();
-        final Num hc = high.minus(previousClose);
-        final Num cl = previousClose.minus(low);
-        this.previousBar = bar;
-        return hl.abs().max(hc.abs()).max(cl.abs());
+  @Override
+  public void updateState(final Bar bar) {
+    this.value = calculate(bar);
+  }
 
-    }
 
-    @Override
-    public Num getValue() {
-        return this.value;
-    }
-
-    @Override
-    public void refresh(final Instant tick) {
-        if (tick.isAfter(this.currentTick)) {
-            this.value = calculate();
-            this.currentTick = tick;
-        } else if (tick.isBefore(this.currentTick)) {
-            this.previousBar = null;
-            this.stable = false;
-            this.value = calculate();
-            this.currentTick = tick;
-        }
-    }
-
-    @Override
-    public boolean isStable() {
-        return this.stable;
-    }
+  @Override
+  public boolean isStable() {
+    return this.stable;
+  }
 }

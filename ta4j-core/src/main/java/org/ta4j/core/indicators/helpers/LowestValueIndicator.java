@@ -23,10 +23,10 @@
  */
 package org.ta4j.core.indicators.helpers;
 
-import java.time.Instant;
 import java.util.Deque;
 import java.util.LinkedList;
 
+import org.ta4j.core.Bar;
 import org.ta4j.core.indicators.Indicator;
 import org.ta4j.core.indicators.numeric.NumericIndicator;
 import org.ta4j.core.num.Num;
@@ -47,7 +47,6 @@ public class LowestValueIndicator extends NumericIndicator {
   private final Deque<Integer> deque = new LinkedList<>();
   private Num value;
   private int barsPassed;
-  private Instant currentTick = Instant.EPOCH;
 
 
   /**
@@ -96,18 +95,9 @@ public class LowestValueIndicator extends NumericIndicator {
 
 
   @Override
-  public Num getValue() {
-    return this.value;
-  }
-
-
-  @Override
-  public void refresh(final Instant tick) {
-    if (tick.isAfter(this.currentTick)) {
-      this.indicator.refresh(tick);
-      this.value = calculate();
-      this.currentTick = tick;
-    }
+  public void updateState(final Bar bar) {
+    this.indicator.onBar(bar);
+    this.value = calculate();
   }
 
 

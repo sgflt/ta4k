@@ -70,7 +70,7 @@
 //        org.jfree.data.time.TimeSeries chartTimeSeries = new org.jfree.data.time.TimeSeries(name);
 //        for (int i = 0; i < barSeries.getBarCount(); i++) {
 //            Bar bar = barSeries.getBar(i);
-//            chartTimeSeries.add(new Minute(Date.from(bar.endTime().toInstant())),
+//            chartTimeSeries.onCandle(new Minute(Date.from(bar.endTime().toInstant())),
 //                    indicator.getValue(i).doubleValue());
 //        }
 //        return chartTimeSeries;

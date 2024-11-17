@@ -47,7 +47,7 @@
 //    @Before
 //    public void setUp() {
 //        closePrice = new ClosePriceIndicator(
-//                new MockBarSeriesBuilder().withNumFactory(numFactory).withData(closePriceValues).build());
+//                new MockBarSeriesBuilder().withNumFactory(numFactory).withCandleClosePrices(closePriceValues).build());
 //    }
 //
 //    @Test

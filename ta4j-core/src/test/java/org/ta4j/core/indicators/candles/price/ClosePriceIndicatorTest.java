@@ -1,7 +1,7 @@
-/**
+/*
  * The MIT License (MIT)
  *
- * Copyright (c) 2017-2023 Ta4j Organization & respective
+ * Copyright (c) 2017-2024 Ta4j Organization & respective
  * authors (see AUTHORS)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
@@ -23,35 +23,35 @@
  */
 package org.ta4j.core.indicators.candles.price;
 
-import static junit.framework.TestCase.assertEquals;
-
-import org.junit.Before;
-import org.junit.Test;
-import org.ta4j.core.backtest.BacktestBarSeries;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.ta4j.core.TestContext;
 import org.ta4j.core.indicators.AbstractIndicatorTest;
-import org.ta4j.core.mocks.MockBarSeriesBuilder;
+import org.ta4j.core.indicators.numeric.NumericIndicator;
 import org.ta4j.core.num.Num;
 import org.ta4j.core.num.NumFactory;
 
-public class ClosePriceIndicatorTest extends AbstractIndicatorTest<Num> {
-    private ClosePriceIndicator closePrice;
+class ClosePriceIndicatorTest extends AbstractIndicatorTest<Num> {
+  private TestContext context;
 
-    BacktestBarSeries barSeries;
 
-    public ClosePriceIndicatorTest(final NumFactory numFactory) {
-        super(numFactory);
+  ClosePriceIndicatorTest(final NumFactory numFactory) {
+    super(numFactory);
+  }
+
+
+  @BeforeEach
+  void setUp() {
+    this.context = new TestContext().withDefaultMarketEvents();
+
+    this.context.withIndicator(NumericIndicator.closePrice());
+  }
+
+
+  @Test
+  void indicatorShouldRetrieveBarClosePrice() {
+    for (int i = 0; i < 10; i++) {
+      this.context.assertNext(i + 1);
     }
-
-    @Before
-    public void setUp() {
-        this.barSeries = new MockBarSeriesBuilder().withNumFactory(this.numFactory).withDefaultData().build();
-        this.closePrice = new ClosePriceIndicator(this.barSeries);
-    }
-
-    @Test
-    public void indicatorShouldRetrieveBarClosePrice() {
-        while (this.barSeries.advance()) {
-            assertEquals(this.closePrice.getValue(), this.barSeries.getBar().closePrice());
-        }
-    }
+  }
 }

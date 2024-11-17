@@ -157,7 +157,7 @@ public class BuildBarSeries {
         .withNumFactory(DoubleNumFactory.getInstance())
         .build();
 
-    // create bars and add them to the series. The bars have the same Num type
+    // create bars and onCandle them to the series. The bars have the same Num type
     // as the series
     final Instant endTime = Instant.now();
     final Bar b1 = series.barBuilder()

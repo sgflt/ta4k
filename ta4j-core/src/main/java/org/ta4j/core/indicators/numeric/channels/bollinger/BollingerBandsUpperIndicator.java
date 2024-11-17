@@ -23,8 +23,7 @@
  */
 package org.ta4j.core.indicators.numeric.channels.bollinger;
 
-import java.time.Instant;
-
+import org.ta4j.core.Bar;
 import org.ta4j.core.indicators.numeric.NumericIndicator;
 import org.ta4j.core.num.Num;
 
@@ -41,8 +40,6 @@ public class BollingerBandsUpperIndicator extends NumericIndicator {
   private final BollingerBandsMiddleIndicator bbm;
   private final NumericIndicator deviation;
   private final Num k;
-  private Instant currentTick = Instant.EPOCH;
-  private Num value;
 
 
   /**
@@ -86,19 +83,10 @@ public class BollingerBandsUpperIndicator extends NumericIndicator {
 
 
   @Override
-  public Num getValue() {
-    return this.value;
-  }
-
-
-  @Override
-  public void refresh(final Instant tick) {
-    if (tick.isAfter(this.currentTick)) {
-      this.bbm.refresh(tick);
-      this.deviation.refresh(tick);
-      this.value = calculate();
-      this.currentTick = tick;
-    }
+  public void updateState(final Bar bar) {
+    this.bbm.onBar(bar);
+    this.deviation.onBar(bar);
+    this.value = calculate();
   }
 
 

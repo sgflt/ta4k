@@ -55,7 +55,7 @@
 //
 //    @Before
 //    public void setUp() {
-//        data = new MockBarSeriesBuilder().withNumFactory(numFactory).withData(typicalPrices).build();
+//        data = new MockBarSeriesBuilder().withNumFactory(numFactory).withCandleClosePrices(typicalPrices).build();
 //    }
 //
 //    @Test

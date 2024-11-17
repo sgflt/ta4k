@@ -1,4 +1,4 @@
-/**
+/*
  * The MIT License (MIT)
  *
  * Copyright (c) 2017-2023 Ta4j Organization & respective
@@ -25,49 +25,53 @@ package org.ta4j.core.criteria.pnl;
 
 import org.ta4j.core.Position;
 import org.ta4j.core.TradingRecord;
-import org.ta4j.core.backtest.BacktestBarSeries;
 import org.ta4j.core.criteria.AbstractAnalysisCriterion;
 import org.ta4j.core.criteria.NumberOfWinningPositionsCriterion;
 import org.ta4j.core.num.Num;
+import org.ta4j.core.num.NumFactoryProvider;
 
 /**
  * Average gross profit criterion (includes trading costs).
  */
 public class AverageProfitCriterion extends AbstractAnalysisCriterion {
 
-    private final ProfitCriterion grossProfitCriterion = new ProfitCriterion(false);
-    private final NumberOfWinningPositionsCriterion numberOfWinningPositionsCriterion = new NumberOfWinningPositionsCriterion();
+  private final ProfitCriterion grossProfitCriterion = new ProfitCriterion(false);
+  private final NumberOfWinningPositionsCriterion numberOfWinningPositionsCriterion =
+      new NumberOfWinningPositionsCriterion();
 
-    @Override
-    public Num calculate(BacktestBarSeries series, Position position) {
-        Num numberOfWinningPositions = numberOfWinningPositionsCriterion.calculate(series, position);
-        if (numberOfWinningPositions.isZero()) {
-            return series.numFactory().zero();
-        }
-        Num grossProfit = grossProfitCriterion.calculate(series, position);
-        if (grossProfit.isZero()) {
-            return series.numFactory().zero();
-        }
-        return grossProfit.dividedBy(numberOfWinningPositions);
-    }
 
-    @Override
-    public Num calculate(BacktestBarSeries series, TradingRecord tradingRecord) {
-        Num numberOfWinningPositions = numberOfWinningPositionsCriterion.calculate(series, tradingRecord);
-        if (numberOfWinningPositions.isZero()) {
-            return series.numFactory().zero();
-        }
-        Num grossProfit = grossProfitCriterion.calculate(series, tradingRecord);
-        if (grossProfit.isZero()) {
-            return series.numFactory().zero();
-        }
-        return grossProfit.dividedBy(numberOfWinningPositions);
+  @Override
+  public Num calculate(final Position position) {
+    final Num numberOfWinningPositions = this.numberOfWinningPositionsCriterion.calculate(position);
+    if (numberOfWinningPositions.isZero()) {
+      return NumFactoryProvider.getDefaultNumFactory().zero();
     }
+    final Num grossProfit = this.grossProfitCriterion.calculate(position);
+    if (grossProfit.isZero()) {
+      return NumFactoryProvider.getDefaultNumFactory().zero();
+    }
+    return grossProfit.dividedBy(numberOfWinningPositions);
+  }
 
-    /** The higher the criterion value, the better. */
-    @Override
-    public boolean betterThan(Num criterionValue1, Num criterionValue2) {
-        return criterionValue1.isGreaterThan(criterionValue2);
+
+  @Override
+  public Num calculate(final TradingRecord tradingRecord) {
+    final Num numberOfWinningPositions = this.numberOfWinningPositionsCriterion.calculate(tradingRecord);
+    if (numberOfWinningPositions.isZero()) {
+      return NumFactoryProvider.getDefaultNumFactory().zero();
     }
+    final Num grossProfit = this.grossProfitCriterion.calculate(tradingRecord);
+    if (grossProfit.isZero()) {
+      return NumFactoryProvider.getDefaultNumFactory().zero();
+    }
+    return grossProfit.dividedBy(numberOfWinningPositions);
+  }
+
+
+  /** The higher the criterion value, the better. */
+  @Override
+  public boolean betterThan(final Num criterionValue1, final Num criterionValue2) {
+    return criterionValue1.isGreaterThan(criterionValue2);
+  }
 
 }

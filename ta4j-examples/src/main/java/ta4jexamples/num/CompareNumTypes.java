@@ -74,7 +74,7 @@
 //                    .closePrice(randoms[i] + 21)
 //                    .highPrice(randoms[i] - 21)
 //                    .lowPrice(randoms[i] - 5)
-//                    .add();
+//                    .onCandle();
 //            seriesP.barBuilder()
 //                    .timePeriod(Duration.ofDays(1))
 //                    .endTime(date)
@@ -82,7 +82,7 @@
 //                    .closePrice(randoms[i] + 21)
 //                    .highPrice(randoms[i] - 21)
 //                    .lowPrice(randoms[i] - 5)
-//                    .add();
+//                    .onCandle();
 //            seriesPH.barBuilder()
 //                    .timePeriod(Duration.ofDays(1))
 //                    .endTime(date)
@@ -90,7 +90,7 @@
 //                    .closePrice(randoms[i] + 21)
 //                    .highPrice(randoms[i] - 21)
 //                    .lowPrice(randoms[i] - 5)
-//                    .add();
+//                    .onCandle();
 //        }
 //        Num D = DecimalNum.valueOf(test(seriesD).toString(), 256);
 //        Num P = DecimalNum.valueOf(test(seriesP).toString(), 256);

@@ -24,7 +24,6 @@
 package org.ta4j.core.indicators;
 
 import static org.junit.Assert.assertEquals;
-import static org.ta4j.core.TestUtils.assertIndicatorEquals;
 import static org.ta4j.core.TestUtils.assertNext;
 import static org.ta4j.core.TestUtils.fastForward;
 
@@ -142,7 +141,7 @@ public class RSIIndicatorTest extends AbstractIndicatorTest<Num> {
 
   @Test
   public void xlsTest() throws Exception {
-    final var xlsSeries = this.xls.getSeries();
+    final var xlsSeries = this.xls.getMarketEvents();
     final var xlsClose = NumericIndicator.closePrice(xlsSeries);
     xlsSeries.replaceStrategy(new MockStrategy(xlsClose));
     Indicator<Num> indicator;

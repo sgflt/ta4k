@@ -143,33 +143,33 @@
 //        Num two = series.numFactory().numOf(2);
 //        Num three = series.numFactory().numOf(3);
 //        Num four = series.numFactory().numOf(4);
-//        series.barBuilder().endTime(now).openPrice(one).closePrice(one).highPrice(one).lowPrice(one).add();
+//        series.barBuilder().endTime(now).openPrice(one).closePrice(one).highPrice(one).lowPrice(one).onCandle();
 //        series.barBuilder()
 //                .endTime(now.plusSeconds(1))
 //                .openPrice(two)
 //                .closePrice(two)
 //                .highPrice(two)
 //                .lowPrice(two)
-//                .add();
+//                .onCandle();
 //        series.barBuilder()
 //                .endTime(now.plusSeconds(2))
 //                .openPrice(three)
 //                .closePrice(three)
 //                .highPrice(three)
 //                .lowPrice(three)
-//                .add();
+//                .onCandle();
 //        series.barBuilder()
 //                .endTime(now.plusSeconds(3))
 //                .openPrice(four)
 //                .closePrice(four)
 //                .highPrice(four)
 //                .lowPrice(four)
-//                .add();
+//                .onCandle();
 //
 //        Rule entryRule = new FixedRule(0, 2);
 //        Rule exitRule = new FixedRule(1, 3);
 //        List<Strategy> strategies = new LinkedList<>();
-//        strategies.add(new BacktestStrategy("Cost model test strategy", entryRule, exitRule));
+//        strategies.onCandle(new BacktestStrategy("Cost model test strategy", entryRule, exitRule));
 //
 //        Num orderFee = series.numFactory().numOf(new BigDecimal("0.0026"));
 //        BacktestExecutor executor = new BacktestExecutor(series, new LinearTransactionCostModel(orderFee.doubleValue()),

@@ -144,7 +144,7 @@ public class DurationBarAggregator implements BarAggregator {
 //                        .amount(amount)
 //                        .trades(trades)
 //                        .build();
-//                aggregated.add(aggregatedBar);
+//                aggregated.onCandle(aggregatedBar);
             }
         }
 

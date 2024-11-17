@@ -23,8 +23,7 @@
  */
 package org.ta4j.core.indicators;
 
-import java.time.Instant;
-
+import org.ta4j.core.Bar;
 import org.ta4j.core.indicators.numeric.NumericIndicator;
 import org.ta4j.core.indicators.numeric.average.MMAIndicator;
 import org.ta4j.core.num.Num;
@@ -39,8 +38,6 @@ public class RSIIndicator extends NumericIndicator {
 
   private final MMAIndicator averageGainIndicator;
   private final MMAIndicator averageLossIndicator;
-  private Num value;
-  private Instant currentTick = Instant.EPOCH;
 
 
   /**
@@ -73,19 +70,10 @@ public class RSIIndicator extends NumericIndicator {
 
 
   @Override
-  public Num getValue() {
-    return this.value;
-  }
-
-
-  @Override
-  public void refresh(final Instant tick) {
-    if (tick.isAfter(this.currentTick)) {
-      this.averageGainIndicator.refresh(tick);
-      this.averageLossIndicator.refresh(tick);
-      this.value = calculate();
-      this.currentTick = tick;
-    }
+  public void updateState(final Bar bar) {
+    this.averageGainIndicator.onBar(bar);
+    this.averageLossIndicator.onBar(bar);
+    this.value = calculate();
   }
 
 

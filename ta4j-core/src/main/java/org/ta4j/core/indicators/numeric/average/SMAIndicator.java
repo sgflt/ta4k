@@ -23,8 +23,7 @@
  */
 package org.ta4j.core.indicators.numeric.average;
 
-import java.time.Instant;
-
+import org.ta4j.core.Bar;
 import org.ta4j.core.indicators.Indicator;
 import org.ta4j.core.indicators.helpers.RunningTotalIndicator;
 import org.ta4j.core.indicators.numeric.NumericIndicator;
@@ -40,9 +39,7 @@ public class SMAIndicator extends NumericIndicator {
 
   private final int barCount;
   private final RunningTotalIndicator sum;
-  private Num value;
   private int processedBars;
-  private Instant currentTick = Instant.EPOCH;
   private final Num divisor;
 
 
@@ -72,30 +69,16 @@ public class SMAIndicator extends NumericIndicator {
 
 
   @Override
-  public Num getValue() {
-    return this.value;
-  }
-
-
-  @Override
   public boolean isStable() {
     return this.processedBars >= this.barCount && this.sum.isStable();
   }
 
 
   @Override
-  public void refresh(final Instant tick) {
-    if (tick.isAfter(this.currentTick)) {
-      ++this.processedBars;
-      this.sum.refresh(tick);
-      this.value = calculate();
-      this.currentTick = tick;
-    } else if (tick.isBefore(this.currentTick)) {
-      this.processedBars = 1;
-      this.sum.refresh(tick);
-      this.value = calculate();
-      this.currentTick = tick;
-    }
+  public void updateState(final Bar bar) {
+    ++this.processedBars;
+    this.sum.onBar(bar);
+    this.value = calculate();
   }
 
 

@@ -66,7 +66,7 @@
 //        org.jfree.data.time.TimeSeries chartTimeSeries = new org.jfree.data.time.TimeSeries(name);
 //        for (int i = 0; i < barSeries.getBarCount(); i++) {
 //            Bar bar = barSeries.getBar(i);
-//            chartTimeSeries.add(new Day(Date.from(bar.endTime().toInstant())), indicator.getValue(i).doubleValue());
+//            chartTimeSeries.onCandle(new Day(Date.from(bar.endTime().toInstant())), indicator.getValue(i).doubleValue());
 //        }
 //        return chartTimeSeries;
 //    }

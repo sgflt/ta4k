@@ -1,4 +1,4 @@
-/**
+/*
  * The MIT License (MIT)
  *
  * Copyright (c) 2017-2024 Ta4j Organization & respective
@@ -23,11 +23,10 @@
  */
 package org.ta4j.core.indicators.candles.price;
 
-import java.time.Instant;
-
-import org.ta4j.core.BarSeries;
+import org.ta4j.core.Bar;
 import org.ta4j.core.indicators.SeriesRelatedNumericIndicator;
 import org.ta4j.core.num.Num;
+import org.ta4j.core.num.NumFactory;
 
 /**
  * Close price indicator.
@@ -37,32 +36,24 @@ import org.ta4j.core.num.Num;
  */
 public class ClosePriceIndicator extends SeriesRelatedNumericIndicator {
 
+  private Num value;
+
+
   /**
    * Constructor.
    *
-   * @param series the bar series
+   * @param numFactory the bar series
    */
-  public ClosePriceIndicator(final BarSeries series) {
-    super(series);
+  public ClosePriceIndicator(final NumFactory numFactory) {
+    super(numFactory);
   }
 
 
   @Override
-  public Num getValue() {
-    return getBarSeries().getBar().closePrice();
+  public void updateState(final Bar bar) {
+    this.value = bar.closePrice();
   }
 
-
-  @Override
-  public void refresh(final Instant tick) {
-    // NOOP
-  }
-
-
-  @Override
-  public boolean isStable() {
-    return true;
-  }
 
 
   @Override

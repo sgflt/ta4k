@@ -49,7 +49,7 @@
 //        for (Returns.ReturnType type : Returns.ReturnType.values()) {
 //            // No return at index 0
 //            var sampleBarSeries = new MockBarSeriesBuilder().withNumFactory(numFactory)
-//                    .withData(1d, 2d, 3d, 4d, 5d)
+//                    .withCandleClosePrices(1d, 2d, 3d, 4d, 5d)
 //                    .build();
 //            Returns returns = new Returns(sampleBarSeries, new BackTestTradingRecord(), type);
 //            assertEquals(4, returns.getSize());
@@ -58,7 +58,7 @@
 //
 //    @Test
 //    public void singleReturnPositionArith() {
-//        var sampleBarSeries = new MockBarSeriesBuilder().withNumFactory(numFactory).withData(1d, 2d).build();
+//        var sampleBarSeries = new MockBarSeriesBuilder().withNumFactory(numFactory).withCandleClosePrices(1d, 2d).build();
 //        TradingRecord tradingRecord = new BackTestTradingRecord(Trade.buyAt(0, sampleBarSeries),
 //                Trade.sellAt(1, sampleBarSeries));
 //        Returns return1 = new Returns(sampleBarSeries, tradingRecord, Returns.ReturnType.ARITHMETIC);
@@ -69,7 +69,7 @@
 //    @Test
 //    public void returnsWithSellAndBuyTrades() {
 //        var sampleBarSeries = new MockBarSeriesBuilder().withNumFactory(numFactory)
-//                .withData(2, 1, 3, 5, 6, 3, 20)
+//                .withCandleClosePrices(2, 1, 3, 5, 6, 3, 20)
 //                .build();
 //        TradingRecord tradingRecord = new BackTestTradingRecord(Trade.buyAt(0, sampleBarSeries),
 //                Trade.sellAt(1, sampleBarSeries), Trade.buyAt(3, sampleBarSeries), Trade.sellAt(4, sampleBarSeries),
@@ -89,7 +89,7 @@
 //    @Test
 //    public void returnsWithGaps() {
 //        var sampleBarSeries = new MockBarSeriesBuilder().withNumFactory(numFactory)
-//                .withData(1d, 2d, 3d, 4d, 5d, 6d, 7d, 8d, 9d, 10d, 11d, 12d)
+//                .withCandleClosePrices(1d, 2d, 3d, 4d, 5d, 6d, 7d, 8d, 9d, 10d, 11d, 12d)
 //                .build();
 //        TradingRecord tradingRecord = new BackTestTradingRecord(Trade.sellAt(2, sampleBarSeries),
 //                Trade.buyAt(5, sampleBarSeries), Trade.buyAt(8, sampleBarSeries), Trade.sellAt(10, sampleBarSeries));
@@ -114,7 +114,7 @@
 //    @Test
 //    public void returnsWithNoPositions() {
 //        var sampleBarSeries = new MockBarSeriesBuilder().withNumFactory(numFactory)
-//                .withData(3d, 2d, 5d, 4d, 7d, 6d, 7d, 8d, 5d, 6d)
+//                .withCandleClosePrices(3d, 2d, 5d, 4d, 7d, 6d, 7d, 8d, 5d, 6d)
 //                .build();
 //        Returns returns = new Returns(sampleBarSeries, new BackTestTradingRecord(), Returns.ReturnType.LOG);
 //        assertNumEquals(NaN.NaN, returns.getValue(0));
@@ -125,9 +125,9 @@
 //
 //    @Test
 //    public void returnsPrecision() {
-//        var doubleSeries = new MockBarSeriesBuilder().withNumFactory(numFactory).withData(1.2d, 1.1d).build();
+//        var doubleSeries = new MockBarSeriesBuilder().withNumFactory(numFactory).withCandleClosePrices(1.2d, 1.1d).build();
 //        BarSeries precisionSeries = new MockBarSeriesBuilder().withNumFactory(DecimalNumFactory.getInstance())
-//                .withData(1.2d, 1.1d)
+//                .withCandleClosePrices(1.2d, 1.1d)
 //                .build();
 //
 //        TradingRecord fullRecordDouble = new BackTestTradingRecord();

@@ -23,11 +23,10 @@
  */
 package org.ta4j.core.indicators.candles;
 
-import java.time.Instant;
-
-import org.ta4j.core.BarSeries;
+import org.ta4j.core.Bar;
 import org.ta4j.core.indicators.SeriesRelatedNumericIndicator;
 import org.ta4j.core.num.Num;
+import org.ta4j.core.num.NumFactory;
 
 /**
  * Real (candle) body height indicator.
@@ -42,43 +41,24 @@ import org.ta4j.core.num.Num;
  */
 public class RealBodyIndicator extends SeriesRelatedNumericIndicator {
 
-  private Instant currentTick = Instant.EPOCH;
-  private Num value;
-
 
   /**
    * Constructor.
    *
-   * @param series the bar series
+   * @param numFactory the bar numFactory
    */
-  public RealBodyIndicator(final BarSeries series) {
-    super(series);
+  public RealBodyIndicator(final NumFactory numFactory) {
+    super(numFactory);
   }
 
 
-  protected Num calculate() {
-    final var bar = getBarSeries().getBar();
+  protected Num calculate(final Bar bar) {
     return bar.closePrice().minus(bar.openPrice());
   }
 
 
   @Override
-  public Num getValue() {
-    return this.value;
-  }
-
-
-  @Override
-  public void refresh(final Instant tick) {
-    if (tick.isAfter(this.currentTick)) {
-      this.value = calculate();
-      this.currentTick = tick;
-    }
-  }
-
-
-  @Override
-  public boolean isStable() {
-    return this.value != null;
+  public void updateState(final Bar bar) {
+    this.value = calculate(bar);
   }
 }

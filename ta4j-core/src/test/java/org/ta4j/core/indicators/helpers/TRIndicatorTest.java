@@ -41,11 +41,11 @@
 //    @Test
 //    public void getValue() {
 //        final var series = new MockBarSeriesBuilder().withNumFactory(numFactory).build();
-//        series.barBuilder().openPrice(0).closePrice(12).highPrice(15).lowPrice(8).add();
-//        series.barBuilder().openPrice(0).closePrice(8).highPrice(11).lowPrice(6).add();
-//        series.barBuilder().openPrice(0).closePrice(15).highPrice(17).lowPrice(14).add();
-//        series.barBuilder().openPrice(0).closePrice(15).highPrice(17).lowPrice(14).add();
-//        series.barBuilder().openPrice(0).closePrice(0).highPrice(0).lowPrice(2).add();
+//        series.barBuilder().openPrice(0).closePrice(12).highPrice(15).lowPrice(8).onCandle();
+//        series.barBuilder().openPrice(0).closePrice(8).highPrice(11).lowPrice(6).onCandle();
+//        series.barBuilder().openPrice(0).closePrice(15).highPrice(17).lowPrice(14).onCandle();
+//        series.barBuilder().openPrice(0).closePrice(15).highPrice(17).lowPrice(14).onCandle();
+//        series.barBuilder().openPrice(0).closePrice(0).highPrice(0).lowPrice(2).onCandle();
 //
 //        var tr = new TRIndicator(series);
 //

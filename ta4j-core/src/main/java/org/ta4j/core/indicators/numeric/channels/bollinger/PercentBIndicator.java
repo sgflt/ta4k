@@ -23,8 +23,7 @@
  */
 package org.ta4j.core.indicators.numeric.channels.bollinger;
 
-import java.time.Instant;
-
+import org.ta4j.core.Bar;
 import org.ta4j.core.indicators.Indicator;
 import org.ta4j.core.indicators.numeric.NumericIndicator;
 import org.ta4j.core.indicators.numeric.average.SMAIndicator;
@@ -43,8 +42,6 @@ public class PercentBIndicator extends NumericIndicator {
   private final Indicator<Num> indicator;
   private final BollingerBandsUpperIndicator bbu;
   private final BollingerBandsLowerIndicator bbl;
-  private Instant currentTick = Instant.EPOCH;
-  private Num value;
 
 
   /**
@@ -73,20 +70,11 @@ public class PercentBIndicator extends NumericIndicator {
 
 
   @Override
-  public Num getValue() {
-    return this.value;
-  }
-
-
-  @Override
-  public void refresh(final Instant tick) {
-    if (tick.isAfter(this.currentTick)) {
-      this.indicator.refresh(tick);
-      this.bbl.refresh(tick);
-      this.bbu.refresh(tick);
-      this.value = calculate();
-      this.currentTick = tick;
-    }
+  public void updateState(final Bar bar) {
+    this.indicator.onBar(bar);
+    this.bbl.onBar(bar);
+    this.bbu.onBar(bar);
+    this.value = calculate();
   }
 
 

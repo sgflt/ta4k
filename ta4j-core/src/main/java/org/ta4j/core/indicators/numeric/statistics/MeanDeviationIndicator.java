@@ -23,10 +23,10 @@
  */
 package org.ta4j.core.indicators.numeric.statistics;
 
-import java.time.Instant;
 import java.util.LinkedList;
 import java.util.Queue;
 
+import org.ta4j.core.Bar;
 import org.ta4j.core.indicators.numeric.NumericIndicator;
 import org.ta4j.core.num.Num;
 
@@ -43,12 +43,10 @@ public class MeanDeviationIndicator extends NumericIndicator {
   private final int barCount;
   private final Queue<Num> window = new LinkedList<>();
   private final Num numBarCount;
-  private Instant currentTick = Instant.EPOCH;
+  private final Num divisor;
   private int currentBar;
   private Num sum;
   private Num deviationSum;
-  private Num value;
-  private final Num divisor;
 
 
   /**
@@ -128,19 +126,10 @@ public class MeanDeviationIndicator extends NumericIndicator {
 
 
   @Override
-  public Num getValue() {
-    return this.value;
-  }
-
-
-  @Override
-  public void refresh(final Instant tick) {
-    if (tick.isAfter(this.currentTick)) {
-      ++this.currentBar;
-      this.indicator.refresh(tick);
-      this.value = calculate();
-      this.currentTick = tick;
-    }
+  public void updateState(final Bar bar) {
+    ++this.currentBar;
+    this.indicator.onBar(bar);
+    this.value = calculate();
   }
 
 

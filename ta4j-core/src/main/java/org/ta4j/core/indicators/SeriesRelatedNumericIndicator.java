@@ -23,8 +23,8 @@
  */
 package org.ta4j.core.indicators;
 
-import org.ta4j.core.BarSeries;
 import org.ta4j.core.indicators.numeric.NumericIndicator;
+import org.ta4j.core.num.NumFactory;
 
 /**
  * Indicator that fetches data from series directly
@@ -32,21 +32,18 @@ import org.ta4j.core.indicators.numeric.NumericIndicator;
 public abstract class SeriesRelatedNumericIndicator extends NumericIndicator {
 
 
-  private final BarSeries series;
-
-
   /**
    * Constructor.
    *
-   * @param series the bar series
+   * @param numFactory the bar numFactory
    */
-  protected SeriesRelatedNumericIndicator(final BarSeries series) {
-    super(series.numFactory());
-    this.series = series;
+  protected SeriesRelatedNumericIndicator(final NumFactory numFactory) {
+    super(numFactory);
   }
 
 
-  public BarSeries getBarSeries() {
-    return this.series;
+  @Override
+  public final boolean isStable() {
+    return this.value != null;
   }
 }

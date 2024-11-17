@@ -23,14 +23,13 @@
  */
 package org.ta4j.core.indicators.candles;
 
-import java.time.Instant;
-
-import org.ta4j.core.BarSeries;
-import org.ta4j.core.indicators.SeriesRelatedBooleanIndicator;
+import org.ta4j.core.Bar;
+import org.ta4j.core.indicators.bool.BooleanIndicator;
 import org.ta4j.core.indicators.helpers.TransformIndicator;
 import org.ta4j.core.indicators.helpers.previous.PreviousNumericValueIndicator;
 import org.ta4j.core.indicators.numeric.NumericIndicator;
 import org.ta4j.core.num.Num;
+import org.ta4j.core.num.NumFactory;
 
 /**
  * Doji indicator.
@@ -43,7 +42,7 @@ import org.ta4j.core.num.Num;
  *     "http://stockcharts.com/school/doku.php?id=chart_school:chart_analysis:introduction_to_candlesticks#doji">
  *     http://stockcharts.com/school/doku.php?id=chart_school:chart_analysis:introduction_to_candlesticks#doji</a>
  */
-public class DojiIndicator extends SeriesRelatedBooleanIndicator {
+public class DojiIndicator extends BooleanIndicator {
 
   /** Body height. */
   private final NumericIndicator bodyHeightInd;
@@ -53,23 +52,20 @@ public class DojiIndicator extends SeriesRelatedBooleanIndicator {
 
   /** The factor used when checking if a candle is Doji. */
   private final Num factor;
-  private Instant currentTick = Instant.EPOCH;
   private Boolean value;
 
 
   /**
    * Constructor.
    *
-   * @param series the bar series
    * @param barCount the number of bars used to calculate the average body
    *     height
    * @param bodyFactor the factor used when checking if a candle is Doji
    */
-  public DojiIndicator(final BarSeries series, final int barCount, final double bodyFactor) {
-    super(series);
-    this.bodyHeightInd = TransformIndicator.abs(new RealBodyIndicator(series));
+  public DojiIndicator(final NumFactory numFactory, final int barCount, final double bodyFactor) {
+    this.bodyHeightInd = TransformIndicator.abs(NumericIndicator.realBody());
     this.averageBodyHeightInd = this.bodyHeightInd.sma(barCount).previous();
-    this.factor = getBarSeries().numFactory().numOf(bodyFactor);
+    this.factor = numFactory.numOf(bodyFactor);
   }
 
 
@@ -86,19 +82,10 @@ public class DojiIndicator extends SeriesRelatedBooleanIndicator {
 
 
   @Override
-  public Boolean getValue() {
-    return this.value;
-  }
-
-
-  @Override
-  public void refresh(final Instant tick) {
-    if (tick.isAfter(this.currentTick)) {
-      this.bodyHeightInd.refresh(tick);
-      this.averageBodyHeightInd.refresh(tick);
-      this.value = calculate();
-      this.currentTick = tick;
-    }
+  public void updateState(final Bar bar) {
+    this.bodyHeightInd.onBar(bar);
+    this.averageBodyHeightInd.onBar(bar);
+    this.value = calculate();
   }
 
 

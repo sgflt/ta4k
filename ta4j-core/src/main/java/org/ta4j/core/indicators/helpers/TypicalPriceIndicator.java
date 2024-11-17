@@ -23,12 +23,10 @@
  */
 package org.ta4j.core.indicators.helpers;
 
-import java.time.Instant;
-
 import org.ta4j.core.Bar;
-import org.ta4j.core.BarSeries;
 import org.ta4j.core.indicators.SeriesRelatedNumericIndicator;
 import org.ta4j.core.num.Num;
+import org.ta4j.core.num.NumFactory;
 
 /**
  * Typical price indicator.
@@ -42,46 +40,26 @@ import org.ta4j.core.num.Num;
  */
 public class TypicalPriceIndicator extends SeriesRelatedNumericIndicator {
 
-  private Instant currentTick = Instant.EPOCH;
-  private Num value;
-
-
   /**
    * Constructor.
    *
-   * @param series the bar series
+   * @param numFactory the bar numFactory
    */
-  public TypicalPriceIndicator(final BarSeries series) {
-    super(series);
+  public TypicalPriceIndicator(final NumFactory numFactory) {
+    super(numFactory);
   }
 
 
-  protected Num calculate() {
-    final Bar bar = getBarSeries().getBar();
+  protected Num calculate(final Bar bar) {
     final Num highPrice = bar.highPrice();
     final Num lowPrice = bar.lowPrice();
     final Num closePrice = bar.closePrice();
-    return highPrice.plus(lowPrice).plus(closePrice).dividedBy(getBarSeries().numFactory().three());
+    return highPrice.plus(lowPrice).plus(closePrice).dividedBy(getNumFactory().three());
   }
 
 
   @Override
-  public Num getValue() {
-    return this.value;
-  }
-
-
-  @Override
-  public void refresh(final Instant tick) {
-    if (tick.isAfter(this.currentTick)) {
-      this.value = calculate();
-      this.currentTick = tick;
-    }
-  }
-
-
-  @Override
-  public boolean isStable() {
-    return true;
+  public void updateState(final Bar bar) {
+    this.value = calculate(bar);
   }
 }

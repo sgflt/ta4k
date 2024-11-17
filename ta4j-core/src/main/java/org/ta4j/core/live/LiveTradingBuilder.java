@@ -94,7 +94,7 @@ public class LiveTradingBuilder {
     }
 
     final var strategy = this.strategyFactory.createStrategy(liveBarSeries);
-    liveBarSeries.replaceStrategy(strategy);
+// FIXME   liveBarSeries.replaceStrategy(strategy);
 
     return new LiveTrading(liveBarSeries, strategy);
   }

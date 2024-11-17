@@ -86,7 +86,7 @@
 //                .closePrice(close)
 //                .highPrice(0)
 //                .lowPrice(0)
-//                .add());
+//                .onCandle());
 //
 //        // Building the trading strategy
 //        Strategy strategy = buildStrategy(series);

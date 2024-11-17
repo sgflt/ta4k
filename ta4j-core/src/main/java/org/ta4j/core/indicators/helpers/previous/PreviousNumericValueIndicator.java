@@ -23,8 +23,7 @@
  */
 package org.ta4j.core.indicators.helpers.previous;
 
-import java.time.Instant;
-
+import org.ta4j.core.Bar;
 import org.ta4j.core.indicators.numeric.NumericIndicator;
 import org.ta4j.core.num.Num;
 import org.ta4j.core.num.NumFactory;
@@ -45,16 +44,16 @@ public class PreviousNumericValueIndicator extends NumericIndicator {
   }
 
 
-  @Override
-  public Num getValue() {
+  private Num calculate() {
     final var value = this.previousValueHelper.getValue();
     return value == null ? this.numFactory.zero() : value;
   }
 
 
   @Override
-  public void refresh(final Instant tick) {
-    this.previousValueHelper.refresh(tick);
+  public void updateState(final Bar bar) {
+    this.previousValueHelper.onBar(bar);
+    this.value = calculate();
   }
 
 

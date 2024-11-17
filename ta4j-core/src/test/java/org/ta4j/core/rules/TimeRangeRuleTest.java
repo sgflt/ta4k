@@ -49,17 +49,17 @@
 //        final DateTimeFormatter dtf = DateTimeFormatter.ISO_ZONED_DATE_TIME;
 //        final var series = new MockBarSeriesBuilder().withNumFactory(numFactory).build();
 //
-//        series.barBuilder().endTime(ZonedDateTime.parse("2019-09-17T00:00:00-00:00", dtf)).closePrice(100).add();
-//        series.barBuilder().endTime(ZonedDateTime.parse("2019-09-17T05:00:00-00:00", dtf)).closePrice(100).add();
-//        series.barBuilder().endTime(ZonedDateTime.parse("2019-09-17T07:00:00-00:00", dtf)).closePrice(100).add();
-//        series.barBuilder().endTime(ZonedDateTime.parse("2019-09-17T08:00:00-00:00", dtf)).closePrice(100).add();
-//        series.barBuilder().endTime(ZonedDateTime.parse("2019-09-17T15:00:00-00:00", dtf)).closePrice(100).add();
-//        series.barBuilder().endTime(ZonedDateTime.parse("2019-09-17T15:05:00-00:00", dtf)).closePrice(100).add();
-//        series.barBuilder().endTime(ZonedDateTime.parse("2019-09-17T16:59:00-00:00", dtf)).closePrice(100).add();
-//        series.barBuilder().endTime(ZonedDateTime.parse("2019-09-17T17:05:00-00:00", dtf)).closePrice(100).add();
-//        series.barBuilder().endTime(ZonedDateTime.parse("2019-09-17T23:00:00-00:00", dtf)).closePrice(100).add();
-//        series.barBuilder().endTime(ZonedDateTime.parse("2019-09-17T23:30:00-00:00", dtf)).closePrice(100).add();
-//        series.barBuilder().endTime(ZonedDateTime.parse("2019-09-17T23:35:00-00:00", dtf)).closePrice(100).add();
+//        series.barBuilder().endTime(ZonedDateTime.parse("2019-09-17T00:00:00-00:00", dtf)).closePrice(100).onCandle();
+//        series.barBuilder().endTime(ZonedDateTime.parse("2019-09-17T05:00:00-00:00", dtf)).closePrice(100).onCandle();
+//        series.barBuilder().endTime(ZonedDateTime.parse("2019-09-17T07:00:00-00:00", dtf)).closePrice(100).onCandle();
+//        series.barBuilder().endTime(ZonedDateTime.parse("2019-09-17T08:00:00-00:00", dtf)).closePrice(100).onCandle();
+//        series.barBuilder().endTime(ZonedDateTime.parse("2019-09-17T15:00:00-00:00", dtf)).closePrice(100).onCandle();
+//        series.barBuilder().endTime(ZonedDateTime.parse("2019-09-17T15:05:00-00:00", dtf)).closePrice(100).onCandle();
+//        series.barBuilder().endTime(ZonedDateTime.parse("2019-09-17T16:59:00-00:00", dtf)).closePrice(100).onCandle();
+//        series.barBuilder().endTime(ZonedDateTime.parse("2019-09-17T17:05:00-00:00", dtf)).closePrice(100).onCandle();
+//        series.barBuilder().endTime(ZonedDateTime.parse("2019-09-17T23:00:00-00:00", dtf)).closePrice(100).onCandle();
+//        series.barBuilder().endTime(ZonedDateTime.parse("2019-09-17T23:30:00-00:00", dtf)).closePrice(100).onCandle();
+//        series.barBuilder().endTime(ZonedDateTime.parse("2019-09-17T23:35:00-00:00", dtf)).closePrice(100).onCandle();
 //
 //        var dateTimeIndicator = new DateTimeIndicator(series, Bar::beginTime);
 //        TimeRangeRule rule = new TimeRangeRule(

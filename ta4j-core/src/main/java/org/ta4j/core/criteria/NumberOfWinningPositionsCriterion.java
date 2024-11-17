@@ -1,4 +1,4 @@
-/**
+/*
  * The MIT License (MIT)
  *
  * Copyright (c) 2017-2023 Ta4j Organization & respective
@@ -25,28 +25,32 @@ package org.ta4j.core.criteria;
 
 import org.ta4j.core.Position;
 import org.ta4j.core.TradingRecord;
-import org.ta4j.core.backtest.BacktestBarSeries;
 import org.ta4j.core.num.Num;
+import org.ta4j.core.num.NumFactoryProvider;
 
 /**
  * Number of closed winning positions criterion.
  */
 public class NumberOfWinningPositionsCriterion extends AbstractAnalysisCriterion {
 
-    @Override
-    public Num calculate(BacktestBarSeries series, Position position) {
-        return position.hasProfit() ? series.numFactory().one() : series.numFactory().zero();
-    }
+  @Override
+  public Num calculate(final Position position) {
+    return position.hasProfit()
+           ? NumFactoryProvider.getDefaultNumFactory().one()
+           : NumFactoryProvider.getDefaultNumFactory().zero();
+  }
 
-    @Override
-    public Num calculate(BacktestBarSeries series, TradingRecord tradingRecord) {
-        long numberOfWinningPositions = tradingRecord.getPositions().stream().filter(Position::hasProfit).count();
-        return series.numFactory().numOf(numberOfWinningPositions);
-    }
 
-    /** The higher the criterion value, the better. */
-    @Override
-    public boolean betterThan(Num criterionValue1, Num criterionValue2) {
-        return criterionValue1.isGreaterThan(criterionValue2);
-    }
+  @Override
+  public Num calculate(final TradingRecord tradingRecord) {
+    final long numberOfWinningPositions = tradingRecord.getPositions().stream().filter(Position::hasProfit).count();
+    return NumFactoryProvider.getDefaultNumFactory().numOf(numberOfWinningPositions);
+  }
+
+
+  /** The higher the criterion value, the better. */
+  @Override
+  public boolean betterThan(final Num criterionValue1, final Num criterionValue2) {
+    return criterionValue1.isGreaterThan(criterionValue2);
+  }
 }

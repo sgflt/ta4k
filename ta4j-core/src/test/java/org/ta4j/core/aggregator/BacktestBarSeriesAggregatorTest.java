@@ -158,8 +158,8 @@
 //            }
 //            int lastBarIndex = bars.size() - 1;
 //
-//            aggregated.add(bars.get(0));
-//            aggregated.add(bars.get(lastBarIndex));
+//            aggregated.onCandle(bars.get(0));
+//            aggregated.onCandle(bars.get(lastBarIndex));
 //            return aggregated;
 //        }
 //    }

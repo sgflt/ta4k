@@ -30,6 +30,7 @@ import static org.ta4j.core.TestUtils.assertNumEquals;
 import java.util.List;
 
 import org.junit.Test;
+import org.ta4j.core.BarSeries;
 import org.ta4j.core.Position;
 import org.ta4j.core.Trade;
 import org.ta4j.core.Trade.TradeType;
@@ -41,9 +42,9 @@ public class EnterAndHoldReturnCriterionTest extends AbstractCriterionTest {
 
   public EnterAndHoldReturnCriterionTest(final NumFactory numFactory) {
     super(
-        params -> params.length == 0
-                  ? EnterAndHoldReturnCriterion.buy()
-                  : new EnterAndHoldReturnCriterion((TradeType) params[0]),
+        params -> params.length == 1
+                  ? EnterAndHoldReturnCriterion.buy((BarSeries) params[0])
+                  : new EnterAndHoldReturnCriterion((BarSeries) params[1], (TradeType) params[0]),
         numFactory
     );
   }
@@ -51,13 +52,13 @@ public class EnterAndHoldReturnCriterionTest extends AbstractCriterionTest {
 
   @Test
   public void calculateWithEmpty() {
-    final var series = new MockBarSeriesBuilder().withNumFactory(this.numFactory).withData(List.of()).build();
+    final var series = new MockBarSeriesBuilder().withNumFactory(numFactory).withData(List.of()).build();
     final var tradingRecord = new BackTestTradingRecord();
-    final var buyAndHold = getCriterion();
-    final var sellAndHold = getCriterion(TradeType.SELL);
+    final var buyAndHold = getCriterion(series);
+    final var sellAndHold = getCriterion(TradeType.SELL, series);
 
-    final var buyAndHoldResult = buyAndHold.calculate(series, tradingRecord);
-    final var sellAndHoldResult = sellAndHold.calculate(series, tradingRecord);
+    final var buyAndHoldResult = buyAndHold.calculate(tradingRecord);
+    final var sellAndHoldResult = sellAndHold.calculate(tradingRecord);
 
     assertNumEquals(1, buyAndHoldResult);
     assertNumEquals(1, sellAndHoldResult);
@@ -70,15 +71,16 @@ public class EnterAndHoldReturnCriterionTest extends AbstractCriterionTest {
     final var series = new MockBarSeriesBuilder().withNumFactory(this.numFactory)
         .withData(100, 105, 110, 100, 95, 105)
         .build();
-    final var tradingRecord = new BackTestTradingRecord(Trade.buyAt(0, series), Trade.sellAt(2, series),
+    final var tradingRecord = new BackTestTradingRecord(
+        Trade.buyAt(0, series), Trade.sellAt(2, series),
         Trade.buyAt(3, series), Trade.sellAt(5, series)
     );
 
-    final var buyAndHold = getCriterion();
-    assertNumEquals(1.05, buyAndHold.calculate(series, tradingRecord));
+    final var buyAndHold = getCriterion(series);
+    assertNumEquals(1.05, buyAndHold.calculate(tradingRecord));
 
     final var sellAndHold = getCriterion(TradeType.SELL);
-    assertNumEquals(0.95, sellAndHold.calculate(series, tradingRecord));
+    assertNumEquals(0.95, sellAndHold.calculate(tradingRecord));
   }
 
 
@@ -93,11 +95,11 @@ public class EnterAndHoldReturnCriterionTest extends AbstractCriterionTest {
         Trade.sellAt(5, series)
     );
 
-    final var buyAndHold = getCriterion();
-    assertNumEquals(0.7, buyAndHold.calculate(series, tradingRecord));
+    final var buyAndHold = getCriterion(series);
+    assertNumEquals(0.7, buyAndHold.calculate(tradingRecord));
 
-    final var sellAndHold = getCriterion(TradeType.SELL);
-    assertNumEquals(1.3, sellAndHold.calculate(series, tradingRecord));
+    final var sellAndHold = getCriterion(TradeType.SELL, series);
+    assertNumEquals(1.3, sellAndHold.calculate(tradingRecord));
   }
 
 
@@ -106,11 +108,11 @@ public class EnterAndHoldReturnCriterionTest extends AbstractCriterionTest {
     final var series =
         new MockBarSeriesBuilder().withNumFactory(this.numFactory).withData(100, 95, 100, 80, 85, 70).build();
 
-    final var buyAndHold = getCriterion();
-    assertNumEquals(1.0, buyAndHold.calculate(series, new BackTestTradingRecord()));
+    final var buyAndHold = getCriterion(series);
+    assertNumEquals(1.0, buyAndHold.calculate(new BackTestTradingRecord()));
 
-    final var sellAndHold = getCriterion(TradeType.SELL);
-    assertNumEquals(1.0, sellAndHold.calculate(series, new BackTestTradingRecord()));
+    final var sellAndHold = getCriterion(TradeType.SELL, series);
+    assertNumEquals(1.0, sellAndHold.calculate(new BackTestTradingRecord()));
   }
 
 
@@ -118,11 +120,11 @@ public class EnterAndHoldReturnCriterionTest extends AbstractCriterionTest {
   public void calculateWithOnePositions() {
     final var series = new MockBarSeriesBuilder().withNumFactory(this.numFactory).withData(100, 105).build();
     final var position = new Position(Trade.buyAt(0, series), Trade.sellAt(1, series));
-    final var buyAndHold = getCriterion();
-    assertNumEquals(105d / 100, buyAndHold.calculate(series, position));
+    final var buyAndHold = getCriterion(series);
+    assertNumEquals(105d / 100, buyAndHold.calculate(position));
 
-    final var sellAndHold = getCriterion(TradeType.SELL);
-    assertNumEquals(0.95, sellAndHold.calculate(series, position));
+    final var sellAndHold = getCriterion(TradeType.SELL, series);
+    assertNumEquals(0.95, sellAndHold.calculate(position));
   }
 
 
@@ -132,7 +134,7 @@ public class EnterAndHoldReturnCriterionTest extends AbstractCriterionTest {
     assertTrue(buyAndHold.betterThan(numOf(1.3), numOf(1.1)));
     assertFalse(buyAndHold.betterThan(numOf(0.6), numOf(0.9)));
 
-    final var sellAndHold = getCriterion(TradeType.SELL);
+    final var sellAndHold = getCriterion(TradeType.SELL, null);
     assertTrue(sellAndHold.betterThan(numOf(1.3), numOf(1.1)));
     assertFalse(sellAndHold.betterThan(numOf(0.6), numOf(0.9)));
   }

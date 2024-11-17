@@ -47,7 +47,7 @@
 //    @Test
 //    public void calculateOnlyWithGainPositions() {
 //        var series = new MockBarSeriesBuilder().withNumFactory(numFactory)
-//                .withData(100, 105, 110, 100, 95, 105)
+//                .withCandleClosePrices(100, 105, 110, 100, 95, 105)
 //                .build();
 //        var tradingRecord = new BackTestTradingRecord(Trade.buyAt(0, series), Trade.sellAt(2, series),
 //                Trade.buyAt(3, series), Trade.sellAt(5, series));
@@ -58,7 +58,7 @@
 //
 //    @Test
 //    public void calculateOnlyWithLossPositions() {
-//        var series = new MockBarSeriesBuilder().withNumFactory(numFactory).withData(100, 95, 100, 80, 85, 70).build();
+//        var series = new MockBarSeriesBuilder().withNumFactory(numFactory).withCandleClosePrices(100, 95, 100, 80, 85, 70).build();
 //        TradingRecord tradingRecord = new BackTestTradingRecord(Trade.buyAt(0, series), Trade.sellAt(1, series),
 //                Trade.buyAt(2, series), Trade.sellAt(5, series));
 //
@@ -68,7 +68,7 @@
 //
 //    @Test
 //    public void calculateWithOnlyOnePosition() {
-//        var series = new MockBarSeriesBuilder().withNumFactory(numFactory).withData(100, 95, 100, 80, 85, 70).build();
+//        var series = new MockBarSeriesBuilder().withNumFactory(numFactory).withCandleClosePrices(100, 95, 100, 80, 85, 70).build();
 //        Position position = new Position(Trade.buyAt(0, series), Trade.sellAt(1, series));
 //
 //        AnalysisCriterion buyAndHold = getCriterion(new ReturnCriterion());
@@ -77,7 +77,7 @@
 //
 //    @Test
 //    public void calculateWithNoPositions() {
-//        var series = new MockBarSeriesBuilder().withNumFactory(numFactory).withData(100, 95, 100, 80, 85, 70).build();
+//        var series = new MockBarSeriesBuilder().withNumFactory(numFactory).withCandleClosePrices(100, 95, 100, 80, 85, 70).build();
 //
 //        AnalysisCriterion buyAndHold = getCriterion(new ReturnCriterion());
 //        assertNumEquals(1 / 0.7, buyAndHold.calculate(series, new BackTestTradingRecord()));
@@ -85,7 +85,7 @@
 //
 //    @Test
 //    public void calculateWithAverageProfit() {
-//        var series = new MockBarSeriesBuilder().withNumFactory(numFactory).withData(100, 95, 100, 80, 85, 130).build();
+//        var series = new MockBarSeriesBuilder().withNumFactory(numFactory).withCandleClosePrices(100, 95, 100, 80, 85, 130).build();
 //        TradingRecord tradingRecord = new BackTestTradingRecord(Trade.buyAt(0, NaN, NaN), Trade.sellAt(1, NaN, NaN),
 //                Trade.buyAt(2, NaN, NaN), Trade.sellAt(5, NaN, NaN));
 //
@@ -97,7 +97,7 @@
 //
 //    @Test
 //    public void calculateWithNumberOfBars() {
-//        var series = new MockBarSeriesBuilder().withNumFactory(numFactory).withData(100, 95, 100, 80, 85, 130).build();
+//        var series = new MockBarSeriesBuilder().withNumFactory(numFactory).withCandleClosePrices(100, 95, 100, 80, 85, 130).build();
 //        TradingRecord tradingRecord = new BackTestTradingRecord(Trade.buyAt(0, series), Trade.sellAt(1, series),
 //                Trade.buyAt(2, series), Trade.sellAt(5, series));
 //

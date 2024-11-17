@@ -53,7 +53,7 @@
 //    public void setUp() {
 //        series = new MockBarSeriesBuilder().withNumFactory(numFactory).build();
 //        for (var price : typicalPrices) {
-//            series.barBuilder().openPrice(price).closePrice(price).highPrice(price).lowPrice(price).add();
+//            series.barBuilder().openPrice(price).closePrice(price).highPrice(price).lowPrice(price).onCandle();
 //        }
 //    }
 //

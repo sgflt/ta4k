@@ -85,32 +85,32 @@
 //                .timePeriod(Duration.ofDays(1))
 //                .endTime(ZonedDateTime.of(2014, 6, 13, 0, 0, 0, 0, ZoneId.systemDefault()))
 //                .closePrice(1d)
-//                .add();
+//                .onCandle();
 //        defaultSeries.barBuilder()
 //                .timePeriod(Duration.ofDays(1))
 //                .endTime(ZonedDateTime.of(2014, 6, 14, 0, 0, 0, 0, ZoneId.systemDefault()))
 //                .closePrice(2d)
-//                .add();
+//                .onCandle();
 //        defaultSeries.barBuilder()
 //                .timePeriod(Duration.ofDays(1))
 //                .endTime(ZonedDateTime.of(2014, 6, 15, 0, 0, 0, 0, ZoneId.systemDefault()))
 //                .closePrice(3d)
-//                .add();
+//                .onCandle();
 //        defaultSeries.barBuilder()
 //                .timePeriod(Duration.ofDays(1))
 //                .endTime(ZonedDateTime.of(2014, 6, 20, 0, 0, 0, 0, ZoneId.systemDefault()))
 //                .closePrice(4d)
-//                .add();
+//                .onCandle();
 //        defaultSeries.barBuilder()
 //                .timePeriod(Duration.ofDays(1))
 //                .endTime(ZonedDateTime.of(2014, 6, 25, 0, 0, 0, 0, ZoneId.systemDefault()))
 //                .closePrice(5d)
-//                .add();
+//                .onCandle();
 //        defaultSeries.barBuilder()
 //                .timePeriod(Duration.ofDays(1))
 //                .endTime(ZonedDateTime.of(2014, 6, 30, 0, 0, 0, 0, ZoneId.systemDefault()))
 //                .closePrice(6d)
-//                .add();
+//                .onCandle();
 //
 //        subSeries = defaultSeries.getSubSeries(2, 5);
 //        emptySeries = new BacktestBarSeriesBuilder().withNumFactory(numFactory).build();
@@ -391,7 +391,7 @@
 //        var series = new BacktestBarSeriesBuilder().withNumFactory(numFactory)
 //                .withBarBuilderFactory(new MockBarBuilderFactory())
 //                .build();
-//        series.barBuilder().closePrice(1d).volume(0).amount(0).add();
+//        series.barBuilder().closePrice(1d).volume(0).amount(0).onCandle();
 //        series.addTrade(200, 11.5);
 //        assertNumEquals(series.numFactory().numOf(200), series.getLastBar().volume());
 //        assertNumEquals(series.numFactory().numOf(11.5), series.getLastBar().closePrice());
@@ -435,7 +435,7 @@
 //                    .lowPrice(1)
 //                    .closePrice(5)
 //                    .volume(i)
-//                    .add();
+//                    .onCandle();
 //            int startIndex = Math.max(series.getBeginIndex(), series.getEndIndex() - timespan + 1);
 //            int endIndex = i + 1;
 //            final BarSeries subSeries = series.getSubSeries(startIndex, endIndex);

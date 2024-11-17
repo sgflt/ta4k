@@ -45,7 +45,7 @@
 //
 //    @Before
 //    public void setUp() {
-//        data = new MockBarSeriesBuilder().withNumFactory(numFactory).withData( 1, 2, 3, 4, 7).build();
+//        data = new MockBarSeriesBuilder().withNumFactory(numFactory).withCandleClosePrices( 1, 2, 3, 4, 7).build();
 //        data.setMaximumBarCount(4);
 //    }
 //
@@ -59,7 +59,7 @@
 //    }
 //
 //    private void firstAddition() {
-//        data.barBuilder().closePrice(5.).add();
+//        data.barBuilder().closePrice(5.).onCandle();
 //        Indicator<Num> indicator2 = getIndicator(new ClosePriceIndicator(data), 2);
 //
 //        // unstable bars skipped, unpredictable results
@@ -75,7 +75,7 @@
 //    }
 //
 //    private void secondAddition() {
-//        data.barBuilder().closePrice(10.).add();
+//        data.barBuilder().closePrice(10.).onCandle();
 //        Indicator<Num> indicator2 = getIndicator(new ClosePriceIndicator(data), 2);
 //
 //        // unstable bars skipped, unpredictable results
@@ -91,7 +91,7 @@
 //    }
 //
 //    private void thirdAddition() {
-//        data.barBuilder().closePrice(20.).add();
+//        data.barBuilder().closePrice(20.).onCandle();
 //        Indicator<Num> indicator2 = getIndicator(new ClosePriceIndicator(data), 2);
 //
 //        // unstable bars skipped, unpredictable results
@@ -107,7 +107,7 @@
 //    }
 //
 //    private void fourthAddition() {
-//        data.barBuilder().closePrice(30.).add();
+//        data.barBuilder().closePrice(30.).onCandle();
 //        Indicator<Num> indicator2 = getIndicator(new ClosePriceIndicator(data), 2);
 //
 //        // unstable bars skipped, unpredictable results
@@ -139,8 +139,8 @@
 //
 //    @Test
 //    public void whenBarCountIs1ResultShouldBeIndicatorValue() {
-//        data.barBuilder().closePrice(5.).add();
-//        data.barBuilder().closePrice(5.).add();
+//        data.barBuilder().closePrice(5.).onCandle();
+//        data.barBuilder().closePrice(5.).onCandle();
 //
 //        Indicator<Num> indicator = getIndicator(new ClosePriceIndicator(data), 1);
 //        for (int i = 0; i < data.getBarCount(); i++) {

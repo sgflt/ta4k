@@ -52,7 +52,7 @@
 //        final ZonedDateTime time = ZonedDateTime.of(2019, 6, 12, 4, 1, 0, 0, ZoneId.systemDefault());
 //
 //        // days 1 - 5
-//        bars.add(new MockBarBuilder(numFactory).endTime(time)
+//        bars.onCandle(new MockBarBuilder(numFactory).endTime(time)
 //                .openPrice(1d)
 //                .closePrice(2d)
 //                .highPrice(3d)
@@ -61,7 +61,7 @@
 //                .volume(6d)
 //                .trades(7)
 //                .build());
-//        bars.add(new MockBarBuilder(numFactory).endTime(time.plusDays(1))
+//        bars.onCandle(new MockBarBuilder(numFactory).endTime(time.plusDays(1))
 //                .openPrice(2d)
 //                .closePrice(3d)
 //                .highPrice(3d)
@@ -70,7 +70,7 @@
 //                .volume(6d)
 //                .trades(7)
 //                .build());
-//        bars.add(new MockBarBuilder(numFactory).endTime(time.plusDays(2))
+//        bars.onCandle(new MockBarBuilder(numFactory).endTime(time.plusDays(2))
 //                .openPrice(3d)
 //                .closePrice(4d)
 //                .highPrice(4d)
@@ -79,7 +79,7 @@
 //                .volume(7d)
 //                .trades(7)
 //                .build());
-//        bars.add(new MockBarBuilder(numFactory).endTime(time.plusDays(3))
+//        bars.onCandle(new MockBarBuilder(numFactory).endTime(time.plusDays(3))
 //                .openPrice(4d)
 //                .closePrice(5d)
 //                .highPrice(6d)
@@ -88,7 +88,7 @@
 //                .volume(8d)
 //                .trades(7)
 //                .build());
-//        bars.add(new MockBarBuilder(numFactory).endTime(time.plusDays(4))
+//        bars.onCandle(new MockBarBuilder(numFactory).endTime(time.plusDays(4))
 //                .openPrice(5d)
 //                .closePrice(9d)
 //                .highPrice(3d)
@@ -99,7 +99,7 @@
 //                .build());
 //
 //        // days 6 - 10
-//        bars.add(new MockBarBuilder(numFactory).endTime(time.plusDays(5))
+//        bars.onCandle(new MockBarBuilder(numFactory).endTime(time.plusDays(5))
 //                .openPrice(6d)
 //                .closePrice(10d)
 //                .highPrice(9d)
@@ -108,7 +108,7 @@
 //                .volume(3d)
 //                .trades(7)
 //                .build());
-//        bars.add(new MockBarBuilder(numFactory).endTime(time.plusDays(6))
+//        bars.onCandle(new MockBarBuilder(numFactory).endTime(time.plusDays(6))
 //                .openPrice(3d)
 //                .closePrice(3d)
 //                .highPrice(4d)
@@ -117,7 +117,7 @@
 //                .volume(74d)
 //                .trades(7)
 //                .build());
-//        bars.add(new MockBarBuilder(numFactory).endTime(time.plusDays(7))
+//        bars.onCandle(new MockBarBuilder(numFactory).endTime(time.plusDays(7))
 //                .openPrice(4d)
 //                .closePrice(7d)
 //                .highPrice(63d)
@@ -126,7 +126,7 @@
 //                .volume(89d)
 //                .trades(7)
 //                .build());
-//        bars.add(new MockBarBuilder(numFactory).endTime(time.plusDays(8))
+//        bars.onCandle(new MockBarBuilder(numFactory).endTime(time.plusDays(8))
 //                .openPrice(5d)
 //                .closePrice(93d)
 //                .highPrice(3d)
@@ -135,7 +135,7 @@
 //                .volume(62d)
 //                .trades(7)
 //                .build());
-//        bars.add(new MockBarBuilder(numFactory).endTime(time.plusDays(9))
+//        bars.onCandle(new MockBarBuilder(numFactory).endTime(time.plusDays(9))
 //                .openPrice(6d)
 //                .closePrice(10d)
 //                .highPrice(91d)
@@ -146,7 +146,7 @@
 //                .build());
 //
 //        // days 11 - 15
-//        bars.add(new MockBarBuilder(numFactory).endTime(time.plusDays(10))
+//        bars.onCandle(new MockBarBuilder(numFactory).endTime(time.plusDays(10))
 //                .openPrice(4d)
 //                .closePrice(10d)
 //                .highPrice(943d)
@@ -155,7 +155,7 @@
 //                .volume(43d)
 //                .trades(7)
 //                .build());
-//        bars.add(new MockBarBuilder(numFactory).endTime(time.plusDays(11))
+//        bars.onCandle(new MockBarBuilder(numFactory).endTime(time.plusDays(11))
 //                .openPrice(3d)
 //                .closePrice(3d)
 //                .highPrice(43d)
@@ -164,7 +164,7 @@
 //                .volume(784d)
 //                .trades(7)
 //                .build());
-//        bars.add(new MockBarBuilder(numFactory).endTime(time.plusDays(12))
+//        bars.onCandle(new MockBarBuilder(numFactory).endTime(time.plusDays(12))
 //                .openPrice(4d)
 //                .closePrice(74d)
 //                .highPrice(53d)
@@ -173,7 +173,7 @@
 //                .volume(89d)
 //                .trades(7)
 //                .build());
-//        bars.add(new MockBarBuilder(numFactory).endTime(time.plusDays(13))
+//        bars.onCandle(new MockBarBuilder(numFactory).endTime(time.plusDays(13))
 //                .openPrice(5d)
 //                .closePrice(93d)
 //                .highPrice(31d)
@@ -182,7 +182,7 @@
 //                .volume(62d)
 //                .trades(7)
 //                .build());
-//        bars.add(new MockBarBuilder(numFactory).endTime(time.plusDays(14))
+//        bars.onCandle(new MockBarBuilder(numFactory).endTime(time.plusDays(14))
 //                .openPrice(6d)
 //                .closePrice(10d)
 //                .highPrice(991d)
@@ -193,7 +193,7 @@
 //                .build());
 //
 //        // day 16
-//        bars.add(new MockBarBuilder(numFactory).endTime(time.plusDays(15))
+//        bars.onCandle(new MockBarBuilder(numFactory).endTime(time.plusDays(15))
 //                .openPrice(6d)
 //                .closePrice(108d)
 //                .highPrice(1991d)
@@ -292,7 +292,7 @@
 //                .closePrice(2)
 //                .lowPrice(1)
 //                .volume(1)
-//                .add();
+//                .onCandle();
 //        barSeries.barBuilder()
 //                .timePeriod(Duration.ofMinutes(1))
 //                .endTime(now.plusMinutes(2))
@@ -301,7 +301,7 @@
 //                .closePrice(3)
 //                .lowPrice(1)
 //                .volume(1)
-//                .add();
+//                .onCandle();
 //        ;
 //        barSeries.barBuilder()
 //                .timePeriod(Duration.ofMinutes(1))
@@ -311,7 +311,7 @@
 //                .closePrice(1)
 //                .lowPrice(1)
 //                .volume(1)
-//                .add();
+//                .onCandle();
 //        ;
 //
 //        BarSeries aggregated2MinSeries = new BacktestBarSeriesAggregator(

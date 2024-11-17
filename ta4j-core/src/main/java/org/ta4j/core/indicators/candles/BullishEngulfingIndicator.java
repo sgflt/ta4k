@@ -23,8 +23,6 @@
  */
 package org.ta4j.core.indicators.candles;
 
-import java.time.Instant;
-
 import org.ta4j.core.Bar;
 import org.ta4j.core.BarSeries;
 import org.ta4j.core.indicators.SeriesRelatedBooleanIndicator;
@@ -39,7 +37,6 @@ import org.ta4j.core.num.Num;
  */
 public class BullishEngulfingIndicator extends SeriesRelatedBooleanIndicator {
 
-  private Instant currentTick = Instant.EPOCH;
   private Boolean value;
   private Bar previousBar;
 
@@ -54,22 +51,21 @@ public class BullishEngulfingIndicator extends SeriesRelatedBooleanIndicator {
   }
 
 
-  protected Boolean calculate() {
+  protected Boolean calculate(final Bar bar) {
     if (this.value == null) {
-      this.previousBar = getBarSeries().getBar();
+      this.previousBar = bar;
       // Engulfing is a 2-candle pattern
       return false;
     }
 
     final Bar prevBar = this.previousBar;
-    final Bar currBar = getBarSeries().getBar();
-    this.previousBar = currBar;
+    this.previousBar = bar;
 
-    if (prevBar.isBearish() && currBar.isBullish()) {
+    if (prevBar.isBearish() && bar.isBullish()) {
       final Num prevOpenPrice = prevBar.openPrice();
       final Num prevClosePrice = prevBar.closePrice();
-      final Num currOpenPrice = currBar.openPrice();
-      final Num currClosePrice = currBar.closePrice();
+      final Num currOpenPrice = bar.openPrice();
+      final Num currClosePrice = bar.closePrice();
       return currOpenPrice.isLessThan(prevOpenPrice)
              && currOpenPrice.isLessThan(prevClosePrice)
              && currClosePrice.isGreaterThan(prevOpenPrice)
@@ -81,17 +77,8 @@ public class BullishEngulfingIndicator extends SeriesRelatedBooleanIndicator {
 
 
   @Override
-  public Boolean getValue() {
-    return this.value;
-  }
-
-
-  @Override
-  public void refresh(final Instant tick) {
-    if (tick.isAfter(this.currentTick)) {
-      this.value = calculate();
-      this.currentTick = tick;
-    }
+  public void updateState(final Bar bar) {
+    this.value = calculate(bar);
   }
 
 

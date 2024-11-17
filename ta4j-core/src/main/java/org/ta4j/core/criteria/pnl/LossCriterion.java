@@ -1,4 +1,4 @@
-/**
+/*
  * The MIT License (MIT)
  *
  * Copyright (c) 2017-2023 Ta4j Organization & respective
@@ -26,9 +26,9 @@ package org.ta4j.core.criteria.pnl;
 import org.ta4j.core.BarSeries;
 import org.ta4j.core.Position;
 import org.ta4j.core.TradingRecord;
-import org.ta4j.core.backtest.BacktestBarSeries;
 import org.ta4j.core.criteria.AbstractAnalysisCriterion;
 import org.ta4j.core.num.Num;
+import org.ta4j.core.num.NumFactoryProvider;
 
 /**
  * Loss criterion with trading costs (= Gross loss) or without ( = Net loss).
@@ -39,46 +39,51 @@ import org.ta4j.core.num.Num;
  */
 public class LossCriterion extends AbstractAnalysisCriterion {
 
-    private final boolean excludeCosts;
+  private final boolean excludeCosts;
 
-    /**
-     * Constructor for GrossLoss (includes trading costs).
-     */
-    public LossCriterion() {
-        this(false);
+
+  /**
+   * Constructor for GrossLoss (includes trading costs).
+   */
+  public LossCriterion() {
+    this(false);
+  }
+
+
+  /**
+   * Constructor.
+   *
+   * @param excludeCosts set to true to exclude trading costs
+   */
+  public LossCriterion(final boolean excludeCosts) {
+    this.excludeCosts = excludeCosts;
+  }
+
+
+  @Override
+  public Num calculate(final Position position) {
+    if (position.isClosed()) {
+      final Num loss = this.excludeCosts ? position.getGrossProfit() : position.getProfit();
+      return loss.isNegative() ? loss : NumFactoryProvider.getDefaultNumFactory().zero();
     }
+    return NumFactoryProvider.getDefaultNumFactory().zero();
 
-    /**
-     * Constructor.
-     *
-     * @param excludeCosts set to true to exclude trading costs
-     */
-    public LossCriterion(boolean excludeCosts) {
-        this.excludeCosts = excludeCosts;
-    }
+  }
 
-    @Override
-    public Num calculate(BacktestBarSeries series, Position position) {
-        if (position.isClosed()) {
-            Num loss = excludeCosts ? position.getGrossProfit() : position.getProfit();
-            return loss.isNegative() ? loss : series.numFactory().zero();
-        }
-        return series.numFactory().zero();
 
-    }
+  @Override
+  public Num calculate(final TradingRecord tradingRecord) {
+    return tradingRecord.getPositions()
+        .stream()
+        .filter(Position::isClosed)
+        .map(this::calculate)
+        .reduce(NumFactoryProvider.getDefaultNumFactory().zero(), Num::plus);
+  }
 
-    @Override
-    public Num calculate(BacktestBarSeries series, TradingRecord tradingRecord) {
-        return tradingRecord.getPositions()
-                .stream()
-                .filter(Position::isClosed)
-                .map(position -> calculate(series, position))
-                .reduce(series.numFactory().zero(), Num::plus);
-    }
 
-    /** The higher the criterion value (= the less the loss), the better. */
-    @Override
-    public boolean betterThan(Num criterionValue1, Num criterionValue2) {
-        return criterionValue1.isGreaterThan(criterionValue2);
-    }
+  /** The higher the criterion value (= the less the loss), the better. */
+  @Override
+  public boolean betterThan(final Num criterionValue1, final Num criterionValue2) {
+    return criterionValue1.isGreaterThan(criterionValue2);
+  }
 }

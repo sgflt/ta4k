@@ -49,7 +49,7 @@
 //
 //    @Test
 //    public void randomWalkIndexHigh() throws Exception {
-//        BarSeries series = xls.getSeries();
+//        BarSeries series = xls.getMarketEvents();
 //        RWILowIndicator rwih = (RWILowIndicator) getIndicator(series, 20);
 //        assertIndicatorEquals(getIndicator(series, 20), rwih);
 //    }

@@ -23,13 +23,12 @@
  */
 package org.ta4j.core.indicators.numeric.adx;
 
-import java.time.Instant;
-
-import org.ta4j.core.BarSeries;
+import org.ta4j.core.Bar;
 import org.ta4j.core.indicators.numeric.ATRIndicator;
 import org.ta4j.core.indicators.numeric.NumericIndicator;
 import org.ta4j.core.indicators.numeric.average.MMAIndicator;
 import org.ta4j.core.num.Num;
+import org.ta4j.core.num.NumFactory;
 
 /**
  * +DI indicator.
@@ -48,23 +47,21 @@ public class PlusDIIndicator extends NumericIndicator {
   private final int barCount;
   private final ATRIndicator atrIndicator;
   private final MMAIndicator avgPlusDMIndicator;
-  private Num value;
   private int barsPassed;
-  private Instant currentTick = Instant.EPOCH;
 
 
   /**
    * Constructor.
    *
-   * @param series the bar series
+   * @param numFactory the bar numFactory
    * @param barCount the bar count for {@link #atrIndicator} and
    *     {@link #avgPlusDMIndicator}
    */
-  public PlusDIIndicator(final BarSeries series, final int barCount) {
-    super(series.numFactory());
+  public PlusDIIndicator(final NumFactory numFactory, final int barCount) {
+    super(numFactory);
     this.barCount = barCount;
-    this.atrIndicator = new ATRIndicator(series, barCount);
-    this.avgPlusDMIndicator = new MMAIndicator(new PlusDMIndicator(series), barCount);
+    this.atrIndicator = NumericIndicator.atr(barCount);
+    this.avgPlusDMIndicator = NumericIndicator.plusDMI().mma(barCount);
   }
 
 
@@ -76,26 +73,11 @@ public class PlusDIIndicator extends NumericIndicator {
 
 
   @Override
-  public Num getValue() {
-    return this.value;
-  }
-
-
-  @Override
-  public void refresh(final Instant tick) {
-    if (tick.isAfter(this.currentTick)) {
-      ++this.barsPassed;
-      this.atrIndicator.refresh(tick);
-      this.avgPlusDMIndicator.refresh(tick);
-      this.value = calculate();
-      this.currentTick = tick;
-    } else if (tick.isBefore(tick)) {
-      this.barsPassed = 1;
-      this.atrIndicator.refresh(tick);
-      this.avgPlusDMIndicator.refresh(tick);
-      this.value = calculate();
-      this.currentTick = tick;
-    }
+  public void updateState(final Bar bar) {
+    ++this.barsPassed;
+    this.atrIndicator.onBar(bar);
+    this.avgPlusDMIndicator.onBar(bar);
+    this.value = calculate();
   }
 
 

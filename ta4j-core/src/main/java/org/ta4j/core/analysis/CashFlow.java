@@ -149,10 +149,10 @@
 //            for (int i = startingIndex; i < endIndex; i++) {
 //                Num intermediateNetPrice = addCost(barSeries.getBar(i).closePrice(), avgCost, isLongTrade);
 //                Num ratio = getIntermediateRatio(isLongTrade, netEntryPrice, intermediateNetPrice);
-//                values.add(values.get(entryIndex).multipliedBy(ratio));
+//                values.onCandle(values.get(entryIndex).multipliedBy(ratio));
 //            }
 //
-//            // add net cash flow at exit position
+//            // onCandle net cash flow at exit position
 //            Num exitPrice;
 //            if (position.getExit() != null) {
 //                exitPrice = position.getExit().getNetPrice();
@@ -160,7 +160,7 @@
 //                exitPrice = barSeries.getBar(endIndex).closePrice();
 //            }
 //            Num ratio = getIntermediateRatio(isLongTrade, netEntryPrice, addCost(exitPrice, avgCost, isLongTrade));
-//            values.add(values.get(entryIndex).multipliedBy(ratio));
+//            values.onCandle(values.get(entryIndex).multipliedBy(ratio));
 //        }
 //    }
 //

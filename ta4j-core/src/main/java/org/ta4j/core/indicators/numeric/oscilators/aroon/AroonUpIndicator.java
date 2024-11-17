@@ -25,15 +25,15 @@ package org.ta4j.core.indicators.numeric.oscilators.aroon;
 
 import static org.ta4j.core.num.NaN.NaN;
 
-import java.time.Instant;
 import java.util.ArrayList;
 
-import org.ta4j.core.BarSeries;
+import org.ta4j.core.Bar;
 import org.ta4j.core.indicators.Indicator;
 import org.ta4j.core.indicators.candles.price.HighPriceIndicator;
 import org.ta4j.core.indicators.helpers.HighestValueIndicator;
 import org.ta4j.core.indicators.numeric.NumericIndicator;
 import org.ta4j.core.num.Num;
+import org.ta4j.core.num.NumFactory;
 
 /**
  * Aroon up indicator.
@@ -47,10 +47,8 @@ public class AroonUpIndicator extends NumericIndicator {
   private final HighestValueIndicator highestHighValueIndicator;
   private final Indicator<Num> highIndicator;
 
-  private Instant currentTick = Instant.EPOCH;
   private int index;
   private final ArrayList<Num> previousValues;
-  private Num value;
 
 
   /**
@@ -60,8 +58,8 @@ public class AroonUpIndicator extends NumericIndicator {
    *     {@link HighPriceIndicator})
    * @param barCount the time frame
    */
-  public AroonUpIndicator(final BarSeries series, final NumericIndicator highIndicator, final int barCount) {
-    super(series.numFactory());
+  public AroonUpIndicator(final NumFactory numFactory, final NumericIndicator highIndicator, final int barCount) {
+    super(numFactory);
     this.barCount = barCount;
     this.highIndicator = highIndicator;
     this.previousValues = new ArrayList<>(barCount);
@@ -77,11 +75,11 @@ public class AroonUpIndicator extends NumericIndicator {
    * Default Constructor with {@code highPriceIndicator} =
    * {@link HighPriceIndicator}.
    *
-   * @param series the bar series
+   * @param numFactory the bar numFactory
    * @param barCount the time frame
    */
-  public AroonUpIndicator(final BarSeries series, final int barCount) {
-    this(series, new HighPriceIndicator(series), barCount);
+  public AroonUpIndicator(final NumFactory numFactory, final int barCount) {
+    this(numFactory, NumericIndicator.highPrice(), barCount);
   }
 
 
@@ -116,20 +114,11 @@ public class AroonUpIndicator extends NumericIndicator {
 
 
   @Override
-  public Num getValue() {
-    return this.value;
-  }
-
-
-  @Override
-  public void refresh(final Instant tick) {
-    if (tick.isAfter(this.currentTick)) {
-      ++this.index;
-      this.highIndicator.refresh(tick);
-      this.highestHighValueIndicator.refresh(tick);
-      this.value = calculate();
-      this.currentTick = tick;
-    }
+  public void updateState(final Bar bar) {
+    ++this.index;
+    this.highIndicator.onBar(bar);
+    this.highestHighValueIndicator.onBar(bar);
+    this.value = calculate();
   }
 
 

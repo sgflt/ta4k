@@ -23,9 +23,7 @@
  */
 package org.ta4j.core.indicators.numeric.oscilators;
 
-import java.time.Instant;
-
-import org.ta4j.core.BarSeries;
+import org.ta4j.core.Bar;
 import org.ta4j.core.indicators.helpers.MedianPriceIndicator;
 import org.ta4j.core.indicators.numeric.NumericIndicator;
 import org.ta4j.core.indicators.numeric.average.SMAIndicator;
@@ -34,14 +32,12 @@ import org.ta4j.core.num.Num;
 /**
  * Awesome oscillator (AO) indicator.
  *
- * @see https://www.tradingview.com/wiki/Awesome_Oscillator_(AO)
+ * @see <a href="https://www.tradingview.com/wiki/Awesome_Oscillator_(AO)">Awesome Oscillator</a>
  */
 public class AwesomeOscillatorIndicator extends NumericIndicator {
 
   private final SMAIndicator shortSma;
   private final SMAIndicator longSma;
-  private Num value;
-  private Instant currentTick = Instant.EPOCH;
 
 
   /**
@@ -53,8 +49,8 @@ public class AwesomeOscillatorIndicator extends NumericIndicator {
    */
   public AwesomeOscillatorIndicator(final NumericIndicator indicator, final int shortBarCount, final int longBarCOunt) {
     super(indicator.getNumFactory());
-    this.shortSma = new SMAIndicator(indicator, shortBarCount);
-    this.longSma = new SMAIndicator(indicator, longBarCOunt);
+    this.shortSma = indicator.sma(shortBarCount);
+    this.longSma = indicator.sma(longBarCOunt);
   }
 
 
@@ -81,11 +77,9 @@ public class AwesomeOscillatorIndicator extends NumericIndicator {
    * <li>{@code barCountSma1} = 5
    * <li>{@code barCountSma2} = 34
    * </ul>
-   *
-   * @param series the bar series
    */
-  public AwesomeOscillatorIndicator(final BarSeries series) {
-    this(new MedianPriceIndicator(series), 5, 34);
+  public AwesomeOscillatorIndicator() {
+    this(NumericIndicator.medianPrice(), 5, 34);
   }
 
 
@@ -95,19 +89,10 @@ public class AwesomeOscillatorIndicator extends NumericIndicator {
 
 
   @Override
-  public Num getValue() {
-    return this.value;
-  }
-
-
-  @Override
-  public void refresh(final Instant tick) {
-    if (tick.isAfter(this.currentTick)) {
-      this.shortSma.refresh(tick);
-      this.longSma.refresh(tick);
-      this.value = calculate();
-      this.currentTick = tick;
-    }
+  public void updateState(final Bar bar) {
+    this.shortSma.onBar(bar);
+    this.longSma.onBar(bar);
+    this.value = calculate();
   }
 
 

@@ -23,10 +23,10 @@
  */
 package org.ta4j.core.indicators.helpers;
 
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.ta4j.core.Bar;
 import org.ta4j.core.indicators.Indicator;
 
 /**
@@ -40,7 +40,6 @@ import org.ta4j.core.indicators.Indicator;
 class FixedIndicator<T> implements Indicator<T> {
 
   private final List<T> values = new ArrayList<>();
-  private Instant currentTick = Instant.EPOCH;
   private int index = -1;
 
 
@@ -58,7 +57,7 @@ class FixedIndicator<T> implements Indicator<T> {
   /**
    * Adds the {@code value} to {@link #values}.
    *
-   * @param value the value to add
+   * @param value the value to onCandle
    */
   public void addValue(final T value) {
     this.values.add(value);
@@ -72,11 +71,8 @@ class FixedIndicator<T> implements Indicator<T> {
 
 
   @Override
-  public void refresh(final Instant tick) {
-    if (tick.isAfter(this.currentTick)) {
-      ++this.index;
-      this.currentTick = tick;
-    }
+  public void onBar(final Bar bar) {
+    ++this.index;
   }
 
 

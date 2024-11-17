@@ -58,11 +58,11 @@ public class ReturnCriterionTest extends AbstractCriterionTest {
 
     // include base percentage
     final AnalysisCriterion retWithBase = getCriterion();
-    assertNumEquals(1.10 * 1.05, retWithBase.calculate(series, tradingRecord));
+    assertNumEquals(1.10 * 1.05, retWithBase.calculate(tradingRecord));
 
     // exclude base percentage
     final AnalysisCriterion retWithoutBase = getCriterion(false);
-    assertNumEquals(1.10 * 1.05 - 1, retWithoutBase.calculate(series, tradingRecord));
+    assertNumEquals(1.10 * 1.05 - 1, retWithoutBase.calculate(tradingRecord));
   }
 
 
@@ -76,11 +76,11 @@ public class ReturnCriterionTest extends AbstractCriterionTest {
 
     // include base percentage
     final AnalysisCriterion retWithBase = getCriterion();
-    assertNumEquals(0.95 * 0.7, retWithBase.calculate(series, tradingRecord));
+    assertNumEquals(0.95 * 0.7, retWithBase.calculate(tradingRecord));
 
     // exclude base percentage
     final AnalysisCriterion retWithoutBase = getCriterion(false);
-    assertNumEquals(0.95 * 0.7 - 1, retWithoutBase.calculate(series, tradingRecord));
+    assertNumEquals(0.95 * 0.7 - 1, retWithoutBase.calculate(tradingRecord));
   }
 
 
@@ -94,11 +94,11 @@ public class ReturnCriterionTest extends AbstractCriterionTest {
 
     // include base percentage
     final AnalysisCriterion retWithBase = getCriterion();
-    assertNumEquals(1.05 * 1.30, retWithBase.calculate(series, tradingRecord));
+    assertNumEquals(1.05 * 1.30, retWithBase.calculate(tradingRecord));
 
     // exclude base percentage
     final AnalysisCriterion retWithoutBase = getCriterion(false);
-    assertNumEquals(1.05 * 1.30 - 1, retWithoutBase.calculate(series, tradingRecord));
+    assertNumEquals(1.05 * 1.30 - 1, retWithoutBase.calculate(tradingRecord));
   }
 
 
@@ -112,11 +112,11 @@ public class ReturnCriterionTest extends AbstractCriterionTest {
 
     // include base percentage
     final AnalysisCriterion retWithBase = getCriterion();
-    assertNumEquals(0.95 * 0.70, retWithBase.calculate(series, tradingRecord));
+    assertNumEquals(0.95 * 0.70, retWithBase.calculate(tradingRecord));
 
     // exclude base percentage
     final AnalysisCriterion retWithoutBase = getCriterion(false);
-    assertNumEquals(0.95 * 0.70 - 1, retWithoutBase.calculate(series, tradingRecord));
+    assertNumEquals(0.95 * 0.70 - 1, retWithoutBase.calculate(tradingRecord));
   }
 
 
@@ -127,11 +127,11 @@ public class ReturnCriterionTest extends AbstractCriterionTest {
 
     // with base percentage should return 1
     final AnalysisCriterion retWithBase = getCriterion();
-    assertNumEquals(1d, retWithBase.calculate(series, new BackTestTradingRecord()));
+    assertNumEquals(1d, retWithBase.calculate(new BackTestTradingRecord()));
 
     // without base percentage should return 0
     final AnalysisCriterion retWithoutBase = getCriterion(false);
-    assertNumEquals(0, retWithoutBase.calculate(series, new BackTestTradingRecord()));
+    assertNumEquals(0, retWithoutBase.calculate(new BackTestTradingRecord()));
   }
 
 
@@ -143,16 +143,16 @@ public class ReturnCriterionTest extends AbstractCriterionTest {
     // with base percentage should return 1
     final AnalysisCriterion retWithBase = getCriterion();
     final Position position1 = new Position();
-    assertNumEquals(1d, retWithBase.calculate(series, position1));
+    assertNumEquals(1d, retWithBase.calculate(position1));
     position1.operate(0);
-    assertNumEquals(1d, retWithBase.calculate(series, position1));
+    assertNumEquals(1d, retWithBase.calculate(position1));
 
     // without base percentage should return 0
     final AnalysisCriterion retWithoutBase = getCriterion(false);
     final Position position2 = new Position();
-    assertNumEquals(0, retWithoutBase.calculate(series, position2));
+    assertNumEquals(0, retWithoutBase.calculate(position2));
     position2.operate(0);
-    assertNumEquals(0, retWithoutBase.calculate(series, position2));
+    assertNumEquals(0, retWithoutBase.calculate(position2));
   }
 
 

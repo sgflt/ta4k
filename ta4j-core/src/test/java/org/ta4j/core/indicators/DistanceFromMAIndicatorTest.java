@@ -44,7 +44,7 @@
 //    @Before
 //    public void setUp() {
 //        data = new MockBarSeriesBuilder().withNumFactory(numFactory)
-//                .withData(10, 15, 20, 18, 17, 18, 15, 12, 10, 8, 5, 2)
+//                .withCandleClosePrices(10, 15, 20, 18, 17, 18, 15, 12, 10, 8, 5, 2)
 //                .build();
 //    }
 //

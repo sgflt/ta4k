@@ -1,4 +1,4 @@
-/**
+/*
  * The MIT License (MIT)
  *
  * Copyright (c) 2017-2023 Ta4j Organization & respective
@@ -23,100 +23,93 @@
  */
 package org.ta4j.core.backtest;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.ta4j.core.BarBuilderFactory;
-import org.ta4j.core.StrategyFactory;
-import org.ta4j.core.num.DecimalNumFactory;
+import org.ta4j.core.indicators.IndicatorContext;
 import org.ta4j.core.num.NumFactory;
+import org.ta4j.core.num.NumFactoryProvider;
 
 /**
  * A builder to build a new {@link BacktestBarSeries}.
  */
 public class BacktestBarSeriesBuilder {
 
-    /** The {@link #name} for an unnamed bar series. */
-    private static final String UNNAMED_SERIES_NAME = "unnamed_series";
+  /** The {@link #name} for an unnamed bar series. */
+  private static final String UNNAMED_SERIES_NAME = "unnamed_series";
 
-    private List<BacktestBar> bars;
-    private String name;
-    private NumFactory numFactory = DecimalNumFactory.getInstance();
-    private BarBuilderFactory barBuilderFactory = new BacktestBarBuilderFactory();
-    private final List<StrategyFactory> strategyFactories = new ArrayList<>();
+  private String name;
+  private NumFactory numFactory = NumFactoryProvider.getDefaultNumFactory();
+  private BarBuilderFactory barBuilderFactory = new BacktestBarBuilderFactory();
+  private IndicatorContext indicatorContext;
 
-    /** Constructor to build a {@code BacktestBarSeries}. */
-    public BacktestBarSeriesBuilder() {
-        initValues();
-    }
 
-    private void initValues() {
-        this.bars = new ArrayList<>();
-        this.name = "unnamed_series";
-    }
+  /** Constructor to build a {@code BacktestBarSeries}. */
+  public BacktestBarSeriesBuilder() {
+    initValues();
+  }
 
-    /**
-     * @param numFactory to set {@link BacktestBarSeries#numFactory()}
-     * @return {@code this}
-     */
-    public BacktestBarSeriesBuilder withNumFactory(final NumFactory numFactory) {
-        this.numFactory = numFactory;
-        return this;
-    }
 
-    /**
-     * @param name to set {@link BacktestBarSeries#getName()}
-     * @return {@code this}
-     */
-    public BacktestBarSeriesBuilder withName(final String name) {
-        this.name = name;
-        return this;
-    }
+  private void initValues() {
+    this.name = "unnamed_series";
+  }
 
-    /**
-     * @param bars to set {@link BacktestBarSeries#getBarData()}
-     * @return {@code this}
-     */
-    public BacktestBarSeriesBuilder withBars(final List<BacktestBar> bars) {
-        this.bars = bars;
-        return this;
-    }
 
-    /**
-     * @param barBuilderFactory to build bars with the same datatype as series
-     *
-     * @return {@code this}
-     */
-    public BacktestBarSeriesBuilder withBarBuilderFactory(final BarBuilderFactory barBuilderFactory) {
-        this.barBuilderFactory = barBuilderFactory;
-        return this;
-    }
+  /**
+   * Sets numFactory as default for whole runtime.
+   *
+   * @param numFactory to set {@link BacktestBarSeries#numFactory()}
+   *
+   * @return {@code this}
+   */
+  public BacktestBarSeriesBuilder withNumFactory(final NumFactory numFactory) {
+    this.numFactory = numFactory;
+    NumFactoryProvider.setDefaultNumFactory(numFactory);
+    return this;
+  }
 
-    public BacktestBarSeriesBuilder withStrategyFactory(final StrategyFactory strategy) {
-        this.strategyFactories.add(strategy);
-        return this;
-    }
 
-    public BacktestBarSeriesBuilder withStrategyFactories(
-            final List<StrategyFactory> strategyFunction) {
-      this.strategyFactories.addAll(strategyFunction);
-        return this;
-    }
+  /**
+   * @param name to set {@link BacktestBarSeries#getName()}
+   *
+   * @return {@code this}
+   */
+  public BacktestBarSeriesBuilder withName(final String name) {
+    this.name = name;
+    return this;
+  }
 
-    public BacktestBarSeries build() {
-        final var series = new BacktestBarSeries(
-            this.name == null ? UNNAMED_SERIES_NAME : this.name,
-            this.numFactory,
-            this.barBuilderFactory
-        );
 
-        series.replaceStrategies(
-            this.strategyFactories.stream()
-                .map(strategyFactory -> strategyFactory.createStrategy(series))
-                .map(BacktestStrategy.class::cast)
-                .toList()
-        );
-        this.bars.forEach(series::addBar);
-        return series;
-    }
+  /**
+   * @param barBuilderFactory to build bars with the same datatype as series
+   *
+   * @return {@code this}
+   */
+  public BacktestBarSeriesBuilder withBarBuilderFactory(final BarBuilderFactory barBuilderFactory) {
+    this.barBuilderFactory = barBuilderFactory;
+    return this;
+  }
+
+
+  //  FIXME
+  //  public BacktestBarSeriesBuilder withStrategyFactory(final StrategyFactory strategy) {
+  //    this.strategyFactories.add(strategy);
+  //    return this;
+  //  }
+  //
+  //
+  public BacktestBarSeries build() {
+    return new BacktestBarSeries(
+        this.name == null ? UNNAMED_SERIES_NAME : this.name,
+        this.numFactory,
+        this.barBuilderFactory,
+        List.of(this.indicatorContext)
+    );
+  }
+
+
+  public BacktestBarSeriesBuilder withIndicatorContext(final IndicatorContext indicatorContext) {
+    this.indicatorContext = indicatorContext;
+    return this;
+  }
 }

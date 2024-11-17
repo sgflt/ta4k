@@ -148,7 +148,7 @@
 //                    .volume("0")
 //                    .amount("0")
 //                    .trades("0")
-//                    .add();
+//                    .onCandle();
 //            this.precisionSeries.barBuilder()
 //                    .timePeriod(Duration.ofDays(1))
 //                    .endTime(endTime)
@@ -159,7 +159,7 @@
 //                    .amount("0")
 //                    .volume("0")
 //                    .trades("0")
-//                    .add();
+//                    .onCandle();
 //            this.precision32Series.barBuilder()
 //                    .timePeriod(Duration.ofDays(1))
 //                    .endTime(endTime)
@@ -170,7 +170,7 @@
 //                    .amount("0")
 //                    .volume("0")
 //                    .trades("0")
-//                    .add();
+//                    .onCandle();
 //            this.doubleSeries.barBuilder()
 //                    .timePeriod(Duration.ofDays(1))
 //                    .endTime(endTime)
@@ -181,7 +181,7 @@
 //                    .amount("0")
 //                    .volume("0")
 //                    .trades("0")
-//                    .add();
+//                    .onCandle();
 //            this.lowPrecisionSeries.barBuilder()
 //                    .timePeriod(Duration.ofDays(1))
 //                    .endTime(endTime)
@@ -192,7 +192,7 @@
 //                    .amount("0")
 //                    .volume("0")
 //                    .trades("0")
-//                    .add();
+//                    .onCandle();
 //            endTime = endTime.plus(timePeriod);
 //            superPrecisionNum = superPrecisionNum.plus(DecimalNum.valueOf(deltas[i % 6]));
 //        }

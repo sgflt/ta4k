@@ -43,13 +43,13 @@
 //    @Before
 //    public void setUp() {
 //        barSeries = new MockBarSeriesBuilder().withNumFactory(numFactory).build();
-//        barSeries.barBuilder().closePrice(0).volume(10).add();
-//        barSeries.barBuilder().closePrice(0).volume(11).add();
-//        barSeries.barBuilder().closePrice(0).volume(12).add();
-//        barSeries.barBuilder().closePrice(0).volume(13).add();
-//        barSeries.barBuilder().closePrice(0).volume(150).add();
-//        barSeries.barBuilder().closePrice(0).volume(155).add();
-//        barSeries.barBuilder().closePrice(0).volume(160).add();
+//        barSeries.barBuilder().closePrice(0).volume(10).onCandle();
+//        barSeries.barBuilder().closePrice(0).volume(11).onCandle();
+//        barSeries.barBuilder().closePrice(0).volume(12).onCandle();
+//        barSeries.barBuilder().closePrice(0).volume(13).onCandle();
+//        barSeries.barBuilder().closePrice(0).volume(150).onCandle();
+//        barSeries.barBuilder().closePrice(0).volume(155).onCandle();
+//        barSeries.barBuilder().closePrice(0).volume(160).onCandle();
 //    }
 //
 //    @Test

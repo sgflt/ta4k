@@ -136,13 +136,13 @@
 //                .trades(6)
 //                .build();
 //
-//        bars.add(bar0);
-//        bars.add(bar1);
-//        bars.add(bar2);
-//        bars.add(bar3);
-//        bars.add(bar4);
-//        bars.add(bar5);
-//        bars.add(bar6);
+//        bars.onCandle(bar0);
+//        bars.onCandle(bar1);
+//        bars.onCandle(bar2);
+//        bars.onCandle(bar3);
+//        bars.onCandle(bar4);
+//        bars.onCandle(bar5);
+//        bars.onCandle(bar6);
 //
 //        this.series = new MockBarSeriesBuilder().withNumFactory(this.numFactory)
 //                .withName("Series Name")
@@ -260,12 +260,12 @@
 //                .build();
 //
 //        this.series = new BacktestBarSeriesBuilder().withNumFactory(this.numFactory).withName("Series Name").build();
-//        bars.add(bar0);
-//        bars.add(bar1);
-//        bars.add(bar4);
-//        bars.add(bar5);
-//        bars.add(bar7);
-//        bars.add(bar8);
+//        bars.onCandle(bar0);
+//        bars.onCandle(bar1);
+//        bars.onCandle(bar4);
+//        bars.onCandle(bar5);
+//        bars.onCandle(bar7);
+//        bars.onCandle(bar8);
 //
 //        bars.forEach(series::addBar);
 //
@@ -295,7 +295,7 @@
 //                .volume(0d)
 //                .amount(0)
 //                .trades(7)
-//                .add();
+//                .onCandle();
 //        decimalBarSeries.barBuilder()
 //                .openPrice(1d)
 //                .closePrice(1d)
@@ -304,7 +304,7 @@
 //                .volume(1d)
 //                .amount(0)
 //                .trades(1)
-//                .add();
+//                .onCandle();
 //        decimalBarSeries.barBuilder()
 //                .openPrice(2d)
 //                .closePrice(2d)
@@ -313,7 +313,7 @@
 //                .volume(2d)
 //                .amount(0)
 //                .trades(2)
-//                .add();
+//                .onCandle();
 //
 //        // convert barSeries with DecimalNum to barSeries with DoubleNum
 //        final BarSeries decimalToDoubleSeries = BarSeriesUtils.convertBarSeries(decimalBarSeries,
@@ -364,9 +364,9 @@
 //                .volume(NaN.NaN)
 //                .build();
 //
-//        bars.add(bar0);
-//        bars.add(bar1);
-//        bars.add(bar8);
+//        bars.onCandle(bar0);
+//        bars.onCandle(bar1);
+//        bars.onCandle(bar8);
 //
 //        this.series = new BacktestBarSeriesBuilder().withNumFactory(this.numFactory)
 //                .withName("Series Name")
@@ -418,11 +418,11 @@
 //                .trades(1)
 //                .build();
 //
-//        bars.add(bar2);
-//        bars.add(bar0);
-//        bars.add(bar1);
+//        bars.onCandle(bar2);
+//        bars.onCandle(bar0);
+//        bars.onCandle(bar1);
 //
-//        // add 3 bars to empty barSeries
+//        // onCandle 3 bars to empty barSeries
 //        BarSeriesUtils.addBars(barSeries, bars);
 //
 //        assertEquals(bar0.endTime(), barSeries.getFirstBar().endTime());
@@ -439,9 +439,9 @@
 //                .trades(1)
 //                .build();
 //
-//        bars.add(bar3);
+//        bars.onCandle(bar3);
 //
-//        // add 1 bar to non empty barSeries
+//        // onCandle 1 bar to non empty barSeries
 //        BarSeriesUtils.addBars(barSeries, bars);
 //        assertEquals(bar3.endTime(), barSeries.getLastBar().endTime());
 //    }
@@ -491,10 +491,10 @@
 //                .build();
 //
 //        final List<Bar> sortedBars = new ArrayList<>();
-//        sortedBars.add(bar0);
-//        sortedBars.add(bar1);
-//        sortedBars.add(bar2);
-//        sortedBars.add(bar3);
+//        sortedBars.onCandle(bar0);
+//        sortedBars.onCandle(bar1);
+//        sortedBars.onCandle(bar2);
+//        sortedBars.onCandle(bar3);
 //
 //        BarSeriesUtils.sortBars(sortedBars);
 //        assertEquals(bar0.endTime(), sortedBars.get(0).endTime());
@@ -503,10 +503,10 @@
 //        assertEquals(bar3.endTime(), sortedBars.get(3).endTime());
 //
 //        final List<Bar> unsortedBars = new ArrayList<>();
-//        unsortedBars.add(bar3);
-//        unsortedBars.add(bar2);
-//        unsortedBars.add(bar1);
-//        unsortedBars.add(bar0);
+//        unsortedBars.onCandle(bar3);
+//        unsortedBars.onCandle(bar2);
+//        unsortedBars.onCandle(bar1);
+//        unsortedBars.onCandle(bar0);
 //
 //        BarSeriesUtils.sortBars(unsortedBars);
 //        assertEquals(bar0.endTime(), unsortedBars.get(0).endTime());
@@ -515,10 +515,10 @@
 //        assertEquals(bar3.endTime(), unsortedBars.get(3).endTime());
 //
 //        final List<Bar> unsortedBars2 = new ArrayList<>();
-//        unsortedBars2.add(bar2);
-//        unsortedBars2.add(bar1);
-//        unsortedBars2.add(bar3);
-//        unsortedBars2.add(bar0);
+//        unsortedBars2.onCandle(bar2);
+//        unsortedBars2.onCandle(bar1);
+//        unsortedBars2.onCandle(bar3);
+//        unsortedBars2.onCandle(bar0);
 //
 //        BarSeriesUtils.sortBars(unsortedBars2);
 //        assertEquals(bar0.endTime(), unsortedBars2.get(0).endTime());

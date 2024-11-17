@@ -23,7 +23,6 @@
 package org.ta4j.core.indicators.numeric.average;
 
 import static org.junit.Assert.assertEquals;
-import static org.ta4j.core.TestUtils.assertIndicatorEquals;
 import static org.ta4j.core.TestUtils.assertNumEquals;
 
 import org.junit.Before;
@@ -140,7 +139,7 @@ public class SMAIndicatorTest extends AbstractIndicatorTest<Num> {
 
   @Test
   public void externalData3() throws Exception {
-    final var series = this.xls.getSeries();
+    final var series = this.xls.getMarketEvents();
 
     final var actualIndicator = NumericIndicator.closePrice(series).sma(3);
     final var expectedIndicator = this.xls.getIndicator(3);
@@ -153,7 +152,7 @@ public class SMAIndicatorTest extends AbstractIndicatorTest<Num> {
 
   @Test
   public void externalData1() throws Exception {
-    final var series = this.xls.getSeries();
+    final var series = this.xls.getMarketEvents();
 
     final var actualIndicator = NumericIndicator.closePrice(series).sma(1);
     final var expectedIndicator = this.xls.getIndicator(1);
@@ -167,7 +166,7 @@ public class SMAIndicatorTest extends AbstractIndicatorTest<Num> {
 
   @Test
   public void externalData13() throws Exception {
-    final var series = this.xls.getSeries();
+    final var series = this.xls.getMarketEvents();
     final Indicator<Num> xlsClose = new ClosePriceIndicator(series);
     series.addStrategy(new MockStrategy(xlsClose));
 

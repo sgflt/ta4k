@@ -1,4 +1,4 @@
-/**
+/*
  * The MIT License (MIT)
  *
  * Copyright (c) 2017-2023 Ta4j Organization & respective
@@ -45,7 +45,7 @@ public interface BarBuilder {
   BarBuilder volume(Number volume);
 
   /**
-   * Build this bar and add him to related {@link BarSeries}
+   * Build this bar and onCandle him to related {@link BarSeries}
    */
   void add();
 }

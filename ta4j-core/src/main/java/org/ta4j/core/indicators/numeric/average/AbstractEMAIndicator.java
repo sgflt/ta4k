@@ -23,8 +23,7 @@
  */
 package org.ta4j.core.indicators.numeric.average;
 
-import java.time.Instant;
-
+import org.ta4j.core.Bar;
 import org.ta4j.core.indicators.Indicator;
 import org.ta4j.core.indicators.numeric.NumericIndicator;
 import org.ta4j.core.num.Num;
@@ -39,10 +38,7 @@ public abstract class AbstractEMAIndicator extends NumericIndicator {
   private final Num multiplier;
 
   private Num previousValue;
-  private Num currentValue;
   private int barsPassed;
-
-  private Instant currentTick = Instant.EPOCH;
 
 
   /**
@@ -66,12 +62,6 @@ public abstract class AbstractEMAIndicator extends NumericIndicator {
 
   protected int getBarCount() {
     return this.barCount;
-  }
-
-
-  @Override
-  public Num getValue() {
-    return this.currentValue;
   }
 
 
@@ -103,17 +93,9 @@ public abstract class AbstractEMAIndicator extends NumericIndicator {
 
 
   @Override
-  public void refresh(final Instant tick) {
-    if (tick.isAfter(this.currentTick)) {
-      ++this.barsPassed;
-      this.indicator.refresh(tick);
-      this.currentValue = calculate();
-      this.currentTick = tick;
-    } else if (tick.isBefore(this.currentTick)) {
-      this.barsPassed = 1;
-      this.indicator.refresh(tick);
-      this.currentValue = calculate();
-      this.currentTick = tick;
-    }
+  protected void updateState(final Bar bar) {
+    ++this.barsPassed;
+    this.indicator.onBar(bar);
+    this.value = calculate();
   }
 }

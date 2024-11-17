@@ -24,7 +24,6 @@
 package org.ta4j.core.indicators.numeric.adx;
 
 import static org.junit.Assert.assertEquals;
-import static org.ta4j.core.TestUtils.assertIndicatorEquals;
 
 import org.junit.Test;
 import org.ta4j.core.ExternalIndicatorTest;
@@ -67,7 +66,7 @@ public class PlusDIIndicatorTest extends AbstractIndicatorTest<Num> {
 
 
   private void assertXlsValues(final int x, final double expected) throws Exception {
-    final var xlsSeries = this.xls.getSeries();
+    final var xlsSeries = this.xls.getMarketEvents();
     final var actualIndicator = new PlusDIIndicator(xlsSeries, x);
     final var expectedIndicator = this.xls.getIndicator(x);
     xlsSeries.replaceStrategy(new MockStrategy(actualIndicator, expectedIndicator));

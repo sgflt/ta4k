@@ -23,7 +23,6 @@
 package org.ta4j.core.indicators.numeric.average;
 
 import static org.junit.Assert.assertEquals;
-import static org.ta4j.core.TestUtils.assertIndicatorEquals;
 import static org.ta4j.core.TestUtils.assertNext;
 import static org.ta4j.core.TestUtils.fastForward;
 
@@ -105,7 +104,7 @@ public class MMAIndicatorTest extends AbstractIndicatorTest<Num> {
 
 
   private void assertBarCount(final int barCount, final double expected) throws Exception {
-    final var xlsSeries = this.xls.getSeries();
+    final var xlsSeries = this.xls.getMarketEvents();
     final var actualIndicator = NumericIndicator.closePrice(xlsSeries).mma(barCount);
     final var expectedIndicator = this.xls.getIndicator(barCount);
     xlsSeries.replaceStrategy(new MockStrategy(actualIndicator, expectedIndicator));

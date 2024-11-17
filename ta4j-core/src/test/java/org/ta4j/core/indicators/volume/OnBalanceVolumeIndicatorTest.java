@@ -41,12 +41,12 @@
 //    @Test
 //    public void getValue() {
 //        final var series = new MockBarSeriesBuilder().withNumFactory(numFactory).build();
-//        series.barBuilder().closePrice(10).volume(4).add();
-//        series.barBuilder().closePrice(5).volume(2).add();
-//        series.barBuilder().closePrice(6).volume(3).add();
-//        series.barBuilder().closePrice(7).volume(8).add();
-//        series.barBuilder().closePrice(7).volume(6).add();
-//        series.barBuilder().closePrice(6).volume(10).add();
+//        series.barBuilder().closePrice(10).volume(4).onCandle();
+//        series.barBuilder().closePrice(5).volume(2).onCandle();
+//        series.barBuilder().closePrice(6).volume(3).onCandle();
+//        series.barBuilder().closePrice(7).volume(8).onCandle();
+//        series.barBuilder().closePrice(7).volume(6).onCandle();
+//        series.barBuilder().closePrice(6).volume(10).onCandle();
 //
 //        var obv = new OnBalanceVolumeIndicator(series);
 //        assertNumEquals(0, obv.getValue(0));
@@ -61,7 +61,7 @@
 //    public void noStackOverflowError() {
 //        var bigSeries = new MockBarSeriesBuilder().withNumFactory(numFactory).build();
 //        for (int i = 0; i < 10000; i++) {
-//            bigSeries.barBuilder().closePrice(i).volume(0).add();
+//            bigSeries.barBuilder().closePrice(i).volume(0).onCandle();
 //        }
 //        var obv = new OnBalanceVolumeIndicator(bigSeries);
 //        // If a StackOverflowError is thrown here, then the RecursiveCachedIndicator

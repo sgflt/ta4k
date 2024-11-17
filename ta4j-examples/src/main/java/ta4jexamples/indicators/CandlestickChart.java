@@ -92,7 +92,7 @@
 //        org.jfree.data.time.TimeSeries chartTimeSeries = new org.jfree.data.time.TimeSeries("Btc price");
 //        for (int i = 0; i < series.getBarCount(); i++) {
 //            Bar bar = series.getBar(i);
-//            chartTimeSeries.add(new Second(new Date(bar.endTime().toEpochSecond() * 1000)),
+//            chartTimeSeries.onCandle(new Second(new Date(bar.endTime().toEpochSecond() * 1000)),
 //                    indicator.getValue(i).doubleValue());
 //        }
 //        dataset.addSeries(chartTimeSeries);

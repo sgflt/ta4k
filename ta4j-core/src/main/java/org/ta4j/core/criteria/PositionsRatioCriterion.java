@@ -1,4 +1,4 @@
-/**
+/*
  * The MIT License (MIT)
  *
  * Copyright (c) 2017-2023 Ta4j Organization & respective
@@ -26,8 +26,8 @@ package org.ta4j.core.criteria;
 import org.ta4j.core.AnalysisCriterion;
 import org.ta4j.core.Position;
 import org.ta4j.core.TradingRecord;
-import org.ta4j.core.backtest.BacktestBarSeries;
 import org.ta4j.core.num.Num;
+import org.ta4j.core.num.NumFactoryProvider;
 
 /**
  * Calculates the percentage of losing or winning positions, returned in decimal
@@ -42,60 +42,67 @@ import org.ta4j.core.num.Num;
  */
 public class PositionsRatioCriterion extends AbstractAnalysisCriterion {
 
-    private final PositionFilter positionFilter;
-    private final AnalysisCriterion numberOfPositionsCriterion;
+  private final PositionFilter positionFilter;
+  private final AnalysisCriterion numberOfPositionsCriterion;
 
-    /**
-     * @return {@link PositionsRatioCriterion} with {@link PositionFilter#PROFIT}
-     */
-    public static PositionsRatioCriterion WinningPositionsRatioCriterion() {
-        return new PositionsRatioCriterion(PositionFilter.PROFIT);
+
+  /**
+   * @return {@link PositionsRatioCriterion} with {@link PositionFilter#PROFIT}
+   */
+  public static PositionsRatioCriterion WinningPositionsRatioCriterion() {
+    return new PositionsRatioCriterion(PositionFilter.PROFIT);
+  }
+
+
+  /**
+   * @return {@link PositionsRatioCriterion} with {@link PositionFilter#LOSS}
+   */
+  public static PositionsRatioCriterion LosingPositionsRatioCriterion() {
+    return new PositionsRatioCriterion(PositionFilter.LOSS);
+  }
+
+
+  /**
+   * Constructor.
+   *
+   * @param positionFilter consider either the winning or losing positions
+   */
+  public PositionsRatioCriterion(final PositionFilter positionFilter) {
+    this.positionFilter = positionFilter;
+    if (positionFilter == PositionFilter.PROFIT) {
+      this.numberOfPositionsCriterion = new NumberOfWinningPositionsCriterion();
+    } else {
+      this.numberOfPositionsCriterion = new NumberOfLosingPositionsCriterion();
     }
 
-    /**
-     * @return {@link PositionsRatioCriterion} with {@link PositionFilter#LOSS}
-     */
-    public static PositionsRatioCriterion LosingPositionsRatioCriterion() {
-        return new PositionsRatioCriterion(PositionFilter.LOSS);
-    }
+  }
 
-    /**
-     * Constructor.
-     *
-     * @param positionFilter consider either the winning or losing positions
-     */
-    public PositionsRatioCriterion(PositionFilter positionFilter) {
-        this.positionFilter = positionFilter;
-        if (positionFilter == PositionFilter.PROFIT) {
-            this.numberOfPositionsCriterion = new NumberOfWinningPositionsCriterion();
-        } else {
-            this.numberOfPositionsCriterion = new NumberOfLosingPositionsCriterion();
-        }
 
-    }
+  @Override
+  public Num calculate(final Position position) {
+    return this.numberOfPositionsCriterion.calculate(position);
+  }
 
-    @Override
-    public Num calculate(BacktestBarSeries series, Position position) {
-        return numberOfPositionsCriterion.calculate(series, position);
-    }
 
-    @Override
-    public Num calculate(BacktestBarSeries series, TradingRecord tradingRecord) {
-        Num numberOfPositions = numberOfPositionsCriterion.calculate(series, tradingRecord);
-        return numberOfPositions.dividedBy(series.numFactory().numOf(tradingRecord.getPositionCount()));
-    }
+  @Override
+  public Num calculate(final TradingRecord tradingRecord) {
+    final Num numberOfPositions = this.numberOfPositionsCriterion.calculate(tradingRecord);
+    return numberOfPositions.dividedBy(NumFactoryProvider.getDefaultNumFactory()
+        .numOf(tradingRecord.getPositionCount()));
+  }
 
-    /**
-     * <ul>
-     * <li>For {@link PositionFilter#PROFIT}: The higher the criterion value, the
-     * better.
-     * <li>For {@link PositionFilter#LOSS}: The lower the criterion value, the
-     * better.
-     * </ul>
-     */
-    @Override
-    public boolean betterThan(Num criterionValue1, Num criterionValue2) {
-        return positionFilter == PositionFilter.PROFIT ? criterionValue1.isGreaterThan(criterionValue2)
-                : criterionValue1.isLessThan(criterionValue2);
-    }
+
+  /**
+   * <ul>
+   * <li>For {@link PositionFilter#PROFIT}: The higher the criterion value, the
+   * better.
+   * <li>For {@link PositionFilter#LOSS}: The lower the criterion value, the
+   * better.
+   * </ul>
+   */
+  @Override
+  public boolean betterThan(final Num criterionValue1, final Num criterionValue2) {
+    return this.positionFilter == PositionFilter.PROFIT ? criterionValue1.isGreaterThan(criterionValue2)
+                                                        : criterionValue1.isLessThan(criterionValue2);
+  }
 }

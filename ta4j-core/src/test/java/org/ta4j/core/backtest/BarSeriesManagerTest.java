@@ -64,15 +64,15 @@
 //        final DateTimeFormatter dtf = DateTimeFormatter.ISO_ZONED_DATE_TIME;
 //        seriesForRun = new MockBarSeriesBuilder().withNumFactory(numFactory).build();
 //
-//        seriesForRun.barBuilder().endTime(ZonedDateTime.parse("2013-01-01T00:00:00-05:00", dtf)).closePrice(1d).add();
-//        seriesForRun.barBuilder().endTime(ZonedDateTime.parse("2013-08-01T00:00:00-05:00", dtf)).closePrice(2d).add();
-//        seriesForRun.barBuilder().endTime(ZonedDateTime.parse("2013-10-01T00:00:00-05:00", dtf)).closePrice(3d).add();
-//        seriesForRun.barBuilder().endTime(ZonedDateTime.parse("2013-12-01T00:00:00-05:00", dtf)).closePrice(4d).add();
-//        seriesForRun.barBuilder().endTime(ZonedDateTime.parse("2014-02-01T00:00:00-05:00", dtf)).closePrice(5d).add();
-//        seriesForRun.barBuilder().endTime(ZonedDateTime.parse("2015-01-01T00:00:00-05:00", dtf)).closePrice(6d).add();
-//        seriesForRun.barBuilder().endTime(ZonedDateTime.parse("2015-08-01T00:00:00-05:00", dtf)).closePrice(7d).add();
-//        seriesForRun.barBuilder().endTime(ZonedDateTime.parse("2015-10-01T00:00:00-05:00", dtf)).closePrice(8d).add();
-//        seriesForRun.barBuilder().endTime(ZonedDateTime.parse("2015-12-01T00:00:00-05:00", dtf)).closePrice(7d).add();
+//        seriesForRun.barBuilder().endTime(ZonedDateTime.parse("2013-01-01T00:00:00-05:00", dtf)).closePrice(1d).onCandle();
+//        seriesForRun.barBuilder().endTime(ZonedDateTime.parse("2013-08-01T00:00:00-05:00", dtf)).closePrice(2d).onCandle();
+//        seriesForRun.barBuilder().endTime(ZonedDateTime.parse("2013-10-01T00:00:00-05:00", dtf)).closePrice(3d).onCandle();
+//        seriesForRun.barBuilder().endTime(ZonedDateTime.parse("2013-12-01T00:00:00-05:00", dtf)).closePrice(4d).onCandle();
+//        seriesForRun.barBuilder().endTime(ZonedDateTime.parse("2014-02-01T00:00:00-05:00", dtf)).closePrice(5d).onCandle();
+//        seriesForRun.barBuilder().endTime(ZonedDateTime.parse("2015-01-01T00:00:00-05:00", dtf)).closePrice(6d).onCandle();
+//        seriesForRun.barBuilder().endTime(ZonedDateTime.parse("2015-08-01T00:00:00-05:00", dtf)).closePrice(7d).onCandle();
+//        seriesForRun.barBuilder().endTime(ZonedDateTime.parse("2015-10-01T00:00:00-05:00", dtf)).closePrice(8d).onCandle();
+//        seriesForRun.barBuilder().endTime(ZonedDateTime.parse("2015-12-01T00:00:00-05:00", dtf)).closePrice(7d).onCandle();
 //
 //        manager = new BarSeriesManager(seriesForRun, new TradeOnCurrentCloseModel());
 //
@@ -83,7 +83,7 @@
 //    @Test
 //    public void runOnWholeSeries() {
 //        var series = new MockBarSeriesBuilder().withNumFactory(numFactory)
-//                .withData(20d, 40d, 60d, 10d, 30d, 50d, 0d, 20d, 40d)
+//                .withCandleClosePrices(20d, 40d, 60d, 10d, 30d, 50d, 0d, 20d, 40d)
 //                .build();
 //        manager = new BarSeriesManager(series, new TradeOnCurrentCloseModel());
 //        List<Position> allPositions = manager.run(strategy).getPositions();
@@ -93,7 +93,7 @@
 //    @Test
 //    public void runOnWholeSeriesWithAmount() {
 //        var series = new MockBarSeriesBuilder().withNumFactory(numFactory)
-//                .withData(20d, 40d, 60d, 10d, 30d, 50d, 0d, 20d, 40d)
+//                .withCandleClosePrices(20d, 40d, 60d, 10d, 30d, 50d, 0d, 20d, 40d)
 //                .build();
 //        manager = new BarSeriesManager(series, new TradeOnCurrentCloseModel());
 //        List<Position> allPositions = manager.run(strategy, TradeType.BUY, HUNDRED).getPositions();
@@ -169,16 +169,16 @@
 //    public void runOnSeriesSlices() {
 //        var series = new MockBarSeriesBuilder().withNumFactory(numFactory).build();
 //
-//        series.barBuilder().closePrice(1d).add();
-//        series.barBuilder().closePrice(2d).add();
-//        series.barBuilder().closePrice(3d).add();
-//        series.barBuilder().closePrice(4d).add();
-//        series.barBuilder().closePrice(5d).add();
-//        series.barBuilder().closePrice(6d).add();
-//        series.barBuilder().closePrice(7d).add();
-//        series.barBuilder().closePrice(8d).add();
-//        series.barBuilder().closePrice(9d).add();
-//        series.barBuilder().closePrice(10d).add();
+//        series.barBuilder().closePrice(1d).onCandle();
+//        series.barBuilder().closePrice(2d).onCandle();
+//        series.barBuilder().closePrice(3d).onCandle();
+//        series.barBuilder().closePrice(4d).onCandle();
+//        series.barBuilder().closePrice(5d).onCandle();
+//        series.barBuilder().closePrice(6d).onCandle();
+//        series.barBuilder().closePrice(7d).onCandle();
+//        series.barBuilder().closePrice(8d).onCandle();
+//        series.barBuilder().closePrice(9d).onCandle();
+//        series.barBuilder().closePrice(10d).onCandle();
 //
 //        manager = new BarSeriesManager(series, new TradeOnCurrentCloseModel());
 //

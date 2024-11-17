@@ -25,10 +25,10 @@ package org.ta4j.core.indicators.numeric.statistics;
 
 import static org.ta4j.core.num.NaN.NaN;
 
-import java.time.Instant;
 import java.util.ArrayDeque;
 import java.util.Deque;
 
+import org.ta4j.core.Bar;
 import org.ta4j.core.indicators.numeric.NumericIndicator;
 import org.ta4j.core.num.Num;
 
@@ -50,8 +50,6 @@ public class PearsonCorrelationIndicator extends NumericIndicator {
   private Num sxx;
   private Num syy;
   private Num sxy;
-  private Instant currentTick = Instant.EPOCH;
-  private Num value;
   private final Num n;
 
 
@@ -123,19 +121,10 @@ public class PearsonCorrelationIndicator extends NumericIndicator {
 
 
   @Override
-  public Num getValue() {
-    return this.value;
-  }
-
-
-  @Override
-  public void refresh(final Instant tick) {
-    if (tick.isAfter(this.currentTick)) {
-      this.indicator1.refresh(tick);
-      this.indicator2.refresh(tick);
-      this.value = calculate();
-      this.currentTick = tick;
-    }
+  public void updateState(final Bar bar) {
+    this.indicator1.onBar(bar);
+    this.indicator2.onBar(bar);
+    this.value = calculate();
   }
 
 

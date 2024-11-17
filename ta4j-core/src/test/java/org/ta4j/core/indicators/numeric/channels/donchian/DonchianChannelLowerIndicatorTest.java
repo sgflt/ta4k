@@ -48,15 +48,15 @@
 //                .withName("DonchianChannelLowerIndicatorTestSeries")
 //                .build();
 //
-//        series.barBuilder().openPrice(100d).highPrice(105d).lowPrice(95d).closePrice(100d).add();
-//        series.barBuilder().openPrice(105).highPrice(110).lowPrice(100).closePrice(105).add();
-//        series.barBuilder().openPrice(110).highPrice(115).lowPrice(105).closePrice(110).add();
-//        series.barBuilder().openPrice(115).highPrice(120).lowPrice(110).closePrice(115).add();
-//        series.barBuilder().openPrice(120).highPrice(125).lowPrice(115).closePrice(120).add();
-//        series.barBuilder().openPrice(115).highPrice(120).lowPrice(110).closePrice(115).add();
-//        series.barBuilder().openPrice(110).highPrice(115).lowPrice(105).closePrice(110).add();
-//        series.barBuilder().openPrice(105).highPrice(110).lowPrice(100).closePrice(105).add();
-//        series.barBuilder().openPrice(100).highPrice(105).lowPrice(95).closePrice(100).add();
+//        series.barBuilder().openPrice(100d).highPrice(105d).lowPrice(95d).closePrice(100d).onCandle();
+//        series.barBuilder().openPrice(105).highPrice(110).lowPrice(100).closePrice(105).onCandle();
+//        series.barBuilder().openPrice(110).highPrice(115).lowPrice(105).closePrice(110).onCandle();
+//        series.barBuilder().openPrice(115).highPrice(120).lowPrice(110).closePrice(115).onCandle();
+//        series.barBuilder().openPrice(120).highPrice(125).lowPrice(115).closePrice(120).onCandle();
+//        series.barBuilder().openPrice(115).highPrice(120).lowPrice(110).closePrice(115).onCandle();
+//        series.barBuilder().openPrice(110).highPrice(115).lowPrice(105).closePrice(110).onCandle();
+//        series.barBuilder().openPrice(105).highPrice(110).lowPrice(100).closePrice(105).onCandle();
+//        series.barBuilder().openPrice(100).highPrice(105).lowPrice(95).closePrice(100).onCandle();
 //
 //    }
 //

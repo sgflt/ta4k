@@ -43,13 +43,13 @@
 //    @Test
 //    public void givenBarCount_whenGetValueForIndexWithinBarCount_thenReturnNaN() {
 //        var series = new MockBarSeriesBuilder().build();
-//        series.barBuilder().openPrice(10).closePrice(10).highPrice(10).lowPrice(10).volume(0).add();
-//        series.barBuilder().openPrice(10).closePrice(10).highPrice(10).lowPrice(10).volume(10).add();
-//        series.barBuilder().openPrice(10).closePrice(10).highPrice(10).lowPrice(10).volume(10).add();
-//        series.barBuilder().openPrice(10).closePrice(10).highPrice(10).lowPrice(10).volume(10).add();
-//        series.barBuilder().openPrice(10).closePrice(10).highPrice(10).lowPrice(10).volume(10).add();
-//        series.barBuilder().openPrice(9).closePrice(9).highPrice(9).lowPrice(9).volume(10).add();
-//        series.barBuilder().openPrice(11).closePrice(11).highPrice(11).lowPrice(11).volume(10).add();
+//        series.barBuilder().openPrice(10).closePrice(10).highPrice(10).lowPrice(10).volume(0).onCandle();
+//        series.barBuilder().openPrice(10).closePrice(10).highPrice(10).lowPrice(10).volume(10).onCandle();
+//        series.barBuilder().openPrice(10).closePrice(10).highPrice(10).lowPrice(10).volume(10).onCandle();
+//        series.barBuilder().openPrice(10).closePrice(10).highPrice(10).lowPrice(10).volume(10).onCandle();
+//        series.barBuilder().openPrice(10).closePrice(10).highPrice(10).lowPrice(10).volume(10).onCandle();
+//        series.barBuilder().openPrice(9).closePrice(9).highPrice(9).lowPrice(9).volume(10).onCandle();
+//        series.barBuilder().openPrice(11).closePrice(11).highPrice(11).lowPrice(11).volume(10).onCandle();
 //
 //        var mfi = new MoneyFlowIndexIndicator(series, 5);
 //
@@ -64,13 +64,13 @@
 //    @Test
 //    public void givenBarCountOf1_whenGetValue_thenReturnEdgeCaseCorrectedValue() {
 //        var series = new MockBarSeriesBuilder().build();
-//        series.barBuilder().openPrice(10).closePrice(10).highPrice(10).lowPrice(10).volume(0).add();
-//        series.barBuilder().openPrice(9).closePrice(9).highPrice(9).lowPrice(9).volume(10).add();
-//        series.barBuilder().openPrice(10).closePrice(10).highPrice(10).lowPrice(10).volume(10).add();
-//        series.barBuilder().openPrice(11).closePrice(11).highPrice(11).lowPrice(11).volume(10).add();
-//        series.barBuilder().openPrice(12).closePrice(12).highPrice(12).lowPrice(12).volume(10).add();
-//        series.barBuilder().openPrice(11).closePrice(11).highPrice(11).lowPrice(11).volume(10).add();
-//        series.barBuilder().openPrice(11).closePrice(11).highPrice(11).lowPrice(11).volume(10).add();
+//        series.barBuilder().openPrice(10).closePrice(10).highPrice(10).lowPrice(10).volume(0).onCandle();
+//        series.barBuilder().openPrice(9).closePrice(9).highPrice(9).lowPrice(9).volume(10).onCandle();
+//        series.barBuilder().openPrice(10).closePrice(10).highPrice(10).lowPrice(10).volume(10).onCandle();
+//        series.barBuilder().openPrice(11).closePrice(11).highPrice(11).lowPrice(11).volume(10).onCandle();
+//        series.barBuilder().openPrice(12).closePrice(12).highPrice(12).lowPrice(12).volume(10).onCandle();
+//        series.barBuilder().openPrice(11).closePrice(11).highPrice(11).lowPrice(11).volume(10).onCandle();
+//        series.barBuilder().openPrice(11).closePrice(11).highPrice(11).lowPrice(11).volume(10).onCandle();
 //
 //        var mfi = new MoneyFlowIndexIndicator(series, 1);
 //
@@ -85,14 +85,14 @@
 //    @Test
 //    public void givenBarCountOf3_whenGetValue_thenReturnCorrectValue() {
 //        var series = new MockBarSeriesBuilder().build();
-//        series.barBuilder().openPrice(10).closePrice(10).highPrice(10).lowPrice(10).volume(0).add();
-//        series.barBuilder().openPrice(9).closePrice(9).highPrice(9).lowPrice(9).volume(10).add();
-//        series.barBuilder().openPrice(10).closePrice(10).highPrice(10).lowPrice(10).volume(10).add();
-//        series.barBuilder().openPrice(11).closePrice(11).highPrice(11).lowPrice(11).volume(10).add();
-//        series.barBuilder().openPrice(12).closePrice(12).highPrice(12).lowPrice(12).volume(10).add();
-//        series.barBuilder().openPrice(11).closePrice(11).highPrice(11).lowPrice(11).volume(10).add();
-//        series.barBuilder().openPrice(12).closePrice(12).highPrice(12).lowPrice(12).volume(10).add();
-//        series.barBuilder().openPrice(9).closePrice(9).highPrice(9).lowPrice(9).volume(10).add();
+//        series.barBuilder().openPrice(10).closePrice(10).highPrice(10).lowPrice(10).volume(0).onCandle();
+//        series.barBuilder().openPrice(9).closePrice(9).highPrice(9).lowPrice(9).volume(10).onCandle();
+//        series.barBuilder().openPrice(10).closePrice(10).highPrice(10).lowPrice(10).volume(10).onCandle();
+//        series.barBuilder().openPrice(11).closePrice(11).highPrice(11).lowPrice(11).volume(10).onCandle();
+//        series.barBuilder().openPrice(12).closePrice(12).highPrice(12).lowPrice(12).volume(10).onCandle();
+//        series.barBuilder().openPrice(11).closePrice(11).highPrice(11).lowPrice(11).volume(10).onCandle();
+//        series.barBuilder().openPrice(12).closePrice(12).highPrice(12).lowPrice(12).volume(10).onCandle();
+//        series.barBuilder().openPrice(9).closePrice(9).highPrice(9).lowPrice(9).volume(10).onCandle();
 //
 //        var mfi = new MoneyFlowIndexIndicator(series, 3);
 //

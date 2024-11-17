@@ -50,7 +50,7 @@
 //    public void testChoppy() {
 //        var series = new MockBarSeriesBuilder().withNumFactory(numFactory).withName("low volatility series").build();
 //        for (int i = 0; i < 50; i++) {
-//            series.barBuilder().openPrice(21.5).highPrice(21.5 + 1).lowPrice(21.5 - 1).closePrice(21.5).add();
+//            series.barBuilder().openPrice(21.5).highPrice(21.5 + 1).lowPrice(21.5 - 1).closePrice(21.5).onCandle();
 //        }
 //        var ci1 = new ChopIndicator(series, 14, 100);
 //        int HIGH_CHOPPINESS_VALUE = 85;
@@ -66,7 +66,7 @@
 //        var series = new MockBarSeriesBuilder().withNumFactory(numFactory).withName("low volatility series").build();
 //        float value = 21.5f;
 //        for (int i = 0; i < 50; i++) {
-//            series.barBuilder().openPrice(value).highPrice(value + 1).lowPrice(value - 1).closePrice(value).add();
+//            series.barBuilder().openPrice(value).highPrice(value + 1).lowPrice(value - 1).closePrice(value).onCandle();
 //            value += 2.0f;
 //        }
 //        ChopIndicator ci1 = new ChopIndicator(series, 14, 100);
