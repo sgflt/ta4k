@@ -89,8 +89,8 @@ public class MockMarketEventBuilder {
    *
    * @return this
    */
-  public MockMarketEventBuilder withCandleClosePrices(final double... data) {
-    withCandleClosePrices(DoubleStream.of(data).boxed().toList());
+  public MockMarketEventBuilder withCandlePrices(final double... data) {
+    withCandlePrices(DoubleStream.of(data).boxed().toList());
     return this;
   }
 

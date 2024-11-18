@@ -40,7 +40,7 @@ class EMAIndicatorTest extends AbstractIndicatorTest<Num> {
   @BeforeEach
   void setUp() {
     this.context = new TestContext()
-        .withClosePrices(
+        .withCandlePrices(
             64.75, 63.79, 63.73, 63.73, 63.55, 63.19,
             63.91, 63.85, 62.95, 63.37, 61.33, 61.51
         );

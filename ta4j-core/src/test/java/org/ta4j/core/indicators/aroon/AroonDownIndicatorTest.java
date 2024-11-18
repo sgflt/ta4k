@@ -41,7 +41,7 @@ class AroonDownIndicatorTest extends AbstractIndicatorTest<Num> {
   void init() {
     this.context = new TestContext();
     // barcount before
-    this.context.withClosePrices(
+    this.context.withCandlePrices(
         167.15,  // 0 -> unstable
         168.20,  // 1 -> unstable
         166.41,  // 0 -> unstable

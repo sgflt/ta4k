@@ -35,10 +35,17 @@ public class TestContext {
   private BarSeries barSeries = new BacktestBarSeriesBuilder().withIndicatorContext(this.indicatorContext).build();
 
 
-  public TestContext withClosePrices(final double... prices) {
+  /**
+   * Sets OHLC to the same value.
+   *
+   * @param prices to set for each candle
+   *
+   * @return this
+   */
+  public TestContext withCandlePrices(final double... prices) {
     this.marketEvents = new LinkedList<>(
         new MockMarketEventBuilder()
-            .withCandleClosePrices(prices)
+            .withCandlePrices(prices)
             .build()
     );
     return this;
