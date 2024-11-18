@@ -104,7 +104,7 @@ public abstract class NumericIndicator implements Indicator<Num> {
    * Factory used for creation of this indicator that will be propagated to child indicators.
    */
   private final NumFactory numFactory;
-  private Instant currentBeginTime = Instant.EPOCH;
+  private Instant currentBeginTime = Instant.MIN;
   protected Num value;
 
 
