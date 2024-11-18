@@ -25,6 +25,7 @@ package org.ta4j.core.indicators.numeric;
 
 import java.time.Instant;
 
+import lombok.extern.slf4j.Slf4j;
 import org.ta4j.core.Bar;
 import org.ta4j.core.BarSeries;
 import org.ta4j.core.indicators.Indicator;
@@ -98,6 +99,7 @@ import org.ta4j.core.rules.UnderIndicatorRule;
  * objects. These are also overloaded to accept both {@code NumericIndicator} and
  * {@code Number} arguments.
  */
+@Slf4j
 public abstract class NumericIndicator implements Indicator<Num> {
 
   /**
@@ -665,6 +667,8 @@ public abstract class NumericIndicator implements Indicator<Num> {
 
   @Override
   public Num getValue() {
+    log.debug("{}", this);
+
     return this.value;
   }
 
