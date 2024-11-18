@@ -10,6 +10,8 @@ import java.util.Queue;
 import java.util.stream.Stream;
 
 import org.assertj.core.data.Offset;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.ta4j.core.backtest.BacktestBarSeriesBuilder;
 import org.ta4j.core.events.CandleReceived;
 import org.ta4j.core.events.MarketEvent;
@@ -26,6 +28,7 @@ import org.ta4j.core.num.NumFactory;
  * @author Lukáš Kvídera
  */
 public class TestContext {
+  private static final Logger log = LoggerFactory.getLogger(TestContext.class);
 
   private Queue<MarketEvent> marketEvents;
   private final IndicatorContext indicatorContext = IndicatorContext.empty();
@@ -93,7 +96,7 @@ public class TestContext {
 
   public TestContext fastForwardUntilStable() {
     while (this.indicatorContext.isNotEmpty() && !this.indicatorContext.isStable()) {
-      TestUtils.fastForward(this, 1);
+      fastForward(1);
     }
 
     return this;
@@ -124,7 +127,13 @@ public class TestContext {
    * @return this
    */
   public TestContext fastForward(final int bars) {
-    TestUtils.fastForward(this, bars);
+    log.debug("Fast forward =====> {}", bars);
+    for (int i = 0; i < bars; i++) {
+      log.trace("\t =====> {}", i);
+      if (!advance()) {
+        throw new IllegalStateException("Fast forward failed at index " + i);
+      }
+    }
     return this;
   }
 
@@ -136,7 +145,10 @@ public class TestContext {
 
 
   public TestContext assertNext(final double expected) {
-    advance();
+    if (!advance()) {
+      throw new IllegalStateException("Next failed");
+    }
+
     assertNumEquals(expected, getNumericIndicator(0).getValue());
     return this;
   }

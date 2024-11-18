@@ -46,14 +46,6 @@ public class TestUtils {
   private static final Logger log = LoggerFactory.getLogger(TestUtils.class);
 
 
-  public static void fastForward(final TestContext context, final int bars) {
-    log.debug("Fast forward =====> {}", bars);
-    for (int i = 0; i < bars; i++) {
-      log.trace("\t =====> {}", i);
-      context.advance();
-    }
-  }
-
   /**
    * Verifies that the actual {@code Num} value is equal to the given
    * {@code String} representation.
