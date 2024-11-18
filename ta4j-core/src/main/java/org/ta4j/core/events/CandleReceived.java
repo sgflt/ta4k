@@ -27,6 +27,9 @@ package org.ta4j.core.events;
 import java.time.Duration;
 import java.time.Instant;
 
+import lombok.Builder;
+
+@Builder
 public record CandleReceived(
     Duration timePeriod, // FIXME for what is duration usable?
     Instant beginTime,
