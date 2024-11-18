@@ -25,7 +25,6 @@ package org.ta4j.core.indicators.candles.price;
 
 import org.ta4j.core.Bar;
 import org.ta4j.core.indicators.SeriesRelatedNumericIndicator;
-import org.ta4j.core.num.Num;
 import org.ta4j.core.num.NumFactory;
 
 /**
@@ -35,9 +34,6 @@ import org.ta4j.core.num.NumFactory;
  * Returns the close price of a bar.
  */
 public class ClosePriceIndicator extends SeriesRelatedNumericIndicator {
-
-  private Num value;
-
 
   /**
    * Constructor.
@@ -53,7 +49,6 @@ public class ClosePriceIndicator extends SeriesRelatedNumericIndicator {
   public void updateState(final Bar bar) {
     this.value = bar.closePrice();
   }
-
 
 
   @Override
