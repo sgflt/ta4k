@@ -114,4 +114,9 @@ public class IndicatorContext {
   public boolean isStable() {
     return this.indicators.stream().allMatch(Indicator::isStable);
   }
+
+
+  public boolean isNotEmpty() {
+    return !this.indicators.isEmpty();
+  }
 }
