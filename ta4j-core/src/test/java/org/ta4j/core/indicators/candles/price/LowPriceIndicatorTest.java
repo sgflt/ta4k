@@ -27,7 +27,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.ta4j.core.TestContext;
 import org.ta4j.core.indicators.AbstractIndicatorTest;
-import org.ta4j.core.indicators.numeric.NumericIndicator;
+import org.ta4j.core.indicators.numeric.Indicators;
 import org.ta4j.core.num.Num;
 import org.ta4j.core.num.NumFactory;
 
@@ -44,7 +44,7 @@ class LowPriceIndicatorTest extends AbstractIndicatorTest<Num> {
   void setUp() {
     this.context = new TestContext().withDefaultMarketEvents();
 
-    this.context.withIndicator(NumericIndicator.lowPrice());
+    this.context.withIndicator(Indicators.lowPrice());
   }
 
 

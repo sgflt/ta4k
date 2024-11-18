@@ -27,7 +27,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.ta4j.core.TestContext;
 import org.ta4j.core.indicators.AbstractIndicatorTest;
-import org.ta4j.core.indicators.numeric.NumericIndicator;
+import org.ta4j.core.indicators.numeric.Indicators;
 import org.ta4j.core.num.Num;
 import org.ta4j.core.num.NumFactory;
 
@@ -45,14 +45,14 @@ public class OpenPriceIndicatorTest extends AbstractIndicatorTest<Num> {
   public void setUp() {
     this.context = new TestContext().withDefaultMarketEvents();
 
-    this.context.withIndicator(NumericIndicator.openPrice());
+    this.context.withIndicator(Indicators.openPrice());
   }
 
 
   @Test
   public void indicatorShouldRetrieveBarOpenPrice() {
     for (int i = 0; i < 10; i++) {
-      this.context.assertNext(i);
+      this.context.assertNext(i + 1);
     }
   }
 }

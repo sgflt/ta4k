@@ -26,6 +26,7 @@ package org.ta4j.core.indicators.numeric.channels.keltner;
 import org.ta4j.core.Bar;
 import org.ta4j.core.BarSeries;
 import org.ta4j.core.indicators.Indicator;
+import org.ta4j.core.indicators.numeric.Indicators;
 import org.ta4j.core.indicators.numeric.NumericIndicator;
 import org.ta4j.core.indicators.numeric.average.EMAIndicator;
 import org.ta4j.core.num.Num;
@@ -49,7 +50,7 @@ public class KeltnerChannelMiddleIndicator extends NumericIndicator {
    * @param barCountEMA the bar count for the {@link EMAIndicator}
    */
   public KeltnerChannelMiddleIndicator(final BarSeries series, final int barCountEMA) {
-    this(NumericIndicator.typicalPrice(), barCountEMA);
+    this(Indicators.typicalPrice(), barCountEMA);
   }
 
 

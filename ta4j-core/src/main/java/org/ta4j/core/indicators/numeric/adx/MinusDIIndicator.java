@@ -25,6 +25,7 @@ package org.ta4j.core.indicators.numeric.adx;
 
 import org.ta4j.core.Bar;
 import org.ta4j.core.indicators.numeric.ATRIndicator;
+import org.ta4j.core.indicators.numeric.Indicators;
 import org.ta4j.core.indicators.numeric.NumericIndicator;
 import org.ta4j.core.indicators.numeric.average.MMAIndicator;
 import org.ta4j.core.num.Num;
@@ -59,8 +60,8 @@ public class MinusDIIndicator extends NumericIndicator {
   public MinusDIIndicator(final NumFactory numFactory, final int barCount) {
     super(numFactory);
     this.barCount = barCount;
-    this.atrIndicator = NumericIndicator.atr(barCount);
-    this.avgMinusDMIndicator = NumericIndicator.minusDMI().mma(barCount);
+    this.atrIndicator = Indicators.atr(barCount);
+    this.avgMinusDMIndicator = Indicators.minusDMI().mma(barCount);
   }
 
 

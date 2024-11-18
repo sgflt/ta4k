@@ -25,6 +25,7 @@ package org.ta4j.core.indicators.numeric.oscilators;
 
 import org.ta4j.core.Bar;
 import org.ta4j.core.indicators.helpers.MedianPriceIndicator;
+import org.ta4j.core.indicators.numeric.Indicators;
 import org.ta4j.core.indicators.numeric.NumericIndicator;
 import org.ta4j.core.indicators.numeric.average.SMAIndicator;
 import org.ta4j.core.num.Num;
@@ -79,7 +80,7 @@ public class AwesomeOscillatorIndicator extends NumericIndicator {
    * </ul>
    */
   public AwesomeOscillatorIndicator() {
-    this(NumericIndicator.medianPrice(), 5, 34);
+    this(Indicators.medianPrice(), 5, 34);
   }
 
 

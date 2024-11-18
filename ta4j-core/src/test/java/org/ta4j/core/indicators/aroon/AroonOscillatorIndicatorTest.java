@@ -39,7 +39,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.ta4j.core.TestContext;
 import org.ta4j.core.events.CandleReceived;
 import org.ta4j.core.indicators.AbstractIndicatorTest;
-import org.ta4j.core.indicators.numeric.NumericIndicator;
+import org.ta4j.core.indicators.numeric.Indicators;
 import org.ta4j.core.num.Num;
 import org.ta4j.core.num.NumFactory;
 
@@ -239,7 +239,7 @@ class AroonOscillatorIndicatorTest extends AbstractIndicatorTest<Num> {
   @ParameterizedTest(name = "External data with bar count 25 [{index}] {0}")
   @MethodSource("provideNumFactories")
   void test(NumFactory numFactory) {
-    final var aroonOscillator = NumericIndicator.aroonOscillatpr(25);
+    final var aroonOscillator = Indicators.aroonOscillator(25);
     assertNotNull(aroonOscillator.getAroonUpIndicator());
     assertNotNull(aroonOscillator.getAroonDownIndicator());
 

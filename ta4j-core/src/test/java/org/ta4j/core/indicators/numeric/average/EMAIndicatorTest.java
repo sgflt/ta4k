@@ -28,7 +28,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.ta4j.core.TestContext;
 import org.ta4j.core.indicators.AbstractIndicatorTest;
 import org.ta4j.core.indicators.XLSIndicatorTest;
-import org.ta4j.core.indicators.numeric.NumericIndicator;
+import org.ta4j.core.indicators.numeric.Indicators;
 import org.ta4j.core.num.Num;
 import org.ta4j.core.num.NumFactory;
 
@@ -51,7 +51,7 @@ class EMAIndicatorTest extends AbstractIndicatorTest<Num> {
   @MethodSource("provideNumFactories")
   void firstValueShouldBeEqualsToFirstDataValue(final NumFactory factory) {
     this.context.withNumFactory(factory)
-        .withIndicator(NumericIndicator.closePrice().ema(1))
+        .withIndicator(Indicators.closePrice().ema(1))
         .assertNext(64.75);
   }
 
@@ -60,7 +60,7 @@ class EMAIndicatorTest extends AbstractIndicatorTest<Num> {
   @MethodSource("provideNumFactories")
   void testEmaWithBarCount10(final NumFactory factory) {
     this.context.withNumFactory(factory)
-        .withIndicator(NumericIndicator.closePrice().ema(10))
+        .withIndicator(Indicators.closePrice().ema(10))
         .fastForwardUntilStable()
         .assertCurrent(63.6948)
         .assertNext(63.2648)
@@ -75,7 +75,7 @@ class EMAIndicatorTest extends AbstractIndicatorTest<Num> {
     final var xlsContext = new TestContext();
     xlsContext.withMarketEvents(xls.getMarketEvents());
 
-    final var indicator = NumericIndicator.closePrice().ema(1);
+    final var indicator = Indicators.closePrice().ema(1);
     final var expectedIndicator = xls.getIndicator(1);
     xlsContext.withIndicators(indicator, expectedIndicator)
         .assertIndicatorEquals(expectedIndicator, indicator)
@@ -90,7 +90,7 @@ class EMAIndicatorTest extends AbstractIndicatorTest<Num> {
     final var xlsContext = new TestContext();
     xlsContext.withMarketEvents(xls.getMarketEvents());
 
-    final var indicator = NumericIndicator.closePrice().ema(3);
+    final var indicator = Indicators.closePrice().ema(3);
     final var expectedIndicator = xls.getIndicator(3);
     xlsContext.withIndicators(indicator, expectedIndicator)
         .assertIndicatorEquals(expectedIndicator, indicator)
@@ -105,7 +105,7 @@ class EMAIndicatorTest extends AbstractIndicatorTest<Num> {
     final var xlsContext = new TestContext();
     xlsContext.withMarketEvents(xls.getMarketEvents());
 
-    final var indicator = NumericIndicator.closePrice().ema(13);
+    final var indicator = Indicators.closePrice().ema(13);
     final var expectedIndicator = xls.getIndicator(13);
     xlsContext.withIndicators(indicator, expectedIndicator)
         .assertIndicatorEquals(expectedIndicator, indicator)

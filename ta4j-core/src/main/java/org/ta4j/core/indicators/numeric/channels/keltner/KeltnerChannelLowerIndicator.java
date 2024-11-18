@@ -26,6 +26,7 @@ package org.ta4j.core.indicators.numeric.channels.keltner;
 import org.ta4j.core.Bar;
 import org.ta4j.core.BarSeries;
 import org.ta4j.core.indicators.numeric.ATRIndicator;
+import org.ta4j.core.indicators.numeric.Indicators;
 import org.ta4j.core.indicators.numeric.NumericIndicator;
 import org.ta4j.core.num.Num;
 
@@ -56,7 +57,7 @@ public class KeltnerChannelLowerIndicator extends NumericIndicator {
       final double ratio,
       final int barCountATR
   ) {
-    this(series, middle, NumericIndicator.atr(barCountATR), ratio);
+    this(series, middle, Indicators.atr(barCountATR), ratio);
   }
 
 

@@ -25,6 +25,7 @@ package org.ta4j.core.indicators;
 
 import org.ta4j.core.Bar;
 import org.ta4j.core.BarSeries;
+import org.ta4j.core.indicators.numeric.Indicators;
 import org.ta4j.core.indicators.numeric.NumericIndicator;
 import org.ta4j.core.indicators.numeric.average.SMAIndicator;
 import org.ta4j.core.indicators.numeric.oscilators.AwesomeOscillatorIndicator;
@@ -48,7 +49,7 @@ public class AccelerationDecelerationIndicator extends NumericIndicator {
    */
   public AccelerationDecelerationIndicator(final BarSeries series, final int shortBarCount, final int longBarCount) {
     super(series.numFactory());
-    this.awesome = NumericIndicator.awesomeOscillator(shortBarCount, longBarCount);
+    this.awesome = Indicators.awesomeOscillator(shortBarCount, longBarCount);
     this.sma = this.awesome.sma(shortBarCount);
   }
 

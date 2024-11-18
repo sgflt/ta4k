@@ -29,7 +29,7 @@ import org.ta4j.core.indicators.bool.BooleanIndicator;
 import org.ta4j.core.indicators.candles.price.ClosePriceIndicator;
 import org.ta4j.core.indicators.helpers.LowestValueIndicator;
 import org.ta4j.core.indicators.numeric.ATRIndicator;
-import org.ta4j.core.indicators.numeric.NumericIndicator;
+import org.ta4j.core.indicators.numeric.Indicators;
 import org.ta4j.core.num.Num;
 
 /**
@@ -71,9 +71,9 @@ public class ChandelierExitShortIndicator extends BooleanIndicator {
    * @param k the K multiplier for ATR (usually 3.0)
    */
   public ChandelierExitShortIndicator(final BarSeries series, final int barCount, final double k) {
-    this.close = NumericIndicator.closePrice();
-    this.low = NumericIndicator.lowPrice().lowest(barCount);
-    this.atr = NumericIndicator.atr(barCount);
+    this.close = Indicators.closePrice();
+    this.low = Indicators.lowPrice().lowest(barCount);
+    this.atr = Indicators.atr(barCount);
     this.k = series.numFactory().numOf(k);
   }
 

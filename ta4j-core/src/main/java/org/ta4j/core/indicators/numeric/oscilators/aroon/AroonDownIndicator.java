@@ -29,6 +29,7 @@ import org.ta4j.core.Bar;
 import org.ta4j.core.indicators.Indicator;
 import org.ta4j.core.indicators.candles.price.LowPriceIndicator;
 import org.ta4j.core.indicators.helpers.LowestValueIndicator;
+import org.ta4j.core.indicators.numeric.Indicators;
 import org.ta4j.core.indicators.numeric.NumericIndicator;
 import org.ta4j.core.num.NaN;
 import org.ta4j.core.num.Num;
@@ -77,7 +78,7 @@ public class AroonDownIndicator extends NumericIndicator {
    * @param barCount the time frame
    */
   public AroonDownIndicator(final NumFactory numFactory, final int barCount) {
-    this(numFactory, NumericIndicator.lowPrice(), barCount);
+    this(numFactory, Indicators.lowPrice(), barCount);
   }
 
 

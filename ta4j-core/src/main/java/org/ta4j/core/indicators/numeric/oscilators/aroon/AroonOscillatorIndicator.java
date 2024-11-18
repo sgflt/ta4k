@@ -24,7 +24,7 @@
 package org.ta4j.core.indicators.numeric.oscilators.aroon;
 
 import org.ta4j.core.Bar;
-import org.ta4j.core.BarSeries;
+import org.ta4j.core.indicators.numeric.Indicators;
 import org.ta4j.core.indicators.numeric.NumericIndicator;
 import org.ta4j.core.num.Num;
 import org.ta4j.core.num.NumFactory;
@@ -50,15 +50,25 @@ public class AroonOscillatorIndicator extends NumericIndicator {
    */
   public AroonOscillatorIndicator(final NumFactory numFactory, final int barCount) {
     super(numFactory);
-    this.aroonUpIndicator = NumericIndicator.aroonUp(barCount);
-    this.aroonDownIndicator = NumericIndicator.aroonDown(barCount);
+    this.aroonUpIndicator = Indicators.aroonUp(barCount);
+    this.aroonDownIndicator = Indicators.aroonDown(barCount);
   }
 
 
-  public AroonOscillatorIndicator(final BarSeries series, final NumericIndicator indicator, final int barCount) {
-    super(series.numFactory());
-    this.aroonUpIndicator = NumericIndicator.aroonUp(indicator, barCount);
-    this.aroonDownIndicator = NumericIndicator.aroonDown(indicator, barCount);
+  public AroonOscillatorIndicator(final NumFactory numFactory, final NumericIndicator indicator, final int barCount) {
+    this(numFactory, indicator, indicator, barCount);
+  }
+
+
+  public AroonOscillatorIndicator(
+      final NumFactory numFactory,
+      final NumericIndicator downIndicator,
+      final NumericIndicator upIndicator,
+      final int barCount
+  ) {
+    super(numFactory);
+    this.aroonUpIndicator = upIndicator.aroonUp(barCount);
+    this.aroonDownIndicator = downIndicator.aroonDown(barCount);
   }
 
 

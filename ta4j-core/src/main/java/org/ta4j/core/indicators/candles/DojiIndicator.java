@@ -27,6 +27,7 @@ import org.ta4j.core.Bar;
 import org.ta4j.core.indicators.bool.BooleanIndicator;
 import org.ta4j.core.indicators.helpers.TransformIndicator;
 import org.ta4j.core.indicators.helpers.previous.PreviousNumericValueIndicator;
+import org.ta4j.core.indicators.numeric.Indicators;
 import org.ta4j.core.indicators.numeric.NumericIndicator;
 import org.ta4j.core.num.Num;
 import org.ta4j.core.num.NumFactory;
@@ -63,7 +64,7 @@ public class DojiIndicator extends BooleanIndicator {
    * @param bodyFactor the factor used when checking if a candle is Doji
    */
   public DojiIndicator(final NumFactory numFactory, final int barCount, final double bodyFactor) {
-    this.bodyHeightInd = TransformIndicator.abs(NumericIndicator.realBody());
+    this.bodyHeightInd = TransformIndicator.abs(Indicators.realBody());
     this.averageBodyHeightInd = this.bodyHeightInd.sma(barCount).previous();
     this.factor = numFactory.numOf(bodyFactor);
   }

@@ -23,6 +23,7 @@
  */
 package org.ta4j.core.indicators.numeric.channels.keltner;
 
+import org.ta4j.core.indicators.numeric.Indicators;
 import org.ta4j.core.indicators.numeric.NumericIndicator;
 import org.ta4j.core.indicators.numeric.average.EMAIndicator;
 
@@ -51,8 +52,8 @@ public class KeltnerChannelFacade {
    *     channel
    */
   public KeltnerChannelFacade(final int emaCount, final int atrCount, final Number k) {
-    final var price = NumericIndicator.closePrice();
-    final var atr = NumericIndicator.atr(atrCount);
+    final var price = Indicators.closePrice();
+    final var atr = Indicators.atr(atrCount);
     this.middle = price.ema(emaCount);
     this.upper = this.middle.plus(atr.multipliedBy(k));
     this.lower = this.middle.minus(atr.multipliedBy(k));

@@ -27,7 +27,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.ta4j.core.TestContext;
 import org.ta4j.core.indicators.AbstractIndicatorTest;
-import org.ta4j.core.indicators.numeric.NumericIndicator;
+import org.ta4j.core.indicators.numeric.Indicators;
 import org.ta4j.core.num.Num;
 import org.ta4j.core.num.NumFactory;
 
@@ -44,14 +44,14 @@ class ClosePriceIndicatorTest extends AbstractIndicatorTest<Num> {
   void setUp() {
     this.context = new TestContext().withDefaultMarketEvents();
 
-    this.context.withIndicator(NumericIndicator.closePrice());
+    this.context.withIndicator(Indicators.closePrice());
   }
 
 
   @Test
   void indicatorShouldRetrieveBarClosePrice() {
     for (int i = 0; i < 10; i++) {
-      this.context.assertNext(i + 1);
+      this.context.assertNext(i + 4);
     }
   }
 }

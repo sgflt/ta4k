@@ -26,7 +26,7 @@ package org.ta4j.core.indicators.candles;
 import org.ta4j.core.Bar;
 import org.ta4j.core.indicators.bool.BooleanIndicator;
 import org.ta4j.core.indicators.helpers.previous.PreviousNumericValueIndicator;
-import org.ta4j.core.indicators.numeric.NumericIndicator;
+import org.ta4j.core.indicators.numeric.Indicators;
 import org.ta4j.core.num.Num;
 import org.ta4j.core.num.NumFactory;
 import org.ta4j.core.utils.CircularBarArray;
@@ -50,7 +50,6 @@ public class ThreeBlackCrowsIndicator extends BooleanIndicator {
   private final Num factor;
 
   private final CircularBarArray bars = new CircularBarArray(4);
-  private Boolean value;
 
 
   /**
@@ -62,7 +61,7 @@ public class ThreeBlackCrowsIndicator extends BooleanIndicator {
    *     lower shadow
    */
   public ThreeBlackCrowsIndicator(final NumFactory numFactory, final int barCount, final double factor) {
-    final var lowerShadowIndicator = NumericIndicator.lowerShadow();
+    final var lowerShadowIndicator = Indicators.lowerShadow();
     this.lowerShadows.addLast(lowerShadowIndicator.previous(3));
     this.lowerShadows.addLast(lowerShadowIndicator.previous(2));
     this.lowerShadows.addLast(lowerShadowIndicator.previous());
