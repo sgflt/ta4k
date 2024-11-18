@@ -40,7 +40,6 @@ import com.opencsv.exceptions.CsvValidationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.ta4j.core.events.CandleReceived;
-import org.ta4j.core.num.NumFactoryProvider;
 
 /**
  * This class build a Ta4j bar series from a CSV file containing bars.
@@ -105,12 +104,12 @@ public final class CsvBarsLoader {
     return new CandleReceived(
         Duration.ofDays(1),
         start,
-        NumFactoryProvider.getDefaultNumFactory().numOf(open),
-        NumFactoryProvider.getDefaultNumFactory().numOf(high),
-        NumFactoryProvider.getDefaultNumFactory().numOf(low),
-        NumFactoryProvider.getDefaultNumFactory().numOf(close),
-        NumFactoryProvider.getDefaultNumFactory().numOf(volume),
-        NumFactoryProvider.getDefaultNumFactory().zero()
+        open,
+        high,
+        low,
+        close,
+        volume,
+        0
     );
   }
 }

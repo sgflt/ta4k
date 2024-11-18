@@ -40,7 +40,6 @@ import org.ta4j.core.events.MarketEvent;
 import org.ta4j.core.indicators.IndicatorContext;
 import org.ta4j.core.indicators.numeric.NumericIndicator;
 import org.ta4j.core.num.DoubleNumFactory;
-import org.ta4j.core.num.NumFactoryProvider;
 import org.ta4j.core.reports.TradingStatement;
 
 public class SimpleMovingAverageBacktest {
@@ -92,12 +91,12 @@ public class SimpleMovingAverageBacktest {
     return new CandleReceived(
         Duration.ofDays(1),
         start,
-        NumFactoryProvider.getDefaultNumFactory().numOf(open),
-        NumFactoryProvider.getDefaultNumFactory().numOf(high),
-        NumFactoryProvider.getDefaultNumFactory().numOf(low),
-        NumFactoryProvider.getDefaultNumFactory().numOf(close),
-        NumFactoryProvider.getDefaultNumFactory().numOf(volume),
-        NumFactoryProvider.getDefaultNumFactory().zero()
+        open,
+        high,
+        low,
+        close,
+        volume,
+        0
     );
   }
 
@@ -108,7 +107,7 @@ public class SimpleMovingAverageBacktest {
 
 
   private static Strategy create3DaySmaStrategy(final BarSeries series) {
-    final var closePrice = NumericIndicator.closePrice(series);
+    final var closePrice = NumericIndicator.closePrice();
     final var sma = closePrice.sma(3);
     return new BacktestStrategy(
         "",
@@ -120,7 +119,7 @@ public class SimpleMovingAverageBacktest {
 
 
   private static Strategy create2DaySmaStrategy(final BarSeries series) {
-    final var closePrice = NumericIndicator.closePrice(series);
+    final var closePrice = NumericIndicator.closePrice();
     final var sma = closePrice.sma(2);
     return new BacktestStrategy(
         "",

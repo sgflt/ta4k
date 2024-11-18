@@ -81,7 +81,7 @@ public class SimpleMovingAverageRangeBacktest {
       final BarSeries series,
       final int smaBarCount
   ) {
-    final var closePrice = NumericIndicator.closePrice(series);
+    final var closePrice = NumericIndicator.closePrice();
     final var sma = closePrice.sma(smaBarCount);
     final var entryRule = new OverIndicatorRule(sma, closePrice);
     final var exitRule = new UnderIndicatorRule(sma, closePrice);
