@@ -29,7 +29,6 @@ import org.ta4j.core.TestContext;
 import org.ta4j.core.indicators.AbstractIndicatorTest;
 import org.ta4j.core.indicators.XLSIndicatorTest;
 import org.ta4j.core.indicators.numeric.NumericIndicator;
-import org.ta4j.core.mocks.MockMarketEventBuilder;
 import org.ta4j.core.num.Num;
 import org.ta4j.core.num.NumFactory;
 
@@ -41,13 +40,9 @@ class EMAIndicatorTest extends AbstractIndicatorTest<Num> {
   @BeforeEach
   void setUp() {
     this.context = new TestContext()
-        .withMarketEvents(
-            new MockMarketEventBuilder()
-                .withCandleClosePrices(
-                    64.75, 63.79, 63.73, 63.73, 63.55, 63.19,
-                    63.91, 63.85, 62.95, 63.37, 61.33, 61.51
-                )
-                .build()
+        .withClosePrices(
+            64.75, 63.79, 63.73, 63.73, 63.55, 63.19,
+            63.91, 63.85, 62.95, 63.37, 61.33, 61.51
         );
   }
 
