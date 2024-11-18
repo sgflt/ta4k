@@ -22,14 +22,10 @@
  */
 package org.ta4j.core.indicators.numeric.average;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-import org.assertj.core.data.Offset;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.ta4j.core.ExternalIndicatorTest;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.ta4j.core.TestContext;
-import org.ta4j.core.TestUtils;
 import org.ta4j.core.indicators.AbstractIndicatorTest;
 import org.ta4j.core.indicators.XLSIndicatorTest;
 import org.ta4j.core.indicators.numeric.NumericIndicator;
@@ -39,15 +35,6 @@ import org.ta4j.core.num.NumFactory;
 
 class EMAIndicatorTest extends AbstractIndicatorTest<Num> {
 
-  private final ExternalIndicatorTest xls;
-
-
-  EMAIndicatorTest(final NumFactory numFactory) {
-    super(numFactory);
-    this.xls = new XLSIndicatorTest(this.getClass(), "EMA.xls", 6, numFactory);
-  }
-
-
   private TestContext context;
 
 
@@ -55,80 +42,78 @@ class EMAIndicatorTest extends AbstractIndicatorTest<Num> {
   void setUp() {
     this.context = new TestContext()
         .withMarketEvents(
-            new MockMarketEventBuilder().withNumFactory(this.numFactory)
+            new MockMarketEventBuilder()
                 .withCandleClosePrices(
-                    64.75,
-                    63.79,
-                    63.73,
-                    63.73,
-                    63.55,
-                    63.19,
-                    63.91,
-                    63.85,
-                    62.95,
-                    63.37,
-                    61.33,
-                    61.51
+                    64.75, 63.79, 63.73, 63.73, 63.55, 63.19,
+                    63.91, 63.85, 62.95, 63.37, 61.33, 61.51
                 )
                 .build()
         );
   }
 
 
-  @Test
-  void firstValueShouldBeEqualsToFirstDataValue() {
-    this.context.withIndicator(NumericIndicator.closePrice().ema(1));
-
-    this.context.assertNext(64.75);
+  @ParameterizedTest(name = "First value equals first data value [{index}] {0}")
+  @MethodSource("provideNumFactories")
+  void firstValueShouldBeEqualsToFirstDataValue(final NumFactory factory) {
+    this.context.withNumFactory(factory)
+        .withIndicator(NumericIndicator.closePrice().ema(1))
+        .assertNext(64.75);
   }
 
 
-  @Test
-  void usingBarCount10UsingClosePrice() {
-    this.context.withIndicator(NumericIndicator.closePrice().ema(10));
-
-    this.context.fastForward(10);
-    this.context.assertNext(63.6948);
-    this.context.assertNext(63.2648);
-    this.context.assertNext(62.9457);
+  @ParameterizedTest(name = "EMA with barCount 10 [{index}] {0}")
+  @MethodSource("provideNumFactories")
+  void testEmaWithBarCount10(final NumFactory factory) {
+    this.context.withNumFactory(factory)
+        .withIndicator(NumericIndicator.closePrice().ema(10))
+        .fastForwardUntilStable()
+        .assertCurrent(63.6948)
+        .assertNext(63.2648)
+        .assertNext(62.9457);
   }
 
 
-  @Test
-  void externalData1() throws Exception {
+  @ParameterizedTest(name = "External data test [{index}] {0}")
+  @MethodSource("provideNumFactories")
+  void testExternalData(final NumFactory numFactory) throws Exception {
+    final var xls = new XLSIndicatorTest(this.getClass(), "EMA.xls", 6, numFactory);
     final var xlsContext = new TestContext();
-    xlsContext.withMarketEvents(this.xls.getMarketEvents());
+    xlsContext.withMarketEvents(xls.getMarketEvents());
 
     final var indicator = NumericIndicator.closePrice().ema(1);
-    final var expectedIndicator = this.xls.getIndicator(1);
-    xlsContext.withIndicators(indicator, expectedIndicator);
-
-    this.context.assertIndicatorEquals(expectedIndicator, indicator);
-    assertThat(indicator.getValue().doubleValue()).isCloseTo(329.0, Offset.offset(TestUtils.GENERAL_OFFSET));
+    final var expectedIndicator = xls.getIndicator(1);
+    xlsContext.withIndicators(indicator, expectedIndicator)
+        .assertIndicatorEquals(expectedIndicator, indicator)
+        .assertCurrent(329.0);
   }
-  //
-  //
-  //  @Test
-  //  void externalData3() throws Exception {
-  //    final BacktestBarSeries xlsSeries = this.xls.getMarketEvents();
-  //    final var indicator = NumericIndicator.closePrice(xlsSeries).ema(3);
-  //    final var expectedIndicator = this.xls.getIndicator(3);
-  //    xlsSeries.replaceStrategy(new MockStrategy(indicator, expectedIndicator));
-  //
-  //    assertIndicatorEquals(expectedIndicator, new TestIndicator<>(xlsSeries, indicator));
-  //    assertEquals(327.7748, indicator.getValue().doubleValue(), TestUtils.GENERAL_OFFSET);
-  //  }
-  //
-  //
-  //  @Test
-  //  void externalData13() throws Exception {
-  //    final BacktestBarSeries xlsSeries = this.xls.getMarketEvents();
-  //    final var indicator = NumericIndicator.closePrice(xlsSeries).ema(13);
-  //    final var expectedIndicator = this.xls.getIndicator(13);
-  //    xlsSeries.replaceStrategy(new MockStrategy(indicator, expectedIndicator));
-  //
-  //    assertIndicatorEquals(expectedIndicator, new TestIndicator<>(xlsSeries, indicator));
-  //    assertEquals(327.4076, indicator.getValue().doubleValue(), TestUtils.GENERAL_OFFSET);
-  //  }
 
+
+  @ParameterizedTest(name = "External data with bar count 3 [{index}] {0}")
+  @MethodSource("provideNumFactories")
+  void testExternalDataBarCount3(final NumFactory numFactory) throws Exception {
+    final var xls = new XLSIndicatorTest(this.getClass(), "EMA.xls", 6, numFactory);
+    final var xlsContext = new TestContext();
+    xlsContext.withMarketEvents(xls.getMarketEvents());
+
+    final var indicator = NumericIndicator.closePrice().ema(3);
+    final var expectedIndicator = xls.getIndicator(3);
+    xlsContext.withIndicators(indicator, expectedIndicator)
+        .assertIndicatorEquals(expectedIndicator, indicator)
+        .assertCurrent(327.7748);
+  }
+
+
+  @ParameterizedTest(name = "External data with bar count 13 [{index}] {0}")
+  @MethodSource("provideNumFactories")
+  void testExternalDataBarCount13(final NumFactory numFactory) throws Exception {
+    final var xls = new XLSIndicatorTest(this.getClass(), "EMA.xls", 6, numFactory);
+    final var xlsContext = new TestContext();
+    xlsContext.withMarketEvents(xls.getMarketEvents());
+
+    final var indicator = NumericIndicator.closePrice().ema(13);
+    final var expectedIndicator = xls.getIndicator(13);
+    xlsContext.withIndicators(indicator, expectedIndicator)
+        .assertIndicatorEquals(expectedIndicator, indicator)
+        .assertCurrent(327.4076);
+  }
 }

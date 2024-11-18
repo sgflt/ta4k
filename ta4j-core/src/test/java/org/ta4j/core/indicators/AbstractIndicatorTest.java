@@ -1,4 +1,4 @@
-/**
+/*
  * The MIT License (MIT)
  *
  * Copyright (c) 2017-2023 Ta4j Organization & respective
@@ -23,17 +23,13 @@
  */
 package org.ta4j.core.indicators;
 
-import java.util.List;
+import java.util.stream.Stream;
 
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
 import org.ta4j.core.num.DecimalNum;
 import org.ta4j.core.num.DecimalNumFactory;
 import org.ta4j.core.num.DoubleNum;
 import org.ta4j.core.num.DoubleNumFactory;
-import org.ta4j.core.num.Num;
 import org.ta4j.core.num.NumFactory;
-import org.ta4j.core.num.NumFactoryProvider;
 
 /**
  * Abstract test class to extend BarSeries, Indicator an other test cases. The
@@ -45,31 +41,17 @@ import org.ta4j.core.num.NumFactoryProvider;
  * @param <I> The generic class of the test indicator (could be
  *     <code>Num</code>, <code>Boolean</code>, ...)
  */
-@RunWith(Parameterized.class)
 public abstract class AbstractIndicatorTest<I> {
 
-  public final NumFactory numFactory;
-
-
-  @Parameterized.Parameters(name = "Test Case: {index} (0=DoubleNum, 1=DecimalNum)")
-  public static List<NumFactory> function() {
-    return List.of(DoubleNumFactory.getInstance(), DecimalNumFactory.getInstance());
-  }
-
-
   /**
-   * Constructor
+   * Provides the number factories to test with
    *
-   * @param numFactory the function to convert a Number into a Num implementation
-   *     (automatically inserted by Junit)
+   * @return Stream of NumFactory implementations
    */
-  public AbstractIndicatorTest(final NumFactory numFactory) {
-    this.numFactory = numFactory;
-    NumFactoryProvider.setDefaultNumFactory(numFactory);
-  }
-
-
-  protected Num numOf(final Number n) {
-    return this.numFactory.numOf(n);
+  protected static Stream<NumFactory> provideNumFactories() {
+    return Stream.of(
+        DoubleNumFactory.getInstance(),
+        DecimalNumFactory.getInstance()
+    );
   }
 }

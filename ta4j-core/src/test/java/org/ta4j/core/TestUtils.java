@@ -33,10 +33,6 @@ import java.math.BigDecimal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.ta4j.core.indicators.Indicator;
-import org.ta4j.core.indicators.numeric.NumericIndicator;
-import org.ta4j.core.mocks.MockIndicator;
-import org.ta4j.core.num.DecimalNum;
-import org.ta4j.core.num.NaN;
 import org.ta4j.core.num.Num;
 
 /**
@@ -51,35 +47,12 @@ public class TestUtils {
 
 
   public static void fastForward(final TestContext context, final int bars) {
-    for (int i = 0; i < bars - 1; i++) {
+    log.debug("Fast forward =====> {}", bars);
+    for (int i = 0; i < bars; i++) {
+      log.trace("\t =====> {}", i);
       context.advance();
     }
   }
-
-
-  public static void assertNextNaN(final TestContext context, final NumericIndicator indicator) {
-    context.advance();
-    assertNumEquals(NaN.NaN, indicator.getValue());
-  }
-
-
-  public static void assertNext(final TestContext context, final double expected) {
-    context.advance();
-    assertNumEquals(expected, context.getNumericIndicator(0).getValue());
-  }
-
-
-  public static void assertNextFalse(final TestContext context) {
-    context.advance();
-    assertFalse(context.getBooleanIndicator(0).getValue());
-  }
-
-
-  public static void assertNextTrue(final TestContext context) {
-    context.advance();
-    assertTrue(context.getBooleanIndicator(0).getValue());
-  }
-
 
   /**
    * Verifies that the actual {@code Num} value is equal to the given
@@ -179,63 +152,63 @@ public class TestUtils {
   }
 
 
-  /**
-   * Verifies that two indicators have the same size and values to an offset
-   *
-   * @param expected indicator of expected values
-   * @param actual indicator of actual values
-   */
-  public static void assertIndicatorEquals(
-      TestContext context,
-      final MockIndicator expected,
-      final MockIndicator actual
-  ) {
-    while (context.advance()) {
-
-      if (actual.isStable()) {
-        assertEquals(
-            String.format(
-                "Failed at index %s: %s",
-                expected.getBarSeries().getCurrentIndex(), actual
-            ),
-            expected.getValue().doubleValue(), actual.getValue().doubleValue(), GENERAL_OFFSET
-        );
-      }
-    }
-  }
-
-
-  private static void advanceIfTwoSeries(final TestIndicator<Num> expected, final TestIndicator<Num> actual) {
-    if (!expected.getBarSeries().equals(actual.getBarSeries())) {
-      actual.getBarSeries().advance();
-    }
-  }
-
-
-  /**
-   * Verifies that two indicators have either different size or different values
-   * to an offset
-   *
-   * @param expected indicator of expected values
-   * @param actual indicator of actual values
-   */
-  public static void assertIndicatorNotEquals(
-      final TestIndicator<Num> expected,
-      final TestIndicator<Num> actual
-  ) {
-    if (expected.getBarSeries().getBarCount() != actual.getBarSeries().getBarCount()) {
-      return;
-    }
-
-    while (expected.getBarSeries().advance()) {
-      advanceIfTwoSeries(expected, actual);
-
-      if (Math.abs(expected.getValue().doubleValue() - actual.getValue().doubleValue()) > GENERAL_OFFSET) {
-        return;
-      }
-    }
-    throw new AssertionError("Indicators match to " + GENERAL_OFFSET);
-  }
+//  /**
+//   * Verifies that two indicators have the same size and values to an offset
+//   *
+//   * @param expected indicator of expected values
+//   * @param actual indicator of actual values
+//   */
+//  public static void assertIndicatorEquals(
+//      TestContext context,
+//      final MockIndicator expected,
+//      final MockIndicator actual
+//  ) {
+//    while (context.advance()) {
+//
+//      if (actual.isStable()) {
+//        assertEquals(
+//            String.format(
+//                "Failed at index %s: %s",
+//                expected.getBarSeries().getCurrentIndex(), actual
+//            ),
+//            expected.getValue().doubleValue(), actual.getValue().doubleValue(), GENERAL_OFFSET
+//        );
+//      }
+//    }
+//  }
+//
+//
+//  private static void advanceIfTwoSeries(final TestIndicator<Num> expected, final TestIndicator<Num> actual) {
+//    if (!expected.getBarSeries().equals(actual.getBarSeries())) {
+//      actual.getBarSeries().advance();
+//    }
+//  }
+//
+//
+//  /**
+//   * Verifies that two indicators have either different size or different values
+//   * to an offset
+//   *
+//   * @param expected indicator of expected values
+//   * @param actual indicator of actual values
+//   */
+//  public static void assertIndicatorNotEquals(
+//      final TestIndicator<Num> expected,
+//      final TestIndicator<Num> actual
+//  ) {
+//    if (expected.getBarSeries().getBarCount() != actual.getBarSeries().getBarCount()) {
+//      return;
+//    }
+//
+//    while (expected.getBarSeries().advance()) {
+//      advanceIfTwoSeries(expected, actual);
+//
+//      if (Math.abs(expected.getValue().doubleValue() - actual.getValue().doubleValue()) > GENERAL_OFFSET) {
+//        return;
+//      }
+//    }
+//    throw new AssertionError("Indicators match to " + GENERAL_OFFSET);
+//  }
 
 
   /**
@@ -284,78 +257,78 @@ public class TestUtils {
   public static void assertNumNotEquals(final double expected, final Num actual) {
     assertNotEquals(expected, actual.doubleValue(), GENERAL_OFFSET);
   }
+//
+//
+//  /**
+//   * Verifies that two indicators have the same size and values
+//   *
+//   * @param expected indicator of expected values
+//   * @param actual indicator of actual values
+//   */
+//  public static void assertIndicatorEquals(
+//      final TestIndicator<Num> expected,
+//      final TestIndicator<Num> actual,
+//      final Num delta
+//  ) {
+//    assertEquals(
+//        "Size does not match,",
+//        expected.getBarSeries().getBarCount(),
+//        actual.getBarSeries().getBarCount()
+//    );
+//    while (expected.getBarSeries().advance()) {
+//      // convert to DecimalNum via String (auto-precision) avoids Cast Class
+//      // Exception
+//      final Num exp = DecimalNum.valueOf(expected.getValue().toString());
+//      final Num act = DecimalNum.valueOf(actual.getValue().toString());
+//      final Num result = exp.minus(act).abs();
+//      if (result.isGreaterThan(delta)) {
+//        log.debug("{} expected does not match", exp);
+//        log.debug("{} actual", act);
+//        log.debug("{} offset", delta);
+//        String expString = exp.toString();
+//        String actString = act.toString();
+//        final int minLen = Math.min(expString.length(), actString.length());
+//        if (expString.length() > minLen) {
+//          expString = expString.substring(0, minLen) + "..";
+//        }
+//        if (actString.length() > minLen) {
+//          actString = actString.substring(0, minLen) + "..";
+//        }
+//        throw new AssertionError(String.format(
+//            "Failed at index %s: expected %s but actual was %s",
+//            expected.getBarSeries().getCurrentIndex(), expString, actString
+//        ));
+//      }
+//    }
+//  }
 
-
-  /**
-   * Verifies that two indicators have the same size and values
-   *
-   * @param expected indicator of expected values
-   * @param actual indicator of actual values
-   */
-  public static void assertIndicatorEquals(
-      final TestIndicator<Num> expected,
-      final TestIndicator<Num> actual,
-      final Num delta
-  ) {
-    assertEquals(
-        "Size does not match,",
-        expected.getBarSeries().getBarCount(),
-        actual.getBarSeries().getBarCount()
-    );
-    while (expected.getBarSeries().advance()) {
-      // convert to DecimalNum via String (auto-precision) avoids Cast Class
-      // Exception
-      final Num exp = DecimalNum.valueOf(expected.getValue().toString());
-      final Num act = DecimalNum.valueOf(actual.getValue().toString());
-      final Num result = exp.minus(act).abs();
-      if (result.isGreaterThan(delta)) {
-        log.debug("{} expected does not match", exp);
-        log.debug("{} actual", act);
-        log.debug("{} offset", delta);
-        String expString = exp.toString();
-        String actString = act.toString();
-        final int minLen = Math.min(expString.length(), actString.length());
-        if (expString.length() > minLen) {
-          expString = expString.substring(0, minLen) + "..";
-        }
-        if (actString.length() > minLen) {
-          actString = actString.substring(0, minLen) + "..";
-        }
-        throw new AssertionError(String.format(
-            "Failed at index %s: expected %s but actual was %s",
-            expected.getBarSeries().getCurrentIndex(), expString, actString
-        ));
-      }
-    }
-  }
-
-
-  /**
-   * Verifies that two indicators have either different size or different values
-   * to an offset
-   *
-   * @param expected indicator of expected values
-   * @param actual indicator of actual values
-   * @param delta num offset to which the indicators must be different
-   */
-  public static void assertIndicatorNotEquals(
-      final TestIndicator<Num> expected,
-      final TestIndicator<Num> actual,
-      final Num delta
-  ) {
-    if (expected.getBarSeries().getBarCount() != actual.getBarSeries().getBarCount()) {
-      return;
-    }
-    while (expected.getBarSeries().advance()) {
-      final Num exp = DecimalNum.valueOf(expected.getValue().toString());
-      final Num act = DecimalNum.valueOf(actual.getValue().toString());
-      final Num result = exp.minus(act).abs();
-      if (result.isGreaterThan(delta)) {
-        return;
-      }
-    }
-    throw new AssertionError("Indicators match to " + delta);
-  }
+//
+//  /**
+//   * Verifies that two indicators have either different size or different values
+//   * to an offset
+//   *
+//   * @param expected indicator of expected values
+//   * @param actual indicator of actual values
+//   * @param delta num offset to which the indicators must be different
+//   */
+//  public static void assertIndicatorNotEquals(
+//      final TestIndicator<Num> expected,
+//      final TestIndicator<Num> actual,
+//      final Num delta
+//  ) {
+//    if (expected.getBarSeries().getBarCount() != actual.getBarSeries().getBarCount()) {
+//      return;
+//    }
+//    while (expected.getBarSeries().advance()) {
+//      final Num exp = DecimalNum.valueOf(expected.getValue().toString());
+//      final Num act = DecimalNum.valueOf(actual.getValue().toString());
+//      final Num result = exp.minus(act).abs();
+//      if (result.isGreaterThan(delta)) {
+//        return;
+//      }
+//    }
+//    throw new AssertionError("Indicators match to " + delta);
+//  }
 
 
   public static void assertUnstable(final Indicator<?> indicator) {

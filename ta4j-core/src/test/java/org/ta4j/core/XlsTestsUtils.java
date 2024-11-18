@@ -181,11 +181,11 @@ public class XlsTestsUtils {
           new CandleReceived(
               duration,
               endDateTime,
-              Double.parseDouble(cellValues[1].toString()), // open
-              Double.parseDouble(cellValues[2].toString()), // high
-              Double.parseDouble(cellValues[3].toString()), // low
-              Double.parseDouble(cellValues[4].toString()), // close
-              Double.parseDouble(cellValues[5].toString()), // volume
+              cellValues[1].getNumberValue(), // open
+              cellValues[2].getNumberValue(), // high
+              cellValues[3].getNumberValue(), // low
+              cellValues[4].getNumberValue(), // close
+              cellValues[5].getNumberValue(), // volume
               0.0 // amount
           )
       );

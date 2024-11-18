@@ -1,14 +1,15 @@
 package org.ta4j.core;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.ta4j.core.TestUtils.GENERAL_OFFSET;
+import static org.ta4j.core.TestUtils.assertNumEquals;
 
-import java.time.Duration;
-import java.time.ZonedDateTime;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 import java.util.stream.Stream;
 
+import org.assertj.core.data.Offset;
 import org.ta4j.core.backtest.BacktestBarSeriesBuilder;
 import org.ta4j.core.events.CandleReceived;
 import org.ta4j.core.events.MarketEvent;
@@ -16,17 +17,19 @@ import org.ta4j.core.indicators.Indicator;
 import org.ta4j.core.indicators.IndicatorContext;
 import org.ta4j.core.indicators.bool.BooleanIndicator;
 import org.ta4j.core.indicators.numeric.NumericIndicator;
+import org.ta4j.core.mocks.MockMarketEventBuilder;
+import org.ta4j.core.num.NaN;
 import org.ta4j.core.num.Num;
+import org.ta4j.core.num.NumFactory;
 
 /**
  * @author Lukáš Kvídera
  */
 public class TestContext {
 
-
   private Queue<MarketEvent> marketEvents;
   private final IndicatorContext indicatorContext = IndicatorContext.empty();
-  private final BarSeries barSeries = new BacktestBarSeriesBuilder().build();
+  private BarSeries barSeries = new BacktestBarSeriesBuilder().withIndicatorContext(this.indicatorContext).build();
 
 
   public TestContext withMarketEvents(final List<MarketEvent> marketEvents) {
@@ -36,23 +39,7 @@ public class TestContext {
 
 
   public TestContext withDefaultMarketEvents() {
-    this.marketEvents = new LinkedList<>();
-
-    for (double i = 0d; i < 5000; i++) {
-      this.marketEvents.add(
-          new CandleReceived(
-              Duration.ofMinutes(1),
-              ZonedDateTime.now().minusMinutes((long) (5001 - i)).toInstant(),
-              i,
-              i + 1,
-              i + 2,
-              i + 3,
-              i + 4,
-              i + 5
-          )
-      );
-    }
-
+    this.marketEvents = new LinkedList<>(new MockMarketEventBuilder().withDefaultData().build());
     return this;
   }
 
@@ -65,6 +52,16 @@ public class TestContext {
 
   public TestContext withIndicators(final Indicator<?>... indicator) {
     Stream.of(indicator).forEach(this::withIndicator);
+    return this;
+  }
+
+
+  public TestContext withNumFactory(final NumFactory factory) {
+    this.barSeries =
+        new BacktestBarSeriesBuilder()
+            .withNumFactory(factory)
+            .withIndicatorContext(this.indicatorContext)
+            .build();
     return this;
   }
 
@@ -94,23 +91,66 @@ public class TestContext {
   }
 
 
-  public void fastForward(final int bars) {
-    TestUtils.fastForward(this, bars);
-  }
+  public TestContext fastForwardUntilStable() {
+    while (this.indicatorContext.isNotEmpty() && !this.indicatorContext.isStable()) {
+      TestUtils.fastForward(this, 1);
+    }
 
-
-  public TestContext assertNext(final double expected) {
-    TestUtils.assertNext(this, expected);
     return this;
   }
 
 
-  public void assertIndicatorEquals(final Indicator<Num> expectedIndicator, final Indicator<Num> indicator) {
+  public static void assertNextNaN(final TestContext context, final NumericIndicator indicator) {
+    context.advance();
+    assertNumEquals(NaN.NaN, indicator.getValue());
+  }
+
+
+  public static void assertNextFalse(final TestContext context) {
+    context.advance();
+    assertThat(context.getBooleanIndicator(0).getValue()).isFalse();
+  }
+
+
+  public static void assertNextTrue(final TestContext context) {
+    context.advance();
+    assertThat(context.getBooleanIndicator(0).getValue()).isTrue();
+  }
+
+
+  /**
+   * @param bars how many bars should be skipped.
+   *
+   * @return this
+   */
+  public TestContext fastForward(final int bars) {
+    TestUtils.fastForward(this, bars);
+    return this;
+  }
+
+
+  public TestContext assertCurrent(final double expected) {
+    assertNumEquals(expected, getNumericIndicator(0).getValue());
+    return this;
+  }
+
+
+  public TestContext assertNext(final double expected) {
+    advance();
+    assertNumEquals(expected, getNumericIndicator(0).getValue());
+    return this;
+  }
+
+
+  public TestContext assertIndicatorEquals(final Indicator<Num> expectedIndicator, final Indicator<Num> indicator) {
     while (advance()) {
-      if (Math.abs(expectedIndicator.getValue().doubleValue() - indicator.getValue().doubleValue()) > GENERAL_OFFSET) {
-        return;
-      }
+      assertThat(indicator.getValue().doubleValue())
+          .isCloseTo(
+              expectedIndicator.getValue().doubleValue(),
+              Offset.offset(GENERAL_OFFSET)
+          );
     }
-    throw new AssertionError("Indicators match to " + GENERAL_OFFSET);
+
+    return this;
   }
 }
