@@ -35,6 +35,16 @@ public class TestContext {
   private BarSeries barSeries = new BacktestBarSeriesBuilder().withIndicatorContext(this.indicatorContext).build();
 
 
+  public TestContext withClosePrices(final double... prices) {
+    this.marketEvents = new LinkedList<>(
+        new MockMarketEventBuilder()
+            .withCandleClosePrices(prices)
+            .build()
+    );
+    return this;
+  }
+
+
   public TestContext withMarketEvents(final List<MarketEvent> marketEvents) {
     this.marketEvents = new LinkedList<>(marketEvents);
     return this;
