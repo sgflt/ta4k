@@ -159,8 +159,6 @@ public class BacktestBarSeries implements BarSeries {
         .volume(candleReceived.volume())
         .amount(candleReceived.amount())
         .add();
-
-    advance();
   }
 
 
