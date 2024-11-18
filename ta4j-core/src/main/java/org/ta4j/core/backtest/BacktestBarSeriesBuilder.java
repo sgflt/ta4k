@@ -41,7 +41,7 @@ public class BacktestBarSeriesBuilder {
   private String name;
   private NumFactory numFactory = NumFactoryProvider.getDefaultNumFactory();
   private BarBuilderFactory barBuilderFactory = new BacktestBarBuilderFactory();
-  private IndicatorContext indicatorContext;
+  private IndicatorContext indicatorContext = IndicatorContext.empty();
 
 
   /** Constructor to build a {@code BacktestBarSeries}. */
