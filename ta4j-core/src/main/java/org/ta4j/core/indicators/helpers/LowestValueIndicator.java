@@ -43,9 +43,8 @@ public class LowestValueIndicator extends NumericIndicator {
   private final int barCount;
 
   /** circular array */
-  private final Num[] window;
+  private final Num[] window; // TODO CircularNumArray
   private final Deque<Integer> deque = new LinkedList<>();
-  private Num value;
   private int barsPassed;
 
 
