@@ -47,7 +47,7 @@ public class AroonDownIndicator extends NumericIndicator {
   private final Indicator<Num> lowIndicator;
 
   private int index;
-  private final ArrayList<Num> previousValues;
+  private final ArrayList<Num> previousValues; // TODO CircularNumArray
 
 
   /**
@@ -65,7 +65,7 @@ public class AroonDownIndicator extends NumericIndicator {
       this.previousValues.add(NaN.NaN);
     }
     this.lowIndicator = lowIndicator;
-    this.lowestLowValueIndicator = new LowestValueIndicator(lowIndicator, barCount + 1);
+    this.lowestLowValueIndicator = lowIndicator.lowest(barCount + 1);
   }
 
 
@@ -122,7 +122,7 @@ public class AroonDownIndicator extends NumericIndicator {
 
   @Override
   public boolean isStable() {
-    return this.index > this.barCount && this.lowIndicator.isStable() && this.lowestLowValueIndicator.isStable();
+    return this.index >= this.barCount && this.lowIndicator.isStable() && this.lowestLowValueIndicator.isStable();
   }
 
 
