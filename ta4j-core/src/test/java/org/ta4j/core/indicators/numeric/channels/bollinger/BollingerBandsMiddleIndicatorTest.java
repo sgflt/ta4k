@@ -23,42 +23,37 @@
  */
 package org.ta4j.core.indicators.numeric.channels.bollinger;
 
-import static junit.framework.TestCase.assertEquals;
-
-import org.junit.Before;
-import org.junit.Test;
-import org.ta4j.core.backtest.BacktestBarSeries;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.ta4j.core.TestContext;
 import org.ta4j.core.indicators.AbstractIndicatorTest;
-import org.ta4j.core.indicators.candles.price.ClosePriceIndicator;
-import org.ta4j.core.indicators.numeric.average.SMAIndicator;
-import org.ta4j.core.mocks.MockBarSeriesBuilder;
+import org.ta4j.core.indicators.numeric.Indicators;
 import org.ta4j.core.num.Num;
-import org.ta4j.core.num.NumFactory;
 
-public class BollingerBandsMiddleIndicatorTest extends AbstractIndicatorTest<Num> {
-  private BacktestBarSeries data;
+class BollingerBandsMiddleIndicatorTest extends AbstractIndicatorTest<Num> {
 
 
-  public BollingerBandsMiddleIndicatorTest(final NumFactory numFactory) {
-    super(numFactory);
+  private TestContext testContext;
+
+
+  @BeforeEach
+  void setUp() {
+    this.testContext = new TestContext();
+    this.testContext.withCandlePrices(
+        1, 2, 3, 4, 3, 4, 5, 4, 3, 3, 4, 3, 2
+    );
   }
 
 
-  @Before
-  public void setUp() {
-    this.data = new MockBarSeriesBuilder().withNumFactory(this.numFactory)
-        .withData(1, 2, 3, 4, 3, 4, 5, 4, 3, 3, 4, 3, 2)
-        .build();
-  }
-
-
-  @Test
-  public void bollingerBandsMiddleUsingSMA() {
-    final var sma = new SMAIndicator(new ClosePriceIndicator(this.data), 3);
+  @ParameterizedTest(name = "Middle bollinger band derived from SMA [{index}] {0}")
+  @MethodSource("provideNumFactories")
+  void bollingerBandsMiddleUsingSMA() {
+    final var sma = Indicators.closePrice().sma(3);
     final var bbmSMA = new BollingerBandsMiddleIndicator(sma);
 
-    while (this.data.advance()) {
-      assertEquals(sma.getValue(), bbmSMA.getValue());
-    }
+    this.testContext.withIndicators(bbmSMA, sma)
+        .fastForwardUntilStable()
+        .assertIndicatorEquals(sma, bbmSMA);
   }
 }
