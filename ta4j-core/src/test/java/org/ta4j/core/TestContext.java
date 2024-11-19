@@ -83,6 +83,13 @@ public class TestContext {
   }
 
 
+  /**
+   * This method should be called before creation of any indicator to preserve precision.
+   *
+   * @param factory that wil build {@link Num}
+   *
+   * @return this
+   */
   public TestContext withNumFactory(final NumFactory factory) {
     this.barSeries =
         new BacktestBarSeriesBuilder()
