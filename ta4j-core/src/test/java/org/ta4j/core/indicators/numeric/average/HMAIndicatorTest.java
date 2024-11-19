@@ -2,6 +2,8 @@
  * The MIT License (MIT)
  *
  * Copyright (c) 2024 Lukáš Kvídera
+ * Copyright (c) 2017-2024 Ta4j Organization & respective
+ * authors (see AUTHORS)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -22,67 +24,53 @@
  */
 package org.ta4j.core.indicators.numeric.average;
 
-import static org.ta4j.core.TestUtils.assertNumEquals;
-
-import org.junit.Before;
-import org.junit.Test;
-import org.ta4j.core.MockStrategy;
-import org.ta4j.core.backtest.BacktestBarSeries;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.ta4j.core.TestContext;
 import org.ta4j.core.indicators.AbstractIndicatorTest;
-import org.ta4j.core.indicators.candles.price.ClosePriceIndicator;
-import org.ta4j.core.mocks.MockBarSeriesBuilder;
+import org.ta4j.core.indicators.numeric.Indicators;
 import org.ta4j.core.num.Num;
 import org.ta4j.core.num.NumFactory;
 
-public class HMAIndicatorTest extends AbstractIndicatorTest<Num> {
+class HMAIndicatorTest extends AbstractIndicatorTest<Num> {
 
-    private BacktestBarSeries data;
 
-    public HMAIndicatorTest(final NumFactory numFunction) {
-        super(numFunction);
-    }
+  private TestContext testContext;
 
-    @Before
-    public void setUp() {
-      this.data = new MockBarSeriesBuilder().withNumFactory(this.numFactory)
-                .withData(84.53, 87.39, 84.55, 82.83, 82.58, 83.74, 83.33, 84.57, 86.98, 87.10, 83.11, 83.60, 83.66,
-                        82.76, 79.22, 79.03, 78.18, 77.42, 74.65, 77.48, 76.87)
-                .build();
-    }
 
-    @Test
-    public void hmaUsingBarCount9UsingClosePrice() {
-        // Example from
-        // http://traders.com/Documentation/FEEDbk_docs/2010/12/TradingIndexesWithHullMA.xls
-        final var hma = new HMAIndicator(new ClosePriceIndicator(this.data), 9);
+  @BeforeEach
+  void setUp() {
+    this.testContext = new TestContext();
+    this.testContext.withCandlePrices(
+        84.53, 87.39, 84.55, 82.83, 82.58, 83.74, 83.33, 84.57, 86.98, 87.10, 83.11, 83.60, 83.66,
+        82.76, 79.22, 79.03, 78.18, 77.42, 74.65, 77.48, 76.87
+    );
+  }
 
-      this.data.replaceStrategy(new MockStrategy(hma));
 
-      for (int i = 0; i < 11; i++) {
-        this.data.advance();
-      }
-
-      assertNumEquals(86.3204, hma.getValue());
-      this.data.advance();
-      assertNumEquals(85.3705, hma.getValue());
-      this.data.advance();
-      assertNumEquals(84.1044, hma.getValue());
-      this.data.advance();
-      assertNumEquals(83.0197, hma.getValue());
-      this.data.advance();
-      assertNumEquals(81.3913, hma.getValue());
-      this.data.advance();
-      assertNumEquals(79.6511, hma.getValue());
-      this.data.advance();
-      assertNumEquals(78.0443, hma.getValue());
-      this.data.advance();
-      assertNumEquals(76.8832, hma.getValue());
-      this.data.advance();
-      assertNumEquals(75.5363, hma.getValue());
-      this.data.advance();
-      assertNumEquals(75.1713, hma.getValue());
-      this.data.advance();
-      assertNumEquals(75.3597, hma.getValue());
-    }
-
+  @ParameterizedTest(name = "HMA [{index}] {0}")
+  @MethodSource("provideNumFactories")
+  void hmaUsingBarCount9UsingClosePrice(final NumFactory numFactory) {
+    this.testContext.withNumFactory(numFactory);
+    // Example from
+    // http://traders.com/Documentation/FEEDbk_docs/2010/12/TradingIndexesWithHullMA.xls
+    final var hma = Indicators.closePrice().hma(9);
+    this.testContext.withIndicator(hma)
+        .fastForwardUntilStable()
+        .assertCurrent(86.1990)
+        .assertNext(86.5763)
+        .assertNext(86.3204)
+        .assertNext(85.3705)
+        .assertNext(84.1044)
+        .assertNext(83.0197)
+        .assertNext(81.3913)
+        .assertNext(79.6511)
+        .assertNext(78.0443)
+        .assertNext(76.8832)
+        .assertNext(75.5363)
+        .assertNext(75.1713)
+        .assertNext(75.3597)
+    ;
+  }
 }
