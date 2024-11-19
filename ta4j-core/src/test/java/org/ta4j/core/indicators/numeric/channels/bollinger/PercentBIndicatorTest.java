@@ -23,59 +23,52 @@
  */
 package org.ta4j.core.indicators.numeric.channels.bollinger;
 
-import static org.ta4j.core.TestUtils.assertNext;
-import static org.ta4j.core.TestUtils.fastForward;
-
-import org.junit.Before;
-import org.junit.Test;
-import org.ta4j.core.MockStrategy;
-import org.ta4j.core.backtest.BacktestBarSeries;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.ta4j.core.TestContext;
 import org.ta4j.core.indicators.AbstractIndicatorTest;
-import org.ta4j.core.indicators.candles.price.ClosePriceIndicator;
-import org.ta4j.core.mocks.MockBarSeriesBuilder;
+import org.ta4j.core.indicators.numeric.Indicators;
 import org.ta4j.core.num.Num;
 import org.ta4j.core.num.NumFactory;
 
-public class PercentBIndicatorTest extends AbstractIndicatorTest<Num> {
-
-  private BacktestBarSeries data;
+class PercentBIndicatorTest extends AbstractIndicatorTest<Num> {
 
 
-  public PercentBIndicatorTest(final NumFactory numFactory) {
-    super(numFactory);
+  private TestContext testContext;
+
+
+  @BeforeEach
+  void setUp() {
+    this.testContext = new TestContext();
+    this.testContext.withCandlePrices(10, 12, 15, 14, 17, 20, 21, 20, 20, 19, 20, 17, 12, 12, 9, 8, 9, 10, 9, 10);
   }
 
 
-  @Before
-  public void setUp() {
-    this.data = new MockBarSeriesBuilder().withNumFactory(this.numFactory)
-        .withData(10, 12, 15, 14, 17, 20, 21, 20, 20, 19, 20, 17, 12, 12, 9, 8, 9, 10, 9, 10)
-        .build();
-  }
+  @ParameterizedTest(name = "%BI [{index}] {0}")
+  @MethodSource("provideNumFactories")
+  void percentBUsingSMAAndStandardDeviation(final NumFactory numFactory) {
+    this.testContext.withNumFactory(numFactory);
 
-
-  @Test
-  public void percentBUsingSMAAndStandardDeviation() {
-
-    final var pcb = new PercentBIndicator(new ClosePriceIndicator(this.data), 5, 2);
-    this.data.replaceStrategy(new MockStrategy(pcb));
-
-    fastForward(this.data, 5);
-    assertNext(this.data, 0.8146, pcb);
-    assertNext(this.data, 0.8607, pcb);
-    assertNext(this.data, 0.7951, pcb);
-    assertNext(this.data, 0.6388, pcb);
-    assertNext(this.data, 0.5659, pcb);
-    assertNext(this.data, 0.1464, pcb);
-    assertNext(this.data, 0.5000, pcb);
-    assertNext(this.data, 0.0782, pcb);
-    assertNext(this.data, 0.0835, pcb);
-    assertNext(this.data, 0.2374, pcb);
-    assertNext(this.data, 0.2169, pcb);
-    assertNext(this.data, 0.2434, pcb);
-    assertNext(this.data, 0.3664, pcb);
-    assertNext(this.data, 0.5659, pcb);
-    assertNext(this.data, 0.5000, pcb);
-    assertNext(this.data, 0.7391, pcb);
+    final var pcb = new PercentBIndicator(Indicators.closePrice(), 5, 2);
+    this.testContext.withIndicator(pcb)
+        .fastForwardUntilStable()
+        .assertCurrent(0.8146)
+        .assertNext(0.8607)
+        .assertNext(0.7951)
+        .assertNext(0.6388)
+        .assertNext(0.5659)
+        .assertNext(0.1464)
+        .assertNext(0.5000)
+        .assertNext(0.0782)
+        .assertNext(0.0835)
+        .assertNext(0.2374)
+        .assertNext(0.2169)
+        .assertNext(0.2434)
+        .assertNext(0.3664)
+        .assertNext(0.5659)
+        .assertNext(0.5000)
+        .assertNext(0.7391)
+    ;
   }
 }
