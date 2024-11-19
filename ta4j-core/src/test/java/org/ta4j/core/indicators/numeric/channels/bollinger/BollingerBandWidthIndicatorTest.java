@@ -23,71 +23,51 @@
  */
 package org.ta4j.core.indicators.numeric.channels.bollinger;
 
-import static org.ta4j.core.TestUtils.assertNext;
-import static org.ta4j.core.TestUtils.fastForward;
-
-import org.junit.Before;
-import org.junit.Test;
-import org.ta4j.core.MockStrategy;
-import org.ta4j.core.backtest.BacktestBarSeries;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.ta4j.core.TestContext;
 import org.ta4j.core.indicators.AbstractIndicatorTest;
-import org.ta4j.core.indicators.candles.price.ClosePriceIndicator;
-import org.ta4j.core.indicators.numeric.average.SMAIndicator;
-import org.ta4j.core.indicators.numeric.statistics.StandardDeviationIndicator;
-import org.ta4j.core.mocks.MockBarSeriesBuilder;
 import org.ta4j.core.num.Num;
-import org.ta4j.core.num.NumFactory;
 
-public class BollingerBandWidthIndicatorTest extends AbstractIndicatorTest<Num> {
-
-  private ClosePriceIndicator closePrice;
-  private BacktestBarSeries data;
+class BollingerBandWidthIndicatorTest extends AbstractIndicatorTest<Num> {
 
 
-  public BollingerBandWidthIndicatorTest(final NumFactory numFactory) {
-    super(numFactory);
+  private TestContext testContext;
+
+
+  @BeforeEach
+  void setUp() {
+    this.testContext = new TestContext();
+    this.testContext.withCandlePrices(10, 12, 15, 14, 17, 20, 21, 20, 20, 19, 20, 17, 12, 12, 9, 8, 9, 10, 9, 10);
   }
 
 
-  @Before
-  public void setUp() {
-    this.data = new MockBarSeriesBuilder().withNumFactory(this.numFactory)
-        .withData(10, 12, 15, 14, 17, 20, 21, 20, 20, 19, 20, 17, 12, 12, 9, 8, 9, 10, 9, 10)
-        .build();
-    this.closePrice = new ClosePriceIndicator(this.data);
-  }
+  @ParameterizedTest(name = "Bollinger bands width [{index}] {0}")
+  @MethodSource("provideNumFactories")
+  void bollingerBandWidthUsingSMAAndStandardDeviation() {
 
+    final var bbf = new BollingerBandFacade(5, 2);
+    final var bandwidth = bbf.bandwidth();
 
-  @Test
-  public void bollingerBandWidthUsingSMAAndStandardDeviation() {
-
-    final var sma = new SMAIndicator(this.closePrice, 5);
-    final var standardDeviation = new StandardDeviationIndicator(this.closePrice, 5);
-
-    final var bbmSMA = new BollingerBandsMiddleIndicator(sma);
-    final var bbuSMA = new BollingerBandsUpperIndicator(bbmSMA, standardDeviation);
-    final var bblSMA = new BollingerBandsLowerIndicator(bbmSMA, standardDeviation);
-
-    final var bandwidth = new BollingerBandWidthIndicator(bbuSMA, bbmSMA, bblSMA);
-
-    this.data.replaceStrategy(new MockStrategy(bandwidth, bbuSMA, bbmSMA, bblSMA, standardDeviation, sma));
-
-    fastForward(this.data, 5);
-    assertNext(this.data, 79.4662, bandwidth);
-    assertNext(this.data, 78.1946, bandwidth);
-    assertNext(this.data, 70.1055, bandwidth);
-    assertNext(this.data, 62.6298, bandwidth);
-    assertNext(this.data, 30.9505, bandwidth);
-    assertNext(this.data, 14.1421, bandwidth);
-    assertNext(this.data, 14.1421, bandwidth);
-    assertNext(this.data, 27.1633, bandwidth);
-    assertNext(this.data, 76.3989, bandwidth);
-    assertNext(this.data, 95.1971, bandwidth);
-    assertNext(this.data, 126.1680, bandwidth);
-    assertNext(this.data, 120.9357, bandwidth);
-    assertNext(this.data, 74.8331, bandwidth);
-    assertNext(this.data, 63.1906, bandwidth);
-    assertNext(this.data, 31.4270, bandwidth);
-    assertNext(this.data, 36.3766, bandwidth);
+    this.testContext.withIndicators(bandwidth)
+        .fastForwardUntilStable()
+        .assertCurrent(79.4662)
+        .assertNext(78.1946)
+        .assertNext(70.1055)
+        .assertNext(62.6298)
+        .assertNext(30.9505)
+        .assertNext(14.1421)
+        .assertNext(14.1421)
+        .assertNext(27.1633)
+        .assertNext(76.3989)
+        .assertNext(95.1971)
+        .assertNext(126.1680)
+        .assertNext(120.9357)
+        .assertNext(74.8331)
+        .assertNext(63.1906)
+        .assertNext(31.4270)
+        .assertNext(36.3766)
+    ;
   }
 }
