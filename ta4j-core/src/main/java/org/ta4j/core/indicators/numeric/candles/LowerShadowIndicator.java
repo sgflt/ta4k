@@ -21,38 +21,52 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.ta4j.core.indicators.candles.price;
+package org.ta4j.core.indicators.numeric.candles;
 
 import org.ta4j.core.Bar;
 import org.ta4j.core.indicators.SeriesRelatedNumericIndicator;
+import org.ta4j.core.num.Num;
 import org.ta4j.core.num.NumFactory;
 
 /**
- * The high price indicator.
+ * Lower shadow height indicator.
  *
  * <p>
- * Returns the high price of a bar.
+ * Provides the (absolute) difference between the low price and the lowest price
+ * of the candle body. I.e.: low price - min(open price, close price)
+ *
+ * @see <a href=
+ *     "http://stockcharts.com/school/doku.php?id=chart_school:chart_analysis:introduction_to_candlesticks#formation">
+ *     http://stockcharts.com/school/doku.php?id=chart_school:chart_analysis:introduction_to_candlesticks#formation</a>
  */
-public class HighPriceIndicator extends SeriesRelatedNumericIndicator {
+public class LowerShadowIndicator extends SeriesRelatedNumericIndicator {
 
   /**
    * Constructor.
    *
    * @param numFactory the bar numFactory
    */
-  public HighPriceIndicator(final NumFactory numFactory) {
+  public LowerShadowIndicator(final NumFactory numFactory) {
     super(numFactory);
+  }
+
+
+  protected Num calculate(final Bar bar) {
+    final var openPrice = bar.openPrice();
+    final var closePrice = bar.closePrice();
+
+    if (closePrice.isGreaterThan(openPrice)) {
+      // Bullish
+      return openPrice.minus(bar.lowPrice());
+    }
+
+    // Bearish
+    return closePrice.minus(bar.lowPrice());
   }
 
 
   @Override
   public void updateState(final Bar bar) {
-    this.value = bar.highPrice();
-  }
-
-
-  @Override
-  public String toString() {
-    return "High() => %s".formatted(getValue());
+    this.value = calculate(bar);
   }
 }

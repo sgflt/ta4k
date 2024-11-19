@@ -21,7 +21,7 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.ta4j.core.indicators.candles;
+package org.ta4j.core.indicators.numeric.candles;
 
 import org.ta4j.core.Bar;
 import org.ta4j.core.BarSeries;
@@ -29,12 +29,13 @@ import org.ta4j.core.indicators.SeriesRelatedBooleanIndicator;
 import org.ta4j.core.num.Num;
 
 /**
- * Bearish Harami pattern indicator.
+ * Bullish engulfing pattern indicator.
  *
- * @see <a href="http://www.investopedia.com/terms/b/bearishharami.asp">
- *     http://www.investopedia.com/terms/b/bearishharami.asp</a>
+ * @see <a href=
+ *     "http://www.investopedia.com/terms/b/bullishengulfingpattern.asp">
+ *     http://www.investopedia.com/terms/b/bullishengulfingpattern.asp</a>
  */
-public class BearishHaramiIndicator extends SeriesRelatedBooleanIndicator {
+public class BullishEngulfingIndicator extends SeriesRelatedBooleanIndicator {
 
   private Boolean value;
   private Bar previousBar;
@@ -45,7 +46,7 @@ public class BearishHaramiIndicator extends SeriesRelatedBooleanIndicator {
    *
    * @param series the bar series
    */
-  public BearishHaramiIndicator(final BarSeries series) {
+  public BullishEngulfingIndicator(final BarSeries series) {
     super(series);
   }
 
@@ -53,22 +54,24 @@ public class BearishHaramiIndicator extends SeriesRelatedBooleanIndicator {
   protected Boolean calculate(final Bar bar) {
     if (this.value == null) {
       this.previousBar = bar;
-      // Harami is a 2-candle pattern
+      // Engulfing is a 2-candle pattern
       return false;
     }
+
     final Bar prevBar = this.previousBar;
     this.previousBar = bar;
 
-    if (prevBar.isBullish() && bar.isBearish()) {
+    if (prevBar.isBearish() && bar.isBullish()) {
       final Num prevOpenPrice = prevBar.openPrice();
       final Num prevClosePrice = prevBar.closePrice();
       final Num currOpenPrice = bar.openPrice();
       final Num currClosePrice = bar.closePrice();
-      return currOpenPrice.isGreaterThan(prevOpenPrice)
+      return currOpenPrice.isLessThan(prevOpenPrice)
              && currOpenPrice.isLessThan(prevClosePrice)
              && currClosePrice.isGreaterThan(prevOpenPrice)
-             && currClosePrice.isLessThan(prevClosePrice);
+             && currClosePrice.isGreaterThan(prevClosePrice);
     }
+
     return false;
   }
 

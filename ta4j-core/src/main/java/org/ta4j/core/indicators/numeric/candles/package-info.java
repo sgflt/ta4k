@@ -1,4 +1,4 @@
-/*
+/**
  * The MIT License (MIT)
  *
  * Copyright (c) 2017-2023 Ta4j Organization & respective
@@ -21,31 +21,7 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.ta4j.core.indicators.candles.price;
-
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.ta4j.core.TestContext;
-import org.ta4j.core.indicators.AbstractIndicatorTest;
-import org.ta4j.core.indicators.numeric.Indicators;
-import org.ta4j.core.num.Num;
-
-class LowPriceIndicatorTest extends AbstractIndicatorTest<Num> {
-  private TestContext context;
-
-
-  @BeforeEach
-  void setUp() {
-    this.context = new TestContext().withDefaultMarketEvents();
-
-    this.context.withIndicator(Indicators.lowPrice());
-  }
-
-
-  @Test
-  void indicatorShouldRetrieveBarHighPrice() {
-    for (int i = 0; i < 10; i++) {
-      this.context.assertNext(i + 3);
-    }
-  }
-}
+/**
+ * Indicators analyzing candle sticks and patterns.
+ */
+package org.ta4j.core.indicators.numeric.candles;

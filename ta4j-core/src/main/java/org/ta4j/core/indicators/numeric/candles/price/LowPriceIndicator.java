@@ -21,67 +21,38 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.ta4j.core.indicators.candles;
+package org.ta4j.core.indicators.numeric.candles.price;
 
 import org.ta4j.core.Bar;
-import org.ta4j.core.BarSeries;
-import org.ta4j.core.indicators.SeriesRelatedBooleanIndicator;
-import org.ta4j.core.num.Num;
+import org.ta4j.core.indicators.SeriesRelatedNumericIndicator;
+import org.ta4j.core.num.NumFactory;
 
 /**
- * Bearish engulfing pattern indicator.
+ * Low price indicator.
  *
- * @see <a href="http://www.investopedia.com/terms/b/bearishengulfingp.asp">
- *     http://www.investopedia.com/terms/b/bearishengulfingp.asp</a>
+ * <p>
+ * Returns the low price of a bar.
  */
-public class BearishEngulfingIndicator extends SeriesRelatedBooleanIndicator {
-
-  private Bar previousBar;
-
+public class LowPriceIndicator extends SeriesRelatedNumericIndicator {
 
   /**
    * Constructor.
    *
    * @param series the bar series
    */
-  public BearishEngulfingIndicator(final BarSeries series) {
+  public LowPriceIndicator(final NumFactory series) {
     super(series);
-  }
-
-
-  protected Boolean calculate(final Bar bar) {
-    if (this.value == null) {
-      this.previousBar = bar;
-      // Engulfing is a 2-candle pattern
-      return false;
-    }
-
-    final Bar prevBar = this.previousBar;
-    this.previousBar = bar;
-
-    if (prevBar.isBullish() && bar.isBearish()) {
-      final Num prevOpenPrice = prevBar.openPrice();
-      final Num prevClosePrice = prevBar.closePrice();
-      final Num currOpenPrice = bar.openPrice();
-      final Num currClosePrice = bar.closePrice();
-      return currOpenPrice.isGreaterThan(prevOpenPrice)
-             && currOpenPrice.isGreaterThan(prevClosePrice)
-             && currClosePrice.isLessThan(prevOpenPrice)
-             && currClosePrice.isLessThan(prevClosePrice);
-    }
-
-    return false;
   }
 
 
   @Override
   public void updateState(final Bar bar) {
-    this.value = calculate(bar);
+    this.value = bar.lowPrice();
   }
 
 
   @Override
-  public boolean isStable() {
-    return this.value != null;
+  public String toString() {
+    return String.format("Low() => %s", getValue());
   }
 }

@@ -21,7 +21,7 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.ta4j.core.indicators.candles.price;
+package org.ta4j.core.indicators.numeric.candles.price;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

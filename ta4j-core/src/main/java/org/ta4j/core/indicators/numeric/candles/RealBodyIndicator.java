@@ -1,7 +1,7 @@
-/**
+/*
  * The MIT License (MIT)
  *
- * Copyright (c) 2017-2023 Ta4j Organization & respective
+ * Copyright (c) 2017-2024 Ta4j Organization & respective
  * authors (see AUTHORS)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
@@ -21,7 +21,44 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
+package org.ta4j.core.indicators.numeric.candles;
+
+import org.ta4j.core.Bar;
+import org.ta4j.core.indicators.SeriesRelatedNumericIndicator;
+import org.ta4j.core.num.Num;
+import org.ta4j.core.num.NumFactory;
+
 /**
- * Indicators analyzing candle sticks and patterns.
+ * Real (candle) body height indicator.
+ *
+ * <p>
+ * Provides the (relative) difference between the open price and the close price
+ * of a bar. I.e.: close price - open price
+ *
+ * @see <a href=
+ *     "http://stockcharts.com/school/doku.php?id=chart_school:chart_analysis:introduction_to_candlesticks#formation">
+ *     http://stockcharts.com/school/doku.php?id=chart_school:chart_analysis:introduction_to_candlesticks#formation</a>
  */
-package org.ta4j.core.indicators.candles;
+public class RealBodyIndicator extends SeriesRelatedNumericIndicator {
+
+
+  /**
+   * Constructor.
+   *
+   * @param numFactory the bar numFactory
+   */
+  public RealBodyIndicator(final NumFactory numFactory) {
+    super(numFactory);
+  }
+
+
+  protected Num calculate(final Bar bar) {
+    return bar.closePrice().minus(bar.openPrice());
+  }
+
+
+  @Override
+  public void updateState(final Bar bar) {
+    this.value = calculate(bar);
+  }
+}

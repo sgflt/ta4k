@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  *
- * Copyright (c) 2017-2023 Ta4j Organization & respective
+ * Copyright (c) 2017-2024 Ta4j Organization & respective
  * authors (see AUTHORS)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
@@ -21,31 +21,38 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.ta4j.core.indicators.candles.price;
+package org.ta4j.core.indicators.numeric.candles.price;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.ta4j.core.TestContext;
-import org.ta4j.core.indicators.AbstractIndicatorTest;
-import org.ta4j.core.indicators.numeric.Indicators;
-import org.ta4j.core.num.Num;
+import org.ta4j.core.Bar;
+import org.ta4j.core.indicators.SeriesRelatedNumericIndicator;
+import org.ta4j.core.num.NumFactory;
 
-class HighPriceIndicatorTest extends AbstractIndicatorTest<Num> {
-  private TestContext context;
+/**
+ * The high price indicator.
+ *
+ * <p>
+ * Returns the high price of a bar.
+ */
+public class HighPriceIndicator extends SeriesRelatedNumericIndicator {
 
-
-  @BeforeEach
-  void setUp() {
-    this.context = new TestContext().withDefaultMarketEvents();
-
-    this.context.withIndicator(Indicators.highPrice());
+  /**
+   * Constructor.
+   *
+   * @param numFactory the bar numFactory
+   */
+  public HighPriceIndicator(final NumFactory numFactory) {
+    super(numFactory);
   }
 
 
-  @Test
-  void indicatorShouldRetrieveBarHighPrice() {
-    for (int i = 0; i < 10; i++) {
-      this.context.assertNext(i + 2);
-    }
+  @Override
+  public void updateState(final Bar bar) {
+    this.value = bar.highPrice();
+  }
+
+
+  @Override
+  public String toString() {
+    return "High() => %s".formatted(getValue());
   }
 }

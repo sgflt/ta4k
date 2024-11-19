@@ -26,10 +26,10 @@ package org.ta4j.core.indicators.bool.chandelier;
 import org.ta4j.core.Bar;
 import org.ta4j.core.BarSeries;
 import org.ta4j.core.indicators.bool.BooleanIndicator;
-import org.ta4j.core.indicators.candles.price.ClosePriceIndicator;
 import org.ta4j.core.indicators.helpers.LowestValueIndicator;
 import org.ta4j.core.indicators.numeric.ATRIndicator;
 import org.ta4j.core.indicators.numeric.Indicators;
+import org.ta4j.core.indicators.numeric.candles.price.ClosePriceIndicator;
 import org.ta4j.core.num.Num;
 
 /**

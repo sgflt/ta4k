@@ -21,44 +21,39 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.ta4j.core.indicators.candles;
+package org.ta4j.core.indicators.numeric.candles.price;
 
 import org.ta4j.core.Bar;
 import org.ta4j.core.indicators.SeriesRelatedNumericIndicator;
-import org.ta4j.core.num.Num;
 import org.ta4j.core.num.NumFactory;
 
 /**
- * Real (candle) body height indicator.
+ * Close price indicator.
  *
  * <p>
- * Provides the (relative) difference between the open price and the close price
- * of a bar. I.e.: close price - open price
- *
- * @see <a href=
- *     "http://stockcharts.com/school/doku.php?id=chart_school:chart_analysis:introduction_to_candlesticks#formation">
- *     http://stockcharts.com/school/doku.php?id=chart_school:chart_analysis:introduction_to_candlesticks#formation</a>
+ * Returns the close price of a bar.
  */
-public class RealBodyIndicator extends SeriesRelatedNumericIndicator {
-
+public class ClosePriceIndicator extends SeriesRelatedNumericIndicator {
 
   /**
    * Constructor.
    *
-   * @param numFactory the bar numFactory
+   * @param numFactory the bar series
    */
-  public RealBodyIndicator(final NumFactory numFactory) {
+  public ClosePriceIndicator(final NumFactory numFactory) {
     super(numFactory);
-  }
-
-
-  protected Num calculate(final Bar bar) {
-    return bar.closePrice().minus(bar.openPrice());
   }
 
 
   @Override
   public void updateState(final Bar bar) {
-    this.value = calculate(bar);
+    this.value = bar.closePrice();
   }
+
+
+  @Override
+  public String toString() {
+    return String.format("Close() => %s", getValue());
+  }
+
 }
