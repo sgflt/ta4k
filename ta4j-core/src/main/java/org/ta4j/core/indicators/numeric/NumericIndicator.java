@@ -38,6 +38,7 @@ import org.ta4j.core.indicators.helpers.LossIndicator;
 import org.ta4j.core.indicators.helpers.LowestValueIndicator;
 import org.ta4j.core.indicators.helpers.RunningTotalIndicator;
 import org.ta4j.core.indicators.helpers.previous.PreviousNumericValueIndicator;
+import org.ta4j.core.indicators.numeric.average.DoubleEMAIndicator;
 import org.ta4j.core.indicators.numeric.average.EMAIndicator;
 import org.ta4j.core.indicators.numeric.average.LWMAIndicator;
 import org.ta4j.core.indicators.numeric.average.MMAIndicator;
@@ -307,6 +308,11 @@ public abstract class NumericIndicator implements Indicator<Num> {
   }
 
 
+  public DoubleEMAIndicator doubleEMA(final int barCount) {
+    return new DoubleEMAIndicator(this, barCount);
+  }
+
+
   public TripleEMAIndicator tripleEma(final int barCount) {
     return new TripleEMAIndicator(this, barCount);
   }
@@ -565,4 +571,5 @@ public abstract class NumericIndicator implements Indicator<Num> {
    * @param bar new {@link Bar} received
    */
   protected abstract void updateState(Bar bar);
+
 }

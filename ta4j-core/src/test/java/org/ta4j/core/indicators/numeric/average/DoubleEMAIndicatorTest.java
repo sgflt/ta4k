@@ -22,64 +22,62 @@
  */
 package org.ta4j.core.indicators.numeric.average;
 
-import static org.ta4j.core.TestUtils.assertNumEquals;
-
-import org.junit.Before;
-import org.junit.Test;
-import org.ta4j.core.MockStrategy;
-import org.ta4j.core.backtest.BacktestBarSeries;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.ta4j.core.TestContext;
 import org.ta4j.core.indicators.AbstractIndicatorTest;
-import org.ta4j.core.indicators.candles.price.ClosePriceIndicator;
-import org.ta4j.core.mocks.MockBarSeriesBuilder;
+import org.ta4j.core.indicators.numeric.Indicators;
 import org.ta4j.core.num.Num;
 import org.ta4j.core.num.NumFactory;
 
-public class DoubleEMAIndicatorTest extends AbstractIndicatorTest<Num> {
-
-  private BacktestBarSeries data;
+class DoubleEMAIndicatorTest extends AbstractIndicatorTest<Num> {
 
 
-  public DoubleEMAIndicatorTest(final NumFactory numFactory) {
-    super(numFactory);
+  private TestContext testContext;
+
+
+  @BeforeEach
+  void setUp() {
+    this.testContext = new TestContext();
+    this.testContext.withCandlePrices(
+        0.73,
+        0.72,
+        0.86,
+        0.72,
+        0.62,
+        0.76,
+        0.84,
+        0.69,
+        0.65,
+        0.71,
+        0.53,
+        0.73,
+        0.77,
+        0.67,
+        0.68
+    );
   }
 
 
-  @Before
-  public void setUp() {
-    this.data = new MockBarSeriesBuilder().withNumFactory(this.numFactory)
-        .withData(0.73, 0.72, 0.86, 0.72, 0.62, 0.76, 0.84, 0.69, 0.65, 0.71, 0.53, 0.73, 0.77, 0.67, 0.68)
-        .build();
-  }
+  @ParameterizedTest(name = "DoubleEMA with window of 5 [{index}] {0}")
+  @MethodSource("provideNumFactories")
+  void doubleEMAUsingBarCount5UsingClosePrice(final NumFactory numFactory) {
+    this.testContext.withNumFactory(numFactory);
 
-
-  @Test
-  public void doubleEMAUsingBarCount5UsingClosePrice() {
-    final var doubleEma = new DoubleEMAIndicator(new ClosePriceIndicator(this.data), 5);
-    this.data.replaceStrategy(new MockStrategy(doubleEma));
-
-    this.data.advance();
-    assertNumEquals(0.73, doubleEma.getValue());
-    this.data.advance();
-    assertNumEquals(0.7244, doubleEma.getValue());
-    this.data.advance();
-    assertNumEquals(0.7992, doubleEma.getValue());
-
-    for (int i = 0; i < 6 - 2; i++) {
-      this.data.advance();
-    }
-    assertNumEquals(0.7858, doubleEma.getValue());
-    this.data.advance();
-    assertNumEquals(0.7374, doubleEma.getValue());
-    this.data.advance();
-    assertNumEquals(0.6884, doubleEma.getValue());
-
-    for (int i = 0; i < 12 - 8; i++) {
-      this.data.advance();
-    }
-    assertNumEquals(0.7184, doubleEma.getValue());
-    this.data.advance();
-    assertNumEquals(0.6939, doubleEma.getValue());
-    this.data.advance();
-    assertNumEquals(0.6859, doubleEma.getValue());
+    final var doubleEma = Indicators.closePrice().doubleEMA(5);
+    this.testContext.withIndicator(doubleEma)
+        .assertNext(0.73)
+        .assertNext(0.7244)
+        .assertNext(0.7992)
+        .fastForward(4)
+        .assertCurrent(0.7858)
+        .assertNext(0.7374)
+        .assertNext(0.6884)
+        .fastForward(4)
+        .assertCurrent(0.7184)
+        .assertNext(0.6939)
+        .assertNext(0.6859)
+    ;
   }
 }
