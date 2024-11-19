@@ -42,7 +42,6 @@ public class TransformIndicator extends NumericIndicator {
 
   private final NumericIndicator indicator;
   private final UnaryOperator<Num> transformationFunction;
-  private Num value;
 
 
   /**
@@ -168,6 +167,6 @@ public class TransformIndicator extends NumericIndicator {
 
   @Override
   public String toString() {
-    return getClass().getSimpleName();
+    return "Transform %s WITH %s".formatted(this.indicator, this.transformationFunction);
   }
 }
