@@ -23,26 +23,20 @@
  */
 package org.ta4j.core.indicators.candles.price;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.ta4j.core.TestContext;
 import org.ta4j.core.indicators.AbstractIndicatorTest;
 import org.ta4j.core.indicators.numeric.Indicators;
 import org.ta4j.core.num.Num;
-import org.ta4j.core.num.NumFactory;
 
-public class OpenPriceIndicatorTest extends AbstractIndicatorTest<Num> {
+class OpenPriceIndicatorTest extends AbstractIndicatorTest<Num> {
 
   private TestContext context;
 
 
-  public OpenPriceIndicatorTest(final NumFactory numFactory) {
-    super(numFactory);
-  }
-
-
-  @Before
-  public void setUp() {
+  @BeforeEach
+  void setUp() {
     this.context = new TestContext().withDefaultMarketEvents();
 
     this.context.withIndicator(Indicators.openPrice());
@@ -50,7 +44,7 @@ public class OpenPriceIndicatorTest extends AbstractIndicatorTest<Num> {
 
 
   @Test
-  public void indicatorShouldRetrieveBarOpenPrice() {
+  void indicatorShouldRetrieveBarOpenPrice() {
     for (int i = 0; i < 10; i++) {
       this.context.assertNext(i + 1);
     }

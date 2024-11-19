@@ -29,15 +29,9 @@ import org.ta4j.core.TestContext;
 import org.ta4j.core.indicators.AbstractIndicatorTest;
 import org.ta4j.core.indicators.numeric.Indicators;
 import org.ta4j.core.num.Num;
-import org.ta4j.core.num.NumFactory;
 
 class LowPriceIndicatorTest extends AbstractIndicatorTest<Num> {
   private TestContext context;
-
-
-  LowPriceIndicatorTest(final NumFactory numFactory) {
-    super(numFactory);
-  }
 
 
   @BeforeEach
