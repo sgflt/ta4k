@@ -41,6 +41,7 @@ import org.ta4j.core.indicators.helpers.previous.PreviousNumericValueIndicator;
 import org.ta4j.core.indicators.numeric.average.DoubleEMAIndicator;
 import org.ta4j.core.indicators.numeric.average.EMAIndicator;
 import org.ta4j.core.indicators.numeric.average.HMAIndicator;
+import org.ta4j.core.indicators.numeric.average.KAMAIndicator;
 import org.ta4j.core.indicators.numeric.average.LWMAIndicator;
 import org.ta4j.core.indicators.numeric.average.MMAIndicator;
 import org.ta4j.core.indicators.numeric.average.SMAIndicator;
@@ -341,6 +342,15 @@ public abstract class NumericIndicator implements Indicator<Num> {
 
   public WMAIndicator wma(final int barCount) {
     return new WMAIndicator(this, barCount);
+  }
+
+
+  public KAMAIndicator kama(
+      final int barCountEffectiveRatio,
+      final int barCountFast,
+      final int barCountSlow
+  ) {
+    return new KAMAIndicator(this, barCountEffectiveRatio, barCountFast, barCountSlow);
   }
 
 
