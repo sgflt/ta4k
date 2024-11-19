@@ -23,88 +23,88 @@
  */
 package org.ta4j.core.indicators.numeric.channels.bollinger;
 
-import static org.ta4j.core.TestUtils.assertNext;
-import static org.ta4j.core.TestUtils.fastForward;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.ta4j.core.MockStrategy;
-import org.ta4j.core.backtest.BacktestBarSeries;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.ta4j.core.TestContext;
 import org.ta4j.core.indicators.AbstractIndicatorTest;
-import org.ta4j.core.indicators.candles.price.ClosePriceIndicator;
-import org.ta4j.core.indicators.numeric.average.SMAIndicator;
-import org.ta4j.core.indicators.numeric.statistics.StandardDeviationIndicator;
-import org.ta4j.core.mocks.MockBarSeriesBuilder;
+import org.ta4j.core.indicators.numeric.Indicators;
 import org.ta4j.core.num.Num;
 import org.ta4j.core.num.NumFactory;
 
-public class BollingerBandsUpperIndicatorTest extends AbstractIndicatorTest<Num> {
+class BollingerBandsUpperIndicatorTest extends AbstractIndicatorTest<Num> {
 
   private int barCount;
-
-  private ClosePriceIndicator closePrice;
-
-  private SMAIndicator sma;
-  private BacktestBarSeries data;
+  private TestContext testContext;
 
 
-  public BollingerBandsUpperIndicatorTest(final NumFactory numFactory) {
-    super(numFactory);
-  }
-
-
-  @Before
-  public void setUp() {
-    this.data = new MockBarSeriesBuilder().withNumFactory(this.numFactory)
-        .withData(1, 2, 3, 4, 3, 4, 5, 4, 3, 3, 4, 3, 2)
-        .build();
+  @BeforeEach
+  void setUp() {
+    this.testContext = new TestContext();
+    this.testContext.withCandlePrices(
+        1, 2, 3, 4, 3, 4, 5, 4, 3, 3, 4, 3, 2
+    );
     this.barCount = 3;
-    this.closePrice = new ClosePriceIndicator(this.data);
-    this.sma = new SMAIndicator(this.closePrice, this.barCount);
   }
 
 
-  @Test
-  public void bollingerBandsUpperUsingSMAAndStandardDeviation() {
+  @ParameterizedTest(name = "Upper bollinger band derived from STDEV of SMA [{index}] {0}")
+  @MethodSource("provideNumFactories")
+  void bollingerBandsUpperUsingSMAAndStandardDeviation(final NumFactory numFactory) {
 
-    final var bbmSMA = new BollingerBandsMiddleIndicator(this.sma);
-    final var standardDeviation = new StandardDeviationIndicator(this.closePrice, this.barCount);
-    final var bbuSMA = new BollingerBandsUpperIndicator(bbmSMA, standardDeviation);
-    this.data.replaceStrategy(new MockStrategy(bbuSMA, bbmSMA, standardDeviation));
+    this.testContext.withNumFactory(numFactory);
 
-    fastForward(this.data, 3);
-    assertNext(this.data, 4.0000, bbuSMA);
-    assertNext(this.data, 5.0000, bbuSMA);
-    assertNext(this.data, 4.4880, bbuSMA);
-    assertNext(this.data, 4.8213, bbuSMA);
-    assertNext(this.data, 6.0000, bbuSMA);
-    assertNext(this.data, 5.4880, bbuSMA);
-    assertNext(this.data, 6.0000, bbuSMA);
-    assertNext(this.data, 4.4880, bbuSMA);
-    assertNext(this.data, 4.4880, bbuSMA);
-    assertNext(this.data, 4.4880, bbuSMA);
-    assertNext(this.data, 5.0000, bbuSMA);
+    final var closePrice = Indicators.closePrice();
+    final var sma = closePrice.sma(this.barCount);
+    final var bbmSMA = new BollingerBandsMiddleIndicator(sma);
+    final var standardDeviation = closePrice.stddev(this.barCount);
+    final var bbu = new BollingerBandsUpperIndicator(bbmSMA, standardDeviation);
+
+    this.testContext.withIndicator(bbu, "bbu")
+        .fastForwardUntilStable()
+        .onIndicator("bbu")
+        .assertCurrent(4.0000)
+        .assertNext(5.0000)
+        .assertNext(4.4880)
+        .assertNext(4.8213)
+        .assertNext(6.0000)
+        .assertNext(5.4880)
+        .assertNext(6.0000)
+        .assertNext(4.4880)
+        .assertNext(4.4880)
+        .assertNext(4.4880)
+        .assertNext(5.0000)
+    ;
   }
 
 
-  @Test
-  public void bollingerBandsUpperUsingSMAAndStandardDeviationWithK() {
-    final var bbmSMA = new BollingerBandsMiddleIndicator(this.sma);
-    final var standardDeviation = new StandardDeviationIndicator(this.closePrice, this.barCount);
-    final var bbuSMAwithK = new BollingerBandsUpperIndicator(bbmSMA, standardDeviation, this.numFactory.numOf(1.5));
-    this.data.replaceStrategy(new MockStrategy(bbmSMA, bbuSMAwithK, standardDeviation));
+  @ParameterizedTest(name = "Upper bollinger band derived from STDEV of SMA with smaller K = 1.5 [{index}] {0}")
+  @MethodSource("provideNumFactories")
+  void bollingerBandsUpperUsingSMAAndStandardDeviationWithK(final NumFactory numFactory) {
 
-    fastForward(this.data, 3);
-    assertNext(this.data, 3.5000, bbuSMAwithK);
-    assertNext(this.data, 4.5000, bbuSMAwithK);
-    assertNext(this.data, 4.1993, bbuSMAwithK);
-    assertNext(this.data, 4.5327, bbuSMAwithK);
-    assertNext(this.data, 5.5000, bbuSMAwithK);
-    assertNext(this.data, 5.1994, bbuSMAwithK);
-    assertNext(this.data, 5.5000, bbuSMAwithK);
-    assertNext(this.data, 4.1994, bbuSMAwithK);
-    assertNext(this.data, 4.1994, bbuSMAwithK);
-    assertNext(this.data, 4.1994, bbuSMAwithK);
-    assertNext(this.data, 4.5000, bbuSMAwithK);
+    this.testContext.withNumFactory(numFactory);
+
+    final var closePrice = Indicators.closePrice();
+    final var sma = closePrice.sma(this.barCount);
+    final var bbmSMA = new BollingerBandsMiddleIndicator(sma);
+    final var standardDeviation = closePrice.stddev(this.barCount);
+    final var bbu = new BollingerBandsUpperIndicator(bbmSMA, standardDeviation, numFactory.numOf(1.5));
+
+    this.testContext.withIndicator(bbu, "bbbbulSMA")
+        .fastForwardUntilStable()
+        .onIndicator("bbu")
+        .assertCurrent(3.5000)
+        .assertNext(4.5000)
+        .assertNext(4.1993)
+        .assertNext(4.5327)
+        .assertNext(5.5000)
+        .assertNext(5.1994)
+        .assertNext(5.5000)
+        .assertNext(4.1994)
+        .assertNext(4.1994)
+        .assertNext(4.1994)
+        .assertNext(4.5000)
+    ;
   }
 }
