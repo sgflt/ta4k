@@ -23,53 +23,113 @@
  */
 package org.ta4j.core.indicators.numeric.channels.bollinger;
 
-import static org.junit.Assert.assertEquals;
-import static org.ta4j.core.TestUtils.assertNumEquals;
-
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.ta4j.core.TestContext;
 import org.ta4j.core.indicators.AbstractIndicatorTest;
-import org.ta4j.core.indicators.numeric.NumericIndicator;
+import org.ta4j.core.indicators.numeric.Indicators;
 import org.ta4j.core.indicators.numeric.average.SMAIndicator;
 import org.ta4j.core.indicators.numeric.statistics.StandardDeviationIndicator;
-import org.ta4j.core.mocks.MockBarSeriesBuilder;
 import org.ta4j.core.num.Num;
 import org.ta4j.core.num.NumFactory;
 
-public class BollingerBandFacadeTest extends AbstractIndicatorTest<Num> {
+class BollingerBandFacadeTest extends AbstractIndicatorTest<Num> {
 
-  public BollingerBandFacadeTest(final NumFactory numFactory) {
-    super(numFactory);
+
+  private TestContext testContext;
+
+
+  @BeforeEach
+  void setUp() {
+    this.testContext = new TestContext();
+    this.testContext.withCandlePrices(
+        1, 2, 3, 4, 3, 4, 5, 4, 3, 3, 4, 3, 2
+    );
   }
 
 
-  @Test
-  public void testCreation() {
-    final var data = new MockBarSeriesBuilder().withNumFactory(this.numFactory)
-        .withData(1, 2, 3, 4, 3, 4, 5, 4, 3, 3, 4, 3, 2)
-        .build();
+  @ParameterizedTest(name = "PCB [{index}] {0}")
+  @MethodSource("provideNumFactories")
+  void pcbFromFacadeIsCorrect(final NumFactory numFactory) {
+    this.testContext.withNumFactory(numFactory);
+
+    final var closePriceIndicator = Indicators.closePrice();
+
+    final var pcb = new PercentBIndicator(closePriceIndicator, 5, 2);
+    final var pcbNumeric = new BollingerBandFacade(5, 2).percentB();
+
+    this.testContext.withIndicators(pcb, pcbNumeric)
+        .assertIndicatorEquals(pcb, pcbNumeric);
+  }
+
+
+  @ParameterizedTest(name = "Middle BB [{index}] {0}")
+  @MethodSource("provideNumFactories")
+  void middleBBFromFacadeIsCorrect(final NumFactory numFactory) {
+    this.testContext.withNumFactory(numFactory);
+
+    final var closePriceIndicator = Indicators.closePrice();
     final int barCount = 3;
+    final var sma = new SMAIndicator(closePriceIndicator, 3);
+
+    final var middleBB = new BollingerBandsMiddleIndicator(sma);
+    final var bollingerBandFacade = new BollingerBandFacade(barCount, 2);
+    final var middleBBNumeric = bollingerBandFacade.middle();
+
+    this.testContext.withIndicators(middleBB, middleBBNumeric)
+        .assertIndicatorEquals(middleBB, middleBBNumeric);
+  }
+
+
+  @ParameterizedTest(name = "Lower BB [{index}] {0}")
+  @MethodSource("provideNumFactories")
+  void lowerBBFromFacadeIsCorrect(final NumFactory numFactory) {
+    this.testContext.withNumFactory(numFactory);
+
+    final var closePriceIndicator = Indicators.closePrice();
+    final int barCount = 3;
+    final var sma = new SMAIndicator(closePriceIndicator, 3);
+
+    final var middleBB = new BollingerBandsMiddleIndicator(sma);
+    final var standardDeviation = new StandardDeviationIndicator(closePriceIndicator, barCount);
+    final var lowerBB = new BollingerBandsLowerIndicator(middleBB, standardDeviation);
 
     final var bollingerBandFacade = new BollingerBandFacade(barCount, 2);
+    final var lowerBBNumeric = bollingerBandFacade.lower();
 
-    assertEquals(data.numFactory(), bollingerBandFacade.bandwidth().getNumFactory());
-    assertEquals(data.numFactory(), bollingerBandFacade.middle().getNumFactory());
-
-    final var bollingerBandFacadeOfIndicator = new BollingerBandFacade(
-        NumericIndicator.openPrice(),
-        barCount, 2
-    );
-
-    assertEquals(data.numFactory(), bollingerBandFacadeOfIndicator.lower().getNumFactory());
-    assertEquals(data.numFactory(), bollingerBandFacadeOfIndicator.upper().getNumFactory());
+    this.testContext.withIndicators(lowerBB, lowerBBNumeric)
+        .assertIndicatorEquals(lowerBB, lowerBBNumeric);
   }
 
 
-  @Test
-  public void testNumericFacadesSameAsDefaultIndicators() {
-    final var data = new MockBarSeriesBuilder().withNumFactory(this.numFactory)
-        .withData(1, 2, 3, 4, 3, 4, 5, 4, 3, 3, 4, 3, 2)
-        .build();
-    final var closePriceIndicator = NumericIndicator.closePrice();
+  @ParameterizedTest(name = "Upper BB [{index}] {0}")
+  @MethodSource("provideNumFactories")
+  void upperBBFromFacadeIsCorrect(final NumFactory numFactory) {
+    this.testContext.withNumFactory(numFactory);
+
+    final var closePriceIndicator = Indicators.closePrice();
+    final int barCount = 3;
+    final var sma = new SMAIndicator(closePriceIndicator, 3);
+
+    final var middleBB = new BollingerBandsMiddleIndicator(sma);
+    final var standardDeviation = new StandardDeviationIndicator(closePriceIndicator, barCount);
+    final var upperBB = new BollingerBandsUpperIndicator(middleBB, standardDeviation);
+
+    final var bollingerBandFacade = new BollingerBandFacade(barCount, 2);
+    final var upperBBNumeric = bollingerBandFacade.upper();
+
+    this.testContext.withIndicators(upperBB, upperBBNumeric)
+        .assertIndicatorEquals(upperBB, upperBBNumeric);
+  }
+
+
+  @ParameterizedTest(name = "Width of BB [{index}] {0}")
+  @MethodSource("provideNumFactories")
+  void widthBBFromFacadeIsCorrect(final NumFactory numFactory) {
+    this.testContext.withNumFactory(numFactory);
+
+    final var closePriceIndicator = Indicators.closePrice();
     final int barCount = 3;
     final var sma = new SMAIndicator(closePriceIndicator, 3);
 
@@ -77,23 +137,12 @@ public class BollingerBandFacadeTest extends AbstractIndicatorTest<Num> {
     final var standardDeviation = new StandardDeviationIndicator(closePriceIndicator, barCount);
     final var lowerBB = new BollingerBandsLowerIndicator(middleBB, standardDeviation);
     final var upperBB = new BollingerBandsUpperIndicator(middleBB, standardDeviation);
-    final var pcb = new PercentBIndicator(closePriceIndicator, 5, 2);
     final var widthBB = new BollingerBandWidthIndicator(upperBB, middleBB, lowerBB);
 
     final var bollingerBandFacade = new BollingerBandFacade(barCount, 2);
-    final var middleBBNumeric = bollingerBandFacade.middle();
-    final var lowerBBNumeric = bollingerBandFacade.lower();
-    final var upperBBNumeric = bollingerBandFacade.upper();
     final var widthBBNumeric = bollingerBandFacade.bandwidth();
 
-    final var pcbNumeric = new BollingerBandFacade(5, 2).percentB();
-
-    while (data.advance()) {
-      assertNumEquals(pcb.getValue(), pcbNumeric.getValue());
-      assertNumEquals(lowerBB.getValue(), lowerBBNumeric.getValue());
-      assertNumEquals(middleBB.getValue(), middleBBNumeric.getValue());
-      assertNumEquals(upperBB.getValue(), upperBBNumeric.getValue());
-      assertNumEquals(widthBB.getValue(), widthBBNumeric.getValue());
-    }
+    this.testContext.withIndicators(widthBB, widthBBNumeric)
+        .assertIndicatorEquals(widthBB, widthBBNumeric);
   }
 }
