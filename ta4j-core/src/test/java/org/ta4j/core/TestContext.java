@@ -101,6 +101,8 @@ public class TestContext {
 
 
   public boolean advance() {
+    log.trace("\t ### advance");
+
     final var marketEvent = this.marketEvents.poll();
     if (marketEvent == null) {
       return false;
@@ -160,7 +162,6 @@ public class TestContext {
   public TestContext fastForward(final int bars) {
     log.debug("Fast forward =====> {}", bars);
     for (int i = 0; i < bars; i++) {
-      log.trace("\t =====> {}", i);
       if (!advance()) {
         throw new IllegalStateException("Fast forward failed at index " + i);
       }
