@@ -24,10 +24,11 @@
 
 package org.ta4j.core.indicators;
 
-import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 import java.util.function.Consumer;
 
 import org.ta4j.core.Bar;
@@ -36,17 +37,25 @@ import org.ta4j.core.Bar;
  * @author Lukáš Kvídera
  */
 public class IndicatorContext {
-  private final List<Indicator<?>> indicators;
+  private final LinkedHashMap<String, Indicator<?>> indicators;
   private final Set<IndicatorChangeListener> changeListeners = new HashSet<>();
 
 
   private IndicatorContext(final Indicator<?>... indicators) {
-    this.indicators = List.of(indicators);
+    this.indicators = new LinkedHashMap<>();
+    for (final var indicator : indicators) {
+      this.indicators.put(generatePlaceholderName(), indicator);
+    }
+  }
+
+
+  private static String generatePlaceholderName() {
+    return UUID.randomUUID().toString();
   }
 
 
   private IndicatorContext() {
-    this.indicators = new ArrayList<>();
+    this.indicators = new LinkedHashMap<>();
   }
 
 
@@ -78,22 +87,32 @@ public class IndicatorContext {
 
 
   public void add(final Indicator<?> indicator) {
-    this.indicators.add(indicator);
+    this.indicators.put(generatePlaceholderName(), indicator);
   }
 
 
-  public Indicator<?> get(final int index) {
-    return this.indicators.get(index);
+  public void add(final Indicator<?> indicator, final String name) {
+    this.indicators.put(name, indicator);
   }
 
 
-  public void addAll(final Indicator<?>... indicator) {
-    this.indicators.addAll(List.of(indicator));
+  public Indicator<?> getFirst() {
+    return this.indicators.values().stream().findFirst().orElse(null);
+  }
+
+
+  public Indicator<?> get(final String name) {
+    return this.indicators.get(name);
+  }
+
+
+  public void addAll(final Indicator<?>... indicators) {
+    List.of(indicators).forEach(indicator -> this.indicators.put(generatePlaceholderName(), indicator));
   }
 
 
   public void refresh(final Bar bar) {
-    for (final var indicator : this.indicators) {
+    for (final var indicator : this.indicators.values()) {
       indicator.onBar(bar);
       for (final var changeListener : this.changeListeners) {
         changeListener.accept(bar.beginTime(), indicator);
@@ -103,7 +122,7 @@ public class IndicatorContext {
 
 
   public void inspect(final Consumer<NamedIndicator<?>> consumer) {
-    for (final var indicator : this.indicators) {
+    for (final var indicator : this.indicators.values()) {
       if (indicator instanceof final NamedIndicator<?> namedIndicator) {
         consumer.accept(namedIndicator);
       }
@@ -112,11 +131,16 @@ public class IndicatorContext {
 
 
   public boolean isStable() {
-    return this.indicators.stream().allMatch(Indicator::isStable);
+    return this.indicators.values().stream().allMatch(Indicator::isStable);
   }
 
 
   public boolean isNotEmpty() {
     return !this.indicators.isEmpty();
+  }
+
+
+  public boolean contains(final String indicatorName) {
+    return this.indicators.containsKey(indicatorName);
   }
 }

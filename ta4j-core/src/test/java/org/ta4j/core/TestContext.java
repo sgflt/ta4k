@@ -7,6 +7,7 @@ import static org.ta4j.core.TestUtils.assertNumEquals;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
+import java.util.UUID;
 import java.util.stream.Stream;
 
 import org.assertj.core.data.Offset;
@@ -65,7 +66,13 @@ public class TestContext {
 
 
   public TestContext withIndicator(final Indicator<?> indicator) {
-    this.indicatorContext.add(indicator);
+    this.indicatorContext.add(indicator, UUID.randomUUID().toString());
+    return this;
+  }
+
+
+  public TestContext withIndicator(final Indicator<?> indicator, final String name) {
+    this.indicatorContext.add(indicator, name);
     return this;
   }
 
@@ -101,13 +108,13 @@ public class TestContext {
   }
 
 
-  public NumericIndicator getNumericIndicator(final int indicatorIndex) {
-    return (NumericIndicator) this.indicatorContext.get(indicatorIndex);
+  public NumericIndicator getFirstNumericIndicator() {
+    return (NumericIndicator) this.indicatorContext.getFirst();
   }
 
 
-  public BooleanIndicator getBooleanIndicator(final int indicatorIndex) {
-    return (BooleanIndicator) this.indicatorContext.get(indicatorIndex);
+  public BooleanIndicator getFisrtBooleanIndicator() {
+    return (BooleanIndicator) this.indicatorContext.getFirst();
   }
 
 
@@ -128,13 +135,13 @@ public class TestContext {
 
   public static void assertNextFalse(final TestContext context) {
     context.advance();
-    assertThat(context.getBooleanIndicator(0).getValue()).isFalse();
+    assertThat(context.getFisrtBooleanIndicator().getValue()).isFalse();
   }
 
 
   public static void assertNextTrue(final TestContext context) {
     context.advance();
-    assertThat(context.getBooleanIndicator(0).getValue()).isTrue();
+    assertThat(context.getFisrtBooleanIndicator().getValue()).isTrue();
   }
 
 
@@ -156,17 +163,34 @@ public class TestContext {
 
 
   public TestContext assertCurrent(final double expected) {
-    assertNumEquals(expected, getNumericIndicator(0).getValue());
+    assertCurrent(getFirstNumericIndicator(), expected);
     return this;
   }
 
 
+  private TestContext assertCurrent(final NumericIndicator indicator, final double expected) {
+    assertNumEquals(expected, indicator.getValue());
+    return this;
+  }
+
+
+  private NumericIndicator getNumericIndicator(final String indicatorName) {
+    return (NumericIndicator) this.indicatorContext.get(indicatorName);
+  }
+
+
   public TestContext assertNext(final double expected) {
+    assertNext(getFirstNumericIndicator(), expected);
+    return this;
+  }
+
+
+  private TestContext assertNext(final NumericIndicator indicator, final double expected) {
     if (!advance()) {
       throw new IllegalStateException("Next failed");
     }
 
-    assertNumEquals(expected, getNumericIndicator(0).getValue());
+    assertNumEquals(expected, indicator.getValue());
     return this;
   }
 
@@ -181,5 +205,35 @@ public class TestContext {
     }
 
     return this;
+  }
+
+
+  public IndicatorAsserts onIndicator(final String name) {
+    return new IndicatorAsserts(name);
+  }
+
+
+  public class IndicatorAsserts {
+    private final String indicatorName;
+
+
+    public IndicatorAsserts(final String indicatorName) {
+      this.indicatorName = indicatorName;
+      if (!TestContext.this.indicatorContext.contains(indicatorName)) {
+        throw new IllegalStateException("Indicator " + indicatorName + " not found");
+      }
+    }
+
+
+    public IndicatorAsserts assertNext(final double expected) {
+      TestContext.this.assertNext(getNumericIndicator(this.indicatorName), expected);
+      return this;
+    }
+
+
+    public IndicatorAsserts assertCurrent(final double expected) {
+      TestContext.this.assertCurrent(getNumericIndicator(this.indicatorName), expected);
+      return this;
+    }
   }
 }

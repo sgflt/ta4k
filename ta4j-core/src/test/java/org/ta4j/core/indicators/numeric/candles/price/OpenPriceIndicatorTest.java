@@ -30,6 +30,7 @@ import org.ta4j.core.indicators.AbstractIndicatorTest;
 import org.ta4j.core.indicators.numeric.Indicators;
 import org.ta4j.core.num.Num;
 
+// TODO unextend
 class OpenPriceIndicatorTest extends AbstractIndicatorTest<Num> {
 
   private TestContext context;
