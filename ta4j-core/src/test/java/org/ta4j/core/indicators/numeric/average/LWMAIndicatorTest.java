@@ -22,51 +22,47 @@
  */
 package org.ta4j.core.indicators.numeric.average;
 
-import static org.ta4j.core.TestUtils.assertNext;
-
-import org.junit.Before;
-import org.junit.Test;
-import org.ta4j.core.MockStrategy;
-import org.ta4j.core.backtest.BacktestBarSeries;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.ta4j.core.TestContext;
 import org.ta4j.core.indicators.AbstractIndicatorTest;
-import org.ta4j.core.indicators.numeric.NumericIndicator;
-import org.ta4j.core.mocks.MockBarSeriesBuilder;
+import org.ta4j.core.indicators.numeric.Indicators;
 import org.ta4j.core.num.Num;
 import org.ta4j.core.num.NumFactory;
 
-public class LWMAIndicatorTest extends AbstractIndicatorTest<Num> {
-
-  private BacktestBarSeries data;
+class LWMAIndicatorTest extends AbstractIndicatorTest<Num> {
 
 
-  public LWMAIndicatorTest(final NumFactory numFunction) {
-    super(numFunction);
+  private TestContext testContext;
+
+
+  @BeforeEach
+  void setUp() {
+    this.testContext = new TestContext();
+    this.testContext.withCandlePrices(37.08, 36.7, 36.11, 35.85, 35.71, 36.04, 36.41, 37.67, 38.01, 37.79, 36.83);
   }
 
 
-  @Before
-  public void setUp() {
-    this.data = new MockBarSeriesBuilder().withNumFactory(this.numFactory)
-        .withData(37.08, 36.7, 36.11, 35.85, 35.71, 36.04, 36.41, 37.67, 38.01, 37.79, 36.83)
-        .build();
-  }
+  @ParameterizedTest(name = "LWMA [{index}] {0}")
+  @MethodSource("provideNumFactories")
+  void lwmaUsingBarCount5UsingClosePrice(final NumFactory numFactory) {
+    this.testContext.withNumFactory(numFactory);
 
+    final var lwma = Indicators.closePrice().lwma(5);
 
-  @Test
-  public void lwmaUsingBarCount5UsingClosePrice() {
-    final var lwma = NumericIndicator.closePrice(data).lwma(5);
-    this.data.replaceStrategy(new MockStrategy(lwma));
-
-    assertNext(this.data,0.0, lwma);
-    assertNext(this.data,0.0, lwma);
-    assertNext(this.data,0.0, lwma);
-    assertNext(this.data,0.0, lwma);
-    assertNext(this.data,36.0506, lwma);
-    assertNext(this.data,35.9673, lwma);
-    assertNext(this.data,36.0766, lwma);
-    assertNext(this.data,36.6253, lwma);
-    assertNext(this.data,37.1833, lwma);
-    assertNext(this.data,37.5240, lwma);
-    assertNext(this.data,37.4060, lwma);
+    this.testContext.withIndicator(lwma)
+        .assertNext(0.0)
+        .assertNext(0.0)
+        .assertNext(0.0)
+        .assertNext(0.0)
+        .assertNext(36.0506)
+        .assertNext(35.9673)
+        .assertNext(36.0766)
+        .assertNext(36.6253)
+        .assertNext(37.1833)
+        .assertNext(37.5240)
+        .assertNext(37.4060)
+    ;
   }
 }
