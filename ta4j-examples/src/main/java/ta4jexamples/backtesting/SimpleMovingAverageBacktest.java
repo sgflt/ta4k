@@ -38,7 +38,7 @@ import org.ta4j.core.criteria.pnl.ReturnCriterion;
 import org.ta4j.core.events.CandleReceived;
 import org.ta4j.core.events.MarketEvent;
 import org.ta4j.core.indicators.IndicatorContext;
-import org.ta4j.core.indicators.numeric.NumericIndicator;
+import org.ta4j.core.indicators.numeric.Indicators;
 import org.ta4j.core.num.DoubleNumFactory;
 import org.ta4j.core.reports.TradingStatement;
 
@@ -107,7 +107,7 @@ public class SimpleMovingAverageBacktest {
 
 
   private static Strategy create3DaySmaStrategy(final BarSeries series) {
-    final var closePrice = NumericIndicator.closePrice();
+    final var closePrice = Indicators.closePrice();
     final var sma = closePrice.sma(3);
     return new BacktestStrategy(
         "",
@@ -119,7 +119,7 @@ public class SimpleMovingAverageBacktest {
 
 
   private static Strategy create2DaySmaStrategy(final BarSeries series) {
-    final var closePrice = NumericIndicator.closePrice();
+    final var closePrice = Indicators.closePrice();
     final var sma = closePrice.sma(2);
     return new BacktestStrategy(
         "",

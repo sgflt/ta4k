@@ -29,13 +29,12 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.ta4j.core.BarSeries;
 import org.ta4j.core.StrategyFactory;
 import org.ta4j.core.Trade;
 import org.ta4j.core.backtest.BacktestExecutorBuilder;
 import org.ta4j.core.backtest.BacktestStrategy;
 import org.ta4j.core.indicators.IndicatorContext;
-import org.ta4j.core.indicators.numeric.NumericIndicator;
+import org.ta4j.core.indicators.numeric.Indicators;
 import org.ta4j.core.num.DoubleNumFactory;
 import org.ta4j.core.reports.PerformanceReport;
 import org.ta4j.core.reports.PositionStatsReport;
@@ -59,7 +58,7 @@ public class SimpleMovingAverageRangeBacktest {
     final var strategyFactories = new ArrayList<StrategyFactory>();
     for (int i = start; i <= stop; i += step) {
       final int smaBarCount = i;
-      strategyFactories.add(s -> createStrategy(s, smaBarCount));
+      strategyFactories.add(s -> createStrategy(smaBarCount));
     }
 
     final var backtestExecutor = new BacktestExecutorBuilder().numFactory(DoubleNumFactory.getInstance()).build();
@@ -78,10 +77,9 @@ public class SimpleMovingAverageRangeBacktest {
 
 
   private static BacktestStrategy createStrategy(
-      final BarSeries series,
       final int smaBarCount
   ) {
-    final var closePrice = NumericIndicator.closePrice();
+    final var closePrice = Indicators.closePrice();
     final var sma = closePrice.sma(smaBarCount);
     final var entryRule = new OverIndicatorRule(sma, closePrice);
     final var exitRule = new UnderIndicatorRule(sma, closePrice);
