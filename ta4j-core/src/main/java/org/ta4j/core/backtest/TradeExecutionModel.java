@@ -1,4 +1,4 @@
-/**
+/*
  * The MIT License (MIT)
  *
  * Copyright (c) 2017-2023 Ta4j Organization & respective
@@ -23,6 +23,7 @@
  */
 package org.ta4j.core.backtest;
 
+import org.ta4j.core.Bar;
 import org.ta4j.core.TradingRecord;
 import org.ta4j.core.num.Num;
 
@@ -34,13 +35,13 @@ import org.ta4j.core.num.Num;
  */
 public interface TradeExecutionModel {
 
-    /**
-     * Executes a trade in the given {@code tradingRecord}.
-     *
-     * @param tradingRecord the trading record to place the trade
-     * @param barSeries     the bar series
-     * @param amount        the trade amount
-     */
-    void execute(int index, TradingRecord tradingRecord, BacktestBarSeries barSeries, Num amount);
+  /**
+   * Executes a trade in the given {@code tradingRecord}.
+   *
+   * @param curentBar the current bar that triggered execution
+   * @param tradingRecord the trading record to place the trade
+   * @param amount the trade amount
+   */
+  void execute(Bar curentBar, TradingRecord tradingRecord, Num amount);
 
 }

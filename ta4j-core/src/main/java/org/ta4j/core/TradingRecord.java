@@ -23,8 +23,7 @@
  */
 package org.ta4j.core;
 
-import static org.ta4j.core.num.NaN.NaN;
-
+import java.time.Instant;
 import java.util.List;
 
 import org.ta4j.core.Trade.TradeType;
@@ -55,57 +54,32 @@ public interface TradingRecord {
 
   /**
    * Places a trade in the trading record.
-   */
-  // TODO BacktestTradingRecord
-  default void operate(final int index) {
-    operate(index, NaN, NaN);
-  }
-
-  /**
-   * Places a trade in the trading record.
    *
-   * @param price the trade price per asset
+   * @param whenExecuted the execution bar
    * @param amount the trade amount
    */
-  void operate(int index, Num price, Num amount);
+  void operate(Instant whenExecuted, Num pricePerAsset, Num amount);
+
 
   /**
    * Places an entry trade in the trading record.
    *
-   * @return true if the entry has been placed, false otherwise
-   */
-  default boolean enter(final int index) {
-    return enter(index, NaN, NaN);
-  }
-
-  /**
-   * Places an entry trade in the trading record.
-   *
-   * @param price the trade price per asset
+   * @param pricePerAsset the trade price per asset
    * @param amount the trade amount
    *
    * @return true if the entry has been placed, false otherwise
    */
-  boolean enter(int index, Num price, Num amount);
+  boolean enter(Instant whenExecuted, Num pricePerAsset, Num amount);
 
   /**
    * Places an exit trade in the trading record.
    *
-   * @return true if the exit has been placed, false otherwise
-   */
-  default boolean exit(final int index) {
-    return exit(index, NaN, NaN);
-  }
-
-  /**
-   * Places an exit trade in the trading record.
-   *
-   * @param price the trade price per asset
+   * @param pricePerAsset the trade price per asset
    * @param amount the trade amount
    *
    * @return true if the exit has been placed, false otherwise
    */
-  boolean exit(int index, Num price, Num amount);
+  boolean exit(Instant whenExecuted, Num pricePerAsset, Num amount);
 
   /**
    * @return true if no position is open, false otherwise
@@ -163,16 +137,6 @@ public interface TradingRecord {
    * @return the last exit trade recorded
    */
   Trade getLastExit();
-
-  /**
-   * @return the start of the recording (included)
-   */
-  Integer getStartIndex();
-
-  /**
-   * @return the end of the recording (included)
-   */
-  Integer getEndIndex();
 
   boolean isEmpty();
 

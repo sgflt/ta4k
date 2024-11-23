@@ -27,11 +27,11 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.ta4j.core.TestUtils.assertNumEquals;
 
+import java.time.Instant;
 import java.util.Random;
 
 import org.junit.Test;
 import org.ta4j.core.Position;
-import org.ta4j.core.Trade;
 import org.ta4j.core.Trade.TradeType;
 import org.ta4j.core.num.DoubleNum;
 import org.ta4j.core.num.Num;
@@ -52,10 +52,10 @@ public class FixedTransactionCostModelTest {
     final var model = new FixedTransactionCostModel(feePerTrade);
 
     final var position = new Position(TradeType.BUY, model, null);
-    position.operate(0, PRICE, AMOUNT);
+    position.operate(Instant.now(), PRICE, AMOUNT);
     final var cost = model.calculate(position);
 
-    assertNumEquals(cost, DoubleNum.valueOf(feePerTrade * positionTrades));
+    assertNumEquals(DoubleNum.valueOf(feePerTrade * positionTrades), cost);
   }
 
 
@@ -65,14 +65,12 @@ public class FixedTransactionCostModelTest {
     final var feePerTrade = RANDOM.nextDouble();
     final var model = new FixedTransactionCostModel(feePerTrade);
 
-    final var holdingPeriod = 2;
-    final var entry = Trade.buyAt(0, PRICE, AMOUNT, model);
-    final var exit = Trade.sellAt(holdingPeriod, PRICE, AMOUNT, model);
-
-    final var position = new Position(entry, exit, model, model);
+    final var position = new Position(TradeType.BUY, model, model);
+    position.operate(Instant.now(), PRICE, AMOUNT);
+    position.operate(Instant.now(), PRICE, AMOUNT);
     final var cost = model.calculate(position, RANDOM.nextInt());
 
-    assertNumEquals(cost, DoubleNum.valueOf(feePerTrade * positionTrades));
+    assertNumEquals(DoubleNum.valueOf(feePerTrade * positionTrades), cost);
   }
 
 

@@ -122,6 +122,7 @@ public class BacktestExecutor {
               .map(s -> {
                     final Strategy strategy = s.createStrategy(series);
                     ((BacktestStrategy) strategy).register(new BackTestTradingRecord(
+                            Trade.TradeType.BUY,    // TODO sell
                             BacktestExecutor.this.configuration.transactionCostModel(),
                             BacktestExecutor.this.configuration.holdingCostModel()
                         )
@@ -155,9 +156,8 @@ public class BacktestExecutor {
 
         if (((BacktestStrategy) strategy).shouldOperate()) {
           BacktestExecutor.this.configuration.tradeExecutionModel().execute(
-              barSeries.getCurrentIndex(),
+              barSeries.getBar(),
               ((BacktestStrategy) strategy).getTradeRecord(),
-              barSeries,
               amount
           );
         }

@@ -1,4 +1,4 @@
-/**
+/*
  * The MIT License (MIT)
  *
  * Copyright (c) 2017-2023 Ta4j Organization & respective
@@ -23,6 +23,7 @@
  */
 package org.ta4j.core.backtest;
 
+import org.ta4j.core.Bar;
 import org.ta4j.core.TradingRecord;
 import org.ta4j.core.num.Num;
 
@@ -37,9 +38,8 @@ import org.ta4j.core.num.Num;
  */
 public class TradeOnCurrentCloseModel implements TradeExecutionModel {
 
-    @Override
-    public void execute(int index, TradingRecord tradingRecord, BacktestBarSeries barSeries, Num amount) {
-        tradingRecord.operate(index, barSeries.getBar(index).closePrice(), amount);
-    }
-
+  @Override
+  public void execute(final Bar currentBar, final TradingRecord tradingRecord, final Num amount) {
+    tradingRecord.operate(currentBar.endTime(), currentBar.closePrice(), amount);
+  }
 }

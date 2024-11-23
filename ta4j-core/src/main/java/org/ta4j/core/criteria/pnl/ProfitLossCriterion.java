@@ -23,7 +23,6 @@
  */
 package org.ta4j.core.criteria.pnl;
 
-import org.ta4j.core.BarSeries;
 import org.ta4j.core.Position;
 import org.ta4j.core.TradingRecord;
 import org.ta4j.core.criteria.AbstractAnalysisCriterion;
@@ -32,9 +31,6 @@ import org.ta4j.core.num.NumFactoryProvider;
 
 /**
  * Net Profit and loss criterion (absolute PnL, excludes trading costs).
- *
- * <p>
- * The profit or loss over the provided {@link BarSeries series}.
  */
 public class ProfitLossCriterion extends AbstractAnalysisCriterion {
 

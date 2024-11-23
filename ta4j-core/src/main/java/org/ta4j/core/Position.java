@@ -23,14 +23,13 @@
  */
 package org.ta4j.core;
 
-import static org.ta4j.core.num.NaN.NaN;
-
+import java.time.Instant;
 import java.util.Objects;
 
+import lombok.Getter;
 import org.ta4j.core.Trade.TradeType;
 import org.ta4j.core.analysis.cost.CostModel;
 import org.ta4j.core.analysis.cost.ZeroCostModel;
-import org.ta4j.core.backtest.BacktestBarSeries;
 import org.ta4j.core.num.Num;
 
 /**
@@ -43,6 +42,7 @@ import org.ta4j.core.num.Num;
  * <li>entry == SELL --> exit == BUY
  * </ul>
  */
+@Getter
 public class Position {
 
   /** The entry trade */
@@ -100,65 +100,6 @@ public class Position {
   }
 
 
-  /**
-   * Constructor.
-   *
-   * @param entry the entry {@link Trade trade}
-   * @param exit the exit {@link Trade trade}
-   */
-  public Position(final Trade entry, final Trade exit) {
-    this(entry, exit, entry.getCostModel(), new ZeroCostModel());
-  }
-
-
-  /**
-   * Constructor.
-   *
-   * @param entry the entry {@link Trade trade}
-   * @param exit the exit {@link Trade trade}
-   * @param transactionCostModel the cost model for transactions of the asset
-   * @param holdingCostModel the cost model for holding asset (e.g. borrowing)
-   */
-  public Position(
-      final Trade entry,
-      final Trade exit,
-      final CostModel transactionCostModel,
-      final CostModel holdingCostModel
-  ) {
-
-    if (entry.getType().equals(exit.getType())) {
-      throw new IllegalArgumentException("Both trades must have different types");
-    }
-
-    if (!(entry.getCostModel().equals(transactionCostModel))
-        || !(exit.getCostModel().equals(transactionCostModel))) {
-      throw new IllegalArgumentException("Trades and the position must incorporate the same trading cost model");
-    }
-
-    this.startingType = entry.getType();
-    this.entry = entry;
-    this.exit = exit;
-    this.transactionCostModel = transactionCostModel;
-    this.holdingCostModel = holdingCostModel;
-  }
-
-
-  /**
-   * @return the entry {@link Trade trade} of the position
-   */
-  public Trade getEntry() {
-    return this.entry;
-  }
-
-
-  /**
-   * @return the exit {@link Trade trade} of the position
-   */
-  public Trade getExit() {
-    return this.exit;
-  }
-
-
   @Override
   public boolean equals(final Object obj) {
     if (obj instanceof final Position p) {
@@ -178,35 +119,34 @@ public class Position {
   /**
    * Operates the position at the index-th position.
    *
-   * @return the trade
-   *
-   * @see #operate(int, Num, Num)
-   */
-  public Trade operate(final int index) {
-    return operate(index, NaN, NaN);
-  }
-
-
-  /**
-   * Operates the position at the index-th position.
-   *
-   * @param price the price
+   * @param whenExecuted the executed bar
    * @param amount the amount
    *
    * @return the trade
    *
    * @throws IllegalStateException if {@link #isOpened()}
    */
-  public Trade operate(final int index, final Num price, final Num amount) {
+  public Trade operate(final Instant whenExecuted, final Num pricePerAsset, final Num amount) {
     Trade trade = null;
     if (isNew()) {
-      trade = new Trade(index, this.startingType, price, amount, this.transactionCostModel);
+      trade = Trade.builder()
+          .whenExecuted(whenExecuted)
+          .pricePerAsset(pricePerAsset)
+          .type(this.startingType)
+          .orderType(Trade.OrderType.OPEN)
+          .amount(amount)
+          .transactionCostModel(this.transactionCostModel)
+          .build();
       this.entry = trade;
     } else if (isOpened()) {
-      if (index < this.entry.getIndex()) {
-        throw new IllegalStateException("The index i is less than the entryTrade index");
-      }
-      trade = new Trade(index, this.startingType.complementType(), price, amount, this.transactionCostModel);
+      trade = Trade.builder()
+          .whenExecuted(whenExecuted)
+          .pricePerAsset(pricePerAsset)
+          .type(this.startingType)
+          .orderType(Trade.OrderType.CLOSE)
+          .amount(amount)
+          .transactionCostModel(this.transactionCostModel)
+          .build();
       this.exit = trade;
     }
     return trade;
@@ -225,7 +165,7 @@ public class Position {
    * @return true if the position is opened, false otherwise
    */
   public boolean isOpened() {
-    return (this.entry != null) && (this.exit == null);
+    return this.entry != null && this.exit == null;
   }
 
 
@@ -233,7 +173,7 @@ public class Position {
    * @return true if the position is new, false otherwise
    */
   public boolean isNew() {
-    return (this.entry == null) && (this.exit == null);
+    return this.entry == null && this.exit == null;
   }
 
 
@@ -360,25 +300,6 @@ public class Position {
 
 
   /**
-   * Calculates the gross return of the position. If either the entry or exit
-   * price is {@code NaN}, the close price from given {@code barSeries} is used.
-   * The gross return excludes any trading costs (and includes the base).
-   *
-   * @param barSeries
-   *
-   * @return the gross return in percent with entry and exit prices from the
-   *     barSeries
-   *
-   * @see #getGrossReturn(Num, Num)
-   */
-  public Num getGrossReturn(final BacktestBarSeries barSeries) {
-    final Num entryPrice = getEntry().getPricePerAsset(barSeries);
-    final Num exitPrice = getExit().getPricePerAsset(barSeries);
-    return getGrossReturn(entryPrice, exitPrice);
-  }
-
-
-  /**
    * Calculates the gross return between entry and exit price in percent. Includes
    * the base.
    *
@@ -452,14 +373,6 @@ public class Position {
    */
   public Num getHoldingCost(final int finalIndex) {
     return this.holdingCostModel.calculate(this, finalIndex);
-  }
-
-
-  /**
-   * @return the {@link #startingType}
-   */
-  public TradeType getStartingType() {
-    return this.startingType;
   }
 
 

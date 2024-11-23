@@ -44,7 +44,7 @@ public class MockTradingRecord extends BackTestTradingRecord {
         for (int i = 0; i < states.size(); i++) {
             double state = states.get(i).doubleValue();
             if (state != lastState) {
-                this.operate(i);
+//               TODO this.operate(i);
             }
             lastState = state;
         }

@@ -1,4 +1,4 @@
-/**
+/*
  * The MIT License (MIT)
  *
  * Copyright (c) 2017-2023 Ta4j Organization & respective
@@ -33,55 +33,61 @@ import org.ta4j.core.num.Num;
  */
 public class LinearTransactionCostModel implements CostModel {
 
-    /** The slope of the linear model (fee per position). */
-    private final double feePerPosition;
+  /** The slope of the linear model (fee per position). */
+  private final double feePerPosition;
 
-    /**
-     * Constructor with {@code feePerPosition * x}.
-     *
-     * @param feePerPosition the feePerPosition coefficient (e.g. 0.005 for 0.5% per
-     *                       {@link Trade trade})
-     */
-    public LinearTransactionCostModel(double feePerPosition) {
-        this.feePerPosition = feePerPosition;
-    }
 
-    /**
-     * @param position     the position
-     * @param currentIndex current bar index (irrelevant for the
-     *                     LinearTransactionCostModel)
-     * @return the trading cost of the single {@code position}
-     */
-    @Override
-    public Num calculate(Position position, int currentIndex) {
-        return this.calculate(position);
-    }
+  /**
+   * Constructor with {@code feePerPosition * x}.
+   *
+   * @param feePerPosition the feePerPosition coefficient (e.g. 0.005 for 0.5% per
+   *     {@link Trade trade})
+   */
+  public LinearTransactionCostModel(final double feePerPosition) {
+    this.feePerPosition = feePerPosition;
+  }
 
-    @Override
-    public Num calculate(Position position) {
-        Num totalPositionCost = null;
-        Trade entryTrade = position.getEntry();
-        if (entryTrade != null) {
-            // transaction costs of the entry trade
-            totalPositionCost = entryTrade.getCost();
-            if (position.getExit() != null) {
-                totalPositionCost = totalPositionCost.plus(position.getExit().getCost());
-            }
-        }
-        return totalPositionCost;
-    }
 
-    @Override
-    public Num calculate(Num price, Num amount) {
-        return amount.getNumFactory().numOf(feePerPosition).multipliedBy(price).multipliedBy(amount);
-    }
+  /**
+   * @param position the position
+   * @param currentIndex current bar index (irrelevant for the
+   *     LinearTransactionCostModel)
+   *
+   * @return the trading cost of the single {@code position}
+   */
+  @Override
+  public Num calculate(final Position position, final int currentIndex) {
+    return this.calculate(position);
+  }
 
-    @Override
-    public boolean equals(CostModel otherModel) {
-        boolean equality = false;
-        if (this.getClass().equals(otherModel.getClass())) {
-            equality = ((LinearTransactionCostModel) otherModel).feePerPosition == this.feePerPosition;
-        }
-        return equality;
+
+  @Override
+  public Num calculate(final Position position) {
+    Num totalPositionCost = null;
+    final Trade entryTrade = position.getEntry();
+    if (entryTrade != null) {
+      // transaction costs of the entry trade
+      totalPositionCost = entryTrade.getCost();
+      if (position.getExit() != null) {
+        totalPositionCost = totalPositionCost.plus(position.getExit().getCost());
+      }
     }
+    return totalPositionCost;
+  }
+
+
+  @Override
+  public Num calculate(final Num price, final Num amount) {
+    return amount.getNumFactory().numOf(this.feePerPosition).multipliedBy(price).multipliedBy(amount);
+  }
+
+
+  @Override
+  public boolean equals(final CostModel otherModel) {
+    boolean equality = false;
+    if (this.getClass().equals(otherModel.getClass())) {
+      equality = ((LinearTransactionCostModel) otherModel).feePerPosition == this.feePerPosition;
+    }
+    return equality;
+  }
 }

@@ -1,4 +1,4 @@
-/**
+/*
  * The MIT License (MIT)
  *
  * Copyright (c) 2017-2023 Ta4j Organization & respective
@@ -23,6 +23,7 @@
  */
 package org.ta4j.core.backtest;
 
+import org.ta4j.core.Bar;
 import org.ta4j.core.TradingRecord;
 import org.ta4j.core.num.Num;
 
@@ -37,12 +38,12 @@ import org.ta4j.core.num.Num;
  */
 public class TradeOnNextOpenModel implements TradeExecutionModel {
 
-    @Override
-    public void execute(int index, TradingRecord tradingRecord, BacktestBarSeries barSeries, Num amount) {
-        int indexOfExecutedBar = index + 1;
-        if (indexOfExecutedBar <= barSeries.getEndIndex()) {
-            tradingRecord.operate(indexOfExecutedBar, barSeries.getBar(indexOfExecutedBar).openPrice(), amount);
-        }
-    }
+  @Override
+  public void execute(final Bar currentBar, final TradingRecord tradingRecord, final Num amount) {
+    //       TODO event driven logic int indexOfExecutedBar = index + 1;
+    //        if (indexOfExecutedBar <= barSeries.getEndIndex()) {
+    //            tradingRecord.operate(indexOfExecutedBar, barSeries.getBar(indexOfExecutedBar).openPrice(), amount);
+    //        }
+  }
 
 }

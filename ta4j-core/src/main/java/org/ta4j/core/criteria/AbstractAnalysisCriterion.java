@@ -28,6 +28,7 @@ import org.ta4j.core.AnalysisCriterion;
 /**
  * An abstract analysis criterion.
  */
+// TODO remove USELESS
 public abstract class AbstractAnalysisCriterion implements AnalysisCriterion {
 
     @Override

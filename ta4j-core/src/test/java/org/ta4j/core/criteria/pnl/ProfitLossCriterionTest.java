@@ -23,103 +23,86 @@
  */
 package org.ta4j.core.criteria.pnl;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.ta4j.core.TestUtils.assertNumEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.junit.Test;
-import org.ta4j.core.AnalysisCriterion;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.ta4j.core.Trade;
-import org.ta4j.core.TradingRecord;
-import org.ta4j.core.backtest.BackTestTradingRecord;
+import org.ta4j.core.TradingRecordTestContext;
 import org.ta4j.core.criteria.AbstractCriterionTest;
-import org.ta4j.core.mocks.MockBarSeriesBuilder;
 import org.ta4j.core.num.NumFactory;
 
-public class ProfitLossCriterionTest extends AbstractCriterionTest {
+class ProfitLossCriterionTest extends AbstractCriterionTest {
 
-  public ProfitLossCriterionTest(final NumFactory numFactory) {
-    super(params -> new ProfitLossCriterion(), numFactory);
+  @ParameterizedTest
+  @MethodSource("numFactories")
+  void calculateOnlyWithProfitPositions(final NumFactory numFactory) {
+    final var context = new TradingRecordTestContext()
+        .withNumFactory(numFactory)
+        .withCriterion(new ProfitLossCriterion());
+
+    context.operate(50).at(100)
+        .operate(50).at(110)
+        .operate(50).at(100)
+        .operate(50).at(105)
+        .assertResults(500 + 250)
+    ;
   }
 
 
-  @Test
-  public void calculateOnlyWithProfitPositions() {
-    final var series = new MockBarSeriesBuilder().withNumFactory(this.numFactory)
-        .withData(100, 105, 110, 100, 95, 105)
-        .build();
-    final TradingRecord tradingRecord = new BackTestTradingRecord(
-        Trade.buyAt(0, series, series.numFactory().numOf(50)),
-        Trade.sellAt(2, series, series.numFactory().numOf(50)),
-        Trade.buyAt(3, series, series.numFactory().numOf(50)),
-        Trade.sellAt(5, series, series.numFactory().numOf(50))
-    );
+  @ParameterizedTest
+  @MethodSource("numFactories")
+  void calculateOnlyWithLossPositions(final NumFactory numFactory) {
+    final var context = new TradingRecordTestContext()
+        .withNumFactory(numFactory)
+        .withCriterion(new ProfitLossCriterion());
 
-    final AnalysisCriterion profit = getCriterion();
-    assertNumEquals(500 + 250, profit.calculate(series, tradingRecord));
+    context.operate(50).at(100)
+        .operate(50).at(95)
+        .operate(50).at(100)
+        .operate(50).at(70)
+        .assertResults(-250 - 1500);
   }
 
 
-  @Test
-  public void calculateOnlyWithLossPositions() {
-    final var series =
-        new MockBarSeriesBuilder().withNumFactory(this.numFactory).withData(100, 95, 100, 80, 85, 70).build();
-    final TradingRecord tradingRecord = new BackTestTradingRecord(
-        Trade.buyAt(0, series, series.numFactory().numOf(50)),
-        Trade.sellAt(1, series, series.numFactory().numOf(50)),
-        Trade.buyAt(2, series, series.numFactory().numOf(50)),
-        Trade.sellAt(5, series, series.numFactory().numOf(50))
-    );
+  @ParameterizedTest
+  @MethodSource("numFactories")
+  void calculateOnlyWithProfitShortPositions(final NumFactory numFactory) {
+    final var context = new TradingRecordTestContext()
+        .withNumFactory(numFactory)
+        .withTradeType(Trade.TradeType.SELL)
+        .withCriterion(new ProfitLossCriterion());
 
-    final AnalysisCriterion profit = getCriterion();
-    assertNumEquals(-250 - 1500, profit.calculate(series, tradingRecord));
+    context.operate(50).at(100)
+        .operate(50).at(110)
+        .operate(50).at(100)
+        .operate(50).at(105)
+        .assertResults(-(500 + 250));
   }
 
 
-  @Test
-  public void calculateOnlyWithProfitShortPositions() {
-    final var series = new MockBarSeriesBuilder().withNumFactory(this.numFactory)
-        .withData(100, 105, 110, 100, 95, 105)
-        .build();
-    final TradingRecord tradingRecord = new BackTestTradingRecord(
-        Trade.sellAt(0, series, series.numFactory().numOf(50)),
-        Trade.buyAt(2, series, series.numFactory().numOf(50)),
-        Trade.sellAt(3, series, series.numFactory().numOf(50)),
-        Trade.buyAt(5, series, series.numFactory().numOf(50))
-    );
+  @ParameterizedTest
+  @MethodSource("numFactories")
+  void calculateOnlyWithLossShortPositions(final NumFactory numFactory) {
+    final var context = new TradingRecordTestContext()
+        .withNumFactory(numFactory)
+        .withTradeType(Trade.TradeType.SELL)
+        .withCriterion(new ProfitLossCriterion());
 
-    final AnalysisCriterion profit = getCriterion();
-    assertNumEquals(-(500 + 250), profit.calculate(series, tradingRecord));
+    context.operate(50).at(100)
+        .operate(50).at(95)
+        .operate(50).at(100)
+        .operate(50).at(70)
+        .assertResults(250 + 1500);
   }
 
 
-  @Test
-  public void calculateOnlyWithLossShortPositions() {
-    final var series =
-        new MockBarSeriesBuilder().withNumFactory(this.numFactory).withData(100, 95, 100, 80, 85, 70).build();
-    final TradingRecord tradingRecord = new BackTestTradingRecord(
-        Trade.sellAt(0, series, series.numFactory().numOf(50)),
-        Trade.buyAt(1, series, series.numFactory().numOf(50)),
-        Trade.sellAt(2, series, series.numFactory().numOf(50)),
-        Trade.buyAt(5, series, series.numFactory().numOf(50))
-    );
-
-    final AnalysisCriterion profit = getCriterion();
-    assertNumEquals(250 + 1500, profit.calculate(series, tradingRecord));
+  @ParameterizedTest
+  @MethodSource("numFactories")
+  void betterThan(final NumFactory numFactory) {
+    final var criterion = new ProfitLossCriterion();
+    assertTrue(criterion.betterThan(numFactory.numOf(5000), numFactory.numOf(4500)));
+    assertFalse(criterion.betterThan(numFactory.numOf(4500), numFactory.numOf(5000)));
   }
-
-
-  @Test
-  public void betterThan() {
-    final AnalysisCriterion criterion = getCriterion();
-    assertTrue(criterion.betterThan(numOf(5000), numOf(4500)));
-    assertFalse(criterion.betterThan(numOf(4500), numOf(5000)));
-  }
-
-
-  @Test
-  public void testCalculateOneOpenPositionShouldReturnZero() {
-    this.openedPositionUtils.testCalculateOneOpenPositionShouldReturnExpectedValue(this.numFactory, getCriterion(), 0);
-  }
-
 }

@@ -23,7 +23,9 @@
  */
 package org.ta4j.core.backtest;
 
+import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 
@@ -44,26 +46,8 @@ public class BackTestTradingRecord implements TradingRecord {
   /** The name of the trading record. */
   private String name;
 
-  /** The start of the recording (included). */
-  private final Integer startIndex;
-
-  /** The end of the recording (included). */
-  private final Integer endIndex;
-
   /** The recorded trades. */
   private final List<Trade> trades = new ArrayList<>();
-
-  /** The recorded BUY trades. */
-  private final List<Trade> buyTrades = new ArrayList<>();
-
-  /** The recorded SELL trades. */
-  private final List<Trade> sellTrades = new ArrayList<>();
-
-  /** The recorded entry trades. */
-  private final List<Trade> entryTrades = new ArrayList<>();
-
-  /** The recorded exit trades. */
-  private final List<Trade> exitTrades = new ArrayList<>();
 
   /** The recorded positions. */
   private final List<Position> positions = new ArrayList<>();
@@ -118,32 +102,11 @@ public class BackTestTradingRecord implements TradingRecord {
     this(tradeType, new ZeroCostModel(), new ZeroCostModel());
   }
 
-
   /**
    * Constructor.
    *
    * @param entryTradeType the {@link TradeType trade type} of entries in
    *     the trading session
-   * @param transactionCostModel the cost model for transactions of the asset
-   * @param holdingCostModel the cost model for holding the asset (e.g.
-   *     borrowing)
-   */
-  public BackTestTradingRecord(
-      final TradeType entryTradeType,
-      final CostModel transactionCostModel,
-      final CostModel holdingCostModel
-  ) {
-    this(entryTradeType, null, null, transactionCostModel, holdingCostModel);
-  }
-
-
-  /**
-   * Constructor.
-   *
-   * @param entryTradeType the {@link TradeType trade type} of entries in
-   *     the trading session
-   * @param startIndex the start of the recording (included)
-   * @param endIndex the end of the recording (included)
    * @param transactionCostModel the cost model for transactions of the asset
    * @param holdingCostModel the cost model for holding the asset (e.g.
    *     borrowing)
@@ -152,64 +115,13 @@ public class BackTestTradingRecord implements TradingRecord {
    */
   public BackTestTradingRecord(
       final TradeType entryTradeType,
-      final Integer startIndex,
-      final Integer endIndex,
       final CostModel transactionCostModel,
       final CostModel holdingCostModel
   ) {
     this.startingType = Objects.requireNonNull(entryTradeType, "Starting type must not be null");
-    this.startIndex = startIndex;
-    this.endIndex = endIndex;
     this.transactionCostModel = transactionCostModel;
     this.holdingCostModel = holdingCostModel;
     this.currentPosition = new Position(entryTradeType, transactionCostModel, holdingCostModel);
-  }
-
-
-  /**
-   * Constructor.
-   *
-   * @param trades the trades to be recorded (cannot be empty)
-   */
-  public BackTestTradingRecord(final Trade... trades) {
-    this(new ZeroCostModel(), new ZeroCostModel(), trades);
-  }
-
-
-  /**
-   * Constructor.
-   *
-   * @param transactionCostModel the cost model for transactions of the asset
-   * @param holdingCostModel the cost model for holding the asset (e.g.
-   *     borrowing)
-   * @param trades the trades to be recorded (cannot be empty)
-   */
-  public BackTestTradingRecord(
-      final CostModel transactionCostModel,
-      final CostModel holdingCostModel,
-      final Trade... trades
-  ) {
-    this(
-        trades[0].getType(),
-        trades[0].getIndex(),
-        trades[trades.length - 1].getIndex(),
-        transactionCostModel,
-        holdingCostModel
-    );
-    for (final var trade : trades) {
-      final boolean newTradeWillBeAnEntry = this.currentPosition.isNew();
-      if (newTradeWillBeAnEntry && trade.getType() != this.startingType) {
-        // Special case for entry/exit types reversal
-        // E.g.: BUY, SELL,
-        // BUY, SELL,
-        // SELL, BUY,
-        // BUY, SELL
-        this.currentPosition = new Position(trade.getType(), transactionCostModel, holdingCostModel);
-      }
-      final var newTrade =
-          this.currentPosition.operate(trade.getIndex(), trade.getPricePerAsset(), trade.getAmount());
-      recordTrade(newTrade, newTradeWillBeAnEntry);
-    }
   }
 
 
@@ -232,33 +144,35 @@ public class BackTestTradingRecord implements TradingRecord {
 
 
   @Override
-  public void operate(final int index, final Num price, final Num amount) {
+  public void operate(final Instant whenExecuted, final Num pricePerAsset, final Num amount) {
     if (this.currentPosition.isClosed()) {
       // Current position closed, should not occur
       throw new IllegalStateException("Current position should not be closed");
     }
-    final boolean newTradeWillBeAnEntry = this.currentPosition.isNew();
-    final Trade newTrade = this.currentPosition.operate(index, price, amount);
-    recordTrade(newTrade, newTradeWillBeAnEntry);
+
+    final var newTrade = this.currentPosition.operate(whenExecuted, pricePerAsset, amount);
+    recordTrade(newTrade);
   }
 
 
   @Override
-  public boolean enter(final int index, final Num price, final Num amount) {
+  public boolean enter(final Instant whenExecuted, final Num pricePerAsset, final Num amount) {
     if (this.currentPosition.isNew()) {
-      operate(index, price, amount);
+      operate(whenExecuted, pricePerAsset, amount);
       return true;
     }
+
     return false;
   }
 
 
   @Override
-  public boolean exit(final int index, final Num price, final Num amount) {
+  public boolean exit(final Instant whenExecuted, final Num pricePerAsset, final Num amount) {
     if (this.currentPosition.isOpened()) {
-      operate(index, price, amount);
+      operate(whenExecuted, pricePerAsset, amount);
       return true;
     }
+
     return false;
   }
 
@@ -280,48 +194,37 @@ public class BackTestTradingRecord implements TradingRecord {
 
   @Override
   public Trade getLastTrade(final TradeType tradeType) {
-    if (TradeType.BUY == tradeType && !this.buyTrades.isEmpty()) {
-      return this.buyTrades.getLast();
-    } else if (TradeType.SELL == tradeType && !this.sellTrades.isEmpty()) {
-      return this.sellTrades.getLast();
-    }
-    return null;
+    return this.trades.stream()
+        .sorted(Comparator.comparing(Trade::getWhenExecuted).reversed())
+        .filter(trade -> trade.getType() == tradeType)
+        .findFirst()
+        .orElse(null);
   }
 
 
   @Override
   public Trade getLastEntry() {
-    if (!this.entryTrades.isEmpty()) {
-      return this.entryTrades.getLast();
-    }
-    return null;
+    return this.trades.stream()
+        .sorted(Comparator.comparing(Trade::getWhenExecuted).reversed())
+        .filter(trade -> trade.getOrderType() == Trade.OrderType.OPEN)
+        .findFirst()
+        .orElse(null);
   }
 
 
   @Override
   public Trade getLastExit() {
-    if (!this.exitTrades.isEmpty()) {
-      return this.exitTrades.getLast();
-    }
-    return null;
-  }
-
-
-  @Override
-  public Integer getStartIndex() {
-    return this.startIndex;
-  }
-
-
-  @Override
-  public Integer getEndIndex() {
-    return this.endIndex;
+    return this.trades.stream()
+        .sorted(Comparator.comparing(Trade::getWhenExecuted).reversed())
+        .filter(trade -> trade.getOrderType() == Trade.OrderType.CLOSE)
+        .findFirst()
+        .orElse(null);
   }
 
 
   @Override
   public boolean isEmpty() {
-    return this.startIndex == null;
+    return this.trades.isEmpty();
   }
 
 
@@ -329,29 +232,13 @@ public class BackTestTradingRecord implements TradingRecord {
    * Records a trade and the corresponding position (if closed).
    *
    * @param trade the trade to be recorded
-   * @param isEntry true if the trade is an entry, false otherwise (exit)
-   *
    * @throws NullPointerException if trade is null
    */
-  private void recordTrade(final Trade trade, final boolean isEntry) {
+  private void recordTrade(final Trade trade) {
     Objects.requireNonNull(trade, "Trade should not be null");
-
-    // Storing the new trade in entries/exits lists
-    if (isEntry) {
-      this.entryTrades.add(trade);
-    } else {
-      this.exitTrades.add(trade);
-    }
 
     // Storing the new trade in trades list
     this.trades.add(trade);
-    if (TradeType.BUY == trade.getType()) {
-      // Storing the new trade in buy trades list
-      this.buyTrades.add(trade);
-    } else if (TradeType.SELL == trade.getType()) {
-      // Storing the new trade in sell trades list
-      this.sellTrades.add(trade);
-    }
 
     // Storing the position if closed
     if (this.currentPosition.isClosed()) {

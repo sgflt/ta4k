@@ -23,57 +23,18 @@
  */
 package org.ta4j.core.criteria;
 
-import java.util.List;
+import java.util.stream.Stream;
 
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.ta4j.core.AnalysisCriterion;
-import org.ta4j.core.CriterionFactory;
 import org.ta4j.core.num.DecimalNumFactory;
 import org.ta4j.core.num.DoubleNumFactory;
-import org.ta4j.core.num.Num;
 import org.ta4j.core.num.NumFactory;
 
-@RunWith(Parameterized.class)
 public abstract class AbstractCriterionTest {
 
-  protected final NumFactory numFactory;
-  protected final OpenedPositionUtils openedPositionUtils = new OpenedPositionUtils();
-  private final CriterionFactory factory;
+  // TODO  protected final OpenedPositionUtils openedPositionUtils = new OpenedPositionUtils();
 
 
-  /**
-   * Constructor.
-   *
-   * @param factory CriterionFactory for building an AnalysisCriterion given
-   *     parameters
-   */
-  public AbstractCriterionTest(final CriterionFactory factory, final NumFactory numFactory) {
-    this.factory = factory;
-    this.numFactory = numFactory;
+  public static Stream<NumFactory> numFactories() {
+    return Stream.of(DoubleNumFactory.getInstance(), DecimalNumFactory.getInstance());
   }
-
-
-  @Parameterized.Parameters(name = "Test Case: {index} (0=DoubleNum, 1=DecimalNum)")
-  public static List<NumFactory> function() {
-    return List.of(DoubleNumFactory.getInstance(), DecimalNumFactory.getInstance());
-  }
-
-
-  /**
-   * Generates an AnalysisCriterion given criterion parameters.
-   *
-   * @param params criterion parameters
-   *
-   * @return AnalysisCriterion given parameters
-   */
-  public AnalysisCriterion getCriterion(final Object... params) {
-    return this.factory.getCriterion(params);
-  }
-
-
-  public Num numOf(final Number n) {
-    return this.numFactory.numOf(n);
-  }
-
 }
