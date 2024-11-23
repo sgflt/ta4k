@@ -91,7 +91,7 @@ class BollingerBandsUpperIndicatorTest extends AbstractIndicatorTest<Num> {
     final var standardDeviation = closePrice.stddev(this.barCount);
     final var bbu = new BollingerBandsUpperIndicator(bbmSMA, standardDeviation, numFactory.numOf(1.5));
 
-    this.testContext.withIndicator(bbu, "bbbbulSMA")
+    this.testContext.withIndicator(bbu, "bbu")
         .fastForwardUntilStable()
         .onIndicator("bbu")
         .assertCurrent(3.5000)
