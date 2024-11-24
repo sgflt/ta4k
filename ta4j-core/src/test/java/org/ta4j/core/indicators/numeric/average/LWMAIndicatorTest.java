@@ -26,12 +26,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.ta4j.core.TestContext;
-import org.ta4j.core.indicators.AbstractIndicatorTest;
 import org.ta4j.core.indicators.numeric.Indicators;
-import org.ta4j.core.num.Num;
 import org.ta4j.core.num.NumFactory;
 
-class LWMAIndicatorTest extends AbstractIndicatorTest<Num> {
+class LWMAIndicatorTest {
 
 
   private TestContext testContext;
@@ -45,7 +43,7 @@ class LWMAIndicatorTest extends AbstractIndicatorTest<Num> {
 
 
   @ParameterizedTest(name = "LWMA [{index}] {0}")
-  @MethodSource("provideNumFactories")
+  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
   void lwmaUsingBarCount5UsingClosePrice(final NumFactory numFactory) {
     this.testContext.withNumFactory(numFactory);
 

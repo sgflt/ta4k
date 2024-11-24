@@ -35,7 +35,7 @@ import org.ta4j.core.num.NumFactory;
 class ExpectancyCriterionTest extends AbstractCriterionTest {
 
   @ParameterizedTest
-  @MethodSource("numFactories")
+  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
   void calculateOnlyWithProfitPositions(final NumFactory numFactory) {
     final var context = new TradingRecordTestContext()
         .withNumFactory(numFactory)
@@ -56,7 +56,7 @@ class ExpectancyCriterionTest extends AbstractCriterionTest {
 
 
   @ParameterizedTest
-  @MethodSource("numFactories")
+  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
   void calculateWithMixedPositions(final NumFactory numFactory) {
     final var context = new TradingRecordTestContext()
         .withNumFactory(numFactory)
@@ -78,7 +78,7 @@ class ExpectancyCriterionTest extends AbstractCriterionTest {
 
 
   @ParameterizedTest
-  @MethodSource("numFactories")
+  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
   void calculateOnlyWithLossPositions(final NumFactory numFactory) {
     final var context = new TradingRecordTestContext()
         .withNumFactory(numFactory)
@@ -99,7 +99,7 @@ class ExpectancyCriterionTest extends AbstractCriterionTest {
 
 
   @ParameterizedTest
-  @MethodSource("numFactories")
+  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
   void calculateProfitWithShortPositions(final NumFactory numFactory) {
     final var context = new TradingRecordTestContext()
         .withNumFactory(numFactory)
@@ -120,7 +120,7 @@ class ExpectancyCriterionTest extends AbstractCriterionTest {
 
 
   @ParameterizedTest
-  @MethodSource("numFactories")
+  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
   void calculateProfitWithMixedShortPositions(final NumFactory numFactory) {
     final var context = new TradingRecordTestContext()
         .withNumFactory(numFactory)
@@ -142,7 +142,7 @@ class ExpectancyCriterionTest extends AbstractCriterionTest {
 
 
   @ParameterizedTest
-  @MethodSource("numFactories")
+  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
   void betterThan(final NumFactory numFactory) {
     final var criterion = new ExpectancyCriterion();
     assertTrue(criterion.betterThan(numFactory.numOf(2.0), numFactory.numOf(1.5)));
@@ -151,7 +151,7 @@ class ExpectancyCriterionTest extends AbstractCriterionTest {
 
 
   @ParameterizedTest
-  @MethodSource("numFactories")
+  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
   void calculateOneOpenPosition(final NumFactory numFactory) {
     final var context = new TradingRecordTestContext()
         .withNumFactory(numFactory)

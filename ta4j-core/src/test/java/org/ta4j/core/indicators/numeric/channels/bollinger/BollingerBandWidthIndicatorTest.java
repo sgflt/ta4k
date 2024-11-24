@@ -27,10 +27,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.ta4j.core.TestContext;
-import org.ta4j.core.indicators.AbstractIndicatorTest;
-import org.ta4j.core.num.Num;
 
-class BollingerBandWidthIndicatorTest extends AbstractIndicatorTest<Num> {
+class BollingerBandWidthIndicatorTest {
 
 
   private TestContext testContext;
@@ -44,7 +42,7 @@ class BollingerBandWidthIndicatorTest extends AbstractIndicatorTest<Num> {
 
 
   @ParameterizedTest(name = "Bollinger bands width [{index}] {0}")
-  @MethodSource("provideNumFactories")
+  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
   void bollingerBandWidthUsingSMAAndStandardDeviation() {
 
     final var bbf = new BollingerBandFacade(5, 2);

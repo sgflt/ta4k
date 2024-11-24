@@ -27,12 +27,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.ta4j.core.TestContext;
-import org.ta4j.core.indicators.AbstractIndicatorTest;
 import org.ta4j.core.indicators.numeric.Indicators;
-import org.ta4j.core.num.Num;
 import org.ta4j.core.num.NumFactory;
 
-class AroonDownIndicatorTest extends AbstractIndicatorTest<Num> {
+class AroonDownIndicatorTest {
 
   private TestContext context;
 
@@ -67,7 +65,7 @@ class AroonDownIndicatorTest extends AbstractIndicatorTest<Num> {
 
 
   @ParameterizedTest
-  @MethodSource("provideNumFactories")
+  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
   void upDownAndHigh(final NumFactory numFactory) {
     final var aroonDownIndicator = Indicators.aroonDown(5);
     this.context.withIndicator(aroonDownIndicator)

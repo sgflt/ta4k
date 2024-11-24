@@ -27,14 +27,12 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.ta4j.core.TestContext;
-import org.ta4j.core.indicators.AbstractIndicatorTest;
 import org.ta4j.core.indicators.numeric.Indicators;
 import org.ta4j.core.indicators.numeric.average.SMAIndicator;
 import org.ta4j.core.indicators.numeric.statistics.StandardDeviationIndicator;
-import org.ta4j.core.num.Num;
 import org.ta4j.core.num.NumFactory;
 
-class BollingerBandFacadeTest extends AbstractIndicatorTest<Num> {
+class BollingerBandFacadeTest {
 
 
   private TestContext testContext;
@@ -50,7 +48,7 @@ class BollingerBandFacadeTest extends AbstractIndicatorTest<Num> {
 
 
   @ParameterizedTest(name = "PCB [{index}] {0}")
-  @MethodSource("provideNumFactories")
+  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
   void pcbFromFacadeIsCorrect(final NumFactory numFactory) {
     this.testContext.withNumFactory(numFactory);
 
@@ -65,7 +63,7 @@ class BollingerBandFacadeTest extends AbstractIndicatorTest<Num> {
 
 
   @ParameterizedTest(name = "Middle BB [{index}] {0}")
-  @MethodSource("provideNumFactories")
+  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
   void middleBBFromFacadeIsCorrect(final NumFactory numFactory) {
     this.testContext.withNumFactory(numFactory);
 
@@ -83,7 +81,7 @@ class BollingerBandFacadeTest extends AbstractIndicatorTest<Num> {
 
 
   @ParameterizedTest(name = "Lower BB [{index}] {0}")
-  @MethodSource("provideNumFactories")
+  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
   void lowerBBFromFacadeIsCorrect(final NumFactory numFactory) {
     this.testContext.withNumFactory(numFactory);
 
@@ -104,7 +102,7 @@ class BollingerBandFacadeTest extends AbstractIndicatorTest<Num> {
 
 
   @ParameterizedTest(name = "Upper BB [{index}] {0}")
-  @MethodSource("provideNumFactories")
+  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
   void upperBBFromFacadeIsCorrect(final NumFactory numFactory) {
     this.testContext.withNumFactory(numFactory);
 
@@ -125,7 +123,7 @@ class BollingerBandFacadeTest extends AbstractIndicatorTest<Num> {
 
 
   @ParameterizedTest(name = "Width of BB [{index}] {0}")
-  @MethodSource("provideNumFactories")
+  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
   void widthBBFromFacadeIsCorrect(final NumFactory numFactory) {
     this.testContext.withNumFactory(numFactory);
 

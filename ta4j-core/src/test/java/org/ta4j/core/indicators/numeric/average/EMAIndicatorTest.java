@@ -26,13 +26,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.ta4j.core.TestContext;
-import org.ta4j.core.indicators.AbstractIndicatorTest;
 import org.ta4j.core.indicators.XLSIndicatorTest;
 import org.ta4j.core.indicators.numeric.Indicators;
-import org.ta4j.core.num.Num;
 import org.ta4j.core.num.NumFactory;
 
-class EMAIndicatorTest extends AbstractIndicatorTest<Num> {
+class EMAIndicatorTest {
 
   private TestContext context;
 
@@ -48,7 +46,7 @@ class EMAIndicatorTest extends AbstractIndicatorTest<Num> {
 
 
   @ParameterizedTest(name = "First value equals first data value [{index}] {0}")
-  @MethodSource("provideNumFactories")
+  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
   void firstValueShouldBeEqualsToFirstDataValue(final NumFactory factory) {
     this.context.withNumFactory(factory)
         .withIndicator(Indicators.closePrice().ema(1))
@@ -57,7 +55,7 @@ class EMAIndicatorTest extends AbstractIndicatorTest<Num> {
 
 
   @ParameterizedTest(name = "EMA with barCount 10 [{index}] {0}")
-  @MethodSource("provideNumFactories")
+  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
   void testEmaWithBarCount10(final NumFactory factory) {
     this.context.withNumFactory(factory)
         .withIndicator(Indicators.closePrice().ema(10))
@@ -69,7 +67,7 @@ class EMAIndicatorTest extends AbstractIndicatorTest<Num> {
 
 
   @ParameterizedTest(name = "External data test [{index}] {0}")
-  @MethodSource("provideNumFactories")
+  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
   void testExternalData(final NumFactory numFactory) throws Exception {
     final var xls = new XLSIndicatorTest(this.getClass(), "EMA.xls", 6, numFactory);
     final var xlsContext = new TestContext();
@@ -84,7 +82,7 @@ class EMAIndicatorTest extends AbstractIndicatorTest<Num> {
 
 
   @ParameterizedTest(name = "External data with bar count 3 [{index}] {0}")
-  @MethodSource("provideNumFactories")
+  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
   void testExternalDataBarCount3(final NumFactory numFactory) throws Exception {
     final var xls = new XLSIndicatorTest(this.getClass(), "EMA.xls", 6, numFactory);
     final var xlsContext = new TestContext();
@@ -99,7 +97,7 @@ class EMAIndicatorTest extends AbstractIndicatorTest<Num> {
 
 
   @ParameterizedTest(name = "External data with bar count 13 [{index}] {0}")
-  @MethodSource("provideNumFactories")
+  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
   void testExternalDataBarCount13(final NumFactory numFactory) throws Exception {
     final var xls = new XLSIndicatorTest(this.getClass(), "EMA.xls", 6, numFactory);
     final var xlsContext = new TestContext();

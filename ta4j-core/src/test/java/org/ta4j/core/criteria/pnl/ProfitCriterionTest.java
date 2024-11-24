@@ -37,7 +37,7 @@ import org.ta4j.core.num.NumFactory;
 class ProfitCriterionTest extends AbstractCriterionTest {
 
   @ParameterizedTest
-  @MethodSource("numFactories")
+  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
   void calculateComparingIncExcludingCosts(final NumFactory numFactory) {
     final var context = new TradingRecordTestContext()
         .withNumFactory(numFactory)
@@ -55,7 +55,7 @@ class ProfitCriterionTest extends AbstractCriterionTest {
 
 
   @ParameterizedTest
-  @MethodSource("numFactories")
+  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
   void calculateComparingIncludingCosts(final NumFactory numFactory) {
     final var context = new TradingRecordTestContext()
         .withNumFactory(numFactory)
@@ -75,7 +75,7 @@ class ProfitCriterionTest extends AbstractCriterionTest {
 
 
   @ParameterizedTest
-  @MethodSource("numFactories")
+  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
   void calculateProfitWithShortPositions(final NumFactory numFactory) {
     final var context = new TradingRecordTestContext()
         .withNumFactory(numFactory)
@@ -96,7 +96,7 @@ class ProfitCriterionTest extends AbstractCriterionTest {
 
 
   @ParameterizedTest
-  @MethodSource("numFactories")
+  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
   void calculateProfitWithShortPositionsIncludingCosts(final NumFactory numFactory) {
     final var context = new TradingRecordTestContext()
         .withNumFactory(numFactory)
@@ -117,7 +117,7 @@ class ProfitCriterionTest extends AbstractCriterionTest {
 
 
   @ParameterizedTest
-  @MethodSource("numFactories")
+  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
   void calculateWithMixedProfitAndLoss(final NumFactory numFactory) {
     final var context = new TradingRecordTestContext()
         .withNumFactory(numFactory)
@@ -136,7 +136,7 @@ class ProfitCriterionTest extends AbstractCriterionTest {
 
 
   @ParameterizedTest
-  @MethodSource("numFactories")
+  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
   void betterThan(final NumFactory numFactory) {
     final var criterion = new ProfitCriterion(true);
     assertTrue(criterion.betterThan(numFactory.numOf(2.0), numFactory.numOf(1.5)));

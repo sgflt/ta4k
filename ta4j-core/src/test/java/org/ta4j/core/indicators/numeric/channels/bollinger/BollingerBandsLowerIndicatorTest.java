@@ -27,12 +27,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.ta4j.core.TestContext;
-import org.ta4j.core.indicators.AbstractIndicatorTest;
 import org.ta4j.core.indicators.numeric.Indicators;
-import org.ta4j.core.num.Num;
 import org.ta4j.core.num.NumFactory;
 
-class BollingerBandsLowerIndicatorTest extends AbstractIndicatorTest<Num> {
+class BollingerBandsLowerIndicatorTest {
 
   private int barCount;
 
@@ -51,7 +49,7 @@ class BollingerBandsLowerIndicatorTest extends AbstractIndicatorTest<Num> {
 
 
   @ParameterizedTest(name = "Lower bollinger band derived from STDEV of SMA [{index}] {0}")
-  @MethodSource("provideNumFactories")
+  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
   void bollingerBandsLowerUsingSMAAndStandardDeviation(final NumFactory numFactory) {
     this.testContext.withNumFactory(numFactory);
 
@@ -80,7 +78,7 @@ class BollingerBandsLowerIndicatorTest extends AbstractIndicatorTest<Num> {
 
 
   @ParameterizedTest(name = "Lower bollinger band derived from STDEV of SMA with smaller K = 1.5 [{index}] {0}")
-  @MethodSource("provideNumFactories")
+  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
   void bollingerBandsLowerUsingSMAAndStandardDeviationWithK(final NumFactory numFactory) {
     this.testContext.withNumFactory(numFactory);
 

@@ -27,11 +27,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.ta4j.core.TestContext;
-import org.ta4j.core.indicators.AbstractIndicatorTest;
 import org.ta4j.core.indicators.numeric.Indicators;
-import org.ta4j.core.num.Num;
 
-class BollingerBandsMiddleIndicatorTest extends AbstractIndicatorTest<Num> {
+class BollingerBandsMiddleIndicatorTest {
 
 
   private TestContext testContext;
@@ -47,7 +45,7 @@ class BollingerBandsMiddleIndicatorTest extends AbstractIndicatorTest<Num> {
 
 
   @ParameterizedTest(name = "Middle bollinger band derived from SMA [{index}] {0}")
-  @MethodSource("provideNumFactories")
+  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
   void bollingerBandsMiddleUsingSMA() {
     final var sma = Indicators.closePrice().sma(3);
     final var bbmSMA = new BollingerBandsMiddleIndicator(sma);

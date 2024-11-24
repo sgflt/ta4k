@@ -1,4 +1,4 @@
-/**
+/*
  * The MIT License (MIT)
  *
  * Copyright (c) 2017-2023 Ta4j Organization & respective
@@ -23,18 +23,8 @@
  */
 package org.ta4j.core.criteria;
 
-import java.util.stream.Stream;
-
-import org.ta4j.core.num.DecimalNumFactory;
-import org.ta4j.core.num.DoubleNumFactory;
-import org.ta4j.core.num.NumFactory;
-
+// TODO smazat celou třídu?
 public abstract class AbstractCriterionTest {
 
   // TODO  protected final OpenedPositionUtils openedPositionUtils = new OpenedPositionUtils();
-
-
-  public static Stream<NumFactory> numFactories() {
-    return Stream.of(DoubleNumFactory.getInstance(), DecimalNumFactory.getInstance());
-  }
 }

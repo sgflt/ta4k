@@ -28,9 +28,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.ta4j.core.TestContext;
-import org.ta4j.core.indicators.AbstractIndicatorTest;
 import org.ta4j.core.indicators.numeric.Indicators;
-import org.ta4j.core.num.Num;
 import org.ta4j.core.num.NumFactory;
 
 /**
@@ -40,7 +38,7 @@ import org.ta4j.core.num.NumFactory;
  *     href="http://stockcharts.com/school/data/media/chart_school/technical_indicators_and_overlays/kaufman_s_adaptive_moving_average/cs-kama.xls>
  *     http://stockcharts.com/school/data/media/chart_school/technical_indicators_and_overlays/kaufman_s_adaptive_moving_average/cs-kama.xls</a>
  */
-class KAMAIndicatorTest extends AbstractIndicatorTest<Num> {
+class KAMAIndicatorTest {
 
 
   private TestContext testContext;
@@ -60,7 +58,7 @@ class KAMAIndicatorTest extends AbstractIndicatorTest<Num> {
 
 
   @ParameterizedTest(name = "KAMA [{index}] {0}")
-  @MethodSource("provideNumFactories")
+  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
   void kama(final NumFactory numFactory) {
     this.testContext.withNumFactory(numFactory);
     final var kama = Indicators.closePrice().kama(10, 2, 30);

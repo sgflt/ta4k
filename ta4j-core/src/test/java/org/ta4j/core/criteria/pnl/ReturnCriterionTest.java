@@ -46,7 +46,7 @@ class ReturnCriterionTest extends AbstractCriterionTest {
 
 
   @ParameterizedTest
-  @MethodSource("numFactories")
+  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
   void calculateWithWinningLongPositions(final NumFactory numFactory) {
     final var context = new TradingRecordTestContext()
         .withNumFactory(numFactory)
@@ -71,7 +71,7 @@ class ReturnCriterionTest extends AbstractCriterionTest {
 
 
   @ParameterizedTest
-  @MethodSource("numFactories")
+  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
   void calculateWithLosingLongPositions(final NumFactory numFactory) {
     final var context = new TradingRecordTestContext()
         .withNumFactory(numFactory)
@@ -96,7 +96,7 @@ class ReturnCriterionTest extends AbstractCriterionTest {
 
 
   @ParameterizedTest
-  @MethodSource("numFactories")
+  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
   void calculateReturnWithWinningShortPositions(final NumFactory numFactory) {
     final var context = new TradingRecordTestContext()
         .withNumFactory(numFactory)
@@ -121,7 +121,7 @@ class ReturnCriterionTest extends AbstractCriterionTest {
 
 
   @ParameterizedTest
-  @MethodSource("numFactories")
+  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
   void calculateReturnWithLosingShortPositions(final NumFactory numFactory) {
     final var context = new TradingRecordTestContext()
         .withNumFactory(numFactory)
@@ -146,7 +146,7 @@ class ReturnCriterionTest extends AbstractCriterionTest {
 
 
   @ParameterizedTest
-  @MethodSource("numFactories")
+  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
   void calculateWithNoPositions() {
     final var tradingRecord = new BackTestTradingRecord();
 
@@ -159,7 +159,7 @@ class ReturnCriterionTest extends AbstractCriterionTest {
 
 
   @ParameterizedTest
-  @MethodSource("numFactories")
+  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
   void calculateWithOpenedPosition(final NumFactory numFactory) {
     var position = new Position(Trade.TradeType.BUY);
 
@@ -184,7 +184,7 @@ class ReturnCriterionTest extends AbstractCriterionTest {
 
 
   @ParameterizedTest
-  @MethodSource("numFactories")
+  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
   void betterThan(final NumFactory numFactory) {
     final var criterion = new ReturnCriterion();
     assertTrue(criterion.betterThan(numFactory.numOf(2.0), numFactory.numOf(1.5)));

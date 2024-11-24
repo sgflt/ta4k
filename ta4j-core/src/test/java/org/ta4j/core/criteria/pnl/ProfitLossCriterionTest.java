@@ -36,7 +36,7 @@ import org.ta4j.core.num.NumFactory;
 class ProfitLossCriterionTest extends AbstractCriterionTest {
 
   @ParameterizedTest
-  @MethodSource("numFactories")
+  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
   void calculateOnlyWithProfitPositions(final NumFactory numFactory) {
     final var context = new TradingRecordTestContext()
         .withNumFactory(numFactory)
@@ -52,7 +52,7 @@ class ProfitLossCriterionTest extends AbstractCriterionTest {
 
 
   @ParameterizedTest
-  @MethodSource("numFactories")
+  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
   void calculateOnlyWithLossPositions(final NumFactory numFactory) {
     final var context = new TradingRecordTestContext()
         .withNumFactory(numFactory)
@@ -67,7 +67,7 @@ class ProfitLossCriterionTest extends AbstractCriterionTest {
 
 
   @ParameterizedTest
-  @MethodSource("numFactories")
+  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
   void calculateOnlyWithProfitShortPositions(final NumFactory numFactory) {
     final var context = new TradingRecordTestContext()
         .withNumFactory(numFactory)
@@ -83,7 +83,7 @@ class ProfitLossCriterionTest extends AbstractCriterionTest {
 
 
   @ParameterizedTest
-  @MethodSource("numFactories")
+  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
   void calculateOnlyWithLossShortPositions(final NumFactory numFactory) {
     final var context = new TradingRecordTestContext()
         .withNumFactory(numFactory)
@@ -99,7 +99,7 @@ class ProfitLossCriterionTest extends AbstractCriterionTest {
 
 
   @ParameterizedTest
-  @MethodSource("numFactories")
+  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
   void betterThan(final NumFactory numFactory) {
     final var criterion = new ProfitLossCriterion();
     assertTrue(criterion.betterThan(numFactory.numOf(5000), numFactory.numOf(4500)));

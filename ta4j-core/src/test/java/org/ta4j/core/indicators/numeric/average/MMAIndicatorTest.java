@@ -28,13 +28,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.ta4j.core.TestContext;
-import org.ta4j.core.indicators.AbstractIndicatorTest;
 import org.ta4j.core.indicators.XLSIndicatorTest;
 import org.ta4j.core.indicators.numeric.Indicators;
-import org.ta4j.core.num.Num;
 import org.ta4j.core.num.NumFactory;
 
-class MMAIndicatorTest extends AbstractIndicatorTest<Num> {
+class MMAIndicatorTest {
 
 
   private TestContext testContext;
@@ -61,7 +59,7 @@ class MMAIndicatorTest extends AbstractIndicatorTest<Num> {
 
 
   @ParameterizedTest(name = "MMA 1 [{index}] {0}")
-  @MethodSource("provideNumFactories")
+  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
   void firstValueShouldBeEqualsToFirstDataValue(final NumFactory numFactory) {
     this.testContext.withNumFactory(numFactory);
 
@@ -73,7 +71,7 @@ class MMAIndicatorTest extends AbstractIndicatorTest<Num> {
 
 
   @ParameterizedTest(name = "MMA 1 [{index}] {0}")
-  @MethodSource("provideNumFactories")
+  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
   void mmaUsingBarCount10UsingClosePrice(final NumFactory numFactory) {
     this.testContext.withNumFactory(numFactory);
 
@@ -89,21 +87,21 @@ class MMAIndicatorTest extends AbstractIndicatorTest<Num> {
 
 
   @ParameterizedTest(name = "MMA 1 [{index}] {0}")
-  @MethodSource("provideNumFactories")
+  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
   void testAgainstExternalData1(final NumFactory numFactory) throws Exception {
     assertBarCount(1, 329.0, numFactory);
   }
 
 
   @ParameterizedTest(name = "MMA 3 [{index}] {0}")
-  @MethodSource("provideNumFactories")
+  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
   void testAgainstExternalData3(final NumFactory numFactory) throws Exception {
     assertBarCount(3, 327.2900, numFactory);
   }
 
 
   @ParameterizedTest(name = "MMA 13 [{index}] {0}")
-  @MethodSource("provideNumFactories")
+  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
   void testAgainstExternalData13(final NumFactory numFactory) throws Exception {
     assertBarCount(13, 326.9696, numFactory);
   }

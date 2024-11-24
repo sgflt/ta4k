@@ -26,11 +26,9 @@ package org.ta4j.core.indicators.numeric.candles.price;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.ta4j.core.TestContext;
-import org.ta4j.core.indicators.AbstractIndicatorTest;
 import org.ta4j.core.indicators.numeric.Indicators;
-import org.ta4j.core.num.Num;
 
-class ClosePriceIndicatorTest extends AbstractIndicatorTest<Num> {
+class ClosePriceIndicatorTest {
   private TestContext context;
 
 

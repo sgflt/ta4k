@@ -26,13 +26,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.ta4j.core.TestContext;
-import org.ta4j.core.indicators.AbstractIndicatorTest;
 import org.ta4j.core.indicators.XLSIndicatorTest;
 import org.ta4j.core.indicators.numeric.Indicators;
-import org.ta4j.core.num.Num;
 import org.ta4j.core.num.NumFactory;
 
-class SMAIndicatorTest extends AbstractIndicatorTest<Num> {
+class SMAIndicatorTest {
 
 
   private TestContext testContext;
@@ -46,7 +44,7 @@ class SMAIndicatorTest extends AbstractIndicatorTest<Num> {
 
 
   @ParameterizedTest(name = "SMA 3 [{index}] {0}")
-  @MethodSource("provideNumFactories")
+  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
   void usingBarCount3UsingClosePrice(final NumFactory numFactory) {
     this.testContext.withNumFactory(numFactory);
 
@@ -70,7 +68,7 @@ class SMAIndicatorTest extends AbstractIndicatorTest<Num> {
 
 
   @ParameterizedTest(name = "SMA 1 [{index}] {0}")
-  @MethodSource("provideNumFactories")
+  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
   void whenBarCountIs1ResultShouldBeIndicatorValue(final NumFactory numFactory) {
     this.testContext.withNumFactory(numFactory);
     final var closePrice = Indicators.closePrice();
@@ -82,14 +80,14 @@ class SMAIndicatorTest extends AbstractIndicatorTest<Num> {
 
 
   @ParameterizedTest(name = "SMA 3 external data [{index}] {0}")
-  @MethodSource("provideNumFactories")
+  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
   void externalData3(final NumFactory numFactory) throws Exception {
     externalData(numFactory, 326.6333, 3);
   }
 
 
   @ParameterizedTest(name = "SMA 13 external data [{index}] {0}")
-  @MethodSource("provideNumFactories")
+  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
   void externalData13(final NumFactory numFactory) throws Exception {
     externalData(numFactory, 327.7846, 13);
   }
