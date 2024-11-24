@@ -42,7 +42,7 @@ import org.ta4j.core.num.NumFactory;
 
 class CashFlowTest {
 
-  private final Clock clock = Clock.fixed(Instant.ofEpochMilli(-1), ZoneId.systemDefault());
+  private final Clock clock = Clock.fixed(Instant.MIN, ZoneId.systemDefault());
 
 
   @ParameterizedTest

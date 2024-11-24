@@ -19,7 +19,7 @@ import org.ta4j.core.num.NumFactoryProvider;
  */
 public class TradingRecordTestContext {
 
-  private final Clock clock = Clock.fixed(Instant.ofEpochMilli(-1), ZoneId.systemDefault());
+  private final Clock clock = Clock.fixed(Instant.MIN, ZoneId.systemDefault());
   private Trade.TradeType tradeType = Trade.TradeType.BUY;
   private BackTestTradingRecord tradingRecord = new BackTestTradingRecord(this.tradeType);
   private NumFactory numFactory;
@@ -87,6 +87,12 @@ public class TradingRecordTestContext {
 
   public void assertResults(final double expected) {
     assertNumEquals(expected, this.criterion.calculate(this.tradingRecord));
+  }
+
+
+  public TradingRecordTestContext forwardTime(final int minutes) {
+    this.operationCount += minutes;
+    return this;
   }
 
 
