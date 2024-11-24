@@ -38,7 +38,7 @@ public class DecimalNumFactory implements NumFactory {
   /**
    * factory singletons for specific precisions
    */
-  private static final Map<Integer, NumFactory> factories = new ConcurrentHashMap<>();
+  private static final Map<Integer, DecimalNumFactory> factories = new ConcurrentHashMap<>();
 
   private final int precision;
 
@@ -127,12 +127,12 @@ public class DecimalNumFactory implements NumFactory {
   }
 
 
-  public static NumFactory getInstance() {
+  public static DecimalNumFactory getInstance() {
     return getInstance(DEFAULT_PRECISION);
   }
 
 
-  public static NumFactory getInstance(final int precision) {
+  public static DecimalNumFactory getInstance(final int precision) {
     return factories.computeIfAbsent(precision, DecimalNumFactory::new);
   }
 }
