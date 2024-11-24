@@ -23,157 +23,171 @@
  */
 package org.ta4j.core.criteria.pnl;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.ta4j.core.TestUtils.assertNumEquals;
 
-import org.junit.Test;
-import org.ta4j.core.AnalysisCriterion;
+import java.time.Clock;
+import java.time.Instant;
+import java.time.ZoneId;
+
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.ta4j.core.Position;
 import org.ta4j.core.Trade;
-import org.ta4j.core.TradingRecord;
+import org.ta4j.core.TradingRecordTestContext;
 import org.ta4j.core.backtest.BackTestTradingRecord;
 import org.ta4j.core.criteria.AbstractCriterionTest;
-import org.ta4j.core.mocks.MockBarSeriesBuilder;
 import org.ta4j.core.num.NumFactory;
 
-public class ReturnCriterionTest extends AbstractCriterionTest {
+class ReturnCriterionTest extends AbstractCriterionTest {
 
-  public ReturnCriterionTest(final NumFactory numFunction) {
-    super(
-        params -> params.length == 1 ? new ReturnCriterion((boolean) params[0]) : new ReturnCriterion(),
-        numFunction
-    );
+  private final Clock clock = Clock.fixed(Instant.now(), ZoneId.systemDefault());
+
+
+  @ParameterizedTest
+  @MethodSource("numFactories")
+  void calculateWithWinningLongPositions(final NumFactory numFactory) {
+    final var context = new TradingRecordTestContext()
+        .withNumFactory(numFactory)
+        .withTradeType(Trade.TradeType.BUY);
+
+    // First trade: buy at 100, sell at 110 (return: 1.10)
+    context.operate(1).at(100)
+        .operate(1).at(110);
+
+    // Second trade: buy at 100, sell at 105 (return: 1.05)
+    context.operate(1).at(100)
+        .operate(1).at(105);
+
+    // Total return with base percentage: 1.10 * 1.05
+    context.withCriterion(new ReturnCriterion())
+        .assertResults(1.10 * 1.05);
+
+    // Total return without base percentage: (1.10 * 1.05) - 1
+    context.withCriterion(new ReturnCriterion(false))
+        .assertResults(1.10 * 1.05 - 1);
   }
 
 
-  @Test
-  public void calculateWithWinningLongPositions() {
-    final var series = new MockBarSeriesBuilder().withNumFactory(this.numFactory)
-        .withData(100, 105, 110, 100, 95, 105)
-        .build();
-    final TradingRecord tradingRecord = new BackTestTradingRecord(Trade.buyAt(0, series), Trade.sellAt(2, series),
-        Trade.buyAt(3, series), Trade.sellAt(5, series)
-    );
+  @ParameterizedTest
+  @MethodSource("numFactories")
+  void calculateWithLosingLongPositions(final NumFactory numFactory) {
+    final var context = new TradingRecordTestContext()
+        .withNumFactory(numFactory)
+        .withTradeType(Trade.TradeType.BUY);
 
-    // include base percentage
-    final AnalysisCriterion retWithBase = getCriterion();
-    assertNumEquals(1.10 * 1.05, retWithBase.calculate(tradingRecord));
+    // First trade: buy at 100, sell at 95 (return: 0.95)
+    context.operate(1).at(100)
+        .operate(1).at(95);
 
-    // exclude base percentage
-    final AnalysisCriterion retWithoutBase = getCriterion(false);
-    assertNumEquals(1.10 * 1.05 - 1, retWithoutBase.calculate(tradingRecord));
+    // Second trade: buy at 100, sell at 70 (return: 0.70)
+    context.operate(1).at(100)
+        .operate(1).at(70);
+
+    // Total return with base percentage: 0.95 * 0.70
+    context.withCriterion(new ReturnCriterion())
+        .assertResults(0.95 * 0.70);
+
+    // Total return without base percentage: (0.95 * 0.70) - 1
+    context.withCriterion(new ReturnCriterion(false))
+        .assertResults(0.95 * 0.70 - 1);
   }
 
 
-  @Test
-  public void calculateWithLosingLongPositions() {
-    final var series =
-        new MockBarSeriesBuilder().withNumFactory(this.numFactory).withData(100, 95, 100, 80, 85, 70).build();
-    final TradingRecord tradingRecord = new BackTestTradingRecord(Trade.buyAt(0, series), Trade.sellAt(1, series),
-        Trade.buyAt(2, series), Trade.sellAt(5, series)
-    );
+  @ParameterizedTest
+  @MethodSource("numFactories")
+  void calculateReturnWithWinningShortPositions(final NumFactory numFactory) {
+    final var context = new TradingRecordTestContext()
+        .withNumFactory(numFactory)
+        .withTradeType(Trade.TradeType.SELL);
 
-    // include base percentage
-    final AnalysisCriterion retWithBase = getCriterion();
-    assertNumEquals(0.95 * 0.7, retWithBase.calculate(tradingRecord));
+    // First trade: sell at 100, buy at 95 (return: 1.05)
+    context.operate(1).at(100)
+        .operate(1).at(95);
 
-    // exclude base percentage
-    final AnalysisCriterion retWithoutBase = getCriterion(false);
-    assertNumEquals(0.95 * 0.7 - 1, retWithoutBase.calculate(tradingRecord));
+    // Second trade: sell at 100, buy at 70 (return: 1.30)
+    context.operate(1).at(100)
+        .operate(1).at(70);
+
+    // Total return with base percentage: 1.05 * 1.30
+    context.withCriterion(new ReturnCriterion())
+        .assertResults(1.05 * 1.30);
+
+    // Total return without base percentage: (1.05 * 1.30) - 1
+    context.withCriterion(new ReturnCriterion(false))
+        .assertResults(1.05 * 1.30 - 1);
   }
 
 
-  @Test
-  public void calculateReturnWithWinningShortPositions() {
-    final var series =
-        new MockBarSeriesBuilder().withNumFactory(this.numFactory).withData(100, 95, 100, 80, 85, 70).build();
-    final TradingRecord tradingRecord = new BackTestTradingRecord(Trade.sellAt(0, series), Trade.buyAt(1, series),
-        Trade.sellAt(2, series), Trade.buyAt(5, series)
-    );
+  @ParameterizedTest
+  @MethodSource("numFactories")
+  void calculateReturnWithLosingShortPositions(final NumFactory numFactory) {
+    final var context = new TradingRecordTestContext()
+        .withNumFactory(numFactory)
+        .withTradeType(Trade.TradeType.SELL);
 
-    // include base percentage
-    final AnalysisCriterion retWithBase = getCriterion();
-    assertNumEquals(1.05 * 1.30, retWithBase.calculate(tradingRecord));
+    // First trade: sell at 100, buy at 105 (return: 0.95)
+    context.operate(1).at(100)
+        .operate(1).at(105);
 
-    // exclude base percentage
-    final AnalysisCriterion retWithoutBase = getCriterion(false);
-    assertNumEquals(1.05 * 1.30 - 1, retWithoutBase.calculate(tradingRecord));
+    // Second trade: sell at 100, buy at 130 (return: 0.70)
+    context.operate(1).at(100)
+        .operate(1).at(130);
+
+    // Total return with base percentage: 0.95 * 0.70
+    context.withCriterion(new ReturnCriterion())
+        .assertResults(0.95 * 0.70);
+
+    // Total return without base percentage: (0.95 * 0.70) - 1
+    context.withCriterion(new ReturnCriterion(false))
+        .assertResults(0.95 * 0.70 - 1);
   }
 
 
-  @Test
-  public void calculateReturnWithLosingShortPositions() {
-    final var series =
-        new MockBarSeriesBuilder().withNumFactory(this.numFactory).withData(100, 105, 100, 80, 85, 130).build();
-    final TradingRecord tradingRecord = new BackTestTradingRecord(Trade.sellAt(0, series), Trade.buyAt(1, series),
-        Trade.sellAt(2, series), Trade.buyAt(5, series)
-    );
+  @ParameterizedTest
+  @MethodSource("numFactories")
+  void calculateWithNoPositions() {
+    final var tradingRecord = new BackTestTradingRecord();
 
-    // include base percentage
-    final AnalysisCriterion retWithBase = getCriterion();
-    assertNumEquals(0.95 * 0.70, retWithBase.calculate(tradingRecord));
+    final var withBase = new ReturnCriterion();
+    assertNumEquals(1d, withBase.calculate(tradingRecord));
 
-    // exclude base percentage
-    final AnalysisCriterion retWithoutBase = getCriterion(false);
-    assertNumEquals(0.95 * 0.70 - 1, retWithoutBase.calculate(tradingRecord));
+    final var withoutBase = new ReturnCriterion(false);
+    assertNumEquals(0d, withoutBase.calculate(tradingRecord));
   }
 
 
-  @Test
-  public void calculateWithNoPositions() {
-    final var series =
-        new MockBarSeriesBuilder().withNumFactory(this.numFactory).withData(100, 95, 100, 80, 85, 70).build();
+  @ParameterizedTest
+  @MethodSource("numFactories")
+  void calculateWithOpenedPosition(final NumFactory numFactory) {
+    var position = new Position(Trade.TradeType.BUY);
 
-    // with base percentage should return 1
-    final AnalysisCriterion retWithBase = getCriterion();
-    assertNumEquals(1d, retWithBase.calculate(new BackTestTradingRecord()));
+    // Test with base percentage
+    final var withBase = new ReturnCriterion();
+    assertNumEquals(1d, withBase.calculate(position));
 
-    // without base percentage should return 0
-    final AnalysisCriterion retWithoutBase = getCriterion(false);
-    assertNumEquals(0, retWithoutBase.calculate(new BackTestTradingRecord()));
+    // Add entry operation
+    final var now = Instant.now(this.clock);
+    position.operate(now, numFactory.numOf(100), numFactory.numOf(1));
+    assertNumEquals(1d, withBase.calculate(position));
+
+    // Test without base percentage
+    position = new Position(Trade.TradeType.BUY);
+    final var withoutBase = new ReturnCriterion(false);
+    assertNumEquals(0d, withoutBase.calculate(position));
+
+    // Add entry operation
+    position.operate(now, numFactory.numOf(100), numFactory.numOf(1));
+    assertNumEquals(0d, withoutBase.calculate(position));
   }
 
 
-  @Test
-  public void calculateWithOpenedPosition() {
-    final var series =
-        new MockBarSeriesBuilder().withNumFactory(this.numFactory).withData(100, 95, 100, 80, 85, 70).build();
-
-    // with base percentage should return 1
-    final AnalysisCriterion retWithBase = getCriterion();
-    final Position position1 = new Position();
-    assertNumEquals(1d, retWithBase.calculate(position1));
-    position1.operate(0);
-    assertNumEquals(1d, retWithBase.calculate(position1));
-
-    // without base percentage should return 0
-    final AnalysisCriterion retWithoutBase = getCriterion(false);
-    final Position position2 = new Position();
-    assertNumEquals(0, retWithoutBase.calculate(position2));
-    position2.operate(0);
-    assertNumEquals(0, retWithoutBase.calculate(position2));
-  }
-
-
-  @Test
-  public void testCalculateOneOpenPosition() {
-    // with base percentage should return 1
-    this.openedPositionUtils.testCalculateOneOpenPositionShouldReturnExpectedValue(this.numFactory, getCriterion(), 1);
-
-    // without base percentage should return 0
-    this.openedPositionUtils.testCalculateOneOpenPositionShouldReturnExpectedValue(
-        this.numFactory,
-        getCriterion(false),
-        0
-    );
-  }
-
-
-  @Test
-  public void betterThan() {
-    final AnalysisCriterion criterion = getCriterion();
-    assertTrue(criterion.betterThan(numOf(2.0), numOf(1.5)));
-    assertFalse(criterion.betterThan(numOf(1.5), numOf(2.0)));
+  @ParameterizedTest
+  @MethodSource("numFactories")
+  void betterThan(final NumFactory numFactory) {
+    final var criterion = new ReturnCriterion();
+    assertTrue(criterion.betterThan(numFactory.numOf(2.0), numFactory.numOf(1.5)));
+    assertFalse(criterion.betterThan(numFactory.numOf(1.5), numFactory.numOf(2.0)));
   }
 }
