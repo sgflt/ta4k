@@ -30,7 +30,7 @@ import org.ta4j.core.num.Num;
 import org.ta4j.core.num.NumFactoryProvider;
 
 /**
- * Net Profit and loss criterion (absolute PnL, excludes trading costs).
+ * Net Profit and loss criterion (absolute PnL, includes trading costs).
  */
 public class ProfitLossCriterion extends AbstractAnalysisCriterion {
 
