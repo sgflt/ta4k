@@ -52,7 +52,7 @@ public class ProfitLossRatioCriterion extends AbstractAnalysisCriterion {
       // only winning positions means a ratio of 1
       return NumFactoryProvider.getDefaultNumFactory().one();
     }
-    return averageProfit.dividedBy(averageLoss).abs();
+    return averageProfit.dividedBy(averageLoss);
   }
 
 
