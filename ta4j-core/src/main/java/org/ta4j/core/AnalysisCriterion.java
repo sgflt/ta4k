@@ -106,5 +106,7 @@ public interface AnalysisCriterion {
    * @return true if the first value is better than (according to the criterion)
    *     the second one, false otherwise
    */
+  // FIXME This method does not makes sence. It would be better to use OOP. new CriterionX(tradingRecord).isBetterThan(new CriterionZ(tradingRecord))
+  // at second glance it simply compares uncomparable: PnL vs Return ???  it is different domain
   boolean betterThan(Num criterionValue1, Num criterionValue2);
 }

@@ -23,117 +23,125 @@
  */
 package org.ta4j.core.criteria.pnl;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.ta4j.core.TestUtils.assertNumEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.junit.Test;
-import org.ta4j.core.AnalysisCriterion;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.ta4j.core.Trade;
-import org.ta4j.core.TradingRecord;
+import org.ta4j.core.TradingRecordTestContext;
 import org.ta4j.core.analysis.cost.LinearTransactionCostModel;
-import org.ta4j.core.analysis.cost.ZeroCostModel;
-import org.ta4j.core.backtest.BackTestTradingRecord;
 import org.ta4j.core.criteria.AbstractCriterionTest;
-import org.ta4j.core.mocks.MockBarSeriesBuilder;
 import org.ta4j.core.num.NumFactory;
 
-public class LossCriterionTest extends AbstractCriterionTest {
+class LossCriterionTest extends AbstractCriterionTest {
 
-  public LossCriterionTest(final NumFactory numFactory) {
-    super(params -> new LossCriterion((boolean) params[0]), numFactory);
+  @ParameterizedTest
+  @MethodSource("numFactories")
+  void calculateComparingIncludingVsExcludingCosts(final NumFactory numFactory) {
+    final var context = new TradingRecordTestContext()
+        .withNumFactory(numFactory)
+        .withTradeType(Trade.TradeType.BUY)
+        .withTransactionCostModel(new LinearTransactionCostModel(0.01));
+
+    // First trade: buy at 100, sell at 95
+    context.operate(1).at(100)
+        .operate(1).at(95);
+
+    // Second trade: buy at 100, sell at 70
+    context.operate(1).at(100)
+        .operate(1).at(70);
+
+    // Calculate with costs included
+    context.withCriterion(new LossCriterion(false))
+        .assertResults(-38.65);
+
+    // Calculate with costs excluded
+    context.withCriterion(new LossCriterion(true))
+        .assertResults(-35);
   }
 
 
-  @Test
-  public void calculateComparingIncludingVsExcludingCosts() {
-    final var series =
-        new MockBarSeriesBuilder().withNumFactory(this.numFactory).withData(100, 95, 100, 80, 85, 70).build();
-    final LinearTransactionCostModel transactionCost = new LinearTransactionCostModel(0.01);
-    final ZeroCostModel holdingCost = new ZeroCostModel();
-    final TradingRecord tradingRecord = new BackTestTradingRecord(Trade.TradeType.BUY, transactionCost, holdingCost);
+  @ParameterizedTest
+  @MethodSource("numFactories")
+  void calculateOnlyWithProfitPositions(final NumFactory numFactory) {
+    final var context = new TradingRecordTestContext()
+        .withNumFactory(numFactory)
+        .withTradeType(Trade.TradeType.BUY)
+        .withCriterion(new LossCriterion(true));
 
-    // entry price = 100 (cost = 100*0.01 = 1) => netPrice = 101, grossPrice = 100
-    tradingRecord.enter(0, series.getBar(0).closePrice(), numOf(1));
-    // exit price = 95 (cost = 95*0.01 = 0.95) => netPrice = 94.05, grossPrice = 95
-    tradingRecord.exit(1, series.getBar(1).closePrice(),
-        tradingRecord.getCurrentPosition().getEntry().getAmount()
-    );
+    // First trade: buy at 100, sell at 110
+    context.operate(1).at(100)
+        .operate(1).at(110);
 
-    // entry price = 100 (cost = 100*0.01 = 1) => netPrice = 101, grossPrice = 100
-    tradingRecord.enter(2, series.getBar(2).closePrice(), numOf(1));
-    // exit price = 70 (cost = 70*0.01 = 0.70) => netPrice = 69.3, grossPrice = 70
-    tradingRecord.exit(5, series.getBar(5).closePrice(),
-        tradingRecord.getCurrentPosition().getEntry().getAmount()
-    );
+    // Second trade: buy at 100, sell at 105
+    context.operate(1).at(100)
+        .operate(1).at(105);
 
-    // include costs, i.e. loss - costs:
-    // [(94.05 - 101)] + [(69.3 - 101)] = -6.95 + (-31.7) = -38.65 loss
-    // [(95 - 100)] + [(70 - 100)] = -5 + (-30) = -35 loss - 3.65 = -38.65 loss
-    final AnalysisCriterion lossIncludingCosts = getCriterion(false);
-    assertNumEquals(-38.65, lossIncludingCosts.calculate(series, tradingRecord));
-
-    // exclude costs, i.e. costs are not contained:
-    // [(95 - 100)] + [(70 - 100)] = -5 + (-30) = -35 loss
-    final AnalysisCriterion lossExcludingCosts = getCriterion(true);
-    assertNumEquals(-35, lossExcludingCosts.calculate(series, tradingRecord));
+    context.assertResults(0);
   }
 
 
-  @Test
-  public void calculateOnlyWithProfitPositions() {
-    final var series = new MockBarSeriesBuilder().withNumFactory(this.numFactory)
-        .withData(100, 105, 110, 100, 95, 105)
-        .build();
-    final TradingRecord tradingRecord = new BackTestTradingRecord(Trade.buyAt(0, series), Trade.sellAt(2, series),
-        Trade.buyAt(3, series), Trade.sellAt(5, series)
-    );
+  @ParameterizedTest
+  @MethodSource("numFactories")
+  void calculateOnlyWithLossPositions(final NumFactory numFactory) {
+    final var context = new TradingRecordTestContext()
+        .withNumFactory(numFactory)
+        .withTradeType(Trade.TradeType.BUY)
+        .withCriterion(new LossCriterion(true));
 
-    final AnalysisCriterion loss = getCriterion(true);
-    assertNumEquals(0, loss.calculate(series, tradingRecord));
+    // First trade: buy at 100, sell at 95
+    context.operate(1).at(100)
+        .operate(1).at(95);
+
+    // Second trade: buy at 100, sell at 70
+    context.operate(1).at(100)
+        .operate(1).at(70);
+
+    context.assertResults(-35);
   }
 
 
-  @Test
-  public void calculateOnlyWithLossPositions() {
-    final var series =
-        new MockBarSeriesBuilder().withNumFactory(this.numFactory).withData(100, 95, 100, 80, 85, 70).build();
-    final TradingRecord tradingRecord = new BackTestTradingRecord(Trade.buyAt(0, series), Trade.sellAt(1, series),
-        Trade.buyAt(2, series), Trade.sellAt(5, series)
-    );
+  @ParameterizedTest
+  @MethodSource("numFactories")
+  void calculateProfitWithShortPositions(final NumFactory numFactory) {
+    final var context = new TradingRecordTestContext()
+        .withNumFactory(numFactory)
+        .withTradeType(Trade.TradeType.SELL)
+        .withCriterion(new LossCriterion(true));
 
-    final AnalysisCriterion loss = getCriterion(true);
-    assertNumEquals(-35, loss.calculate(series, tradingRecord));
+    // First trade: sell at 95, buy at 100
+    context.operate(1).at(95)
+        .operate(1).at(100);
+
+    // Second trade: sell at 70, buy at 100
+    context.operate(1).at(70)
+        .operate(1).at(100);
+
+    context.assertResults(-35);
   }
 
 
-  @Test
-  public void calculateProfitWithShortPositions() {
-    final var series =
-        new MockBarSeriesBuilder().withNumFactory(this.numFactory).withData(95, 100, 70, 80, 85, 100).build();
-    final TradingRecord tradingRecord = new BackTestTradingRecord(Trade.sellAt(0, series), Trade.buyAt(1, series),
-        Trade.sellAt(2, series), Trade.buyAt(5, series)
-    );
-
-    final AnalysisCriterion loss = getCriterion(true);
-    assertNumEquals(-35, loss.calculate(series, tradingRecord));
+  @ParameterizedTest
+  @MethodSource("numFactories")
+  void betterThan(final NumFactory numFactory) {
+    final var criterion = new LossCriterion(true);
+    assertTrue(criterion.betterThan(numFactory.numOf(2.0), numFactory.numOf(1.5)));
+    assertFalse(criterion.betterThan(numFactory.numOf(1.5), numFactory.numOf(2.0)));
   }
 
 
-  @Test
-  public void betterThan() {
-    final AnalysisCriterion criterion = getCriterion(true);
-    assertTrue(criterion.betterThan(numOf(2.0), numOf(1.5)));
-    assertFalse(criterion.betterThan(numOf(1.5), numOf(2.0)));
-  }
+  @ParameterizedTest
+  @MethodSource("numFactories")
+  void calculateOneOpenPosition(final NumFactory numFactory) {
+    final var context = new TradingRecordTestContext()
+        .withNumFactory(numFactory)
+        .withTradeType(Trade.TradeType.BUY)
+        .withCriterion(new LossCriterion(true));
 
+    // Open position without closing it
+    context.operate(1).at(100);
 
-  @Test
-  public void testCalculateOneOpenPositionShouldReturnZero() {
-    this.openedPositionUtils.testCalculateOneOpenPositionShouldReturnExpectedValue(
-        this.numFactory,
-        getCriterion(true),
-        0
-    );
+    context.assertResults(0);
   }
 }
