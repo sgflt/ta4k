@@ -23,100 +23,144 @@
  */
 package org.ta4j.core.criteria.pnl;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.ta4j.core.TestUtils.assertNumEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.junit.Test;
-import org.ta4j.core.AnalysisCriterion;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.ta4j.core.Trade;
-import org.ta4j.core.TradingRecord;
-import org.ta4j.core.backtest.BackTestTradingRecord;
+import org.ta4j.core.TradingRecordTestContext;
 import org.ta4j.core.criteria.AbstractCriterionTest;
-import org.ta4j.core.mocks.MockBarSeriesBuilder;
 import org.ta4j.core.num.NumFactory;
 
-public class ProfitLossPercentageCriterionTest extends AbstractCriterionTest {
+class ProfitLossPercentageCriterionTest extends AbstractCriterionTest {
 
-  public ProfitLossPercentageCriterionTest(final NumFactory numFactory) {
-    super(params -> new ProfitLossPercentageCriterion(), numFactory);
+  @ParameterizedTest
+  @MethodSource("numFactories")
+  void calculateWithWinningLongPositions(final NumFactory numFactory) {
+    final var context = new TradingRecordTestContext()
+        .withNumFactory(numFactory)
+        .withTradeType(Trade.TradeType.BUY)
+        .withCriterion(new ProfitLossPercentageCriterion());
+
+    // First trade: buy at 100, sell at 110 (profit: +10%)
+    context.operate(1).at(100)
+        .operate(1).at(110);
+
+    // Second trade: buy at 100, sell at 105 (profit: +5%)
+    context.operate(1).at(100)
+        .operate(1).at(105);
+
+    // Total percentage profit should be 10% + 5% = 15%
+    context.assertResults(15);
   }
 
 
-  @Test
-  public void calculateWithWinningLongPositions() {
-    final var series = new MockBarSeriesBuilder().withNumFactory(this.numFactory)
-        .withData(100, 105, 110, 100, 95, 105)
-        .build();
-    final var tradingRecord = new BackTestTradingRecord(Trade.buyAt(0, series), Trade.sellAt(2, series),
-        Trade.buyAt(3, series), Trade.sellAt(5, series)
-    );
-    final AnalysisCriterion profit = getCriterion();
-    assertNumEquals(10 + 5, profit.calculate(series, tradingRecord));
+  @ParameterizedTest
+  @MethodSource("numFactories")
+  void calculateWithLosingLongPositions(final NumFactory numFactory) {
+    final var context = new TradingRecordTestContext()
+        .withNumFactory(numFactory)
+        .withTradeType(Trade.TradeType.BUY)
+        .withCriterion(new ProfitLossPercentageCriterion());
+
+    // First trade: buy at 100, sell at 95 (loss: -5%)
+    context.operate(1).at(100)
+        .operate(1).at(95);
+
+    // Second trade: buy at 100, sell at 70 (loss: -30%)
+    context.operate(1).at(100)
+        .operate(1).at(70);
+
+    // Total percentage loss should be -5% + -30% = -35%
+    context.assertResults(-35);
   }
 
 
-  @Test
-  public void calculateWithLosingLongPositions() {
-    final var series =
-        new MockBarSeriesBuilder().withNumFactory(this.numFactory).withData(100, 95, 100, 80, 85, 70).build();
-    final TradingRecord tradingRecord = new BackTestTradingRecord(Trade.buyAt(0, series), Trade.sellAt(1, series),
-        Trade.buyAt(2, series), Trade.sellAt(5, series)
-    );
+  @ParameterizedTest
+  @MethodSource("numFactories")
+  void calculateWithOneWinningAndOneLosingLongPositions(final NumFactory numFactory) {
+    final var context = new TradingRecordTestContext()
+        .withNumFactory(numFactory)
+        .withTradeType(Trade.TradeType.BUY)
+        .withCriterion(new ProfitLossPercentageCriterion());
 
-    final AnalysisCriterion profit = getCriterion();
-    assertNumEquals(-5 + -30, profit.calculate(series, tradingRecord));
+    // First trade: buy at 100, sell at 195 (profit: +95%)
+    context.operate(1).at(100)
+        .operate(1).at(195);
+
+    // Second trade: buy at 100, sell at 70 (loss: -30%)
+    context.operate(1).at(100)
+        .operate(1).at(70);
+
+    // Net percentage should be +95% + -30% = +65%
+    context.assertResults(65);
   }
 
 
-  @Test
-  public void calculateWithOneWinningAndOneLosingLongPositions() {
-    final var series =
-        new MockBarSeriesBuilder().withNumFactory(this.numFactory).withData(100, 195, 100, 80, 85, 70).build();
-    final TradingRecord tradingRecord = new BackTestTradingRecord(Trade.buyAt(0, series), Trade.sellAt(1, series),
-        Trade.buyAt(2, series), Trade.sellAt(5, series)
-    );
+  @ParameterizedTest
+  @MethodSource("numFactories")
+  void calculateWithWinningShortPositions(final NumFactory numFactory) {
+    final var context = new TradingRecordTestContext()
+        .withNumFactory(numFactory)
+        .withTradeType(Trade.TradeType.SELL)
+        .withCriterion(new ProfitLossPercentageCriterion());
 
-    final AnalysisCriterion profit = getCriterion();
-    assertNumEquals(95 + -30, profit.calculate(series, tradingRecord));
+    // First trade: sell at 100, buy at 90 (profit: +10%)
+    context.operate(1).at(100)
+        .operate(1).at(90);
+
+    // Second trade: sell at 100, buy at 95 (profit: +5%)
+    context.operate(1).at(100)
+        .operate(1).at(95);
+
+    // Total percentage profit should be 10% + 5% = 15%
+    context.assertResults(15);
   }
 
 
-  @Test
-  public void calculateWithWinningShortPositions() {
-    final var series =
-        new MockBarSeriesBuilder().withNumFactory(this.numFactory).withData(100, 90, 100, 95, 95, 100).build();
-    final TradingRecord tradingRecord = new BackTestTradingRecord(Trade.sellAt(0, series), Trade.buyAt(1, series),
-        Trade.sellAt(2, series), Trade.buyAt(3, series)
-    );
-    final AnalysisCriterion profit = getCriterion();
-    assertNumEquals(10 + 5, profit.calculate(series, tradingRecord));
+  @ParameterizedTest
+  @MethodSource("numFactories")
+  void calculateWithLosingShortPositions(final NumFactory numFactory) {
+    final var context = new TradingRecordTestContext()
+        .withNumFactory(numFactory)
+        .withTradeType(Trade.TradeType.SELL)
+        .withCriterion(new ProfitLossPercentageCriterion());
+
+    // First trade: sell at 100, buy at 110 (loss: -10%)
+    context.operate(1).at(100)
+        .operate(1).at(110);
+
+    // Second trade: sell at 100, buy at 105 (loss: -5%)
+    context.operate(1).at(100)
+        .operate(1).at(105);
+
+    // Total percentage loss should be -10% + -5% = -15%
+    context.assertResults(-15);
   }
 
 
-  @Test
-  public void calculateWithLosingShortPositions() {
-    final var series = new MockBarSeriesBuilder().withNumFactory(this.numFactory)
-        .withData(100, 110, 100, 105, 95, 105)
-        .build();
-    final TradingRecord tradingRecord = new BackTestTradingRecord(Trade.sellAt(0, series), Trade.buyAt(1, series),
-        Trade.sellAt(2, series), Trade.buyAt(3, series)
-    );
-    final AnalysisCriterion profit = getCriterion();
-    assertNumEquals(-10 - 5, profit.calculate(series, tradingRecord));
+  @ParameterizedTest
+  @MethodSource("numFactories")
+  void betterThan(final NumFactory numFactory) {
+    final var criterion = new ProfitLossPercentageCriterion();
+    assertTrue(criterion.betterThan(numFactory.numOf(50), numFactory.numOf(45)));
+    assertFalse(criterion.betterThan(numFactory.numOf(45), numFactory.numOf(50)));
   }
 
 
-  @Test
-  public void betterThan() {
-    final AnalysisCriterion criterion = getCriterion();
-    assertTrue(criterion.betterThan(numOf(50), numOf(45)));
-    assertFalse(criterion.betterThan(numOf(45), numOf(50)));
-  }
+  @ParameterizedTest
+  @MethodSource("numFactories")
+  void calculateOneOpenPosition(final NumFactory numFactory) {
+    final var context = new TradingRecordTestContext()
+        .withNumFactory(numFactory)
+        .withTradeType(Trade.TradeType.BUY)
+        .withCriterion(new ProfitLossPercentageCriterion());
 
+    // Open position without closing it
+    context.operate(1).at(100);
 
-  @Test
-  public void testCalculateOneOpenPositionShouldReturnZero() {
-    this.openedPositionUtils.testCalculateOneOpenPositionShouldReturnExpectedValue(this.numFactory, getCriterion(), 0);
+    // Open position should return 0
+    context.assertResults(0);
   }
 }
