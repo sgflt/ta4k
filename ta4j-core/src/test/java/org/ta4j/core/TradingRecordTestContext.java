@@ -26,6 +26,8 @@ public class TradingRecordTestContext {
   private AnalysisCriterion criterion;
   private CostModel transactionCostModel = new ZeroCostModel();
   private CostModel holdingCostModel = new ZeroCostModel();
+  private boolean useRandomDelays = true;
+  private int operationCount;
 
 
   public TradingRecordTestContext withNumFactory(final NumFactory numFactory) {
@@ -58,11 +60,6 @@ public class TradingRecordTestContext {
   }
 
 
-  public void assertResults(final double expected) {
-    assertNumEquals(expected, this.criterion.calculate(this.tradingRecord));
-  }
-
-
   public TradingRecordTestContext withTransactionCostModel(final CostModel transactionCostModel) {
     this.transactionCostModel = transactionCostModel;
     reinitalizeTradingRecord();
@@ -74,6 +71,22 @@ public class TradingRecordTestContext {
     this.holdingCostModel = holdingCostModel;
     reinitalizeTradingRecord();
     return this;
+  }
+
+
+  public TradingRecordTestContext withConstantTimeDelays() {
+    this.useRandomDelays = false;
+    return this;
+  }
+
+
+  public TradingRecord getTradingRecord() {
+    return this.tradingRecord;
+  }
+
+
+  public void assertResults(final double expected) {
+    assertNumEquals(expected, this.criterion.calculate(this.tradingRecord));
   }
 
 
@@ -91,7 +104,7 @@ public class TradingRecordTestContext {
           Instant.now(
               Clock.offset(
                   TradingRecordTestContext.this.clock,
-                  Duration.ofMinutes(ThreadLocalRandom.current().nextInt(10))
+                  getTimeDelay()
               )
           ),
           TradingRecordTestContext.this.numFactory.numOf(price),
@@ -99,5 +112,14 @@ public class TradingRecordTestContext {
       );
       return TradingRecordTestContext.this;
     }
+  }
+
+
+  private Duration getTimeDelay() {
+    if (TradingRecordTestContext.this.useRandomDelays) {
+      return Duration.ofMinutes(ThreadLocalRandom.current().nextInt(10));
+    }
+
+    return Duration.ofMinutes(TradingRecordTestContext.this.operationCount++);
   }
 }

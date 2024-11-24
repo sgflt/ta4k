@@ -1,260 +1,230 @@
-///**
-// * The MIT License (MIT)
-// *
-// * Copyright (c) 2017-2023 Ta4j Organization & respective
-// * authors (see AUTHORS)
-// *
-// * Permission is hereby granted, free of charge, to any person obtaining a copy of
-// * this software and associated documentation files (the "Software"), to deal in
-// * the Software without restriction, including without limitation the rights to
-// * use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
-// * the Software, and to permit persons to whom the Software is furnished to do so,
-// * subject to the following conditions:
-// *
-// * The above copyright notice and this permission notice shall be included in all
-// * copies or substantial portions of the Software.
-// *
-// * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
-// * FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
-// * COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
-// * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
-// * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-// */
-//package org.ta4j.core.analysis;
-//
-//import java.util.ArrayList;
-//import java.util.Collections;
-//import java.util.List;
-//
-//import org.ta4j.core.BarSeries;
-//import org.ta4j.core.Position;
-//import org.ta4j.core.TradingRecord;
-//import org.ta4j.core.num.Num;
-//
-///**
-// * Allows to follow the money cash flow involved by a list of positions over a
-// * bar series.
-// */
-//public class CashFlow {
-//
-//    /** The bar series. */
-//    private final BarSeries barSeries;
-//
-//    /** The (accrued) cash flow sequence (without trading costs). */
-//    private final List<Num> values;
-//
-//    /**
-//     * Constructor for cash flows of a closed position.
-//     *
-//     * @param barSeries the bar series
-//     * @param position  a single position
-//     */
-//    public CashFlow(BarSeries barSeries, Position position) {
-//        this.barSeries = barSeries;
-//        values = new ArrayList<>(Collections.singletonList(barSeries.numFactory().one()));
-//
-//        calculate(position);
-//        fillToTheEnd(barSeries.getEndIndex());
-//    }
-//
-//    /**
-//     * Constructor for cash flows of closed positions of a trading record.
-//     *
-//     * @param barSeries     the bar series
-//     * @param tradingRecord the trading record
-//     */
-//    public CashFlow(BarSeries barSeries, TradingRecord tradingRecord) {
-//        this(barSeries, tradingRecord, tradingRecord.getEndIndex(barSeries));
-//    }
-//
-//    /**
-//     * Constructor.
-//     *
-//     * @param barSeries     the bar series
-//     * @param tradingRecord the trading record
-//     * @param finalIndex    index up until cash flows of open positions are
-//     *                      considered
-//     */
-//    public CashFlow(BarSeries barSeries, TradingRecord tradingRecord, int finalIndex) {
-//        this.barSeries = barSeries;
-//        values = new ArrayList<>(Collections.singletonList(getBarSeries().numFactory().one()));
-//
-//        calculate(tradingRecord, finalIndex);
-//        fillToTheEnd(finalIndex);
-//    }
-//
-//    /**
-//     * @param index the bar index
-//     * @return the cash flow value at the index-th position
-//     */
-//    public Num getValue(int index) {
-//        return values.get(index);
-//    }
-//
-//    public int getUnstableBars() {
-//        return 0;
-//    }
-//
-//    public BarSeries getBarSeries() {
-//        return barSeries;
-//    }
-//
-//    /**
-//     * @return the size of the bar series
-//     */
-//    public int getSize() {
-//        return barSeries.getBarCount();
-//    }
-//
-//    /**
-//     * Calculates the cash flow for a single closed position.
-//     *
-//     * @param position a single position
-//     */
-//    private void calculate(Position position) {
-//        if (position.isOpened()) {
-//            throw new IllegalArgumentException(
-//                    "Position is not closed. Final index of observation needs to be provided.");
-//        }
-//        calculate(position, position.getExit().getIndex());
-//    }
-//
-//    /**
-//     * Calculates the cash flow for a single position (including accrued cashflow
-//     * for open positions).
-//     *
-//     * @param position   a single position
-//     * @param finalIndex index up until cash flow of open positions is considered
-//     */
-//    private void calculate(Position position, int finalIndex) {
-//        boolean isLongTrade = position.getEntry().isBuy();
-//        int endIndex = determineEndIndex(position, finalIndex, barSeries.getEndIndex());
-//        final int entryIndex = position.getEntry().getIndex();
-//        int begin = entryIndex + 1;
-//        if (begin > values.size()) {
-//            Num lastValue = values.get(values.size() - 1);
-//            values.addAll(Collections.nCopies(begin - values.size(), lastValue));
-//        }
-//        // Trade is not valid if net balance at the entryIndex is negative
-//        if (values.get(values.size() - 1).isGreaterThan(values.get(0).getNumFactory().numOf(0))) {
-//            int startingIndex = Math.max(begin, 1);
-//
-//            int nPeriods = endIndex - entryIndex;
-//            Num holdingCost = position.getHoldingCost(endIndex);
-//            Num avgCost = holdingCost.dividedBy(holdingCost.getNumFactory().numOf(nPeriods));
-//
-//            // Add intermediate cash flows during position
-//            Num netEntryPrice = position.getEntry().getNetPrice();
-//            for (int i = startingIndex; i < endIndex; i++) {
-//                Num intermediateNetPrice = addCost(barSeries.getBar(i).closePrice(), avgCost, isLongTrade);
-//                Num ratio = getIntermediateRatio(isLongTrade, netEntryPrice, intermediateNetPrice);
-//                values.onCandle(values.get(entryIndex).multipliedBy(ratio));
-//            }
-//
-//            // onCandle net cash flow at exit position
-//            Num exitPrice;
-//            if (position.getExit() != null) {
-//                exitPrice = position.getExit().getNetPrice();
-//            } else {
-//                exitPrice = barSeries.getBar(endIndex).closePrice();
-//            }
-//            Num ratio = getIntermediateRatio(isLongTrade, netEntryPrice, addCost(exitPrice, avgCost, isLongTrade));
-//            values.onCandle(values.get(entryIndex).multipliedBy(ratio));
-//        }
-//    }
-//
-//    /**
-//     * Calculates the ratio of intermediate prices.
-//     *
-//     * @param isLongTrade true, if the entry trade type is BUY
-//     * @param entryPrice  price ratio denominator
-//     * @param exitPrice   price ratio numerator
-//     */
-//    private static Num getIntermediateRatio(boolean isLongTrade, Num entryPrice, Num exitPrice) {
-//        Num ratio;
-//        if (isLongTrade) {
-//            ratio = exitPrice.dividedBy(entryPrice);
-//        } else {
-//            ratio = entryPrice.getNumFactory().numOf(2).minus(exitPrice.dividedBy(entryPrice));
-//        }
-//
-//        return ratio;
-//    }
-//
-//    /**
-//     * Calculates the cash flow for the closed positions of a trading record.
-//     *
-//     * @param tradingRecord the trading record
-//     */
-//    private void calculate(TradingRecord tradingRecord) {
-//        // For each position...
-//        tradingRecord.getPositions().forEach(this::calculate);
-//    }
-//
-//    /**
-//     * Calculates the cash flow for all positions of a trading record, including
-//     * accrued cash flow of an open position.
-//     *
-//     * @param tradingRecord the trading record
-//     * @param finalIndex    index up until cash flows of open positions are
-//     *                      considered
-//     */
-//    private void calculate(TradingRecord tradingRecord, int finalIndex) {
-//        calculate(tradingRecord);
-//
-//        // Add accrued cash flow of open position
-//        if (tradingRecord.getCurrentPosition().isOpened()) {
-//            calculate(tradingRecord.getCurrentPosition(), finalIndex);
-//        }
-//    }
-//
-//    /**
-//     * Adjusts (intermediate) price to incorporate trading costs.
-//     *
-//     * @param rawPrice    the gross asset price
-//     * @param holdingCost share of the holding cost per period
-//     * @param isLongTrade true, if the entry trade type is BUY
-//     */
-//    static Num addCost(Num rawPrice, Num holdingCost, boolean isLongTrade) {
-//        Num netPrice;
-//        if (isLongTrade) {
-//            netPrice = rawPrice.minus(holdingCost);
-//        } else {
-//            netPrice = rawPrice.plus(holdingCost);
-//        }
-//        return netPrice;
-//    }
-//
-//    /**
-//     * Pads {@link #values} with its last value up until {@code endIndex}.
-//     *
-//     * @param endIndex the end index
-//     */
-//    private void fillToTheEnd(int endIndex) {
-//        if (endIndex >= values.size()) {
-//            Num lastValue = values.get(values.size() - 1);
-//            values.addAll(Collections.nCopies(barSeries.getEndIndex() - values.size() + 1, lastValue));
-//        }
-//    }
-//
-//    /**
-//     * Determines the valid final index to be considered.
-//     *
-//     * @param position   the position
-//     * @param finalIndex index up until cash flows of open positions are considered
-//     * @param maxIndex   maximal valid index
-//     */
-//    static int determineEndIndex(Position position, int finalIndex, int maxIndex) {
-//        int idx = finalIndex;
-//        // After closing of position, no further accrual necessary
-//        if (position.getExit() != null) {
-//            idx = Math.min(position.getExit().getIndex(), finalIndex);
-//        }
-//        // Accrual at most until maximal index of asset data
-//        if (idx > maxIndex) {
-//            idx = maxIndex;
-//        }
-//        return idx;
-//    }
-//}
+/*
+ * The MIT License (MIT)
+ *
+ * Copyright (c) 2017-2023 Ta4j Organization & respective
+ * authors (see AUTHORS)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of
+ * this software and associated documentation files (the "Software"), to deal in
+ * the Software without restriction, including without limitation the rights to
+ * use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+ * the Software, and to permit persons to whom the Software is furnished to do so,
+ * subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+ * FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+ * COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+ * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+ * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ */
+package org.ta4j.core.analysis;
+
+import java.time.Instant;
+import java.util.NavigableMap;
+import java.util.TreeMap;
+
+import org.ta4j.core.Position;
+import org.ta4j.core.Trade;
+import org.ta4j.core.TradingRecord;
+import org.ta4j.core.num.Num;
+import org.ta4j.core.num.NumFactory;
+
+/**
+ * Tracks the money cash flow involved by a list of positions over time.
+ */
+public class CashFlow {
+
+  /** The cash flow values mapped to timestamps */
+  private final NavigableMap<Instant, Num> values;
+
+  /** The num factory for creating numbers */
+  private final NumFactory numFactory;
+
+
+  /**
+   * Constructor for cash flows of a closed position.
+   *
+   * @param numFactory the number factory to use
+   * @param position a single position
+   */
+  public CashFlow(final NumFactory numFactory, final Position position) {
+    this.numFactory = numFactory;
+    this.values = new TreeMap<>();
+
+    // Initialize with base value 1
+    if (position.getEntry() != null) {
+      this.values.put(position.getEntry().getWhenExecuted(), numFactory.one());
+    }
+
+    calculate(position);
+  }
+
+
+  /**
+   * Constructor for cash flows of closed positions of a trading record.
+   *
+   * @param numFactory the number factory to use
+   * @param tradingRecord the trading record
+   */
+  public CashFlow(final NumFactory numFactory, final TradingRecord tradingRecord) {
+    this.numFactory = numFactory;
+    this.values = new TreeMap<>();
+
+    // Initialize with base value 1 at first trade
+    if (!tradingRecord.getPositions().isEmpty()) {
+      final Trade firstTrade = tradingRecord.getPositions().getFirst().getEntry();
+      if (firstTrade != null) {
+        this.values.put(firstTrade.getWhenExecuted(), numFactory.one());
+      }
+    }
+
+    calculate(tradingRecord);
+  }
+
+
+  /**
+   * @return all cash flow values with their timestamps
+   */
+  public NavigableMap<Instant, Num> getValues() {
+    return new TreeMap<>(this.values);
+  }
+
+
+  /**
+   * Calculates the cash flow for a single position.
+   *
+   * @param position a single position
+   */
+  private void calculate(final Position position) {
+    if (!position.isOpened()) {
+      calculateClosedPosition(position);
+    } else {
+      calculateOpenPosition(position, position.getEntry().getWhenExecuted());
+    }
+  }
+
+
+  /**
+   * Gets the cash flow value at a specific instant. If no value exists at that instant,
+   * calculates the interpolated value based on the position state at that time.
+   *
+   * @param instant the point in time
+   *
+   * @return the cash flow value
+   */
+  public Num getValue(final Instant instant) {
+    // If we have a value at this exact instant, return it
+    if (this.values.containsKey(instant)) {
+      return this.values.get(instant);
+    }
+
+    // Get the last entry before this instant
+    final var lastEntry = this.values.floorEntry(instant);
+    if (lastEntry == null) {
+      return this.numFactory.one();
+    }
+
+    // Get the next entry after this instant
+    final var nextEntry = this.values.ceilingEntry(instant);
+    if (nextEntry == null) {
+      return lastEntry.getValue();
+    }
+
+    // Linear interpolation between the two points
+    final var lastTime = lastEntry.getKey();
+    final var nextTime = nextEntry.getKey();
+    final var timeRange = nextTime.getEpochSecond() - lastTime.getEpochSecond();
+    final var currentTimeOffset = instant.getEpochSecond() - lastTime.getEpochSecond();
+
+    // Calculate progress between the two points (0 to 1)
+    final var progress = this.numFactory.numOf((double) currentTimeOffset / timeRange);
+
+    // Interpolate between the two values
+    final var valueRange = nextEntry.getValue().minus(lastEntry.getValue());
+    return lastEntry.getValue().plus(valueRange.multipliedBy(progress));
+  }
+
+
+  private void calculateClosedPosition(final Position position) {
+    final boolean isLongTrade = position.getEntry().isBuy();
+    final Trade entry = position.getEntry();
+    final Trade exit = position.getExit();
+
+    // Calculate ratio
+    final Num ratio = calculateRatio(isLongTrade, entry.getNetPrice(), exit.getNetPrice());
+
+    // Get the value at entry and multiply by ratio for exit value
+    final Num entryValue = getValue(entry.getWhenExecuted());
+    this.values.put(exit.getWhenExecuted(), entryValue.multipliedBy(ratio));
+  }
+
+
+  private void calculateOpenPosition(final Position position, final Instant evaluationTime) {
+    final boolean isLongTrade = position.getEntry().isBuy();
+    final Trade entry = position.getEntry();
+    final Instant entryTime = entry.getWhenExecuted();
+
+    // Calculate holding costs
+    final Num holdingCost = position.getHoldingCost();
+    final Num entryPrice = entry.getNetPrice();
+
+    // Record initial value
+    final Num entryValue = getValue(entryTime);
+    this.values.put(entryTime, entryValue);
+
+    // Record value at evaluation time with holding costs
+    final Num currentPrice = entry.getPricePerAsset();
+    final Num adjustedPrice = addCost(currentPrice, holdingCost, isLongTrade);
+    final Num ratio = calculateRatio(isLongTrade, entryPrice, adjustedPrice);
+    this.values.put(evaluationTime, entryValue.multipliedBy(ratio));
+  }
+
+
+  private void calculate(final TradingRecord tradingRecord) {
+    // Calculate for all closed positions
+    tradingRecord.getPositions().forEach(this::calculate);
+
+    // Calculate for current open position if any
+    final var currentPosition = tradingRecord.getCurrentPosition();
+    if (currentPosition.isOpened()) {
+      // Use the latest timestamp from the trading record
+      final var latestTime = tradingRecord.getPositions().stream()
+          .filter(Position::isClosed)
+          .map(p -> p.getExit().getWhenExecuted())
+          .max(Instant::compareTo)
+          .orElse(currentPosition.getEntry().getWhenExecuted());
+
+      calculateOpenPosition(currentPosition, latestTime);
+    }
+  }
+
+
+  /**
+   * Calculates the ratio between entry and exit prices accounting for trade direction.
+   */
+  private Num calculateRatio(final boolean isLongTrade, final Num entryPrice, final Num exitPrice) {
+    if (isLongTrade) {
+      return exitPrice.dividedBy(entryPrice);
+    }
+
+    // For short positions, when price goes down we gain
+    // If price drops from 100 to 90, we gain 0.1 (10%)
+    // ratio should be 1 + (entry - exit)/entry
+    return this.numFactory.one().plus(entryPrice.minus(exitPrice).dividedBy(entryPrice));
+
+  }
+
+
+  /**
+   * Adjusts price to incorporate trading costs.
+   */
+  private static Num addCost(final Num rawPrice, final Num holdingCost, final boolean isLongTrade) {
+    return isLongTrade ?
+           rawPrice.minus(holdingCost) :
+           rawPrice.plus(holdingCost);
+  }
+}
