@@ -23,75 +23,102 @@
  */
 package org.ta4j.core.criteria.pnl;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.ta4j.core.TestUtils.assertNumEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.junit.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.ta4j.core.Trade;
-import org.ta4j.core.backtest.BackTestTradingRecord;
+import org.ta4j.core.TradingRecordTestContext;
 import org.ta4j.core.criteria.AbstractCriterionTest;
-import org.ta4j.core.mocks.MockBarSeriesBuilder;
 import org.ta4j.core.num.NumFactory;
 
-public class AverageLossCriterionTest extends AbstractCriterionTest {
+class AverageLossCriterionTest extends AbstractCriterionTest {
 
-  public AverageLossCriterionTest(final NumFactory numFactory) {
-    super(params -> new AverageLossCriterion(), numFactory);
+  @ParameterizedTest
+  @MethodSource("numFactories")
+  void calculateOnlyWithProfitPositions(final NumFactory numFactory) {
+    final var context = new TradingRecordTestContext()
+        .withNumFactory(numFactory)
+        .withTradeType(Trade.TradeType.BUY)
+        .withCriterion(new AverageLossCriterion());
+
+    // First trade: buy at 100, sell at 110 (profit: +10)
+    context.operate(1).at(100)
+        .operate(1).at(110);
+
+    // Second trade: buy at 100, sell at 105 (profit: +5)
+    context.operate(1).at(100)
+        .operate(1).at(105);
+
+    // No losses, so average loss should be 0
+    context.assertResults(0);
   }
 
 
-  @Test
-  public void calculateOnlyWithProfitPositions() {
-    final var series = new MockBarSeriesBuilder().withNumFactory(this.numFactory)
-        .withData(100, 105, 110, 100, 95, 105)
-        .build();
-    final var tradingRecord = new BackTestTradingRecord(Trade.buyAt(0, series), Trade.sellAt(2, series),
-        Trade.buyAt(3, series), Trade.sellAt(5, series)
-    );
+  @ParameterizedTest
+  @MethodSource("numFactories")
+  void calculateOnlyWithLossPositions(final NumFactory numFactory) {
+    final var context = new TradingRecordTestContext()
+        .withNumFactory(numFactory)
+        .withTradeType(Trade.TradeType.BUY)
+        .withCriterion(new AverageLossCriterion());
 
-    final var avgLoss = getCriterion();
-    assertNumEquals(0, avgLoss.calculate(series, tradingRecord));
+    // First trade: buy at 100, sell at 95 (loss: -5)
+    context.operate(1).at(100)
+        .operate(1).at(95);
+
+    // Second trade: buy at 100, sell at 70 (loss: -30)
+    context.operate(1).at(100)
+        .operate(1).at(70);
+
+    // Average loss should be (-5 + -30) / 2 = -17.5
+    context.assertResults(-17.5);
   }
 
 
-  @Test
-  public void calculateOnlyWithLossPositions() {
-    final var series =
-        new MockBarSeriesBuilder().withNumFactory(this.numFactory).withData(100, 95, 100, 80, 85, 70).build();
-    final var tradingRecord = new BackTestTradingRecord(Trade.buyAt(0, series), Trade.sellAt(1, series),
-        Trade.buyAt(2, series), Trade.sellAt(5, series)
-    );
+  @ParameterizedTest
+  @MethodSource("numFactories")
+  void calculateProfitWithShortPositions(final NumFactory numFactory) {
+    final var context = new TradingRecordTestContext()
+        .withNumFactory(numFactory)
+        .withTradeType(Trade.TradeType.SELL)
+        .withCriterion(new AverageLossCriterion());
 
-    final var avgLoss = getCriterion();
-    assertNumEquals(-17.5, avgLoss.calculate(series, tradingRecord));
+    // First trade: sell at 95, buy at 100 (loss: -5)
+    context.operate(1).at(95)
+        .operate(1).at(100);
+
+    // Second trade: sell at 70, buy at 100 (loss: -30)
+    context.operate(1).at(70)
+        .operate(1).at(100);
+
+    // Average loss should be (-5 + -30) / 2 = -17.5
+    context.assertResults(-17.5);
   }
 
 
-  @Test
-  public void calculateProfitWithShortPositions() {
-    final var series =
-        new MockBarSeriesBuilder().withNumFactory(this.numFactory).withData(95, 100, 70, 80, 85, 100).build();
-    final var tradingRecord = new BackTestTradingRecord(Trade.sellAt(0, series), Trade.buyAt(1, series),
-        Trade.sellAt(2, series), Trade.buyAt(5, series)
-    );
-
-    final var avgLoss = getCriterion();
-    assertNumEquals(-17.5, avgLoss.calculate(series, tradingRecord));
+  @ParameterizedTest
+  @MethodSource("numFactories")
+  void betterThan(final NumFactory numFactory) {
+    final var criterion = new AverageLossCriterion();
+    assertTrue(criterion.betterThan(numFactory.numOf(2.0), numFactory.numOf(1.5)));
+    assertFalse(criterion.betterThan(numFactory.numOf(1.5), numFactory.numOf(2.0)));
   }
 
 
-  @Test
-  public void betterThan() {
-    final var criterion = getCriterion();
-    assertTrue(criterion.betterThan(numOf(2.0), numOf(1.5)));
-    assertFalse(criterion.betterThan(numOf(1.5), numOf(2.0)));
+  @ParameterizedTest
+  @MethodSource("numFactories")
+  void calculateOneOpenPosition(final NumFactory numFactory) {
+    final var context = new TradingRecordTestContext()
+        .withNumFactory(numFactory)
+        .withTradeType(Trade.TradeType.BUY)
+        .withCriterion(new AverageLossCriterion());
+
+    // Open position without closing it
+    context.operate(1).at(100);
+
+    // Open position should return 0
+    context.assertResults(0);
   }
-
-
-  @Test
-  public void testCalculateOneOpenPositionShouldReturnZero() {
-    this.openedPositionUtils.testCalculateOneOpenPositionShouldReturnExpectedValue(this.numFactory, getCriterion(), 0);
-  }
-
 }
