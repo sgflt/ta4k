@@ -76,7 +76,7 @@ public class ProfitCriterion extends AbstractAnalysisCriterion {
     return tradingRecord.getPositions()
         .stream()
         .filter(Position::isClosed)
-        .map(position -> calculate(position))
+        .map(this::calculate)
         .reduce(NumFactoryProvider.getDefaultNumFactory().zero(), Num::plus);
   }
 

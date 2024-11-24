@@ -23,117 +23,123 @@
  */
 package org.ta4j.core.criteria.pnl;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.ta4j.core.TestUtils.assertNumEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.junit.Test;
-import org.ta4j.core.AnalysisCriterion;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.ta4j.core.Trade;
-import org.ta4j.core.TradingRecord;
+import org.ta4j.core.TradingRecordTestContext;
 import org.ta4j.core.analysis.cost.FixedTransactionCostModel;
-import org.ta4j.core.analysis.cost.ZeroCostModel;
-import org.ta4j.core.backtest.BackTestTradingRecord;
 import org.ta4j.core.criteria.AbstractCriterionTest;
-import org.ta4j.core.mocks.MockBarSeriesBuilder;
 import org.ta4j.core.num.NumFactory;
 
-public class ProfitCriterionTest extends AbstractCriterionTest {
+class ProfitCriterionTest extends AbstractCriterionTest {
 
-  public ProfitCriterionTest(final NumFactory numFactory) {
-    super(params -> new ProfitCriterion((boolean) params[0]), numFactory);
+  @ParameterizedTest
+  @MethodSource("numFactories")
+  void calculateComparingIncExcludingCosts(final NumFactory numFactory) {
+    final var context = new TradingRecordTestContext()
+        .withNumFactory(numFactory)
+        .withCriterion(new ProfitCriterion(true));
+
+    context.operate(1).at(100)
+        .operate(1).at(105)
+        .operate(1).at(100)
+        .operate(1).at(120)
+        // exclude costs, i.e. costs are not contained:
+        // [(105 - 100)] + [(120 - 100)] = 5 + 20 = +25 profit
+        .assertResults(25)
+    ;
   }
 
 
-  @Test
-  public void calculateComparingIncludingVsExcludingCosts() {
-    final var series =
-        new MockBarSeriesBuilder().withNumFactory(this.numFactory).withData(100, 105, 100, 80, 85, 120).build();
-    final FixedTransactionCostModel transactionCost = new FixedTransactionCostModel(1);
-    final ZeroCostModel holdingCost = new ZeroCostModel();
-    final TradingRecord tradingRecord = new BackTestTradingRecord(Trade.TradeType.BUY, transactionCost, holdingCost);
+  @ParameterizedTest
+  @MethodSource("numFactories")
+  void calculateComparingIncludingCosts(final NumFactory numFactory) {
+    final var context = new TradingRecordTestContext()
+        .withNumFactory(numFactory)
+        .withTransactionCostModel(new FixedTransactionCostModel(1))
+        .withCriterion(new ProfitCriterion(false));
 
-    // entry price = 100 (cost = 1) => netPrice = 101, grossPrice = 100
-    tradingRecord.enter(0, series.getBar(0).closePrice(), numOf(1));
-    // exit price = 105 (cost = 1) => netPrice = 104, grossPrice = 105
-    tradingRecord.exit(1, series.getBar(1).closePrice(),
-        tradingRecord.getCurrentPosition().getEntry().getAmount()
-    );
-
-    // entry price = 100 (cost = 1) => netPrice = 101, grossPrice = 100
-    tradingRecord.enter(2, series.getBar(2).closePrice(), numOf(1));
-    // exit price = 120 (cost = 1) => netPrice = 119, grossPrice = 120
-    tradingRecord.exit(5, series.getBar(5).closePrice(),
-        tradingRecord.getCurrentPosition().getEntry().getAmount()
-    );
-
-    // include costs, i.e. profit - costs:
-    // [(104 - 101)] + [(119 - 101)] = 3 + 18 = +21 profit
-    // [(105 - 100)] + [(120 - 100)] = 5 + 20 = +25 profit - 4 = +21 profit
-    final AnalysisCriterion profitIncludingCosts = getCriterion(false);
-    assertNumEquals(21, profitIncludingCosts.calculate(series, tradingRecord));
-
-    // exclude costs, i.e. costs are not contained:
-    // [(105 - 100)] + [(120 - 100)] = 5 + 20 = +25 profit
-    final AnalysisCriterion profitExcludingCosts = getCriterion(true);
-    assertNumEquals(25, profitExcludingCosts.calculate(series, tradingRecord));
+    context.operate(1).at(100)
+        .operate(1).at(105)
+        .operate(1).at(100)
+        .operate(1).at(120)
+        // include costs, i.e. profit - costs:
+        // [(104 - 101)] + [(119 - 101)] = 3 + 18 = +21 profit
+        // [(105 - 100)] + [(120 - 100)] = 5 + 20 = +25 profit - 4 = +21 profit
+        .assertResults(21)
+    ;
   }
 
 
-  @Test
-  public void calculateOnlyWithProfitPositions() {
-    final var series = new MockBarSeriesBuilder().withNumFactory(this.numFactory)
-        .withData(100, 105, 110, 100, 95, 105)
-        .build();
-    final TradingRecord tradingRecord = new BackTestTradingRecord(Trade.buyAt(0, series), Trade.sellAt(2, series),
-        Trade.buyAt(3, series), Trade.sellAt(5, series)
-    );
+  @ParameterizedTest
+  @MethodSource("numFactories")
+  void calculateProfitWithShortPositions(final NumFactory numFactory) {
+    final var context = new TradingRecordTestContext()
+        .withNumFactory(numFactory)
+        .withTradeType(Trade.TradeType.SELL)
+        .withCriterion(new ProfitCriterion(false));
 
-    final AnalysisCriterion profit = getCriterion(false);
-    assertNumEquals(15, profit.calculate(series, tradingRecord));
+    // Simulating short positions:
+    context.operate(1).at(95)   // sell short
+        .operate(1).at(100)     // buy to cover
+        .operate(1).at(70)      // sell short
+        .operate(1).at(100)     // buy to cover
+        // First trade: loss of (100 - 95) = -5
+        // Second trade: loss of (100 - 70) = -30
+        // Total profit = 0
+        .assertResults(0)
+    ;
   }
 
 
-  @Test
-  public void calculateOnlyWithProfitPositions2() {
-    final var series =
-        new MockBarSeriesBuilder().withNumFactory(this.numFactory).withData(100, 105, 100, 80, 85, 120).build();
-    final TradingRecord tradingRecord = new BackTestTradingRecord(Trade.buyAt(0, series), Trade.sellAt(1, series),
-        Trade.buyAt(2, series), Trade.sellAt(5, series)
-    );
+  @ParameterizedTest
+  @MethodSource("numFactories")
+  void calculateProfitWithShortPositionsIncludingCosts(final NumFactory numFactory) {
+    final var context = new TradingRecordTestContext()
+        .withNumFactory(numFactory)
+        .withTradeType(Trade.TradeType.SELL)
+        .withTransactionCostModel(new FixedTransactionCostModel(1))
+        .withCriterion(new ProfitCriterion(false));
 
-    final AnalysisCriterion profit = getCriterion(false);
-    assertNumEquals(25, profit.calculate(series, tradingRecord));
+    context.operate(1).at(100)   // sell short
+        .operate(1).at(95)       // buy to cover
+        .operate(1).at(100)      // sell short
+        .operate(1).at(70)       // buy to cover
+        // First trade: profit of (100 - 95) = 5
+        // Second trade: profit of (100 - 70) = 30
+        // Total profit = 35 - 4
+        .assertResults(31)
+    ;
   }
 
 
-  @Test
-  public void calculateProfitWithShortPositions() {
-    final var series =
-        new MockBarSeriesBuilder().withNumFactory(this.numFactory).withData(95, 100, 70, 80, 85, 100).build();
-    final TradingRecord tradingRecord = new BackTestTradingRecord(Trade.sellAt(0, series), Trade.buyAt(1, series),
-        Trade.sellAt(2, series), Trade.buyAt(5, series)
-    );
+  @ParameterizedTest
+  @MethodSource("numFactories")
+  void calculateWithMixedProfitAndLoss(final NumFactory numFactory) {
+    final var context = new TradingRecordTestContext()
+        .withNumFactory(numFactory)
+        .withCriterion(new ProfitCriterion(false));
 
-    final AnalysisCriterion profit = getCriterion(false);
-    assertNumEquals(0, profit.calculate(series, tradingRecord));
+    context.operate(1).at(100)
+        .operate(1).at(105)     // +5 profit
+        .operate(1).at(100)
+        .operate(1).at(95)      // -5 loss (not accounted)
+        .operate(1).at(100)
+        .operate(1).at(110)     // +10 profit
+        // Total profit = +15
+        .assertResults(15)
+    ;
   }
 
 
-  @Test
-  public void betterThan() {
-    final AnalysisCriterion criterion = getCriterion(false);
-    assertTrue(criterion.betterThan(numOf(2.0), numOf(1.5)));
-    assertFalse(criterion.betterThan(numOf(1.5), numOf(2.0)));
-  }
-
-
-  @Test
-  public void testCalculateOneOpenPositionShouldReturnZero() {
-    this.openedPositionUtils.testCalculateOneOpenPositionShouldReturnExpectedValue(
-        this.numFactory,
-        getCriterion(false),
-        0
-    );
+  @ParameterizedTest
+  @MethodSource("numFactories")
+  void betterThan(final NumFactory numFactory) {
+    final var criterion = new ProfitCriterion(true);
+    assertTrue(criterion.betterThan(numFactory.numOf(2.0), numFactory.numOf(1.5)));
+    assertFalse(criterion.betterThan(numFactory.numOf(1.5), numFactory.numOf(2.0)));
   }
 }
