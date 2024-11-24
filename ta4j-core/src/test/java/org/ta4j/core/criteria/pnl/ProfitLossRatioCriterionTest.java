@@ -23,76 +23,133 @@
  */
 package org.ta4j.core.criteria.pnl;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.ta4j.core.TestUtils.assertNumEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.junit.Test;
-import org.ta4j.core.AnalysisCriterion;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.ta4j.core.Trade;
-import org.ta4j.core.TradingRecord;
-import org.ta4j.core.backtest.BackTestTradingRecord;
+import org.ta4j.core.TradingRecordTestContext;
 import org.ta4j.core.criteria.AbstractCriterionTest;
-import org.ta4j.core.mocks.MockBarSeriesBuilder;
 import org.ta4j.core.num.NumFactory;
 
-public class ProfitLossRatioCriterionTest extends AbstractCriterionTest {
+class ProfitLossRatioCriterionTest extends AbstractCriterionTest {
 
-  public ProfitLossRatioCriterionTest(final NumFactory numFactory) {
-    super(params -> new ProfitLossRatioCriterion(), numFactory);
+  @ParameterizedTest
+  @MethodSource("numFactories")
+  void calculateOnlyWithProfitPositions(final NumFactory numFactory) {
+    final var context = new TradingRecordTestContext()
+        .withNumFactory(numFactory)
+        .withTradeType(Trade.TradeType.BUY)
+        .withCriterion(new ProfitLossRatioCriterion());
+
+    // First trade: buy at 100, sell at 120 (profit: 20)
+    context.operate(1).at(100)
+        .operate(1).at(120);
+
+    // Second trade: buy at 120, sell at 130 (profit: 10)
+    context.operate(1).at(120)
+        .operate(1).at(130);
+
+    // Only profits, no losses, so ratio should be 1
+    context.assertResults(1);
   }
 
 
-  @Test
-  public void calculateOnlyWithProfitPositions() {
-    final var series = new MockBarSeriesBuilder().withNumFactory(this.numFactory)
-        .withData(120, 70, 100, 130, 105, 120)
-        .build();
-    final TradingRecord tradingRecord = new BackTestTradingRecord(Trade.buyAt(0, series), Trade.sellAt(2, series),
-        Trade.buyAt(3, series), Trade.sellAt(5, series)
-    );
+  @ParameterizedTest
+  @MethodSource("numFactories")
+  void calculateOnlyWithLossPositions(final NumFactory numFactory) {
+    final var context = new TradingRecordTestContext()
+        .withNumFactory(numFactory)
+        .withTradeType(Trade.TradeType.BUY)
+        .withCriterion(new ProfitLossRatioCriterion());
 
-    final AnalysisCriterion avtProfit = getCriterion();
-    assertNumEquals(0, avtProfit.calculate(series, tradingRecord));
+    // First trade: buy at 100, sell at 95 (loss: -5)
+    context.operate(1).at(100)
+        .operate(1).at(95);
+
+    // Second trade: buy at 100, sell at 70 (loss: -30)
+    context.operate(1).at(100)
+        .operate(1).at(70);
+
+    // Only losses, no profits, so ratio should be 0
+    context.assertResults(0);
   }
 
 
-  @Test
-  public void calculateOnlyWithLossPositions() {
-    final var series =
-        new MockBarSeriesBuilder().withNumFactory(this.numFactory).withData(100, 95, 100, 80, 85, 70).build();
-    final TradingRecord tradingRecord = new BackTestTradingRecord(Trade.buyAt(0, series), Trade.sellAt(1, series),
-        Trade.buyAt(2, series), Trade.sellAt(5, series)
-    );
+  @ParameterizedTest
+  @MethodSource("numFactories")
+  void calculateProfitWithShortPositions(final NumFactory numFactory) {
+    final var context = new TradingRecordTestContext()
+        .withNumFactory(numFactory)
+        .withTradeType(Trade.TradeType.SELL)
+        .withCriterion(new ProfitLossRatioCriterion());
 
-    final AnalysisCriterion avtProfit = getCriterion();
-    assertNumEquals(0, avtProfit.calculate(series, tradingRecord));
+    // First trade: sell at 100, buy at 85 (profit: +15)
+    context.operate(1).at(100)
+        .operate(1).at(85);
+
+    // Second trade: sell at 80, buy at 95 (loss: -15)
+    context.operate(1).at(80)
+        .operate(1).at(95);
+
+    // Profit/Loss ratio = Total Profit / Total Loss = 15/15 = 1
+    context.assertResults(1);
   }
 
 
-  @Test
-  public void calculateProfitWithShortPositions() {
-    final var series =
-        new MockBarSeriesBuilder().withNumFactory(this.numFactory).withData(100, 85, 80, 70, 100, 95).build();
-    final TradingRecord tradingRecord = new BackTestTradingRecord(Trade.sellAt(0, series), Trade.buyAt(1, series),
-        Trade.sellAt(2, series), Trade.buyAt(5, series)
-    );
+  @ParameterizedTest
+  @MethodSource("numFactories")
+  void calculateMixedProfitsAndLosses(final NumFactory numFactory) {
+    final var context = new TradingRecordTestContext()
+        .withNumFactory(numFactory)
+        .withTradeType(Trade.TradeType.BUY)
+        .withCriterion(new ProfitLossRatioCriterion());
 
-    final AnalysisCriterion avtProfit = getCriterion();
-    assertNumEquals(1, avtProfit.calculate(series, tradingRecord));
+    // First trade: buy at 100, sell at 150 (profit: +50)
+    context.operate(1).at(100)
+        .operate(1).at(150);
+
+    // Second trade: buy at 100, sell at 80 (loss: -20)
+    context.operate(1).at(100)
+        .operate(1).at(80);
+
+    // Third trade: buy at 100, sell at 120 (profit: +20)
+    context.operate(1).at(100)
+        .operate(1).at(120);
+
+    // Fourth trade: buy at 100, sell at 90 (loss: -10)
+    context.operate(1).at(100)
+        .operate(1).at(90);
+
+    // Total profits = 50 + 20 = 70
+    // Total losses = 20 + 10 = 30
+    // Profit/Loss ratio = 70/30 = 2.333...
+    context.assertResults(2.333333333333333);
   }
 
 
-  @Test
-  public void betterThan() {
-    final AnalysisCriterion criterion = getCriterion();
-    assertTrue(criterion.betterThan(numOf(2.0), numOf(1.5)));
-    assertFalse(criterion.betterThan(numOf(1.5), numOf(2.0)));
+  @ParameterizedTest
+  @MethodSource("numFactories")
+  void betterThan(final NumFactory numFactory) {
+    final var criterion = new ProfitLossRatioCriterion();
+    assertTrue(criterion.betterThan(numFactory.numOf(2.0), numFactory.numOf(1.5)));
+    assertFalse(criterion.betterThan(numFactory.numOf(1.5), numFactory.numOf(2.0)));
   }
 
 
-  @Test
-  public void testCalculateOneOpenPositionShouldReturnZero() {
-    this.openedPositionUtils.testCalculateOneOpenPositionShouldReturnExpectedValue(this.numFactory, getCriterion(), 0);
+  @ParameterizedTest
+  @MethodSource("numFactories")
+  void calculateOneOpenPosition(final NumFactory numFactory) {
+    final var context = new TradingRecordTestContext()
+        .withNumFactory(numFactory)
+        .withTradeType(Trade.TradeType.BUY)
+        .withCriterion(new ProfitLossRatioCriterion());
+
+    // Open position without closing it
+    context.operate(1).at(100);
+
+    // Open position should return 0
+    context.assertResults(0);
   }
 }
