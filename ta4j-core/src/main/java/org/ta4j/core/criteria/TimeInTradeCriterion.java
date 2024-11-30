@@ -23,26 +23,57 @@
  */
 package org.ta4j.core.criteria;
 
+import java.time.temporal.ChronoUnit;
+
 import org.ta4j.core.Position;
 import org.ta4j.core.TradingRecord;
 import org.ta4j.core.num.Num;
 import org.ta4j.core.num.NumFactoryProvider;
 
 /**
- * Number of bars criterion.
+ * Time in market criterion.
  *
  * <p>
- * Returns the total number of bars in all the positions.
+ * Returns the total time in the market in seconds.
  */
-public class NumberOfBarsCriterion extends AbstractAnalysisCriterion {
+public class TimeInTradeCriterion extends AbstractAnalysisCriterion {
+
+  private final ChronoUnit unit;
+
+
+  private TimeInTradeCriterion(final ChronoUnit unit) {
+    this.unit = unit;
+  }
+
+
+  public static TimeInTradeCriterion seconds() {
+    return new TimeInTradeCriterion(ChronoUnit.SECONDS);
+  }
+
+
+  public static TimeInTradeCriterion minutes() {
+    return new TimeInTradeCriterion(ChronoUnit.MINUTES);
+  }
+
+
+  public static TimeInTradeCriterion hours() {
+    return new TimeInTradeCriterion(ChronoUnit.HOURS);
+  }
+
+
+  public static TimeInTradeCriterion days() {
+    return new TimeInTradeCriterion(ChronoUnit.DAYS);
+  }
+
 
   @Override
   public Num calculate(final Position position) {
     if (position.isClosed()) {
-      final int exitIndex = position.getExit().getIndex();
-      final int entryIndex = position.getEntry().getIndex();
-      return NumFactoryProvider.getDefaultNumFactory().numOf(exitIndex - entryIndex + 1);
+      final var start = position.getEntry().getWhenExecuted();
+      final var end = position.getExit().getWhenExecuted();
+      return NumFactoryProvider.getDefaultNumFactory().numOf(this.unit.between(start, end));
     }
+
     return NumFactoryProvider.getDefaultNumFactory().zero();
   }
 
@@ -53,7 +84,10 @@ public class NumberOfBarsCriterion extends AbstractAnalysisCriterion {
         .stream()
         .filter(Position::isClosed)
         .map(this::calculate)
-        .reduce(NumFactoryProvider.getDefaultNumFactory().zero(), Num::plus);
+        .reduce(
+            NumFactoryProvider.getDefaultNumFactory().zero(),
+            Num::plus
+        );        // FIXME it adds overlapping periods
   }
 
 
