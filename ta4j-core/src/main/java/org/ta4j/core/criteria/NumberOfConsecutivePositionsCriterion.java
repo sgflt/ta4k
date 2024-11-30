@@ -60,7 +60,7 @@ public class NumberOfConsecutivePositionsCriterion extends AbstractAnalysisCrite
     int consecutives = 0;
     for (final Position position : tradingRecord.getPositions()) {
       if (isConsecutive(position)) {
-        consecutives = consecutives + 1;
+        ++consecutives;
       } else {
         if (maxConsecutive < consecutives) {
           maxConsecutive = consecutives;

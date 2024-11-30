@@ -33,8 +33,6 @@ import java.util.stream.DoubleStream;
 
 import org.ta4j.core.events.CandleReceived;
 import org.ta4j.core.events.MarketEvent;
-import org.ta4j.core.num.NumFactory;
-import org.ta4j.core.num.NumFactoryProvider;
 
 /**
  * Generates BacktestBar implementations with mocked time or duration if not set
@@ -44,13 +42,12 @@ public class MockMarketEventBuilder {
 
   private static final Clock clock = Clock.fixed(Instant.ofEpochMilli(-1), ZoneId.systemDefault());
   private boolean defaultData;
-  private NumFactory numFactory = NumFactoryProvider.getDefaultNumFactory();
   private List<CandleReceived> candleEvents = new ArrayList<>();
+  private static int candlesProduced;
 
 
-  public MockMarketEventBuilder withNumFactory(final NumFactory numFactory) {
-    this.numFactory = numFactory;
-    return this;
+  private static int createCandleSerialNumber() {
+    return ++candlesProduced;
   }
 
 
@@ -61,19 +58,20 @@ public class MockMarketEventBuilder {
    *
    * @return this
    */
-  public MockMarketEventBuilder withCandleClosePrices(final List<Double> data) {
+  public MockMarketEventBuilder withCandlePrices(final List<Double> data) {
+    final var timePeriod = Duration.ofDays(1);
 
     data.forEach(d -> {
       this.candleEvents.add(
           new CandleReceived(
-              Duration.ofDays(1),
-              Instant.now(clock),
-              this.numFactory.numOf(d),
-              this.numFactory.numOf(d),
-              this.numFactory.numOf(d),
-              this.numFactory.numOf(d),
-              this.numFactory.numOf(d),
-              this.numFactory.zero()
+              timePeriod,
+              Instant.now(Clock.offset(clock, timePeriod.multipliedBy(createCandleSerialNumber()))),
+              d,
+              d,
+              d,
+              d,
+              d,
+              0.0
           )
       );
     });
@@ -102,18 +100,21 @@ public class MockMarketEventBuilder {
 
 
   private void arbitraryBars() {
-    final var candleEvents = new ArrayList<CandleReceived>();
-    for (double i = 0d; i < 5000; i++) {
+    final int dataSetSize = 5000;
+    final var candleEvents = new ArrayList<CandleReceived>(dataSetSize);
+    final var timePeriod = Duration.ofDays(1);
+
+    for (int i = 0; i < dataSetSize; i++) {
       candleEvents.add(
           new CandleReceived(
-              Duration.ofDays(1),
-              Instant.now(clock),
-              this.numFactory.numOf(i + 1),
-              this.numFactory.numOf(i + 2),
-              this.numFactory.numOf(i + 3),
-              this.numFactory.numOf(i + 4),
-              this.numFactory.numOf(i + 5),
-              this.numFactory.zero()
+              timePeriod,
+              Instant.now(Clock.offset(clock, timePeriod.multipliedBy(createCandleSerialNumber()))),
+              i + 1,
+              i + 2,
+              i + 3,
+              i + 4,
+              i + 5,
+              0.0
           )
       );
     }
