@@ -25,19 +25,19 @@ package org.ta4j.core.indicators.numeric.average;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.ta4j.core.TestContext;
+import org.ta4j.core.MarketEventTestContext;
 import org.ta4j.core.indicators.XLSIndicatorTest;
 import org.ta4j.core.indicators.numeric.Indicators;
 import org.ta4j.core.num.NumFactory;
 
 class EMAIndicatorTest {
 
-  private TestContext context;
+  private MarketEventTestContext context;
 
 
   @BeforeEach
   void setUp() {
-    this.context = new TestContext()
+    this.context = new MarketEventTestContext()
         .withCandlePrices(
             64.75, 63.79, 63.73, 63.73, 63.55, 63.19,
             63.91, 63.85, 62.95, 63.37, 61.33, 61.51
@@ -70,7 +70,7 @@ class EMAIndicatorTest {
   @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
   void testExternalData(final NumFactory numFactory) throws Exception {
     final var xls = new XLSIndicatorTest(this.getClass(), "EMA.xls", 6, numFactory);
-    final var xlsContext = new TestContext();
+    final var xlsContext = new MarketEventTestContext();
     xlsContext.withMarketEvents(xls.getMarketEvents());
 
     final var indicator = Indicators.closePrice().ema(1);
@@ -85,7 +85,7 @@ class EMAIndicatorTest {
   @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
   void testExternalDataBarCount3(final NumFactory numFactory) throws Exception {
     final var xls = new XLSIndicatorTest(this.getClass(), "EMA.xls", 6, numFactory);
-    final var xlsContext = new TestContext();
+    final var xlsContext = new MarketEventTestContext();
     xlsContext.withMarketEvents(xls.getMarketEvents());
 
     final var indicator = Indicators.closePrice().ema(3);
@@ -100,7 +100,7 @@ class EMAIndicatorTest {
   @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
   void testExternalDataBarCount13(final NumFactory numFactory) throws Exception {
     final var xls = new XLSIndicatorTest(this.getClass(), "EMA.xls", 6, numFactory);
-    final var xlsContext = new TestContext();
+    final var xlsContext = new MarketEventTestContext();
     xlsContext.withMarketEvents(xls.getMarketEvents());
 
     final var indicator = Indicators.closePrice().ema(13);

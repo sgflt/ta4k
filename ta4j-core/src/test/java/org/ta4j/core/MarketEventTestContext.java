@@ -31,10 +31,12 @@ import org.ta4j.core.num.Num;
 import org.ta4j.core.num.NumFactory;
 
 /**
- * @author Lukáš Kvídera
+ * This class simplifies testing by connecting market events and bar series through indicator context.
+ *
+ * Events are replayed to bar series that refreshes indicator context by created bar.
  */
-public class TestContext {
-  private static final Logger log = LoggerFactory.getLogger(TestContext.class);
+public class MarketEventTestContext {
+  private static final Logger log = LoggerFactory.getLogger(MarketEventTestContext.class);
 
   private Queue<MarketEvent> marketEvents;
   private final IndicatorContext indicatorContext = IndicatorContext.empty();
@@ -49,7 +51,7 @@ public class TestContext {
    *
    * @return this
    */
-  public TestContext withCandlePrices(final double... prices) {
+  public MarketEventTestContext withCandlePrices(final double... prices) {
     this.marketEvents = new LinkedList<>(
         new MockMarketEventBuilder()
             .withCandlePrices(prices)
@@ -59,31 +61,31 @@ public class TestContext {
   }
 
 
-  public TestContext withMarketEvents(final List<MarketEvent> marketEvents) {
+  public MarketEventTestContext withMarketEvents(final List<MarketEvent> marketEvents) {
     this.marketEvents = new LinkedList<>(marketEvents);
     return this;
   }
 
 
-  public TestContext withDefaultMarketEvents() {
+  public MarketEventTestContext withDefaultMarketEvents() {
     this.marketEvents = new LinkedList<>(new MockMarketEventBuilder().withDefaultData().build());
     return this;
   }
 
 
-  public TestContext withIndicator(final Indicator<?> indicator) {
+  public MarketEventTestContext withIndicator(final Indicator<?> indicator) {
     this.indicatorContext.add(indicator, UUID.randomUUID().toString());
     return this;
   }
 
 
-  public TestContext withIndicator(final Indicator<?> indicator, final String name) {
+  public MarketEventTestContext withIndicator(final Indicator<?> indicator, final String name) {
     this.indicatorContext.add(indicator, name);
     return this;
   }
 
 
-  public TestContext withIndicators(final Indicator<?>... indicator) {
+  public MarketEventTestContext withIndicators(final Indicator<?>... indicator) {
     Stream.of(indicator).forEach(this::withIndicator);
     return this;
   }
@@ -96,7 +98,7 @@ public class TestContext {
    *
    * @return this
    */
-  public TestContext withNumFactory(final NumFactory factory) {
+  public MarketEventTestContext withNumFactory(final NumFactory factory) {
     this.barSeries =
         new BacktestBarSeriesBuilder()
             .withNumFactory(factory)
@@ -133,7 +135,7 @@ public class TestContext {
   }
 
 
-  public TestContext fastForwardUntilStable() {
+  public MarketEventTestContext fastForwardUntilStable() {
     while (this.indicatorContext.isNotEmpty() && !this.indicatorContext.isStable()) {
       fastForward(1);
     }
@@ -142,19 +144,19 @@ public class TestContext {
   }
 
 
-  public static void assertNextNaN(final TestContext context, final NumericIndicator indicator) {
+  public static void assertNextNaN(final MarketEventTestContext context, final NumericIndicator indicator) {
     context.advance();
     assertNumEquals(NaN.NaN, indicator.getValue());
   }
 
 
-  public static void assertNextFalse(final TestContext context) {
+  public static void assertNextFalse(final MarketEventTestContext context) {
     context.advance();
     assertThat(context.getFisrtBooleanIndicator().getValue()).isFalse();
   }
 
 
-  public static void assertNextTrue(final TestContext context) {
+  public static void assertNextTrue(final MarketEventTestContext context) {
     context.advance();
     assertThat(context.getFisrtBooleanIndicator().getValue()).isTrue();
   }
@@ -165,7 +167,7 @@ public class TestContext {
    *
    * @return this
    */
-  public TestContext fastForward(final int bars) {
+  public MarketEventTestContext fastForward(final int bars) {
     log.debug("Fast forward =====> {}", bars);
     for (int i = 0; i < bars; i++) {
       if (!advance()) {
@@ -176,13 +178,13 @@ public class TestContext {
   }
 
 
-  public TestContext assertCurrent(final double expected) {
+  public MarketEventTestContext assertCurrent(final double expected) {
     assertCurrent(getFirstNumericIndicator(), expected);
     return this;
   }
 
 
-  private TestContext assertCurrent(final NumericIndicator indicator, final double expected) {
+  private MarketEventTestContext assertCurrent(final NumericIndicator indicator, final double expected) {
     assertNumEquals(expected, indicator.getValue());
     return this;
   }
@@ -193,13 +195,13 @@ public class TestContext {
   }
 
 
-  public TestContext assertNext(final double expected) {
+  public MarketEventTestContext assertNext(final double expected) {
     assertNext(getFirstNumericIndicator(), expected);
     return this;
   }
 
 
-  private TestContext assertNext(final NumericIndicator indicator, final double expected) {
+  private MarketEventTestContext assertNext(final NumericIndicator indicator, final double expected) {
     if (!advance()) {
       throw new IllegalStateException("Next failed");
     }
@@ -209,7 +211,10 @@ public class TestContext {
   }
 
 
-  public TestContext assertIndicatorEquals(final Indicator<Num> expectedIndicator, final Indicator<Num> indicator) {
+  public MarketEventTestContext assertIndicatorEquals(
+      final Indicator<Num> expectedIndicator,
+      final Indicator<Num> indicator
+  ) {
     while (advance()) {
       assertThat(indicator.getValue().doubleValue())
           .isCloseTo(
@@ -255,20 +260,20 @@ public class TestContext {
 
     public IndicatorAsserts(final String indicatorName) {
       this.indicatorName = indicatorName;
-      if (!TestContext.this.indicatorContext.contains(indicatorName)) {
+      if (!MarketEventTestContext.this.indicatorContext.contains(indicatorName)) {
         throw new IllegalStateException("Indicator " + indicatorName + " not found");
       }
     }
 
 
     public IndicatorAsserts assertNext(final double expected) {
-      TestContext.this.assertNext(getNumericIndicator(this.indicatorName), expected);
+      MarketEventTestContext.this.assertNext(getNumericIndicator(this.indicatorName), expected);
       return this;
     }
 
 
     public IndicatorAsserts assertCurrent(final double expected) {
-      TestContext.this.assertCurrent(getNumericIndicator(this.indicatorName), expected);
+      MarketEventTestContext.this.assertCurrent(getNumericIndicator(this.indicatorName), expected);
       return this;
     }
   }

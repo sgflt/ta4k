@@ -26,18 +26,18 @@ package org.ta4j.core.indicators.numeric.channels.bollinger;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.ta4j.core.TestContext;
+import org.ta4j.core.MarketEventTestContext;
 import org.ta4j.core.indicators.numeric.Indicators;
 
 class BollingerBandsMiddleIndicatorTest {
 
 
-  private TestContext testContext;
+  private MarketEventTestContext testContext;
 
 
   @BeforeEach
   void setUp() {
-    this.testContext = new TestContext();
+    this.testContext = new MarketEventTestContext();
     this.testContext.withCandlePrices(
         1, 2, 3, 4, 3, 4, 5, 4, 3, 3, 4, 3, 2
     );

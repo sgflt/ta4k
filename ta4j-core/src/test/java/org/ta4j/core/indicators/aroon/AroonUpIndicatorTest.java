@@ -26,18 +26,18 @@ package org.ta4j.core.indicators.aroon;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.ta4j.core.TestContext;
+import org.ta4j.core.MarketEventTestContext;
 import org.ta4j.core.indicators.numeric.Indicators;
 import org.ta4j.core.num.NumFactory;
 
 class AroonUpIndicatorTest {
 
-  private TestContext context;
+  private MarketEventTestContext context;
 
 
   @BeforeEach
   void init() {
-    this.context = new TestContext();
+    this.context = new MarketEventTestContext();
     // barcount before
     this.context.withCandlePrices(
         169.87,

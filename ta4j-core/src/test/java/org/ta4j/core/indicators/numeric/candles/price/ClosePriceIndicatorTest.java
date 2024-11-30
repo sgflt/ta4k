@@ -25,16 +25,16 @@ package org.ta4j.core.indicators.numeric.candles.price;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.ta4j.core.TestContext;
+import org.ta4j.core.MarketEventTestContext;
 import org.ta4j.core.indicators.numeric.Indicators;
 
 class ClosePriceIndicatorTest {
-  private TestContext context;
+  private MarketEventTestContext context;
 
 
   @BeforeEach
   void setUp() {
-    this.context = new TestContext().withDefaultMarketEvents();
+    this.context = new MarketEventTestContext().withDefaultMarketEvents();
 
     this.context.withIndicator(Indicators.closePrice());
   }

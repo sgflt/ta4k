@@ -27,7 +27,7 @@ package org.ta4j.core.indicators.numeric.average;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.ta4j.core.TestContext;
+import org.ta4j.core.MarketEventTestContext;
 import org.ta4j.core.indicators.numeric.Indicators;
 import org.ta4j.core.num.NumFactory;
 
@@ -41,12 +41,12 @@ import org.ta4j.core.num.NumFactory;
 class KAMAIndicatorTest {
 
 
-  private TestContext testContext;
+  private MarketEventTestContext testContext;
 
 
   @BeforeEach
   void setUp() {
-    this.testContext = new TestContext();
+    this.testContext = new MarketEventTestContext();
     this.testContext.withCandlePrices(
         110.46, 109.80, 110.17, 109.82, 110.15, 109.31, 109.05, 107.94, 107.76, 109.24, 109.40,
         108.50, 107.96, 108.55, 108.85, 110.44, 109.89, 110.70, 110.79, 110.22, 110.00, 109.27, 106.69,

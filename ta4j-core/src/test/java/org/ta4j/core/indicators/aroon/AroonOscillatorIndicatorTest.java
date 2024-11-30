@@ -36,14 +36,14 @@ import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.ta4j.core.TestContext;
+import org.ta4j.core.MarketEventTestContext;
 import org.ta4j.core.events.CandleReceived;
 import org.ta4j.core.indicators.numeric.Indicators;
 import org.ta4j.core.num.NumFactory;
 
 class AroonOscillatorIndicatorTest {
 
-  private TestContext context;
+  private MarketEventTestContext context;
 
 
   @BeforeEach
@@ -211,7 +211,7 @@ class AroonOscillatorIndicatorTest {
             2017/01/04,118.6900,19594560.0000,117.5500,119.6600,117.2900
             2017/01/03,116.8600,20635600.0000,116.0300,117.8400,115.5100
             """;
-    this.context = new TestContext();
+    this.context = new MarketEventTestContext();
     final var dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd", Locale.getDefault());
 
     this.context.withMarketEvents(

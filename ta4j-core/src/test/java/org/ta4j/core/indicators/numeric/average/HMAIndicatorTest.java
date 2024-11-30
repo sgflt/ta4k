@@ -27,19 +27,19 @@ package org.ta4j.core.indicators.numeric.average;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.ta4j.core.TestContext;
+import org.ta4j.core.MarketEventTestContext;
 import org.ta4j.core.indicators.numeric.Indicators;
 import org.ta4j.core.num.NumFactory;
 
 class HMAIndicatorTest {
 
 
-  private TestContext testContext;
+  private MarketEventTestContext testContext;
 
 
   @BeforeEach
   void setUp() {
-    this.testContext = new TestContext();
+    this.testContext = new MarketEventTestContext();
     this.testContext.withCandlePrices(
         84.53, 87.39, 84.55, 82.83, 82.58, 83.74, 83.33, 84.57, 86.98, 87.10, 83.11, 83.60, 83.66,
         82.76, 79.22, 79.03, 78.18, 77.42, 74.65, 77.48, 76.87

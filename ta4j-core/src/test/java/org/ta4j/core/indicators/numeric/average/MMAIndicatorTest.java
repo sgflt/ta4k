@@ -27,7 +27,7 @@ package org.ta4j.core.indicators.numeric.average;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.ta4j.core.TestContext;
+import org.ta4j.core.MarketEventTestContext;
 import org.ta4j.core.indicators.XLSIndicatorTest;
 import org.ta4j.core.indicators.numeric.Indicators;
 import org.ta4j.core.num.NumFactory;
@@ -35,12 +35,12 @@ import org.ta4j.core.num.NumFactory;
 class MMAIndicatorTest {
 
 
-  private TestContext testContext;
+  private MarketEventTestContext testContext;
 
 
   @BeforeEach
   void setUp() {
-    this.testContext = new TestContext();
+    this.testContext = new MarketEventTestContext();
     this.testContext.withCandlePrices(
         64.75,
         63.79,
@@ -108,7 +108,7 @@ class MMAIndicatorTest {
 
 
   private void assertBarCount(final int barCount, final double expected, final NumFactory numFactory) throws Exception {
-    final var xlsContext = new TestContext();
+    final var xlsContext = new MarketEventTestContext();
     final var xls = new XLSIndicatorTest(this.getClass(), "MMA.xls", 6, numFactory);
     xlsContext.withMarketEvents(xls.getMarketEvents());
     final var actualIndicator = Indicators.closePrice().mma(barCount);

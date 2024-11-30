@@ -26,19 +26,19 @@ package org.ta4j.core.indicators.numeric.channels.bollinger;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.ta4j.core.TestContext;
+import org.ta4j.core.MarketEventTestContext;
 import org.ta4j.core.indicators.numeric.Indicators;
 import org.ta4j.core.num.NumFactory;
 
 class PercentBIndicatorTest {
 
 
-  private TestContext testContext;
+  private MarketEventTestContext testContext;
 
 
   @BeforeEach
   void setUp() {
-    this.testContext = new TestContext();
+    this.testContext = new MarketEventTestContext();
     this.testContext.withCandlePrices(10, 12, 15, 14, 17, 20, 21, 20, 20, 19, 20, 17, 12, 12, 9, 8, 9, 10, 9, 10);
   }
 
