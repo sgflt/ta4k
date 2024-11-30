@@ -40,14 +40,14 @@ import org.ta4j.core.events.MarketEvent;
  */
 public class MockMarketEventBuilder {
 
-  private static final Clock clock = Clock.fixed(Instant.ofEpochMilli(-1), ZoneId.systemDefault());
+  private final Clock clock = Clock.fixed(Instant.ofEpochMilli(-1), ZoneId.systemDefault());
   private boolean defaultData;
   private List<CandleReceived> candleEvents = new ArrayList<>();
-  private static int candlesProduced;
+  private int candlesProduced;
 
 
-  private static int createCandleSerialNumber() {
-    return ++candlesProduced;
+  private int createCandleSerialNumber() {
+    return ++this.candlesProduced;
   }
 
 
@@ -65,7 +65,7 @@ public class MockMarketEventBuilder {
       this.candleEvents.add(
           new CandleReceived(
               timePeriod,
-              Instant.now(Clock.offset(clock, timePeriod.multipliedBy(createCandleSerialNumber()))),
+              Instant.now(Clock.offset(this.clock, timePeriod.multipliedBy(createCandleSerialNumber()))),
               d,
               d,
               d,
@@ -108,7 +108,7 @@ public class MockMarketEventBuilder {
       candleEvents.add(
           new CandleReceived(
               timePeriod,
-              Instant.now(Clock.offset(clock, timePeriod.multipliedBy(createCandleSerialNumber()))),
+              Instant.now(Clock.offset(this.clock, timePeriod.multipliedBy(createCandleSerialNumber()))),
               i + 1,
               i + 2,
               i + 3,

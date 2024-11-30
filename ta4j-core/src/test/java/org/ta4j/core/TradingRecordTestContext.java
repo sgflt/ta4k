@@ -7,10 +7,12 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.function.Function;
 
 import org.ta4j.core.analysis.cost.CostModel;
 import org.ta4j.core.analysis.cost.ZeroCostModel;
 import org.ta4j.core.backtest.BackTestTradingRecord;
+import org.ta4j.core.backtest.BacktestBarSeries;
 import org.ta4j.core.num.NumFactory;
 import org.ta4j.core.num.NumFactoryProvider;
 
@@ -19,7 +21,7 @@ import org.ta4j.core.num.NumFactoryProvider;
  */
 public class TradingRecordTestContext {
 
-  private final Clock clock = Clock.fixed(Instant.MIN, ZoneId.systemDefault());
+  private Clock clock = Clock.fixed(Instant.MIN, ZoneId.systemDefault());
   private Trade.TradeType tradeType = Trade.TradeType.BUY;
   private BackTestTradingRecord tradingRecord = new BackTestTradingRecord(this.tradeType);
   private NumFactory numFactory;
@@ -28,6 +30,8 @@ public class TradingRecordTestContext {
   private CostModel holdingCostModel = new ZeroCostModel();
   private boolean useRandomDelays = true;
   private int operationCount;
+  private BacktestBarSeries series;
+  private Duration duration;
 
 
   public TradingRecordTestContext withNumFactory(final NumFactory numFactory) {
@@ -44,6 +48,12 @@ public class TradingRecordTestContext {
   }
 
 
+  public TradingRecordTestContext withRelatedSeries(final BacktestBarSeries series) {
+    this.series = series;
+    return this;
+  }
+
+
   private void reinitalizeTradingRecord() {
     this.tradingRecord = new BackTestTradingRecord(this.tradeType, this.transactionCostModel, this.holdingCostModel);
   }
@@ -56,6 +66,12 @@ public class TradingRecordTestContext {
 
   public TradingRecordTestContext withCriterion(final AnalysisCriterion criterion) {
     this.criterion = criterion;
+    return this;
+  }
+
+
+  public TradingRecordTestContext withSeriesRelatedCriterion(final Function<BacktestBarSeries, AnalysisCriterion> criterionFactory) {
+    this.criterion = criterionFactory.apply(this.series);
     return this;
   }
 
@@ -96,6 +112,18 @@ public class TradingRecordTestContext {
   }
 
 
+  public TradingRecordTestContext withDuration(final Duration duration) {
+    this.duration = duration;
+    return this;
+  }
+
+
+  public TradingRecordTestContext withStart(final Clock clock) {
+    this.clock = clock;
+    return this;
+  }
+
+
   public class Operation {
     private final double amount;
 
@@ -122,6 +150,10 @@ public class TradingRecordTestContext {
 
 
   private Duration getTimeDelay() {
+    if (this.duration != null) {
+      return this.duration.multipliedBy(TradingRecordTestContext.this.operationCount++);
+    }
+
     if (TradingRecordTestContext.this.useRandomDelays) {
       return Duration.ofMinutes(ThreadLocalRandom.current().nextInt(10));
     }

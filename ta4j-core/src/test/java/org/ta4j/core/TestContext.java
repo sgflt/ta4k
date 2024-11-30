@@ -4,6 +4,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.ta4j.core.TestUtils.GENERAL_OFFSET;
 import static org.ta4j.core.TestUtils.assertNumEquals;
 
+import java.time.Clock;
+import java.time.Duration;
+import java.time.Instant;
+import java.time.ZoneId;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
@@ -13,6 +17,7 @@ import java.util.stream.Stream;
 import org.assertj.core.data.Offset;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.ta4j.core.backtest.BacktestBarSeries;
 import org.ta4j.core.backtest.BacktestBarSeriesBuilder;
 import org.ta4j.core.events.CandleReceived;
 import org.ta4j.core.events.MarketEvent;
@@ -33,7 +38,8 @@ public class TestContext {
 
   private Queue<MarketEvent> marketEvents;
   private final IndicatorContext indicatorContext = IndicatorContext.empty();
-  private BarSeries barSeries = new BacktestBarSeriesBuilder().withIndicatorContext(this.indicatorContext).build();
+  private BacktestBarSeries barSeries =
+      new BacktestBarSeriesBuilder().withIndicatorContext(this.indicatorContext).build();
 
 
   /**
@@ -218,6 +224,28 @@ public class TestContext {
 
   public IndicatorAsserts onIndicator(final String name) {
     return new IndicatorAsserts(name);
+  }
+
+
+  /**
+   * Adaptation of market events to executed position testing.
+   *
+   * There is some magic due to different clocks. This method adjusts clock to match with market events.
+   *
+   * Some criteria are not event based, but are retrospective instead. So for them, we have to replay all events
+   * and calculate them on historical data.
+   */
+  public TradingRecordTestContext toTradingRecordContext() {
+    while (advance()) {
+      // loop to the end
+    }
+
+    return new TradingRecordTestContext()
+        .withNumFactory(this.barSeries.numFactory())
+        .withRelatedSeries(this.barSeries)
+        .withDuration(Duration.ofDays(1))
+        .withStart(Clock.fixed(Instant.EPOCH.plus(Duration.ofDays(2).minusMillis(1)), ZoneId.systemDefault()))
+        ;
   }
 
 
