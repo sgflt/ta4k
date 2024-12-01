@@ -28,61 +28,63 @@ import java.util.NavigableMap;
 import java.util.TreeMap;
 
 import org.ta4j.core.Position;
-import org.ta4j.core.Trade;
 import org.ta4j.core.TradingRecord;
+import org.ta4j.core.backtest.BacktestBarSeries;
 import org.ta4j.core.num.Num;
 import org.ta4j.core.num.NumFactory;
 
 /**
- * Tracks the money cash flow involved by a list of positions over time.
+ * Tracks the portfolio value evolution over time considering all price movements.
  */
 public class CashFlow {
 
-  /** The cash flow values mapped to timestamps */
+  /** The portfolio value mapped to timestamps */
   private final NavigableMap<Instant, Num> values;
 
   /** The num factory for creating numbers */
   private final NumFactory numFactory;
 
+  /** The bar series containing price data */
+  private final BacktestBarSeries barSeries;
+
 
   /**
-   * Constructor for cash flows of a closed position.
+   * Constructor for cash flows of a single position.
    *
-   * @param numFactory the number factory to use
+   * @param barSeries the bar series containing price data
    * @param position a single position
    */
-  public CashFlow(final NumFactory numFactory, final Position position) {
-    this.numFactory = numFactory;
+  public CashFlow(final BacktestBarSeries barSeries, final Position position) {
+    this.barSeries = barSeries;
+    this.numFactory = barSeries.numFactory();
     this.values = new TreeMap<>();
 
-    // Initialize with base value 1
     if (position.getEntry() != null) {
-      this.values.put(position.getEntry().getWhenExecuted(), numFactory.one());
+      calculatePositionValues(position);
     }
-
-    calculate(position);
   }
 
 
   /**
-   * Constructor for cash flows of closed positions of a trading record.
+   * Constructor for cash flows of a trading record.
    *
-   * @param numFactory the number factory to use
+   * @param barSeries the bar series containing price data
    * @param tradingRecord the trading record
    */
-  public CashFlow(final NumFactory numFactory, final TradingRecord tradingRecord) {
-    this.numFactory = numFactory;
+  public CashFlow(final BacktestBarSeries barSeries, final TradingRecord tradingRecord) {
+    this.barSeries = barSeries;
+    this.numFactory = barSeries.numFactory();
     this.values = new TreeMap<>();
 
-    // Initialize with base value 1 at first trade
-    if (!tradingRecord.getPositions().isEmpty()) {
-      final Trade firstTrade = tradingRecord.getPositions().getFirst().getEntry();
-      if (firstTrade != null) {
-        this.values.put(firstTrade.getWhenExecuted(), numFactory.one());
-      }
-    }
+    tradingRecord.getPositions().stream()
+        .filter(p -> p.getEntry() != null)
+        .forEach(this::calculatePositionValues);
 
-    calculate(tradingRecord);
+    // Calculate for current open position
+    final var currentPosition = tradingRecord.getCurrentPosition();
+    if (currentPosition.isOpened()) {
+      calculatePositionValues(currentPosition);
+    }
   }
 
 
@@ -95,136 +97,55 @@ public class CashFlow {
 
 
   /**
-   * Calculates the cash flow for a single position.
-   *
-   * @param position a single position
-   */
-  private void calculate(final Position position) {
-    if (!position.isOpened()) {
-      calculateClosedPosition(position);
-    } else {
-      calculateOpenPosition(position, position.getEntry().getWhenExecuted());
-    }
-  }
-
-
-  /**
-   * Gets the cash flow value at a specific instant. If no value exists at that instant,
-   * calculates the interpolated value based on the position state at that time.
+   * Gets the cash flow value at a specific instant.
    *
    * @param instant the point in time
-   *
-   * @return the cash flow value
+   * @return the cash flow value (returns 1 if no value exists for the instant)
    */
   public Num getValue(final Instant instant) {
-    // If we have a value at this exact instant, return it
-    if (this.values.containsKey(instant)) {
-      return this.values.get(instant);
-    }
-
-    // Get the last entry before this instant
-    final var lastEntry = this.values.floorEntry(instant);
-    if (lastEntry == null) {
-      return this.numFactory.one();
-    }
-
-    // Get the next entry after this instant
-    final var nextEntry = this.values.ceilingEntry(instant);
-    if (nextEntry == null) {
-      return lastEntry.getValue();
-    }
-
-    // Linear interpolation between the two points
-    final var lastTime = lastEntry.getKey();
-    final var nextTime = nextEntry.getKey();
-    final var timeRange = nextTime.getEpochSecond() - lastTime.getEpochSecond();
-    final var currentTimeOffset = instant.getEpochSecond() - lastTime.getEpochSecond();
-
-    // Calculate progress between the two points (0 to 1)
-    final var progress = this.numFactory.numOf((double) currentTimeOffset / timeRange);
-
-    // Interpolate between the two values
-    final var valueRange = nextEntry.getValue().minus(lastEntry.getValue());
-    return lastEntry.getValue().plus(valueRange.multipliedBy(progress));
+    return this.values.getOrDefault(instant, this.numFactory.one());
   }
 
 
-  private void calculateClosedPosition(final Position position) {
-    final boolean isLongTrade = position.getEntry().isBuy();
-    final Trade entry = position.getEntry();
-    final Trade exit = position.getExit();
+  private void calculatePositionValues(final Position position) {
+    final var entryTrade = position.getEntry();
+    final var exitTrade = position.getExit();
+    final var isLongTrade = entryTrade.isBuy();
+    final var holdingCost = position.getHoldingCost();
 
-    // Calculate ratio
-    final Num ratio = calculateRatio(isLongTrade, entry.getNetPrice(), exit.getNetPrice());
+    final var startTime = entryTrade.getWhenExecuted();
+    final var endTime = exitTrade != null ?
+                        exitTrade.getWhenExecuted() :
+                        this.barSeries.getLastBar().endTime();
 
-    // Get the value at entry and multiply by ratio for exit value
-    final Num entryValue = getValue(entry.getWhenExecuted());
-    this.values.put(exit.getWhenExecuted(), entryValue.multipliedBy(ratio));
+    final var entryPrice = entryTrade.getNetPrice();
+
+    this.barSeries.getBarData().stream()
+        .filter(bar -> isBarInTimeRange(bar.endTime(), startTime, endTime))
+        .forEach(bar -> {
+          final var currentPrice = bar.closePrice();
+          final var adjustedPrice = isLongTrade ?
+                                    currentPrice.minus(holdingCost) :
+                                    currentPrice.plus(holdingCost);
+
+          final var ratio = calculatePriceRatio(isLongTrade, entryPrice, adjustedPrice);
+          final var portfolioValue = this.numFactory.one().multipliedBy(ratio);
+          this.values.put(bar.endTime(), portfolioValue);
+        });
   }
 
 
-  private void calculateOpenPosition(final Position position, final Instant evaluationTime) {
-    final boolean isLongTrade = position.getEntry().isBuy();
-    final Trade entry = position.getEntry();
-    final Instant entryTime = entry.getWhenExecuted();
-
-    // Calculate holding costs
-    final Num holdingCost = position.getHoldingCost();
-    final Num entryPrice = entry.getNetPrice();
-
-    // Record initial value
-    final Num entryValue = getValue(entryTime);
-    this.values.put(entryTime, entryValue);
-
-    // Record value at evaluation time with holding costs
-    final Num currentPrice = entry.getPricePerAsset();
-    final Num adjustedPrice = addCost(currentPrice, holdingCost, isLongTrade);
-    final Num ratio = calculateRatio(isLongTrade, entryPrice, adjustedPrice);
-    this.values.put(evaluationTime, entryValue.multipliedBy(ratio));
+  private boolean isBarInTimeRange(final Instant barTime, final Instant start, final Instant end) {
+    return !barTime.isBefore(start) && !barTime.isAfter(end);
   }
 
 
-  private void calculate(final TradingRecord tradingRecord) {
-    // Calculate for all closed positions
-    tradingRecord.getPositions().forEach(this::calculate);
-
-    // Calculate for current open position if any
-    final var currentPosition = tradingRecord.getCurrentPosition();
-    if (currentPosition.isOpened()) {
-      // Use the latest timestamp from the trading record
-      final var latestTime = tradingRecord.getPositions().stream()
-          .filter(Position::isClosed)
-          .map(p -> p.getExit().getWhenExecuted())
-          .max(Instant::compareTo)
-          .orElse(currentPosition.getEntry().getWhenExecuted());
-
-      calculateOpenPosition(currentPosition, latestTime);
-    }
-  }
-
-
-  /**
-   * Calculates the ratio between entry and exit prices accounting for trade direction.
-   */
-  private Num calculateRatio(final boolean isLongTrade, final Num entryPrice, final Num exitPrice) {
+  private Num calculatePriceRatio(final boolean isLongTrade, final Num entryPrice, final Num currentPrice) {
     if (isLongTrade) {
-      return exitPrice.dividedBy(entryPrice);
+      return currentPrice.dividedBy(entryPrice);
     }
 
-    // For short positions, when price goes down we gain
-    // If price drops from 100 to 90, we gain 0.1 (10%)
-    // ratio should be 1 + (entry - exit)/entry
-    return this.numFactory.one().plus(entryPrice.minus(exitPrice).dividedBy(entryPrice));
-
-  }
-
-
-  /**
-   * Adjusts price to incorporate trading costs.
-   */
-  private static Num addCost(final Num rawPrice, final Num holdingCost, final boolean isLongTrade) {
-    return isLongTrade ?
-           rawPrice.minus(holdingCost) :
-           rawPrice.plus(holdingCost);
+    // For short positions
+    return this.numFactory.one().plus(entryPrice.minus(currentPrice).dividedBy(entryPrice));
   }
 }
