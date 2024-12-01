@@ -14,6 +14,7 @@ import java.util.Queue;
 import java.util.UUID;
 import java.util.stream.Stream;
 
+import lombok.Getter;
 import org.assertj.core.data.Offset;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,6 +41,7 @@ public class MarketEventTestContext {
 
   private Queue<MarketEvent> marketEvents;
   private final IndicatorContext indicatorContext = IndicatorContext.empty();
+  @Getter
   private BacktestBarSeries barSeries =
       new BacktestBarSeriesBuilder().withIndicatorContext(this.indicatorContext).build();
 
@@ -251,6 +253,18 @@ public class MarketEventTestContext {
         .withDuration(Duration.ofDays(1))
         .withStart(Clock.fixed(Instant.EPOCH.plus(Duration.ofDays(2).minusMillis(1)), ZoneId.systemDefault()))
         ;
+  }
+
+
+  /**
+   * Replays all events so {@link BacktestBarSeries} is prepared for analysis.
+   */
+  public MarketEventTestContext replayAllEvents() {
+    while (advance()) {
+      // fast forward
+    }
+
+    return this;
   }
 
 
