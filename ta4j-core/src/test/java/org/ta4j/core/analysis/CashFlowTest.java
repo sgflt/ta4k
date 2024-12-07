@@ -25,6 +25,8 @@ package org.ta4j.core.analysis;
 
 import static org.ta4j.core.TestUtils.assertNumEquals;
 
+import java.time.Instant;
+
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -38,39 +40,33 @@ class CashFlowTest {
   @ParameterizedTest
   @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
   void cashFlowBuyWithOnlyOnePosition(final NumFactory numFactory) {
-    final var context = new MarketEventTestContext()
+    final var tradingContext = new MarketEventTestContext()
         .withNumFactory(numFactory)
         .withCandlePrices(1, 2)
-        .replayAllEvents();
+        .toTradingRecordContext()
+        .enter(1).after(1)
+        .exit(1).after(1);
 
-    final var tradingContext = context.toTradingRecordContext();
+    final var cashFlow = new CashFlow(tradingContext.getTradingRecord());
 
-    tradingContext.operate(1).at(1);
-    tradingContext.operate(1).at(2);
-
-    final var cashFlow = new CashFlow(context.getBarSeries(), tradingContext.getTradingRecord());
-
-    assertNumEquals(numFactory.one(), cashFlow.getValue(context.getBarSeries().getBar(0).endTime()));
-    assertNumEquals(numFactory.numOf(2), cashFlow.getValue(context.getBarSeries().getBar(1).endTime()));
+    assertNumEquals(numFactory.one(), cashFlow.getValue(tradingContext.getBarSeries().getBar(0).endTime()));
+    assertNumEquals(numFactory.numOf(2), cashFlow.getValue(tradingContext.getBarSeries().getBar(1).endTime()));
   }
 
 
   @ParameterizedTest
   @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
   void cashFlowShortSellWith20PercentGain(final NumFactory numFactory) {
-    final var context = new MarketEventTestContext()
+    final var tradingContext = new MarketEventTestContext()
         .withNumFactory(numFactory)
         .withCandlePrices(100, 90, 80)
-        .replayAllEvents();
+        .toTradingRecordContext()
+        .withTradeType(Trade.TradeType.SELL)
+        .enter(1).after(1)
+        .exit(1).after(2);
 
-    final var tradingContext = context.toTradingRecordContext()
-        .withTradeType(Trade.TradeType.SELL);
-
-    tradingContext.operate(1).at(100);
-    tradingContext.operate(1).at(80);
-
-    final var cashFlow = new CashFlow(context.getBarSeries(), tradingContext.getTradingRecord());
-    final var bars = context.getBarSeries();
+    final var cashFlow = new CashFlow(tradingContext.getTradingRecord());
+    final var bars = tradingContext.getBarSeries();
 
     assertNumEquals(numFactory.one(), cashFlow.getValue(bars.getBar(0).endTime()));
     assertNumEquals(numFactory.numOf(1.1), cashFlow.getValue(bars.getBar(1).endTime()));
@@ -81,20 +77,17 @@ class CashFlowTest {
   @ParameterizedTest
   @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
   void cashFlowLongWith50PercentLoss(final NumFactory numFactory) {
-    final var context = new MarketEventTestContext()
+    final var tradingContext = new MarketEventTestContext()
         .withNumFactory(numFactory)
         .withCandlePrices(200, 190, 180, 170, 160, 150, 140, 130, 120, 110, 100)
-        .replayAllEvents();
-
-    final var tradingContext = context.toTradingRecordContext()
+        .toTradingRecordContext()
         .withTradeType(Trade.TradeType.BUY);
 
-    tradingContext.operate(1).at(200);
-    tradingContext.forwardTime(9);
-    tradingContext.operate(1).at(100);
+    tradingContext.enter(1).after(1);
+    tradingContext.exit(1).after(10);
 
-    final var cashFlow = new CashFlow(context.getBarSeries(), tradingContext.getTradingRecord());
-    final var bars = context.getBarSeries();
+    final var cashFlow = new CashFlow(tradingContext.getTradingRecord());
+    final var bars = tradingContext.getBarSeries();
 
     // Check values at each step (price increases by 10 each bar)
     for (int i = 0; i <= 10; i++) {
@@ -113,20 +106,17 @@ class CashFlowTest {
   @ParameterizedTest
   @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
   void cashFlowShortSellWith100PercentLoss(final NumFactory numFactory) {
-    final var context = new MarketEventTestContext()
+
+    final var tradingContext = new MarketEventTestContext()
         .withNumFactory(numFactory)
         .withCandlePrices(100, 110, 120, 130, 140, 150, 160, 170, 180, 190, 200)
-        .replayAllEvents();
+        .toTradingRecordContext()
+        .withTradeType(Trade.TradeType.SELL)
+        .enter(1).after(1)
+        .exit(1).after(10);
 
-    final var tradingContext = context.toTradingRecordContext()
-        .withTradeType(Trade.TradeType.SELL);
-
-    tradingContext.operate(1).at(100);
-    tradingContext.forwardTime(9);
-    tradingContext.operate(1).at(200);
-
-    final var cashFlow = new CashFlow(context.getBarSeries(), tradingContext.getTradingRecord());
-    final var bars = context.getBarSeries();
+    final var cashFlow = new CashFlow(tradingContext.getTradingRecord());
+    final var bars = tradingContext.getBarSeries();
 
     // Check values at each step (price increases by 10 each bar)
     for (int i = 0; i <= 10; i++) {
@@ -146,38 +136,30 @@ class CashFlowTest {
   @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
   void cashFlowWithNoTrades(final NumFactory numFactory) {
     final var context = new MarketEventTestContext()
-        .withNumFactory(numFactory)
-        .withCandlePrices(100, 110, 120)
-        .replayAllEvents();
-
+        .withNumFactory(numFactory);
     final var tradingRecord = context.toTradingRecordContext().getTradingRecord();
-    final var cashFlow = new CashFlow(context.getBarSeries(), tradingRecord);
-    final var bars = context.getBarSeries();
+    final var cashFlow = new CashFlow(tradingRecord);
 
-    assertNumEquals(numFactory.one(), cashFlow.getValue(bars.getFirstBar().endTime()));
-    assertNumEquals(numFactory.one(), cashFlow.getValue(bars.getLastBar().endTime()));
+    assertNumEquals(numFactory.one(), cashFlow.getValue(Instant.EPOCH));
   }
 
 
   @ParameterizedTest
   @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
   void cashFlowHODL(final NumFactory numFactory) {
-    final var context = new MarketEventTestContext()
+
+    final var tradingContext = new MarketEventTestContext()
         .withNumFactory(numFactory)
         .withCandlePrices(100, 120, 150, 135, 100, 100, 100, 200, 200, 160)
-        .replayAllEvents();
-
-    final var tradingContext = context.toTradingRecordContext()
-        .withTradeType(Trade.TradeType.BUY)
-        .withConstantTimeDelays();
+        .toTradingRecordContext()
+        .withTradeType(Trade.TradeType.BUY);
 
     // Position 1: 100 -> 160 (profit: +60%)
-    tradingContext.operate(1).at(100);
-    tradingContext.forwardTime(8); // -> 160
-    tradingContext.operate(1).at(160);
+    tradingContext.enter(1).after(1);
+    tradingContext.exit(1).after(9);
 
-    final var cashFlow = new CashFlow(context.getBarSeries(), tradingContext.getTradingRecord());
-    final var bars = context.getBarSeries();
+    final var cashFlow = new CashFlow(tradingContext.getTradingRecord());
+    final var bars = tradingContext.getBarSeries();
 
     // Initial value
     assertNumEquals(numFactory.one(), cashFlow.getValue(bars.getBar(0).endTime()));
@@ -202,37 +184,35 @@ class CashFlowTest {
   @ParameterizedTest
   @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
   void cashFlowWithMultipleBuyPositions(final NumFactory numFactory) {
-    final var context = new MarketEventTestContext()
+
+    final var tradingContext = new MarketEventTestContext()
         .withNumFactory(numFactory)
         .withCandlePrices(100, 120, 150, 135, 100, 100, 100, 200, 200, 160)
-        .replayAllEvents();
-
-    final var tradingContext = context.toTradingRecordContext()
-        .withTradeType(Trade.TradeType.BUY)
-        .withConstantTimeDelays();
+        .toTradingRecordContext()
+        .withTradeType(Trade.TradeType.BUY);
 
     // Position 1: 100 -> 120 (profit: +20%)
-    tradingContext.operate(1).at(100);
-    tradingContext.operate(1).at(120);
+    tradingContext.enter(1).after(1);
+    tradingContext.exit(1).after(1);
 
     // Position 2: 150 -> 135 (loss: -10%)
-    tradingContext.operate(1).at(150);
-    tradingContext.operate(1).at(135);
+    tradingContext.enter(1).after(1);
+    tradingContext.exit(1).after(1);
 
     // Position 3: 100 -> 100 (neutral)
-    tradingContext.operate(1).at(100);
-    tradingContext.operate(1).at(100);
+    tradingContext.enter(1).after(1);
+    tradingContext.exit(1).after(1);
 
     // Position 4: 100 -> 200 (profit: +100%)
-    tradingContext.operate(1).at(100);
-    tradingContext.operate(1).at(200);
+    tradingContext.enter(1).after(1);
+    tradingContext.exit(1).after(1);
 
     // Position 5: 200 -> 160 (loss: -20%)
-    tradingContext.operate(1).at(200);
-    tradingContext.operate(1).at(160);
+    tradingContext.enter(1).after(1);
+    tradingContext.exit(1).after(1);
 
-    final var cashFlow = new CashFlow(context.getBarSeries(), tradingContext.getTradingRecord());
-    final var bars = context.getBarSeries();
+    final var cashFlow = new CashFlow(tradingContext.getTradingRecord());
+    final var bars = tradingContext.getBarSeries();
 
     // Initial value
     assertNumEquals(numFactory.one(), cashFlow.getValue(bars.getBar(0).endTime()));

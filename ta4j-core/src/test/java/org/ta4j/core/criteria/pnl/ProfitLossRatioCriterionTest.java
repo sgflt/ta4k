@@ -44,12 +44,12 @@ class ProfitLossRatioCriterionTest extends AbstractCriterionTest {
         .withCriterion(new ProfitLossRatioCriterion());
 
     // First trade: buy at 100, sell at 120 (profit: 20)
-    context.operate(1).at(100)
-        .operate(1).at(120);
+    context.enter(1).at(100)
+        .exit(1).at(120);
 
     // Second trade: buy at 120, sell at 130 (profit: 10)
-    context.operate(1).at(120)
-        .operate(1).at(130);
+    context.enter(1).at(120)
+        .exit(1).at(130);
 
     // Only profits, no losses, so ratio should be 1
     context.assertResults(1);
@@ -65,12 +65,12 @@ class ProfitLossRatioCriterionTest extends AbstractCriterionTest {
         .withCriterion(new ProfitLossRatioCriterion());
 
     // First trade: buy at 100, sell at 95 (loss: -5)
-    context.operate(1).at(100)
-        .operate(1).at(95);
+    context.enter(1).at(100)
+        .exit(1).at(95);
 
     // Second trade: buy at 100, sell at 70 (loss: -30)
-    context.operate(1).at(100)
-        .operate(1).at(70);
+    context.enter(1).at(100)
+        .exit(1).at(70);
 
     // Only losses, no profits, so ratio should be 0
     context.assertResults(0);
@@ -86,12 +86,12 @@ class ProfitLossRatioCriterionTest extends AbstractCriterionTest {
         .withCriterion(new ProfitLossRatioCriterion());
 
     // First trade: sell at 100, buy at 85 (profit: +15)
-    context.operate(1).at(100)
-        .operate(1).at(85);
+    context.enter(1).at(100)
+        .exit(1).at(85);
 
     // Second trade: sell at 80, buy at 95 (loss: -15)
-    context.operate(1).at(80)
-        .operate(1).at(95);
+    context.enter(1).at(80)
+        .exit(1).at(95);
 
     // Profit/Loss ratio = Total Profit / Total Loss = 15/15 = 1
     context.assertResults(1);
@@ -107,20 +107,20 @@ class ProfitLossRatioCriterionTest extends AbstractCriterionTest {
         .withCriterion(new ProfitLossRatioCriterion());
 
     // First trade: buy at 100, sell at 150 (profit: +50)
-    context.operate(1).at(100)
-        .operate(1).at(150);
+    context.enter(1).at(100)
+        .exit(1).at(150);
 
     // Second trade: buy at 100, sell at 80 (loss: -20)
-    context.operate(1).at(100)
-        .operate(1).at(80);
+    context.enter(1).at(100)
+        .exit(1).at(80);
 
     // Third trade: buy at 100, sell at 120 (profit: +20)
-    context.operate(1).at(100)
-        .operate(1).at(120);
+    context.enter(1).at(100)
+        .exit(1).at(120);
 
     // Fourth trade: buy at 100, sell at 90 (loss: -10)
-    context.operate(1).at(100)
-        .operate(1).at(90);
+    context.enter(1).at(100)
+        .exit(1).at(90);
 
     // Total profits = 50 + 20 = 70
     // Total losses = 20 + 10 = 30
@@ -147,7 +147,7 @@ class ProfitLossRatioCriterionTest extends AbstractCriterionTest {
         .withCriterion(new ProfitLossRatioCriterion());
 
     // Open position without closing it
-    context.operate(1).at(100);
+    context.enter(1).at(100);
 
     // Open position should return 0
     context.assertResults(0);

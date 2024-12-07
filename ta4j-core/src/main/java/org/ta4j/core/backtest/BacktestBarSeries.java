@@ -32,6 +32,7 @@ import java.util.Objects;
 
 import org.ta4j.core.Bar;
 import org.ta4j.core.BarBuilderFactory;
+import org.ta4j.core.BarListener;
 import org.ta4j.core.BarSeries;
 import org.ta4j.core.events.CandleReceived;
 import org.ta4j.core.indicators.IndicatorContext;
@@ -54,7 +55,7 @@ public class BacktestBarSeries implements BarSeries {
   /** The list of bars of the bar series. */
   private final List<BacktestBar> bars = new ArrayList<>();
   private final BarBuilderFactory barBuilderFactory;
-  private final List<IndicatorContext> indicatorContexts = new ArrayList<>(1);
+  private final List<BarListener> barListeners = new ArrayList<>(1);
 
   private final NumFactory numFactory;
 
@@ -72,19 +73,19 @@ public class BacktestBarSeries implements BarSeries {
    * @param numFactory the factory of numbers used in series {@link Num Num
    *     implementation}
    * @param barBuilderFactory factory for creating bars of this series
-   * @param indicatorContexts
+   * @param barListeners that needs to be notified about each bar
    */
   BacktestBarSeries(
       final String name,
       final NumFactory numFactory,
       final BarBuilderFactory barBuilderFactory,
-      final List<IndicatorContext> indicatorContexts
+      final List<IndicatorContext> barListeners
   ) {
     this.name = name;
     this.numFactory = numFactory;
 
     this.barBuilderFactory = Objects.requireNonNull(barBuilderFactory);
-    this.indicatorContexts.addAll(Objects.requireNonNull(indicatorContexts));
+    this.barListeners.addAll(Objects.requireNonNull(barListeners));
   }
 
 
@@ -99,8 +100,8 @@ public class BacktestBarSeries implements BarSeries {
     if (canAdvance()) {
       ++this.currentBarIndex;
 
-      for (final var indicatorContext : this.indicatorContexts) {
-        indicatorContext.refresh(getBar());
+      for (final var barListener : this.barListeners) {
+        barListener.onBar(getBar());
       }
       return true;
     }
@@ -358,7 +359,12 @@ public class BacktestBarSeries implements BarSeries {
   }
 
 
-  public List<IndicatorContext> getIndicatorContexts() {
-    return this.indicatorContexts;
+  public void addListener(final BarListener barListener) {
+    this.barListeners.add(barListener);
+  }
+
+
+  public void clearListeners() {
+    this.barListeners.clear();
   }
 }

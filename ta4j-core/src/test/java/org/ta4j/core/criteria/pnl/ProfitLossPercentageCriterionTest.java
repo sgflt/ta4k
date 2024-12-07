@@ -44,12 +44,12 @@ class ProfitLossPercentageCriterionTest extends AbstractCriterionTest {
         .withCriterion(new ProfitLossPercentageCriterion());
 
     // First trade: buy at 100, sell at 110 (profit: +10%)
-    context.operate(1).at(100)
-        .operate(1).at(110);
+    context.enter(1).at(100)
+        .exit(1).at(110);
 
     // Second trade: buy at 100, sell at 105 (profit: +5%)
-    context.operate(1).at(100)
-        .operate(1).at(105);
+    context.enter(1).at(100)
+        .exit(1).at(105);
 
     // Total percentage profit should be 10% + 5% = 15%
     context.assertResults(15);
@@ -65,12 +65,12 @@ class ProfitLossPercentageCriterionTest extends AbstractCriterionTest {
         .withCriterion(new ProfitLossPercentageCriterion());
 
     // First trade: buy at 100, sell at 95 (loss: -5%)
-    context.operate(1).at(100)
-        .operate(1).at(95);
+    context.enter(1).at(100)
+        .exit(1).at(95);
 
     // Second trade: buy at 100, sell at 70 (loss: -30%)
-    context.operate(1).at(100)
-        .operate(1).at(70);
+    context.enter(1).at(100)
+        .exit(1).at(70);
 
     // Total percentage loss should be -5% + -30% = -35%
     context.assertResults(-35);
@@ -86,12 +86,12 @@ class ProfitLossPercentageCriterionTest extends AbstractCriterionTest {
         .withCriterion(new ProfitLossPercentageCriterion());
 
     // First trade: buy at 100, sell at 195 (profit: +95%)
-    context.operate(1).at(100)
-        .operate(1).at(195);
+    context.enter(1).at(100)
+        .exit(1).at(195);
 
     // Second trade: buy at 100, sell at 70 (loss: -30%)
-    context.operate(1).at(100)
-        .operate(1).at(70);
+    context.enter(1).at(100)
+        .exit(1).at(70);
 
     // Net percentage should be +95% + -30% = +65%
     context.assertResults(65);
@@ -107,12 +107,12 @@ class ProfitLossPercentageCriterionTest extends AbstractCriterionTest {
         .withCriterion(new ProfitLossPercentageCriterion());
 
     // First trade: sell at 100, buy at 90 (profit: +10%)
-    context.operate(1).at(100)
-        .operate(1).at(90);
+    context.enter(1).at(100)
+        .exit(1).at(90);
 
     // Second trade: sell at 100, buy at 95 (profit: +5%)
-    context.operate(1).at(100)
-        .operate(1).at(95);
+    context.enter(1).at(100)
+        .exit(1).at(95);
 
     // Total percentage profit should be 10% + 5% = 15%
     context.assertResults(15);
@@ -128,12 +128,12 @@ class ProfitLossPercentageCriterionTest extends AbstractCriterionTest {
         .withCriterion(new ProfitLossPercentageCriterion());
 
     // First trade: sell at 100, buy at 110 (loss: -10%)
-    context.operate(1).at(100)
-        .operate(1).at(110);
+    context.enter(1).at(100)
+        .exit(1).at(110);
 
     // Second trade: sell at 100, buy at 105 (loss: -5%)
-    context.operate(1).at(100)
-        .operate(1).at(105);
+    context.enter(1).at(100)
+        .exit(1).at(105);
 
     // Total percentage loss should be -10% + -5% = -15%
     context.assertResults(-15);
@@ -158,7 +158,7 @@ class ProfitLossPercentageCriterionTest extends AbstractCriterionTest {
         .withCriterion(new ProfitLossPercentageCriterion());
 
     // Open position without closing it
-    context.operate(1).at(100);
+    context.enter(1).at(100);
 
     // Open position should return 0
     context.assertResults(0);

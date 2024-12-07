@@ -16,7 +16,7 @@ public class BacktestExecutorBuilder {
   private CostModel holdingCostModel = new ZeroCostModel();
 
   /** The trade execution model to use */
-  private TradeExecutionModel tradeExecutionModel = new TradeOnNextOpenModel();
+  private TradeExecutionModel tradeExecutionModel = new TradeOnCurrentCloseModel();
 
 
   public BacktestExecutorBuilder() {

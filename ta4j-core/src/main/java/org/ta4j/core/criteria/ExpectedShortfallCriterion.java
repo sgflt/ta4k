@@ -49,6 +49,7 @@ public class ExpectedShortfallCriterion implements AnalysisCriterion {
 
   /**
    * Constructor.
+   *
    * @param series the bar series
    * @param confidenceLevel the confidence level (e.g. 0.95 for 95%)
    */
@@ -65,7 +66,7 @@ public class ExpectedShortfallCriterion implements AnalysisCriterion {
       return this.series.numFactory().zero();
     }
     // TODO extract ReturnType to parameter
-    final var returns = new Returns(this.series, position, Returns.ReturnType.ARITHMETIC);
+    final var returns = new Returns(this.series.numFactory(), position, Returns.ReturnType.ARITHMETIC);
     final var returnValues = returns.getValues().stream()
         .filter(num -> !num.isZero()) // Remove zero returns
         .toList();
@@ -82,7 +83,7 @@ public class ExpectedShortfallCriterion implements AnalysisCriterion {
       return this.series.numFactory().zero();
     }
 
-    final var returns = new Returns(this.series, tradingRecord, Returns.ReturnType.ARITHMETIC);
+    final var returns = new Returns(this.series.numFactory(), tradingRecord, Returns.ReturnType.ARITHMETIC);
     final var returnValues = returns.getValues().stream()
         .filter(num -> !num.isZero()) // Remove zero returns
         .toList();

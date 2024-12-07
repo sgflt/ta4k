@@ -24,13 +24,21 @@
 package org.ta4j.core;
 
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.NavigableMap;
 import java.util.Objects;
+import java.util.TreeMap;
 
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import org.ta4j.core.Trade.TradeType;
+import org.ta4j.core.analysis.CashFlow;
+import org.ta4j.core.analysis.Returns;
 import org.ta4j.core.analysis.cost.CostModel;
 import org.ta4j.core.analysis.cost.ZeroCostModel;
 import org.ta4j.core.num.Num;
+import org.ta4j.core.num.NumFactory;
 
 /**
  * A {@code Position} is a pair of two {@link Trade trades}.
@@ -42,14 +50,17 @@ import org.ta4j.core.num.Num;
  * <li>entry == SELL --> exit == BUY
  * </ul>
  */
+@Slf4j
 @Getter
-public class Position {
+public class Position implements BarListener {
 
   /** The entry trade */
   private Trade entry;
 
   /** The exit trade */
   private Trade exit;
+
+  private final PositionHistory priceHistory = new PositionHistory();
 
   /** The type of the entry trade */
   private final TradeType startingType;
@@ -59,11 +70,12 @@ public class Position {
 
   /** The cost model for holding the asset */
   private final CostModel holdingCostModel;
+  private final NumFactory numFactory;
 
 
   /** Constructor with {@link #startingType} = BUY. */
-  public Position() {
-    this(TradeType.BUY);
+  public Position(final NumFactory numFactory) {
+    this(TradeType.BUY, numFactory);
   }
 
 
@@ -73,8 +85,8 @@ public class Position {
    * @param startingType the starting {@link TradeType trade type} of the position
    *     (i.e. type of the entry trade)
    */
-  public Position(final TradeType startingType) {
-    this(startingType, new ZeroCostModel(), new ZeroCostModel());
+  public Position(final TradeType startingType, final NumFactory numFactory) {
+    this(startingType, new ZeroCostModel(), new ZeroCostModel(), numFactory);
   }
 
 
@@ -89,8 +101,10 @@ public class Position {
   public Position(
       final TradeType startingType,
       final CostModel transactionCostModel,
-      final CostModel holdingCostModel
+      final CostModel holdingCostModel,
+      final NumFactory numFactory
   ) {
+    this.numFactory = numFactory;
     if (startingType == null) {
       throw new IllegalArgumentException("Starting type must not be null");
     }
@@ -150,6 +164,11 @@ public class Position {
       this.exit = trade;
     }
     return trade;
+  }
+
+
+  private boolean isLong() {
+    return this.entry != null && this.entry.isBuy();
   }
 
 
@@ -385,7 +404,157 @@ public class Position {
 
 
   @Override
+  public void onBar(final Bar bar) {
+    if (isOpened()) {
+      this.priceHistory.onBar(bar);
+    }
+  }
+
+
+  public List<PositionValue> getCashFlow() {
+    return this.priceHistory.getCashFlow();
+  }
+
+
+  @Override
   public String toString() {
     return "Entry: " + this.entry + " exit: " + this.exit;
+  }
+
+
+  /**
+   * Calculates the maximum drawdown from a cash flow over a series.
+   *
+   * The formula is as follows:
+   *
+   * <pre>
+   * MDD = (LP - PV) / PV
+   * with MDD: Maximum drawdown, in percent.
+   * with LP: Lowest point (lowest value after peak value).
+   * with PV: Peak value (highest value within the observation).
+   * </pre>
+   *
+   * @return the maximum drawdown from a cash flow over a series
+   */
+  public Num getMaxDrawdown() {
+    final var values = new CashFlow(this).getValues();
+    if (values.isEmpty()) {
+      log.debug("No values in cash flow - returning zero drawdown");
+      return this.numFactory.zero();
+    }
+
+    var maxPeak = this.numFactory.one();
+    var maximumDrawdown = this.numFactory.zero();
+
+    log.debug("Calculating maximum drawdown for {} position", isLong() ? "long" : "short");
+
+    for (final var entry : values.entrySet()) {
+      final var time = entry.getKey();
+      final var value = entry.getValue();
+      final var adjustedValue = isLong() ? value : this.numFactory.one().dividedBy(value);
+
+      log.debug("Processing value at {}: raw={}, adjusted={}", time, value, adjustedValue);
+
+      // Update peak if we have a new high
+      if (adjustedValue.isGreaterThan(maxPeak)) {
+        log.debug("New peak found: {} -> {}", maxPeak, adjustedValue);
+        maxPeak = adjustedValue;
+      }
+
+      // Calculate drawdown from peak
+      final var drawdown = maxPeak.minus(adjustedValue).dividedBy(maxPeak);
+      log.debug("Current drawdown: {} (peak={}, value={})", drawdown, maxPeak, adjustedValue);
+
+      if (drawdown.isGreaterThan(maximumDrawdown)) {
+        log.debug("New maximum drawdown: {} -> {}", maximumDrawdown, drawdown);
+        maximumDrawdown = drawdown;
+      }
+    }
+
+    log.debug("Final maximum drawdown: {}", maximumDrawdown);
+    return maximumDrawdown;
+  }
+
+
+  /**
+   * Calculates returns for the position using specified return type.
+   *
+   * @param returnType type of return calculation to use
+   *
+   * @return Returns instance representing position returns over time
+   */
+  public NavigableMap<Instant, Num> getReturns(final Returns.ReturnType returnType) {
+    if (this.priceHistory.priceHistory.isEmpty()) {
+      return new TreeMap<>(); // Empty returns if no price history
+    }
+
+    final var returns = new TreeMap<Instant, Num>();
+    final var isLongTrade = this.entry.isBuy();
+    final var holdingCost = getHoldingCost();
+    var previousPrice = this.entry.getNetPrice();
+
+    for (final var bar : this.priceHistory.priceHistory) {
+      final var currentPrice = bar.closePrice();
+      final var adjustedPrice = isLongTrade ?
+                                currentPrice.minus(holdingCost) :
+                                currentPrice.plus(holdingCost);
+
+      final var assetReturn = returnType.calculate(adjustedPrice, previousPrice, this.numFactory);
+      final var strategyReturn = isLongTrade ? assetReturn : assetReturn.negate();
+
+      returns.put(bar.endTime(), strategyReturn);
+      previousPrice = currentPrice;
+    }
+
+    return returns;
+  }
+
+
+  /**
+   * @param when at which time point we measure value
+   * @param value at time point
+   */
+  public record PositionValue(Instant when, Num value) {
+
+  }
+
+  /**
+   * accumulates bars during lifetime of position
+   */
+  public class PositionHistory implements BarListener {
+
+    private final List<Bar> priceHistory = new ArrayList<>();
+
+
+    public List<PositionValue> getCashFlow() {
+      return this.priceHistory.stream()
+          .map(bar -> {
+                final var currentPrice = bar.closePrice();
+                final var adjustedPrice = isLong() // FIXME holding cost is over night, usually not during day
+                                          ? currentPrice.minus(getHoldingCost())
+                                          : currentPrice.plus(getHoldingCost());
+
+                final var ratio = calculatePriceRatio(isLong(), Position.this.entry.getPricePerAsset(), adjustedPrice);
+                return new PositionValue(bar.endTime(), ratio);
+              }
+
+          ).toList();
+    }
+
+
+    private Num calculatePriceRatio(final boolean isLongTrade, final Num entryPrice, final Num currentPrice) {
+      if (isLongTrade) {
+        return currentPrice.dividedBy(entryPrice);
+      }
+
+      // For short positions
+      return Position.this.numFactory.one().plus(entryPrice.minus(currentPrice).dividedBy(entryPrice));
+    }
+
+
+    @Override
+    public void onBar(final Bar bar) {
+      this.priceHistory.add(bar);
+    }
   }
 }

@@ -9,7 +9,7 @@ import org.ta4j.core.indicators.IndicatorContext;
  */
 public class MockStrategy extends BacktestStrategy {
   public MockStrategy(final IndicatorContext indicatorContext) {
-    super("mock strategy", Rule.NOOP, Rule.NOOP, indicatorContext);
+    super("mock strategy", Rule.NOOP, Rule.NOOP, indicatorContext, null);
   }
 
 

@@ -1,9 +1,13 @@
 package org.ta4j.core;
 
-public interface StrategyFactory {
+import org.ta4j.core.backtest.RuntimeContext;
+import org.ta4j.core.indicators.IndicatorContext;
+
+public interface StrategyFactory<T extends Strategy> {
   /**
-   * @param series that will be strategized
-   * @return strategy related to specific series
+   * @param runtimeContext that provides additional data to strategy
+   * @param indicatorContext that performs indicator recalculation on each bar
+   * @return strategy that is source for trading signals
    */
-  Strategy createStrategy(BarSeries series);
+  T createStrategy(RuntimeContext runtimeContext, IndicatorContext indicatorContext);
 }

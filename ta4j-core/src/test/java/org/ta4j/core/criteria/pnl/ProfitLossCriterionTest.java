@@ -42,10 +42,10 @@ class ProfitLossCriterionTest extends AbstractCriterionTest {
         .withNumFactory(numFactory)
         .withCriterion(new ProfitLossCriterion());
 
-    context.operate(50).at(100)
-        .operate(50).at(110)
-        .operate(50).at(100)
-        .operate(50).at(105)
+    context.enter(50).at(100)
+        .exit(50).at(110)
+        .enter(50).at(100)
+        .exit(50).at(105)
         .assertResults(500 + 250)
     ;
   }
@@ -58,10 +58,10 @@ class ProfitLossCriterionTest extends AbstractCriterionTest {
         .withNumFactory(numFactory)
         .withCriterion(new ProfitLossCriterion());
 
-    context.operate(50).at(100)
-        .operate(50).at(95)
-        .operate(50).at(100)
-        .operate(50).at(70)
+    context.enter(50).at(100)
+        .exit(50).at(95)
+        .enter(50).at(100)
+        .exit(50).at(70)
         .assertResults(-250 - 1500);
   }
 
@@ -74,10 +74,10 @@ class ProfitLossCriterionTest extends AbstractCriterionTest {
         .withTradeType(Trade.TradeType.SELL)
         .withCriterion(new ProfitLossCriterion());
 
-    context.operate(50).at(100)
-        .operate(50).at(110)
-        .operate(50).at(100)
-        .operate(50).at(105)
+    context.enter(50).at(100)
+        .exit(50).at(110)
+        .enter(50).at(100)
+        .exit(50).at(105)
         .assertResults(-(500 + 250));
   }
 
@@ -90,10 +90,10 @@ class ProfitLossCriterionTest extends AbstractCriterionTest {
         .withTradeType(Trade.TradeType.SELL)
         .withCriterion(new ProfitLossCriterion());
 
-    context.operate(50).at(100)
-        .operate(50).at(95)
-        .operate(50).at(100)
-        .operate(50).at(70)
+    context.enter(50).at(100)
+        .exit(50).at(95)
+        .enter(50).at(100)
+        .exit(50).at(70)
         .assertResults(250 + 1500);
   }
 

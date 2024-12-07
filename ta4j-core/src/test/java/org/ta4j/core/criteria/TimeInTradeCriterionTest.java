@@ -23,8 +23,11 @@
  */
 package org.ta4j.core.criteria;
 
+import java.time.temporal.ChronoUnit;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.ta4j.core.MarketEventTestContext;
 import org.ta4j.core.Trade;
 import org.ta4j.core.TradingRecordTestContext;
 import org.ta4j.core.num.DoubleNumFactory;
@@ -37,64 +40,69 @@ class TimeInTradeCriterionTest {
   @Test
   @DisplayName("Should calculate zero for no positions")
   void calculateWithNoPositions() {
-    this.context = new TradingRecordTestContext()
+    this.context = new MarketEventTestContext()
         .withNumFactory(DoubleNumFactory.getInstance())
-        .withCriterion(TimeInTradeCriterion.minutes())
-        .withConstantTimeDelays();
+        .toTradingRecordContext()
+        .withCriterion(TimeInTradeCriterion.minutes());
 
     this.context.assertResults(0);
   }
 
+
   @Test
   @DisplayName("Should calculate correct time for two positions")
   void calculateWithTwoPositions() {
-    this.context = new TradingRecordTestContext()
+    this.context = new MarketEventTestContext()
         .withNumFactory(DoubleNumFactory.getInstance())
+        .withCandleDuration(ChronoUnit.MINUTES)
+        .withCandlePrices(100.0, 0, 110.0, 100.0, 0, 0, 105.0)
+        .toTradingRecordContext()
         .withCriterion(TimeInTradeCriterion.minutes())
-        .withConstantTimeDelays()
         .withTradeType(Trade.TradeType.BUY);
 
     this.context
-        .operate(100).at(100.0)
-        .forwardTime(2)
-        .operate(100).at(110.0)
-        .forwardTime(1)
-        .operate(100).at(100.0)
-        .forwardTime(2)
-        .operate(100).at(105.0);
+        .enter(100).after(1)
+        .exit(100).after(2)
+        .enter(100).after(1)
+        .exit(100).after(3);
 
-    this.context.assertResults(6);
+    this.context.assertResults(5);
   }
+
 
   @Test
   @DisplayName("Should calculate correct time for one position")
   void calculateWithOnePosition() {
-    this.context = new TradingRecordTestContext()
+    this.context = new MarketEventTestContext()
+        .withCandleDuration(ChronoUnit.MINUTES)
+        .withCandlePrices(100.0, 0, 0, 70.0)
         .withNumFactory(DoubleNumFactory.getInstance())
+        .toTradingRecordContext()
         .withCriterion(TimeInTradeCriterion.minutes())
-        .withConstantTimeDelays()
         .withTradeType(Trade.TradeType.BUY);
 
     this.context
-        .operate(100).at(100.0)
-        .forwardTime(3)
-        .operate(100).at(70.0);
+        .enter(100).after(1)
+        .exit(100).after(3);
 
-    this.context.assertResults(4);
+    this.context.assertResults(3);
   }
+
 
   @Test
   @DisplayName("Should return zero for open position")
   void calculateOneOpenPositionShouldReturnZero() {
-    this.context = new TradingRecordTestContext()
+    this.context = new MarketEventTestContext()
+        .withCandleDuration(ChronoUnit.MINUTES)
+        .withCandlePrices(100.0, 0, 0, 70.0)
         .withNumFactory(DoubleNumFactory.getInstance())
+        .toTradingRecordContext()
         .withCriterion(TimeInTradeCriterion.minutes())
-        .withConstantTimeDelays()
         .withTradeType(Trade.TradeType.BUY);
 
     this.context
-        .operate(100).at(100.0)
-        .forwardTime(5);
+        .enter(100).after(1)
+        .forwardTime(3);
 
     this.context.assertResults(0);
   }

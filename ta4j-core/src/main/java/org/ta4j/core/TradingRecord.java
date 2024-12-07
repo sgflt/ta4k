@@ -53,15 +53,6 @@ public interface TradingRecord {
   String getName();
 
   /**
-   * Places a trade in the trading record.
-   *
-   * @param whenExecuted the execution bar
-   * @param amount the trade amount
-   */
-  void operate(Instant whenExecuted, Num pricePerAsset, Num amount);
-
-
-  /**
    * Places an entry trade in the trading record.
    *
    * @param pricePerAsset the trade price per asset
@@ -115,6 +106,8 @@ public interface TradingRecord {
     }
     return null;
   }
+
+  Num getMaximumDrawdown();
 
   /**
    * @return the last trade recorded

@@ -23,12 +23,15 @@
  */
 package org.ta4j.core.backtest;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 
+import org.ta4j.core.Bar;
+import org.ta4j.core.BarListener;
 import org.ta4j.core.Position;
 import org.ta4j.core.Trade;
 import org.ta4j.core.Trade.TradeType;
@@ -36,11 +39,12 @@ import org.ta4j.core.TradingRecord;
 import org.ta4j.core.analysis.cost.CostModel;
 import org.ta4j.core.analysis.cost.ZeroCostModel;
 import org.ta4j.core.num.Num;
+import org.ta4j.core.num.NumFactory;
 
 /**
  * Base implementation of a {@link TradingRecord}.
  */
-public class BackTestTradingRecord implements TradingRecord {
+public class BackTestTradingRecord implements TradingRecord, BarListener, RuntimeContext {
 
   private final TradeType startingType;
   /** The name of the trading record. */
@@ -60,11 +64,12 @@ public class BackTestTradingRecord implements TradingRecord {
 
   /** The cost model for holding asset (e.g. borrowing). */
   private final CostModel holdingCostModel;
+  private final NumFactory numFactory;
 
 
   /** Constructor with {@link #startingType} = BUY. */
-  public BackTestTradingRecord() {
-    this(TradeType.BUY);
+  public BackTestTradingRecord(final NumFactory numFactory) {
+    this(TradeType.BUY, numFactory);
   }
 
 
@@ -73,8 +78,8 @@ public class BackTestTradingRecord implements TradingRecord {
    *
    * @param name the name of the tradingRecord
    */
-  public BackTestTradingRecord(final String name) {
-    this(TradeType.BUY);
+  public BackTestTradingRecord(final String name, final NumFactory numFactory) {
+    this(TradeType.BUY, numFactory);
     this.name = name;
   }
 
@@ -86,8 +91,8 @@ public class BackTestTradingRecord implements TradingRecord {
    * @param tradeType the {@link TradeType trade type} of entries in the trading
    *     session
    */
-  public BackTestTradingRecord(final String name, final TradeType tradeType) {
-    this(tradeType, new ZeroCostModel(), new ZeroCostModel());
+  public BackTestTradingRecord(final String name, final TradeType tradeType, final NumFactory numFactory) {
+    this(tradeType, new ZeroCostModel(), new ZeroCostModel(), numFactory);
     this.name = name;
   }
 
@@ -98,9 +103,10 @@ public class BackTestTradingRecord implements TradingRecord {
    * @param tradeType the {@link TradeType trade type} of entries in the trading
    *     session
    */
-  public BackTestTradingRecord(final TradeType tradeType) {
-    this(tradeType, new ZeroCostModel(), new ZeroCostModel());
+  public BackTestTradingRecord(final TradeType tradeType, final NumFactory numFactory) {
+    this(tradeType, new ZeroCostModel(), new ZeroCostModel(), numFactory);
   }
+
 
   /**
    * Constructor.
@@ -116,12 +122,14 @@ public class BackTestTradingRecord implements TradingRecord {
   public BackTestTradingRecord(
       final TradeType entryTradeType,
       final CostModel transactionCostModel,
-      final CostModel holdingCostModel
+      final CostModel holdingCostModel,
+      final NumFactory numFactory
   ) {
     this.startingType = Objects.requireNonNull(entryTradeType, "Starting type must not be null");
     this.transactionCostModel = transactionCostModel;
     this.holdingCostModel = holdingCostModel;
-    this.currentPosition = new Position(entryTradeType, transactionCostModel, holdingCostModel);
+    this.numFactory = numFactory;
+    this.currentPosition = new Position(entryTradeType, transactionCostModel, holdingCostModel, numFactory);
   }
 
 
@@ -144,7 +152,16 @@ public class BackTestTradingRecord implements TradingRecord {
 
 
   @Override
-  public void operate(final Instant whenExecuted, final Num pricePerAsset, final Num amount) {
+  public Num getMaximumDrawdown() {
+    return this.positions.stream()
+        .max(Comparator.comparing(Position::getMaxDrawdown))
+        .map(Position::getMaxDrawdown)
+        .orElse(this.numFactory.zero())
+        ;
+  }
+
+
+  private void operate(final Instant whenExecuted, final Num pricePerAsset, final Num amount) {
     if (this.currentPosition.isClosed()) {
       // Current position closed, should not occur
       throw new IllegalStateException("Current position should not be closed");
@@ -232,6 +249,7 @@ public class BackTestTradingRecord implements TradingRecord {
    * Records a trade and the corresponding position (if closed).
    *
    * @param trade the trade to be recorded
+   *
    * @throws NullPointerException if trade is null
    */
   private void recordTrade(final Trade trade) {
@@ -243,7 +261,8 @@ public class BackTestTradingRecord implements TradingRecord {
     // Storing the position if closed
     if (this.currentPosition.isClosed()) {
       this.positions.add(this.currentPosition);
-      this.currentPosition = new Position(this.startingType, this.transactionCostModel, this.holdingCostModel);
+      this.currentPosition =
+          new Position(this.startingType, this.transactionCostModel, this.holdingCostModel, this.numFactory);
     }
   }
 
@@ -257,5 +276,49 @@ public class BackTestTradingRecord implements TradingRecord {
       sb.append(trade.toString()).append(System.lineSeparator());
     }
     return sb.toString();
+  }
+
+
+  @Override
+  public void onBar(final Bar bar) {
+    this.currentPosition.onBar(bar);  // TODO allow DCA
+  }
+
+
+  @Override
+  public Num getMaxDrawDown() {
+    return null;
+    //    TODO return this.positions.stream()
+    //        .filter(Position::isOpened)
+    //        .max();
+  }
+
+
+  @Override
+  public Duration getTimeInTrade() {
+    return null;
+  }
+
+
+  @Override
+  public int getCountOfOpenedPositions() {
+    return 0;
+  }
+
+
+  @Override
+  public Num getMaxProfit() {
+    return null;
+  }
+
+
+  @Override
+  public Num getMaxGain() {
+    return null;
+  }
+
+
+  public Num getMaxTotalProfit() {
+    return null;
   }
 }

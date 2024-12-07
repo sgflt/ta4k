@@ -44,12 +44,12 @@ class AverageProfitCriterionTest extends AbstractCriterionTest {
         .withCriterion(new AverageProfitCriterion());
 
     // First trade: buy at 100, sell at 110 (profit: +10)
-    context.operate(1).at(100)
-        .operate(1).at(110);
+    context.enter(1).at(100)
+        .exit(1).at(110);
 
     // Second trade: buy at 100, sell at 105 (profit: +5)
-    context.operate(1).at(100)
-        .operate(1).at(105);
+    context.enter(1).at(100)
+        .exit(1).at(105);
 
     // Average profit should be (10 + 5) / 2 = 7.5
     context.assertResults(7.5);
@@ -65,12 +65,12 @@ class AverageProfitCriterionTest extends AbstractCriterionTest {
         .withCriterion(new AverageProfitCriterion());
 
     // First trade: buy at 100, sell at 95 (loss: -5)
-    context.operate(1).at(100)
-        .operate(1).at(95);
+    context.enter(1).at(100)
+        .exit(1).at(95);
 
     // Second trade: buy at 100, sell at 70 (loss: -30)
-    context.operate(1).at(100)
-        .operate(1).at(70);
+    context.enter(1).at(100)
+        .exit(1).at(70);
 
     // No profits, so average profit should be 0
     context.assertResults(0);
@@ -86,12 +86,12 @@ class AverageProfitCriterionTest extends AbstractCriterionTest {
         .withCriterion(new AverageProfitCriterion());
 
     // First trade: sell at 100, buy at 85 (profit: +15)
-    context.operate(1).at(100)
-        .operate(1).at(85);
+    context.enter(1).at(100)
+        .exit(1).at(85);
 
     // Second trade: sell at 80, buy at 95 (loss: -15)
-    context.operate(1).at(80)
-        .operate(1).at(95);
+    context.enter(1).at(80)
+        .exit(1).at(95);
 
     // Average profit should be (15 + 0) / 2 = 15
     context.assertResults(15);
@@ -116,7 +116,7 @@ class AverageProfitCriterionTest extends AbstractCriterionTest {
         .withCriterion(new AverageProfitCriterion());
 
     // Open position without closing it
-    context.operate(1).at(100);
+    context.enter(1).at(100);
 
     // Open position should return 0
     context.assertResults(0);

@@ -32,11 +32,12 @@ import java.util.UUID;
 import java.util.function.Consumer;
 
 import org.ta4j.core.Bar;
+import org.ta4j.core.BarListener;
 
 /**
  * @author Lukáš Kvídera
  */
-public class IndicatorContext {
+public class IndicatorContext implements BarListener {
   private final LinkedHashMap<String, Indicator<?>> indicators;
   private final Set<IndicatorChangeListener> changeListeners = new HashSet<>();
 
@@ -111,7 +112,8 @@ public class IndicatorContext {
   }
 
 
-  public void refresh(final Bar bar) {
+  @Override
+  public void onBar(final Bar bar) {
     for (final var indicator : this.indicators.values()) {
       indicator.onBar(bar);
       for (final var changeListener : this.changeListeners) {

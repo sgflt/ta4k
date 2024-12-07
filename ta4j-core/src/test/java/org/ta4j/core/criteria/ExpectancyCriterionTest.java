@@ -28,6 +28,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.ta4j.core.MarketEventTestContext;
 import org.ta4j.core.Trade;
 import org.ta4j.core.TradingRecordTestContext;
 import org.ta4j.core.num.NumFactory;
@@ -37,18 +38,19 @@ class ExpectancyCriterionTest extends AbstractCriterionTest {
   @ParameterizedTest
   @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
   void calculateOnlyWithProfitPositions(final NumFactory numFactory) {
-    final var context = new TradingRecordTestContext()
+    final var context = new MarketEventTestContext()
         .withNumFactory(numFactory)
+        .toTradingRecordContext()
         .withTradeType(Trade.TradeType.BUY)
         .withCriterion(new ExpectancyCriterion());
 
     // First trade: buy at 100, sell at 120 (profit: +20%)
-    context.operate(1).at(100)
-        .operate(1).at(120);
+    context.enter(1).at(100)
+        .exit(1).at(120);
 
     // Second trade: buy at 130, sell at 160 (profit: +23%)
-    context.operate(1).at(130)
-        .operate(1).at(160);
+    context.enter(1).at(130)
+        .exit(1).at(160);
 
     // All trades are profitable, expectancy should be 1.0
     context.assertResults(1.0);
@@ -64,12 +66,12 @@ class ExpectancyCriterionTest extends AbstractCriterionTest {
         .withCriterion(new ExpectancyCriterion());
 
     // First trade: buy at 100, sell at 80 (loss: -20%)
-    context.operate(1).at(100)
-        .operate(1).at(80);
+    context.enter(1).at(100)
+        .exit(1).at(80);
 
     // Second trade: buy at 130, sell at 160 (profit: +23%)
-    context.operate(1).at(130)
-        .operate(1).at(160);
+    context.enter(1).at(130)
+        .exit(1).at(160);
 
     // One winning trade and one losing trade
     // Expectancy = (1 winning trade / 2 total trades) = 0.25
@@ -86,12 +88,12 @@ class ExpectancyCriterionTest extends AbstractCriterionTest {
         .withCriterion(new ExpectancyCriterion());
 
     // First trade: buy at 100, sell at 95 (loss: -5%)
-    context.operate(1).at(100)
-        .operate(1).at(95);
+    context.enter(1).at(100)
+        .exit(1).at(95);
 
     // Second trade: buy at 80, sell at 50 (loss: -37.5%)
-    context.operate(1).at(80)
-        .operate(1).at(50);
+    context.enter(1).at(80)
+        .exit(1).at(50);
 
     // All trades are losses, expectancy should be 0
     context.assertResults(0);
@@ -107,12 +109,12 @@ class ExpectancyCriterionTest extends AbstractCriterionTest {
         .withCriterion(new ExpectancyCriterion());
 
     // First trade: sell at 160, buy at 140 (profit: +12.5%)
-    context.operate(1).at(160)
-        .operate(1).at(140);
+    context.enter(1).at(160)
+        .exit(1).at(140);
 
     // Second trade: sell at 120, buy at 60 (profit: +50%)
-    context.operate(1).at(120)
-        .operate(1).at(60);
+    context.enter(1).at(120)
+        .exit(1).at(60);
 
     // All trades are profitable, expectancy should be 1.0
     context.assertResults(1.0);
@@ -128,12 +130,12 @@ class ExpectancyCriterionTest extends AbstractCriterionTest {
         .withCriterion(new ExpectancyCriterion());
 
     // First trade: sell at 160, buy at 200 (loss: -25%)
-    context.operate(1).at(160)
-        .operate(1).at(200);
+    context.enter(1).at(160)
+        .exit(1).at(200);
 
     // Second trade: sell at 120, buy at 60 (profit: +50%)
-    context.operate(1).at(120)
-        .operate(1).at(60);
+    context.enter(1).at(120)
+        .exit(1).at(60);
 
     // One winning trade and one losing trade
     // Expectancy = (1 winning trade / 2 total trades) = 0.25
@@ -159,7 +161,7 @@ class ExpectancyCriterionTest extends AbstractCriterionTest {
         .withCriterion(new ExpectancyCriterion());
 
     // Open position without closing it
-    context.operate(1).at(100);
+    context.enter(1).at(100);
 
     // Open position should return 0
     context.assertResults(0);

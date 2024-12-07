@@ -31,57 +31,44 @@ class ValueAtRiskCriterionTest {
 
   @Test
   void calculateOnlyWithGainPositions() {
-    final var testContext = new MarketEventTestContext()
+    new MarketEventTestContext()
         .withNumFactory(DoubleNumFactory.getInstance())
-        .withCandlePrices(100d, 105d, 106d, 107d, 108d, 115d);
-
-    final var context = testContext.toTradingRecordContext()
-        .withSeriesRelatedCriterion(series -> new ValueAtRiskCriterion(series, 0.95));
-
-    context
-        .operate(1).at(100)
-        .operate(1).at(106)
-        .operate(1).at(107)
-        .operate(1).at(115);
-
-    context.assertResults(0);
+        .withCandlePrices(100d, 105d, 106d, 107d, 108d, 115d)
+        .toTradingRecordContext()
+        .withSeriesRelatedCriterion(series -> new ValueAtRiskCriterion(series.numFactory(), 0.95))
+        .enter(1).after(1)
+        .exit(1).after(2)
+        .enter(1).after(1)
+        .exit(1).after(2)
+        .assertResults(0);
   }
 
 
   @Test
   void calculateWithASimplePosition() {
-    final var testContext = new MarketEventTestContext()
+    new MarketEventTestContext()
         .withNumFactory(DoubleNumFactory.getInstance())
-        .withCandlePrices(0, 104, 90);
-
-    final var context = testContext.toTradingRecordContext()
-        .withSeriesRelatedCriterion(series -> new ValueAtRiskCriterion(series, 0.95));
-
-    context
-        .operate(1).at(104)
-        .operate(1).at(90);
-
-    context.assertResults(90. / 104. - 1.);
+        .withCandlePrices(100d, 104d, 90d, 100d, 95d, 105d)
+        .toTradingRecordContext()
+        .withSeriesRelatedCriterion(series -> new ValueAtRiskCriterion(series.numFactory(), 0.95))
+        .enter(1).after(2)
+        .exit(1).after(1)
+        .assertResults(90. / 104. - 1.);
   }
 
 
   @Test
   void calculateOnlyWithLossPositions() {
-    final var testContext = new MarketEventTestContext()
+    new MarketEventTestContext()
         .withNumFactory(DoubleNumFactory.getInstance())
-        .withCandlePrices(0, 100d, 95d, 100d, 80d, 85d, 70d);
-
-    final var context = testContext.toTradingRecordContext()
-        .withSeriesRelatedCriterion(series -> new ValueAtRiskCriterion(series, 0.95));
-
-    context
-        .operate(1).at(100)
-        .operate(1).at(95)
-        .operate(1).at(100)
-        .forwardTime(3)
-        .operate(1).at(70);
-
-    context.assertResults(80. / 100. - 1.); // 80/100 - 1
+        .withCandlePrices(0, 100d, 95d, 100d, 80d, 85d, 70d)
+        .toTradingRecordContext()
+        .withSeriesRelatedCriterion(series -> new ValueAtRiskCriterion(series.numFactory(), 0.95))
+        .enter(1).after(2)
+        .exit(1).after(1)
+        .enter(1).after(1)
+        .exit(1).after(3)
+        .assertResults(80. / 100. - 1.);
   }
 
 
@@ -91,7 +78,7 @@ class ValueAtRiskCriterionTest {
         .withNumFactory(DoubleNumFactory.getInstance())
         .withCandlePrices(0, 100d, 95d, 100d, 80d, 85d, 70d)
         .toTradingRecordContext()
-        .withSeriesRelatedCriterion(series -> new ValueAtRiskCriterion(series, 0.95));
+        .withSeriesRelatedCriterion(series -> new ValueAtRiskCriterion(series.numFactory(), 0.95));
 
     context.assertResults(0);
   }

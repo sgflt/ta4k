@@ -43,10 +43,10 @@ class ProfitCriterionTest extends AbstractCriterionTest {
         .withNumFactory(numFactory)
         .withCriterion(new ProfitCriterion(true));
 
-    context.operate(1).at(100)
-        .operate(1).at(105)
-        .operate(1).at(100)
-        .operate(1).at(120)
+    context.enter(1).at(100)
+        .exit(1).at(105)
+        .enter(1).at(100)
+        .exit(1).at(120)
         // exclude costs, i.e. costs are not contained:
         // [(105 - 100)] + [(120 - 100)] = 5 + 20 = +25 profit
         .assertResults(25)
@@ -62,10 +62,10 @@ class ProfitCriterionTest extends AbstractCriterionTest {
         .withTransactionCostModel(new FixedTransactionCostModel(1))
         .withCriterion(new ProfitCriterion(false));
 
-    context.operate(1).at(100)
-        .operate(1).at(105)
-        .operate(1).at(100)
-        .operate(1).at(120)
+    context.enter(1).at(100)
+        .exit(1).at(105)
+        .enter(1).at(100)
+        .exit(1).at(120)
         // include costs, i.e. profit - costs:
         // [(104 - 101)] + [(119 - 101)] = 3 + 18 = +21 profit
         // [(105 - 100)] + [(120 - 100)] = 5 + 20 = +25 profit - 4 = +21 profit
@@ -83,10 +83,10 @@ class ProfitCriterionTest extends AbstractCriterionTest {
         .withCriterion(new ProfitCriterion(false));
 
     // Simulating short positions:
-    context.operate(1).at(95)   // sell short
-        .operate(1).at(100)     // buy to cover
-        .operate(1).at(70)      // sell short
-        .operate(1).at(100)     // buy to cover
+    context.enter(1).at(95)   // sell short
+        .exit(1).at(100)     // buy to cover
+        .enter(1).at(70)      // sell short
+        .exit(1).at(100)     // buy to cover
         // First trade: loss of (100 - 95) = -5
         // Second trade: loss of (100 - 70) = -30
         // Total profit = 0
@@ -104,10 +104,10 @@ class ProfitCriterionTest extends AbstractCriterionTest {
         .withTransactionCostModel(new FixedTransactionCostModel(1))
         .withCriterion(new ProfitCriterion(false));
 
-    context.operate(1).at(100)   // sell short
-        .operate(1).at(95)       // buy to cover
-        .operate(1).at(100)      // sell short
-        .operate(1).at(70)       // buy to cover
+    context.enter(1).at(100)   // sell short
+        .exit(1).at(95)       // buy to cover
+        .enter(1).at(100)      // sell short
+        .exit(1).at(70)       // buy to cover
         // First trade: profit of (100 - 95) = 5
         // Second trade: profit of (100 - 70) = 30
         // Total profit = 35 - 4
@@ -123,12 +123,12 @@ class ProfitCriterionTest extends AbstractCriterionTest {
         .withNumFactory(numFactory)
         .withCriterion(new ProfitCriterion(false));
 
-    context.operate(1).at(100)
-        .operate(1).at(105)     // +5 profit
-        .operate(1).at(100)
-        .operate(1).at(95)      // -5 loss (not accounted)
-        .operate(1).at(100)
-        .operate(1).at(110)     // +10 profit
+    context.enter(1).at(100)
+        .exit(1).at(105)     // +5 profit
+        .enter(1).at(100)
+        .exit(1).at(95)      // -5 loss (not accounted)
+        .enter(1).at(100)
+        .exit(1).at(110)     // +10 profit
         // Total profit = +15
         .assertResults(15)
     ;

@@ -42,6 +42,15 @@ public interface TradeExecutionModel {
    * @param tradingRecord the trading record to place the trade
    * @param amount the trade amount
    */
-  void execute(Bar curentBar, TradingRecord tradingRecord, Num amount);
+  void enter(Bar curentBar, TradingRecord tradingRecord, Num amount);
+
+  /**
+   * Executes a trade in the given {@code tradingRecord}.
+   *
+   * @param curentBar the current bar that triggered execution
+   * @param tradingRecord the trading record to place the trade
+   * @param amount the trade amount
+   */
+  void exit(Bar curentBar, TradingRecord tradingRecord, Num amount);
 
 }

@@ -23,10 +23,8 @@
  */
 package org.ta4j.core.mocks;
 
-import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.DoubleStream;
@@ -40,10 +38,11 @@ import org.ta4j.core.events.MarketEvent;
  */
 public class MockMarketEventBuilder {
 
-  private final Clock clock = Clock.fixed(Instant.ofEpochMilli(-1), ZoneId.systemDefault());
+  private Instant startTime = Instant.ofEpochMilli(-1);
   private boolean defaultData;
   private List<CandleReceived> candleEvents = new ArrayList<>();
   private int candlesProduced;
+  private Duration candleDuration;
 
 
   private int createCandleSerialNumber() {
@@ -59,13 +58,12 @@ public class MockMarketEventBuilder {
    * @return this
    */
   public MockMarketEventBuilder withCandlePrices(final List<Double> data) {
-    final var timePeriod = Duration.ofDays(1);
 
     data.forEach(d -> {
       this.candleEvents.add(
           new CandleReceived(
-              timePeriod,
-              Instant.now(Clock.offset(this.clock, timePeriod.multipliedBy(createCandleSerialNumber()))),
+              this.candleDuration,
+              this.startTime.plus(this.candleDuration.multipliedBy(createCandleSerialNumber())),
               d,
               d,
               d,
@@ -108,7 +106,7 @@ public class MockMarketEventBuilder {
       candleEvents.add(
           new CandleReceived(
               timePeriod,
-              Instant.now(Clock.offset(this.clock, timePeriod.multipliedBy(createCandleSerialNumber()))),
+              this.startTime.plus(timePeriod.multipliedBy(createCandleSerialNumber())),
               i + 1,
               i + 2,
               i + 3,
@@ -129,5 +127,17 @@ public class MockMarketEventBuilder {
     }
 
     return List.copyOf(this.candleEvents);
+  }
+
+
+  public MockMarketEventBuilder withCandleDuration(final Duration candleDuration) {
+    this.candleDuration = candleDuration;
+    return this;
+  }
+
+
+  public MockMarketEventBuilder withStartTime(final Instant startTime) {
+    this.startTime = startTime;
+    return this;
   }
 }

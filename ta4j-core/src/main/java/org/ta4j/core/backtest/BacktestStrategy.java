@@ -1,4 +1,4 @@
-/**
+/*
  * The MIT License (MIT)
  *
  * Copyright (c) 2017-2024 Ta4j Organization & respective
@@ -27,6 +27,8 @@ import java.time.Instant;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.ta4j.core.Bar;
+import org.ta4j.core.BarListener;
 import org.ta4j.core.Position;
 import org.ta4j.core.Rule;
 import org.ta4j.core.Strategy;
@@ -36,7 +38,7 @@ import org.ta4j.core.indicators.IndicatorContext;
 /**
  * Base implementation of a {@link Strategy}.
  */
-public class BacktestStrategy implements Strategy {
+public class BacktestStrategy implements Strategy, BarListener {
 
   /** The logger. */
   protected final Logger log = LoggerFactory.getLogger(getClass());
@@ -52,7 +54,7 @@ public class BacktestStrategy implements Strategy {
   private final IndicatorContext indicatorContext;
 
   /** Recording of execution of this strategy */
-  private BackTestTradingRecord tradingRecord;
+  private final BackTestTradingRecord tradingRecord;
 
   /** Current time */
   private Instant currentTick;
@@ -69,9 +71,9 @@ public class BacktestStrategy implements Strategy {
       final String name,
       final Rule entryRule,
       final Rule exitRule,
-      final IndicatorContext indicatorContext
+      final IndicatorContext indicatorContext,
+      final BackTestTradingRecord tradingRecord
   ) {
-    this.indicatorContext = indicatorContext;
     if (entryRule == null || exitRule == null) {
       throw new IllegalArgumentException("Rules cannot be null");
     }
@@ -81,6 +83,8 @@ public class BacktestStrategy implements Strategy {
     this.name = name;
     this.entryRule = entryRule;
     this.exitRule = exitRule;
+    this.indicatorContext = indicatorContext;
+    this.tradingRecord = tradingRecord;
   }
 
 
@@ -109,16 +113,18 @@ public class BacktestStrategy implements Strategy {
 
 
   /**
-   * @return true to recommend a trade, false otherwise (no recommendation)
+   * @return {@link OperationType#ENTER} to recommend entering, {@link OperationType#EXIT} to recommend exit, otherwise (no recommendation)
    */
-  public boolean shouldOperate() {
+  public OperationType shouldOperate() {
     final Position position = this.tradingRecord.getCurrentPosition();
     if (position.isNew()) {
-      return shouldEnter();
+      if (shouldEnter()) {
+        return OperationType.ENTER;
+      }
     } else if (position.isOpened()) {
-      return shouldExit();
+      return OperationType.EXIT;
     }
-    return false;
+    return OperationType.NOOP;
   }
 
 
@@ -135,6 +141,14 @@ public class BacktestStrategy implements Strategy {
     final boolean exit = Strategy.super.shouldExit();
     traceShouldExit(exit);
     return exit;
+  }
+
+
+  @Override
+  public void onBar(final Bar bar) {
+    this.currentTick = bar.endTime();
+    this.tradingRecord.onBar(bar);
+    this.indicatorContext.onBar(bar);
   }
 
 
@@ -164,11 +178,6 @@ public class BacktestStrategy implements Strategy {
 
   public TradingRecord getTradeRecord() {
     return this.tradingRecord;
-  }
-
-
-  public void register(final BackTestTradingRecord backTestTradingRecord) {
-    this.tradingRecord = backTestTradingRecord;
   }
 
 

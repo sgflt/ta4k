@@ -24,14 +24,40 @@
 
 package org.ta4j.core.backtest;
 
-import org.ta4j.core.events.CandleReceived;
-import org.ta4j.core.events.NewsReceived;
-import org.ta4j.core.events.TickReceived;
+import java.time.Duration;
+
+import org.ta4j.core.num.Num;
 
 public interface RuntimeContext {
-  void onCandle(CandleReceived event);
+  /**
+   * @return count of currently opened positions
+   */
+  int getCountOfOpenedPositions();
 
-  void onTick(TickReceived event);
+  /**
+   * @return maximum profit in currency (including costs) as sum of all opened positions at the peak.
+   */
+  Num getMaxTotalProfit();
 
-  void onNews(NewsReceived event);
+  /**
+   * @return maximum profit in currency (including costs) from all of opened positions. Only one position with max profit is chosen.
+   */
+  Num getMaxProfit();
+
+  /**
+   * @return how long we have opened first position
+   */
+  Duration getTimeInTrade();
+
+  /**
+   * 100 -> 90 = (100 - 90) / 100 = 0.1
+   * @return in percent how much the worst position fell
+   */
+  Num getMaxDrawDown();
+
+  /**
+   * 100 -> 110 = 110 / 100 - 1 = 0.1
+   * @return in percent how much the best position flew
+   */
+  Num getMaxGain();
 }

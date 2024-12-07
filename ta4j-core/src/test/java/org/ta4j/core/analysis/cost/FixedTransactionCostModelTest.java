@@ -23,20 +23,23 @@
  */
 package org.ta4j.core.analysis.cost;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.ta4j.core.TestUtils.assertNumEquals;
 
 import java.time.Instant;
 import java.util.Random;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.ta4j.core.Position;
 import org.ta4j.core.Trade.TradeType;
 import org.ta4j.core.num.DoubleNum;
 import org.ta4j.core.num.Num;
+import org.ta4j.core.num.NumFactory;
 
-public class FixedTransactionCostModelTest {
+class FixedTransactionCostModelTest {
 
   private static final Random RANDOM = new Random();
 
@@ -45,13 +48,14 @@ public class FixedTransactionCostModelTest {
   private static final Num AMOUNT = DoubleNum.valueOf(5);
 
 
-  @Test
-  public void calculatePerPositionWhenPositionIsOpen() {
+  @ParameterizedTest
+  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
+  void calculatePerPositionWhenPositionIsOpen(final NumFactory numFactory) {
     final var positionTrades = 1;
     final var feePerTrade = RANDOM.nextDouble();
     final var model = new FixedTransactionCostModel(feePerTrade);
 
-    final var position = new Position(TradeType.BUY, model, null);
+    final var position = new Position(TradeType.BUY, new ZeroCostModel(), model, numFactory);
     position.operate(Instant.now(), PRICE, AMOUNT);
     final var cost = model.calculate(position);
 
@@ -59,13 +63,14 @@ public class FixedTransactionCostModelTest {
   }
 
 
-  @Test
-  public void calculatePerPositionWhenPositionIsClosed() {
+  @ParameterizedTest
+  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
+  void calculatePerPositionWhenPositionIsClosed(final NumFactory numFactory) {
     final var positionTrades = 2;
     final var feePerTrade = RANDOM.nextDouble();
     final var model = new FixedTransactionCostModel(feePerTrade);
 
-    final var position = new Position(TradeType.BUY, model, model);
+    final var position = new Position(TradeType.BUY, model, model, numFactory);
     position.operate(Instant.now(), PRICE, AMOUNT);
     position.operate(Instant.now(), PRICE, AMOUNT);
     final var cost = model.calculate(position, RANDOM.nextInt());
@@ -75,7 +80,7 @@ public class FixedTransactionCostModelTest {
 
 
   @Test
-  public void calculatePerPrice() {
+  void calculatePerPrice() {
     final double feePerTrade = RANDOM.nextDouble();
     final FixedTransactionCostModel model = new FixedTransactionCostModel(feePerTrade);
     final Num cost = model.calculate(PRICE, AMOUNT);
@@ -85,7 +90,7 @@ public class FixedTransactionCostModelTest {
 
 
   @Test
-  public void testEquality() {
+  void testEquality() {
     final var randomFee = RANDOM.nextDouble();
     final var model = new FixedTransactionCostModel(randomFee);
     final var modelSame = new FixedTransactionCostModel(randomFee);

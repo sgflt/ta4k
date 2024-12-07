@@ -29,9 +29,8 @@ import java.util.TreeMap;
 
 import org.ta4j.core.Position;
 import org.ta4j.core.TradingRecord;
-import org.ta4j.core.backtest.BacktestBarSeries;
 import org.ta4j.core.num.Num;
-import org.ta4j.core.num.NumFactory;
+import org.ta4j.core.num.NumFactoryProvider;
 
 /**
  * Tracks the portfolio value evolution over time considering all price movements.
@@ -41,22 +40,13 @@ public class CashFlow {
   /** The portfolio value mapped to timestamps */
   private final NavigableMap<Instant, Num> values;
 
-  /** The num factory for creating numbers */
-  private final NumFactory numFactory;
-
-  /** The bar series containing price data */
-  private final BacktestBarSeries barSeries;
-
 
   /**
    * Constructor for cash flows of a single position.
    *
-   * @param barSeries the bar series containing price data
    * @param position a single position
    */
-  public CashFlow(final BacktestBarSeries barSeries, final Position position) {
-    this.barSeries = barSeries;
-    this.numFactory = barSeries.numFactory();
+  public CashFlow(final Position position) {
     this.values = new TreeMap<>();
 
     if (position.getEntry() != null) {
@@ -68,12 +58,9 @@ public class CashFlow {
   /**
    * Constructor for cash flows of a trading record.
    *
-   * @param barSeries the bar series containing price data
    * @param tradingRecord the trading record
    */
-  public CashFlow(final BacktestBarSeries barSeries, final TradingRecord tradingRecord) {
-    this.barSeries = barSeries;
-    this.numFactory = barSeries.numFactory();
+  public CashFlow(final TradingRecord tradingRecord) {
     this.values = new TreeMap<>();
 
     tradingRecord.getPositions().stream()
@@ -103,49 +90,23 @@ public class CashFlow {
    * @return the cash flow value (returns 1 if no value exists for the instant)
    */
   public Num getValue(final Instant instant) {
-    return this.values.getOrDefault(instant, this.numFactory.one());
+    return this.values.getOrDefault(instant, NumFactoryProvider.getDefaultNumFactory().one());
   }
 
 
   private void calculatePositionValues(final Position position) {
-    final var entryTrade = position.getEntry();
-    final var exitTrade = position.getExit();
-    final var isLongTrade = entryTrade.isBuy();
-    final var holdingCost = position.getHoldingCost();
-
-    final var startTime = entryTrade.getWhenExecuted();
-    final var endTime = exitTrade != null ?
-                        exitTrade.getWhenExecuted() :
-                        this.barSeries.getLastBar().endTime();
-
-    final var entryPrice = entryTrade.getNetPrice();
-
-    this.barSeries.getBarData().stream()
-        .filter(bar -> isBarInTimeRange(bar.endTime(), startTime, endTime))
-        .forEach(bar -> {
-          final var currentPrice = bar.closePrice();
-          final var adjustedPrice = isLongTrade ?
-                                    currentPrice.minus(holdingCost) :
-                                    currentPrice.plus(holdingCost);
-
-          final var ratio = calculatePriceRatio(isLongTrade, entryPrice, adjustedPrice);
-          final var portfolioValue = this.numFactory.one().multipliedBy(ratio);
-          this.values.put(bar.endTime(), portfolioValue);
-        });
+    position.getCashFlow()
+        .forEach(positionValue -> this.values.compute(
+            positionValue.when(), (k, v) -> sumUpMultiplePositions(positionValue, v)
+        ));
   }
 
 
-  private boolean isBarInTimeRange(final Instant barTime, final Instant start, final Instant end) {
-    return !barTime.isBefore(start) && !barTime.isAfter(end);
-  }
-
-
-  private Num calculatePriceRatio(final boolean isLongTrade, final Num entryPrice, final Num currentPrice) {
-    if (isLongTrade) {
-      return currentPrice.dividedBy(entryPrice);
+  private static Num sumUpMultiplePositions(final Position.PositionValue positionValue, final Num oldValue) {
+    if (oldValue == null) {
+      return positionValue.value();
     }
 
-    // For short positions
-    return this.numFactory.one().plus(entryPrice.minus(currentPrice).dividedBy(entryPrice));
+    return oldValue.plus(positionValue.value());
   }
 }

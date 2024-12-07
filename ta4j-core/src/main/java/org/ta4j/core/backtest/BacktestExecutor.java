@@ -26,7 +26,6 @@ package org.ta4j.core.backtest;
 import java.util.Comparator;
 import java.util.List;
 
-import org.ta4j.core.Strategy;
 import org.ta4j.core.StrategyFactory;
 import org.ta4j.core.Trade;
 import org.ta4j.core.events.CandleReceived;
@@ -58,36 +57,29 @@ public class BacktestExecutor {
    *
    * @param strategyFactories that creates strategies to test
    * @param amount the amount used to open/close the position
-   * @param tradeType the {@link Trade.TradeType} used to open the position
    *
    * @return a list of TradingStatements
    */
   public List<TradingStatement> execute(
-      final List<StrategyFactory> strategyFactories,
+      final List<StrategyFactory<BacktestStrategy>> strategyFactories,
       final List<MarketEvent> marketEvents,
-      final Number amount,
-      final Trade.TradeType tradeType
+      final Number amount
   ) {
-    final var indicatorContext = IndicatorContext.empty();
-    final var series = new BacktestBarSeriesBuilder()
-        .withIndicatorContext(indicatorContext)
-        .build();
-
-    final var runtimeContext =
-        new DefaultRuntimeContext(series, strategyFactories, this.configuration.numFactory().numOf(amount));
+    final var marketEventHandler =
+        new DefaultMarketEventHandler(strategyFactories, this.configuration.numFactory().numOf(amount));
 
     replay(
         marketEvents,
-        runtimeContext
+        marketEventHandler
     );
 
-    return runtimeContext.getTradintStatements();
+    return marketEventHandler.getTradintStatements();
   }
 
 
   private void replay(
       final List<MarketEvent> marketEvents,
-      final RuntimeContext runtimeContext
+      final MarketEventHandler runtimeContext
   ) {
 
     marketEvents.stream()
@@ -104,34 +96,50 @@ public class BacktestExecutor {
   }
 
 
-  private class DefaultRuntimeContext implements RuntimeContext {
+  /**
+   * Context links Strategy, TradingRecord, IndicatorContext and BarSeries.
+   */
+  private class DefaultMarketEventHandler implements MarketEventHandler {
 
     private final BacktestBarSeries series;
     private final Num amount;
-    private final List<Strategy> strategies;
+    private final List<BacktestStrategy> strategies;
 
 
-    public DefaultRuntimeContext(
-        final BacktestBarSeries series,
-        final List<StrategyFactory> strategyFactories,
+    public DefaultMarketEventHandler(
+        final List<StrategyFactory<BacktestStrategy>> strategyFactories,
         final Num amount
     ) {
-      this.series = series;
+
+      final var indicatorContext = IndicatorContext.empty();
+      this.series = new BacktestBarSeriesBuilder()
+          .withIndicatorContext(indicatorContext)
+          .withNumFactory(BacktestExecutor.this.configuration.numFactory())
+          .build();
+
       this.strategies =
           strategyFactories.stream()
-              .map(s -> {
-                    final Strategy strategy = s.createStrategy(series);
-                    ((BacktestStrategy) strategy).register(new BackTestTradingRecord(
-                            Trade.TradeType.BUY,    // TODO sell
-                            BacktestExecutor.this.configuration.transactionCostModel(),
-                            BacktestExecutor.this.configuration.holdingCostModel()
-                        )
-                    );
-                    return strategy;
-                  }
-              )
+              .map(s -> createStrategy(s, indicatorContext))
               .toList();
+
       this.amount = amount;
+    }
+
+
+    private BacktestStrategy createStrategy(
+        final StrategyFactory<BacktestStrategy> s,
+        final IndicatorContext indicatorContext
+    ) {
+      final var backTestTradingRecord = new BackTestTradingRecord(
+          Trade.TradeType.BUY,    // TODO sell
+          BacktestExecutor.this.configuration.transactionCostModel(),
+          BacktestExecutor.this.configuration.holdingCostModel(),
+          BacktestExecutor.this.configuration.numFactory()
+      );
+
+      final var strategy = s.createStrategy(backTestTradingRecord, indicatorContext);
+      this.series.addListener(strategy);
+      return strategy;
     }
 
 
@@ -154,12 +162,20 @@ public class BacktestExecutor {
     private void reevaluate(final BacktestBarSeries barSeries, final Num amount) {
       this.strategies.forEach(strategy -> {
 
-        if (((BacktestStrategy) strategy).shouldOperate()) {
-          BacktestExecutor.this.configuration.tradeExecutionModel().execute(
+        final var tradeExecutionModel = BacktestExecutor.this.configuration.tradeExecutionModel();
+        switch (strategy.shouldOperate()) {
+          case ENTER -> tradeExecutionModel.enter(
               barSeries.getBar(),
-              ((BacktestStrategy) strategy).getTradeRecord(),
+              strategy.getTradeRecord(),
               amount
           );
+          case EXIT -> tradeExecutionModel.exit(
+              barSeries.getBar(),
+              strategy.getTradeRecord(),
+              amount
+          );
+          case NOOP -> {
+          }
         }
       });
     }
@@ -179,7 +195,7 @@ public class BacktestExecutor {
 
     public List<TradingStatement> getTradintStatements() {
       return this.strategies.stream()
-          .map(strategy -> new TradingStatementGenerator().generate((BacktestStrategy) strategy))
+          .map(strategy -> new TradingStatementGenerator().generate(strategy))
           .toList();
     }
   }

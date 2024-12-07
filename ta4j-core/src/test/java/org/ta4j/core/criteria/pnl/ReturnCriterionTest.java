@@ -53,12 +53,12 @@ class ReturnCriterionTest extends AbstractCriterionTest {
         .withTradeType(Trade.TradeType.BUY);
 
     // First trade: buy at 100, sell at 110 (return: 1.10)
-    context.operate(1).at(100)
-        .operate(1).at(110);
+    context.enter(1).at(100)
+        .exit(1).at(110);
 
     // Second trade: buy at 100, sell at 105 (return: 1.05)
-    context.operate(1).at(100)
-        .operate(1).at(105);
+    context.enter(1).at(100)
+        .exit(1).at(105);
 
     // Total return with base percentage: 1.10 * 1.05
     context.withCriterion(new ReturnCriterion())
@@ -78,12 +78,12 @@ class ReturnCriterionTest extends AbstractCriterionTest {
         .withTradeType(Trade.TradeType.BUY);
 
     // First trade: buy at 100, sell at 95 (return: 0.95)
-    context.operate(1).at(100)
-        .operate(1).at(95);
+    context.enter(1).at(100)
+        .exit(1).at(95);
 
     // Second trade: buy at 100, sell at 70 (return: 0.70)
-    context.operate(1).at(100)
-        .operate(1).at(70);
+    context.enter(1).at(100)
+        .exit(1).at(70);
 
     // Total return with base percentage: 0.95 * 0.70
     context.withCriterion(new ReturnCriterion())
@@ -103,12 +103,12 @@ class ReturnCriterionTest extends AbstractCriterionTest {
         .withTradeType(Trade.TradeType.SELL);
 
     // First trade: sell at 100, buy at 95 (return: 1.05)
-    context.operate(1).at(100)
-        .operate(1).at(95);
+    context.enter(1).at(100)
+        .exit(1).at(95);
 
     // Second trade: sell at 100, buy at 70 (return: 1.30)
-    context.operate(1).at(100)
-        .operate(1).at(70);
+    context.enter(1).at(100)
+        .exit(1).at(70);
 
     // Total return with base percentage: 1.05 * 1.30
     context.withCriterion(new ReturnCriterion())
@@ -128,12 +128,12 @@ class ReturnCriterionTest extends AbstractCriterionTest {
         .withTradeType(Trade.TradeType.SELL);
 
     // First trade: sell at 100, buy at 105 (return: 0.95)
-    context.operate(1).at(100)
-        .operate(1).at(105);
+    context.enter(1).at(100)
+        .exit(1).at(105);
 
     // Second trade: sell at 100, buy at 130 (return: 0.70)
-    context.operate(1).at(100)
-        .operate(1).at(130);
+    context.enter(1).at(100)
+        .exit(1).at(130);
 
     // Total return with base percentage: 0.95 * 0.70
     context.withCriterion(new ReturnCriterion())
@@ -147,8 +147,8 @@ class ReturnCriterionTest extends AbstractCriterionTest {
 
   @ParameterizedTest
   @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
-  void calculateWithNoPositions() {
-    final var tradingRecord = new BackTestTradingRecord();
+  void calculateWithNoPositions(NumFactory numFactory) {
+    final var tradingRecord = new BackTestTradingRecord(numFactory);
 
     final var withBase = new ReturnCriterion();
     assertNumEquals(1d, withBase.calculate(tradingRecord));
@@ -161,7 +161,7 @@ class ReturnCriterionTest extends AbstractCriterionTest {
   @ParameterizedTest
   @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
   void calculateWithOpenedPosition(final NumFactory numFactory) {
-    var position = new Position(Trade.TradeType.BUY);
+    var position = new Position(Trade.TradeType.BUY, numFactory);
 
     // Test with base percentage
     final var withBase = new ReturnCriterion();
@@ -173,7 +173,7 @@ class ReturnCriterionTest extends AbstractCriterionTest {
     assertNumEquals(1d, withBase.calculate(position));
 
     // Test without base percentage
-    position = new Position(Trade.TradeType.BUY);
+    position = new Position(Trade.TradeType.BUY, numFactory);
     final var withoutBase = new ReturnCriterion(false);
     assertNumEquals(0d, withoutBase.calculate(position));
 

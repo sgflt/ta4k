@@ -24,12 +24,13 @@
 package org.ta4j.core.criteria;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 import org.ta4j.core.Position;
 import org.ta4j.core.TradingRecord;
 import org.ta4j.core.analysis.Returns;
-import org.ta4j.core.backtest.BacktestBarSeries;
 import org.ta4j.core.num.Num;
+import org.ta4j.core.num.NumFactory;
 
 /**
  * Value at Risk criterion, returned in decimal format.
@@ -38,7 +39,7 @@ import org.ta4j.core.num.Num;
  */
 public class ValueAtRiskCriterion extends AbstractAnalysisCriterion {
 
-  private final BacktestBarSeries series;
+  private final NumFactory numFactory;
   /** Confidence level as absolute value (e.g. 0.95). */
   private final double confidence;
 
@@ -48,8 +49,8 @@ public class ValueAtRiskCriterion extends AbstractAnalysisCriterion {
    *
    * @param confidence the confidence level
    */
-  public ValueAtRiskCriterion(final BacktestBarSeries series, final double confidence) {
-    this.series = series;
+  public ValueAtRiskCriterion(final NumFactory numFactory, final double confidence) {
+    this.numFactory = numFactory;
     this.confidence = confidence;
   }
 
@@ -60,14 +61,14 @@ public class ValueAtRiskCriterion extends AbstractAnalysisCriterion {
       return position.getEntry().getNetPrice().getNumFactory().zero();
     }
 
-    final var returns = new Returns(this.series, position, Returns.ReturnType.ARITHMETIC);
+    final var returns = new Returns(this.numFactory, position, Returns.ReturnType.ARITHMETIC);
     return calculateVaR(returns);
   }
 
 
   @Override
   public Num calculate(final TradingRecord tradingRecord) {
-    final var returns = new Returns(this.series, tradingRecord, Returns.ReturnType.ARITHMETIC);
+    final var returns = new Returns(this.numFactory, tradingRecord, Returns.ReturnType.ARITHMETIC);
     return calculateVaR(returns);
   }
 
@@ -76,11 +77,12 @@ public class ValueAtRiskCriterion extends AbstractAnalysisCriterion {
    * Calculates the VaR on the return series.
    *
    * @param returns the corresponding returns
+   *
    * @return the relative Value at Risk
    */
   private Num calculateVaR(final Returns returns) {
-    final var zero = returns.getBarSeries().numFactory().zero();
-    final var returnRates = new ArrayList<>(returns.getValues().subList(1, returns.getSize() + 1));
+    final var zero = this.numFactory.zero();
+    final var returnRates = new ArrayList<>(returns.getValues());
 
     if (returnRates.isEmpty()) {
       return zero;
@@ -90,8 +92,8 @@ public class ValueAtRiskCriterion extends AbstractAnalysisCriterion {
     final var nInBody = (int) (returns.getSize() * this.confidence);
     final var nInTail = returns.getSize() - nInBody;
 
-    returnRates.sort(null);
-    var valueAtRisk = returnRates.get(nInTail - 1);
+    Collections.sort(returnRates);
+    var valueAtRisk = returnRates.get(Math.max(0, nInTail - 1));
 
     // VaR is non-positive
     if (valueAtRisk.isGreaterThan(zero)) {

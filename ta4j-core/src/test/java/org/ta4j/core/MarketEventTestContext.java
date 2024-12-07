@@ -4,10 +4,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.ta4j.core.TestUtils.GENERAL_OFFSET;
 import static org.ta4j.core.TestUtils.assertNumEquals;
 
-import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
-import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
@@ -44,6 +43,8 @@ public class MarketEventTestContext {
   @Getter
   private BacktestBarSeries barSeries =
       new BacktestBarSeriesBuilder().withIndicatorContext(this.indicatorContext).build();
+  private Duration candleDuration = Duration.ofDays(1);
+  private Instant startTime = Instant.EPOCH;
 
 
   /**
@@ -56,6 +57,8 @@ public class MarketEventTestContext {
   public MarketEventTestContext withCandlePrices(final double... prices) {
     this.marketEvents = new LinkedList<>(
         new MockMarketEventBuilder()
+            .withStartTime(this.startTime)
+            .withCandleDuration(this.candleDuration)
             .withCandlePrices(prices)
             .build()
     );
@@ -243,27 +246,24 @@ public class MarketEventTestContext {
    * and calculate them on historical data.
    */
   public TradingRecordTestContext toTradingRecordContext() {
-    while (advance()) {
-      // loop to the end
-    }
-
-    return new TradingRecordTestContext()
-        .withNumFactory(this.barSeries.numFactory())
-        .withRelatedSeries(this.barSeries)
-        .withDuration(Duration.ofDays(1))
-        .withStart(Clock.fixed(Instant.EPOCH.plus(Duration.ofDays(2).minusMillis(1)), ZoneId.systemDefault()))
-        ;
+    return new TradingRecordTestContext(this);
   }
 
 
-  /**
-   * Replays all events so {@link BacktestBarSeries} is prepared for analysis.
-   */
-  public MarketEventTestContext replayAllEvents() {
-    while (advance()) {
-      // fast forward
-    }
+  public void withBarListener(final BarListener barListener) {
+    this.barSeries.clearListeners();
+    this.barSeries.addListener(barListener);
+  }
 
+
+  public MarketEventTestContext withCandleDuration(final ChronoUnit candleDuration) {
+    this.candleDuration = candleDuration.getDuration();
+    return this;
+  }
+
+
+  public MarketEventTestContext withStartTime(final Instant startTime) {
+    this.startTime = startTime;
     return this;
   }
 

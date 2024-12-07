@@ -23,84 +23,90 @@
  */
 package org.ta4j.core.criteria;
 
-import static org.ta4j.core.TestUtils.assertNumEquals;
-
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.ta4j.core.MarketEventTestContext;
 import org.ta4j.core.Trade.TradeType;
-import org.ta4j.core.TradingRecordTestContext;
-import org.ta4j.core.backtest.BackTestTradingRecord;
 import org.ta4j.core.num.NumFactory;
 
 class MaximumDrawdownCriterionTest {
 
-
   @ParameterizedTest
   @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
   void calculateWithNoTrades(final NumFactory numFactory) {
-    assertNumEquals(0d, new MaximumDrawdownCriterion(numFactory).calculate(new BackTestTradingRecord()));
+    final var marketContext = new MarketEventTestContext()
+        .withNumFactory(numFactory)
+        .withCandlePrices(100, 105);
+    marketContext.toTradingRecordContext()
+        .withCriterion(new MaximumDrawdownCriterion(numFactory))
+        .assertResults(0.0);
   }
 
 
   @ParameterizedTest
   @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
   void calculateWithOnlyGains(final NumFactory numFactory) {
-    final var context = new TradingRecordTestContext()
+    new MarketEventTestContext()
         .withNumFactory(numFactory)
+        .withCandlePrices(2.0, 3.0, 3.0, 5.0, 10.0, 20.0)
+        .toTradingRecordContext()
         .withTradeType(TradeType.BUY)
-        .withConstantTimeDelays()
-        .withCriterion(new MaximumDrawdownCriterion(numFactory));
-
-    // Execute trades
-    context.operate(1).at(2.0)    // Buy at 2.0
-        .operate(1).at(3.0)    // Sell at 3.0 (gain)
-        .operate(1).at(3.0)    // Buy at 3.0
-        .operate(1).at(20.0);  // Sell at 20.0 (gain)
-
-    context.assertResults(0.0);
+        .withCriterion(new MaximumDrawdownCriterion(numFactory))
+        .enter(1).after(1)
+        .exit(1).after(1)
+        .enter(1).after(2)  // skip 3.0
+        .exit(1).after(2)    // skip 10.0
+        .assertResults(0.0);
   }
 
 
   @ParameterizedTest
   @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
   void calculateWithGainsAndLosses(final NumFactory numFactory) {
-    final var context = new TradingRecordTestContext()
+    new MarketEventTestContext()
         .withNumFactory(numFactory)
+        .withCandlePrices(1.0, 2.0, 20.0, 1.0, 8.0, 3.0)
+        .toTradingRecordContext()
         .withTradeType(TradeType.BUY)
-        .withConstantTimeDelays()
-        .withCriterion(new MaximumDrawdownCriterion(numFactory));
-
-    // Execute trades with gains and losses
-    context.operate(1).at(1.0)    // Buy at 1.0
-        .operate(1).at(2.0)    // Sell at 2.0 (gain)
-        .operate(1).at(6.0)    // Buy at 6.0
-        .operate(1).at(5.0)    // Sell at 5.0 (loss)
-        .operate(1).at(20.0)   // Buy at 20.0
-        .operate(1).at(3.0);   // Sell at 3.0 (major loss)
-
-    context.assertResults(0.875);
+        .withCriterion(new MaximumDrawdownCriterion(numFactory))
+        .enter(1).after(1)
+        .exit(1).after(5)
+        .assertResults((20.0 - 1.0) / 20.0);
   }
 
 
   @ParameterizedTest
   @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
   void calculateWithSimpleTrades(final NumFactory numFactory) {
-    final var context = new TradingRecordTestContext()
+    new MarketEventTestContext()
         .withNumFactory(numFactory)
+        .withCandlePrices(1.0, 10.0, 10.0, 5.0, 5.0, 6.0, 6.0, 1.0)
+        .toTradingRecordContext()
         .withTradeType(TradeType.BUY)
-        .withConstantTimeDelays()
-        .withCriterion(new MaximumDrawdownCriterion(numFactory));
+        .withCriterion(new MaximumDrawdownCriterion(numFactory))
+        .enter(1).after(1)
+        .exit(1).after(1)
+        .enter(1).after(1)
+        .exit(1).after(1)
+        .enter(1).after(1)
+        .exit(1).after(1)
+        .enter(1).after(1)
+        .exit(1).after(1)
+        .assertResults((6.0 - 1.0) / 6.0); // maximum drawdown within last trade
+  }
 
-    // Execute sequence of trades
-    context.operate(1).at(1.0)    // Buy at 1.0
-        .operate(1).at(10.0)   // Sell at 10.0 (gain)
-        .operate(1).at(10.0)   // Buy at 10.0
-        .operate(1).at(5.0)    // Sell at 5.0 (loss)
-        .operate(1).at(5.0)    // Buy at 5.0
-        .operate(1).at(6.0)    // Sell at 6.0 (small gain)
-        .operate(1).at(6.0)    // Buy at 6.0
-        .operate(1).at(1.0);   // Sell at 1.0 (major loss)
 
-    context.assertResults(0.9);
+  @ParameterizedTest
+  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
+  void calculateHODL(final NumFactory numFactory) {
+    new MarketEventTestContext()
+        .withNumFactory(numFactory)
+        .withCandlePrices(1.0, 10.0, 10.0, 5.0, 5.0, 6.0, 6.0, 1.0)
+        .toTradingRecordContext()
+        .withTradeType(TradeType.BUY)
+        .withCriterion(new MaximumDrawdownCriterion(numFactory))
+        .enter(1).after(1)
+        .exit(1).after(7)
+        .assertResults(0.9);  // 10.0 -> 1.0 which is -90 %
   }
 }

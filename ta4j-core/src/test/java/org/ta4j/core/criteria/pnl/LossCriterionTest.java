@@ -45,12 +45,12 @@ class LossCriterionTest extends AbstractCriterionTest {
         .withTransactionCostModel(new LinearTransactionCostModel(0.01));
 
     // First trade: buy at 100, sell at 95
-    context.operate(1).at(100)
-        .operate(1).at(95);
+    context.enter(1).at(100)
+        .exit(1).at(95);
 
     // Second trade: buy at 100, sell at 70
-    context.operate(1).at(100)
-        .operate(1).at(70);
+    context.enter(1).at(100)
+        .exit(1).at(70);
 
     // Calculate with costs included
     context.withCriterion(new LossCriterion(false))
@@ -71,12 +71,12 @@ class LossCriterionTest extends AbstractCriterionTest {
         .withCriterion(new LossCriterion(true));
 
     // First trade: buy at 100, sell at 110
-    context.operate(1).at(100)
-        .operate(1).at(110);
+    context.enter(1).at(100)
+        .exit(1).at(110);
 
     // Second trade: buy at 100, sell at 105
-    context.operate(1).at(100)
-        .operate(1).at(105);
+    context.enter(1).at(100)
+        .exit(1).at(105);
 
     context.assertResults(0);
   }
@@ -91,12 +91,12 @@ class LossCriterionTest extends AbstractCriterionTest {
         .withCriterion(new LossCriterion(true));
 
     // First trade: buy at 100, sell at 95
-    context.operate(1).at(100)
-        .operate(1).at(95);
+    context.enter(1).at(100)
+        .exit(1).at(95);
 
     // Second trade: buy at 100, sell at 70
-    context.operate(1).at(100)
-        .operate(1).at(70);
+    context.enter(1).at(100)
+        .exit(1).at(70);
 
     context.assertResults(-35);
   }
@@ -111,12 +111,12 @@ class LossCriterionTest extends AbstractCriterionTest {
         .withCriterion(new LossCriterion(true));
 
     // First trade: sell at 95, buy at 100
-    context.operate(1).at(95)
-        .operate(1).at(100);
+    context.enter(1).at(95)
+        .exit(1).at(100);
 
     // Second trade: sell at 70, buy at 100
-    context.operate(1).at(70)
-        .operate(1).at(100);
+    context.enter(1).at(70)
+        .exit(1).at(100);
 
     context.assertResults(-35);
   }
@@ -140,7 +140,7 @@ class LossCriterionTest extends AbstractCriterionTest {
         .withCriterion(new LossCriterion(true));
 
     // Open position without closing it
-    context.operate(1).at(100);
+    context.enter(1).at(100);
 
     context.assertResults(0);
   }

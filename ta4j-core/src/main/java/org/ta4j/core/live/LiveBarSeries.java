@@ -37,20 +37,27 @@ import org.ta4j.core.num.NumFactory;
  *
  * @author Lukáš Kvídera
  */
+// FIXME is this class useless now?
 class LiveBarSeries implements BarSeries {
 
   private final NumFactory numFactory;
   private final String name;
   private final BarBuilderFactory barBuilderFactory;
+  private final IndicatorContext indicatorContext;
 
   private Bar bar;
-  private IndicatorContext indicatorContext;
 
 
-  LiveBarSeries(final String name, final NumFactory numFactory, final BarBuilderFactory barBuilderFactory) {
+  LiveBarSeries(
+      final String name,
+      final NumFactory numFactory,
+      final BarBuilderFactory barBuilderFactory,
+      final IndicatorContext indicatorContext
+  ) {
     this.name = name;
     this.numFactory = numFactory;
     this.barBuilderFactory = barBuilderFactory;
+    this.indicatorContext = indicatorContext;
   }
 
 
@@ -87,7 +94,7 @@ class LiveBarSeries implements BarSeries {
     this.bar = bar;
 
     if (this.indicatorContext != null) {
-      this.indicatorContext.refresh(bar);
+      this.indicatorContext.onBar(bar);
     }
   }
 
@@ -103,10 +110,5 @@ class LiveBarSeries implements BarSeries {
         .closePrice(event.closePrice())
         .volume(event.volume())
         .add();
-  }
-
-
-  public void replaceIndicatorContext(final IndicatorContext indicatorContext) {
-    this.indicatorContext = indicatorContext;
   }
 }

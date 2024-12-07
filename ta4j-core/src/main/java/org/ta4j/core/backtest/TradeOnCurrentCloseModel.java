@@ -39,7 +39,13 @@ import org.ta4j.core.num.Num;
 public class TradeOnCurrentCloseModel implements TradeExecutionModel {
 
   @Override
-  public void execute(final Bar currentBar, final TradingRecord tradingRecord, final Num amount) {
-    tradingRecord.operate(currentBar.endTime(), currentBar.closePrice(), amount);
+  public void enter(final Bar currentBar, final TradingRecord tradingRecord, final Num amount) {
+    tradingRecord.enter(currentBar.endTime(), currentBar.closePrice(), amount);
+  }
+
+
+  @Override
+  public void exit(final Bar currentBar, final TradingRecord tradingRecord, final Num amount) {
+    tradingRecord.exit(currentBar.endTime(), currentBar.closePrice(), amount);
   }
 }

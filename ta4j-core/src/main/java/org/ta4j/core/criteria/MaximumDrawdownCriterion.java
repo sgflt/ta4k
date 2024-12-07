@@ -23,10 +23,10 @@
  */
 package org.ta4j.core.criteria;
 
+import lombok.extern.slf4j.Slf4j;
 import org.ta4j.core.AnalysisCriterion;
 import org.ta4j.core.Position;
 import org.ta4j.core.TradingRecord;
-import org.ta4j.core.analysis.CashFlow;
 import org.ta4j.core.num.Num;
 import org.ta4j.core.num.NumFactory;
 
@@ -39,18 +39,18 @@ import org.ta4j.core.num.NumFactory;
  * loss, a maximum drawdown of {@code 0} (= 0%) means no loss at all.
  *
  * @see <a href="http://en.wikipedia.org/wiki/Drawdown_%28economics%29">
- *      https://en.wikipedia.org/wiki/Drawdown_(economics)</a>
+ *     https://en.wikipedia.org/wiki/Drawdown_(economics)</a>
  */
+
+/**
+ * Maximum drawdown criterion.
+ */
+@Slf4j
 public class MaximumDrawdownCriterion implements AnalysisCriterion {
 
   private final NumFactory numFactory;
 
 
-  /**
-   * Constructor.
-   *
-   * @param numFactory the factory for creating number instances
-   */
   public MaximumDrawdownCriterion(final NumFactory numFactory) {
     this.numFactory = numFactory;
   }
@@ -62,8 +62,7 @@ public class MaximumDrawdownCriterion implements AnalysisCriterion {
       return this.numFactory.zero();
     }
 
-    final var cashFlow = new CashFlow(this.numFactory, position);
-    return calculateMaximumDrawdown(cashFlow);
+    return position.getMaxDrawdown();
   }
 
 
@@ -73,53 +72,12 @@ public class MaximumDrawdownCriterion implements AnalysisCriterion {
       return this.numFactory.zero();
     }
 
-    final var cashFlow = new CashFlow(this.numFactory, tradingRecord);
-    return calculateMaximumDrawdown(cashFlow);
+    return tradingRecord.getMaximumDrawdown();
   }
 
 
-  /** The lower the criterion value, the better. */
   @Override
   public boolean betterThan(final Num criterionValue1, final Num criterionValue2) {
     return criterionValue1.isLessThan(criterionValue2);
-  }
-
-
-  /**
-   * Calculates the maximum drawdown from a cash flow.
-   *
-   * The formula is:
-   * MDD = (LP - PV) / PV
-   * where:
-   * MDD: Maximum drawdown, in percent
-   * LP: Lowest point (lowest value after peak value)
-   * PV: Peak value (highest value within the observation period)
-   *
-   * @param cashFlow the cash flow to analyze
-   * @return the maximum drawdown during the period
-   */
-  private Num calculateMaximumDrawdown(final CashFlow cashFlow) {
-    final var values = cashFlow.getValues();
-    if (values.isEmpty()) {
-      return this.numFactory.zero();
-    }
-
-    var maxPeak = this.numFactory.one();
-    var maximumDrawdown = this.numFactory.zero();
-
-    for (final var value : values.values()) {
-      // Update peak if we have a new high
-      if (value.isGreaterThan(maxPeak)) {
-        maxPeak = value;
-      }
-
-      // Calculate drawdown from peak
-      final var drawdown = maxPeak.minus(value).dividedBy(maxPeak);
-      if (drawdown.isGreaterThan(maximumDrawdown)) {
-        maximumDrawdown = drawdown;
-      }
-    }
-
-    return maximumDrawdown;
   }
 }

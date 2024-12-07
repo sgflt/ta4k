@@ -1,8 +1,8 @@
-/**
+
+/*
  * The MIT License (MIT)
  *
- * Copyright (c) 2017-2023 Ta4j Organization & respective
- * authors (see AUTHORS)
+ * Copyright (c) 2024 Lukáš Kvídera
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -21,34 +21,27 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.ta4j.core.mocks;
 
-import java.util.List;
+package org.ta4j.core.backtest;
 
-import org.ta4j.core.backtest.BackTestTradingRecord;
-import org.ta4j.core.num.Num;
-import org.ta4j.core.num.NumFactoryProvider;
+import org.ta4j.core.events.CandleReceived;
+import org.ta4j.core.events.NewsReceived;
+import org.ta4j.core.events.TickReceived;
 
-public class MockTradingRecord extends BackTestTradingRecord {
+public interface MarketEventHandler {
 
-    private static final long serialVersionUID = 6220278197931451635L;
+  /**
+   * Processes candle
+   */
+  void onCandle(CandleReceived event);
 
-    /*
-     * Constructor. Builds a TradingRecord from a list of states. Initial state
-     * value is zero. Then at each index where the state value changes, the
-     * TradingRecord operates at that index.
-     *
-     * @param states List<Num> of state values
-     */
-    public MockTradingRecord(List<Num> states) {
-        super(NumFactoryProvider.getDefaultNumFactory());
-        double lastState = 0d;
-        for (int i = 0; i < states.size(); i++) {
-            double state = states.get(i).doubleValue();
-            if (state != lastState) {
-//               TODO this.operate(i);
-            }
-            lastState = state;
-        }
-    }
+  /**
+   * Processes tick
+   */
+  void onTick(TickReceived event);
+
+  /**
+   * Processes news. Usually AI analysis.
+   */
+  void onNews(NewsReceived event);
 }

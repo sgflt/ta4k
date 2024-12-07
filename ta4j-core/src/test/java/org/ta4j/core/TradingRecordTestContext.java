@@ -2,11 +2,7 @@ package org.ta4j.core;
 
 import static org.ta4j.core.TestUtils.assertNumEquals;
 
-import java.time.Clock;
-import java.time.Duration;
 import java.time.Instant;
-import java.time.ZoneId;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Function;
 
 import org.ta4j.core.analysis.cost.CostModel;
@@ -21,23 +17,24 @@ import org.ta4j.core.num.NumFactoryProvider;
  */
 public class TradingRecordTestContext {
 
-  private Clock clock = Clock.fixed(Instant.MIN, ZoneId.systemDefault());
   private Trade.TradeType tradeType = Trade.TradeType.BUY;
-  private BackTestTradingRecord tradingRecord = new BackTestTradingRecord(this.tradeType);
-  private NumFactory numFactory;
+  private BackTestTradingRecord tradingRecord;
   private AnalysisCriterion criterion;
   private CostModel transactionCostModel = new ZeroCostModel();
   private CostModel holdingCostModel = new ZeroCostModel();
-  private boolean useRandomDelays = true;
-  private int operationCount;
-  private BacktestBarSeries series;
-  private Duration duration;
+  private MarketEventTestContext marketEvenTestContext;
+  private NumFactory numFactory = NumFactoryProvider.getDefaultNumFactory();
 
 
-  public TradingRecordTestContext withNumFactory(final NumFactory numFactory) {
-    this.numFactory = numFactory;
-    NumFactoryProvider.setDefaultNumFactory(numFactory);
-    return this;
+  public TradingRecordTestContext() {
+    reinitalizeTradingRecord();
+  }
+
+
+  public TradingRecordTestContext(final MarketEventTestContext marketEventTestContext) {
+    this.marketEvenTestContext = marketEventTestContext;
+    withNumFactory(marketEventTestContext.getBarSeries().numFactory());
+    reinitalizeTradingRecord();
   }
 
 
@@ -48,19 +45,25 @@ public class TradingRecordTestContext {
   }
 
 
-  public TradingRecordTestContext withRelatedSeries(final BacktestBarSeries series) {
-    this.series = series;
+  public TradingRecordTestContext withNumFactory(final NumFactory numFactory) {
+    this.numFactory = numFactory;
+    NumFactoryProvider.setDefaultNumFactory(numFactory);
+    reinitalizeTradingRecord();
     return this;
   }
 
 
   private void reinitalizeTradingRecord() {
-    this.tradingRecord = new BackTestTradingRecord(this.tradeType, this.transactionCostModel, this.holdingCostModel);
-  }
+    this.tradingRecord = new BackTestTradingRecord(
+        this.tradeType,
+        this.transactionCostModel,
+        this.holdingCostModel,
+        this.numFactory
+    );
 
-
-  public Operation operate(final int amount) {
-    return new Operation(amount);
+    if (this.marketEvenTestContext != null) {
+      this.marketEvenTestContext.withBarListener(this.tradingRecord);
+    }
   }
 
 
@@ -71,7 +74,7 @@ public class TradingRecordTestContext {
 
 
   public TradingRecordTestContext withSeriesRelatedCriterion(final Function<BacktestBarSeries, AnalysisCriterion> criterionFactory) {
-    this.criterion = criterionFactory.apply(this.series);
+    this.criterion = criterionFactory.apply(this.marketEvenTestContext.getBarSeries());
     return this;
   }
 
@@ -90,12 +93,6 @@ public class TradingRecordTestContext {
   }
 
 
-  public TradingRecordTestContext withConstantTimeDelays() {
-    this.useRandomDelays = false;
-    return this;
-  }
-
-
   public TradingRecord getTradingRecord() {
     return this.tradingRecord;
   }
@@ -106,58 +103,139 @@ public class TradingRecordTestContext {
   }
 
 
-  public TradingRecordTestContext forwardTime(final int minutes) {
-    this.operationCount += minutes;
+  public Operation enter(final double amount) {
+    return new EnterOperation(amount);
+  }
+
+
+  public Operation exit(final double amount) {
+    return new ExitOperation(amount);
+  }
+
+
+  private NumFactory getNumFactory() {
+    return this.numFactory;
+  }
+
+
+  public BacktestBarSeries getBarSeries() {
+    return this.marketEvenTestContext.getBarSeries();
+  }
+
+
+  public TradingRecordTestContext forwardTime(final int countOfBars) {
+    this.marketEvenTestContext.fastForward(countOfBars);
     return this;
   }
 
 
-  public TradingRecordTestContext withDuration(final Duration duration) {
-    this.duration = duration;
-    return this;
+  public interface Operation {
+    /**
+     * This method executes operation relatively to current time.
+     *
+     * 0 enter immediatelly at current bar
+     * 1 means one bar is replayed, enter at next bar
+     *
+     * {@code
+     * .enter(1).after(1) // wait until next bar
+     * .exit(1).after(2) // wait two bars, exit at the second
+     * }
+     *
+     * @param countOfBars numbered from 1
+     */
+    TradingRecordTestContext after(int countOfBars);
+
+    /**
+     * Executes operation as soon as possible. Usually at next bar.
+     */
+    default TradingRecordTestContext asap() {
+      return after(1);
+    }
+
+    /**
+     * This method does not care about time, just mocks entry at some price.
+     * Also does not refresh history of positions price.
+     *
+     * @param price at which we enter
+     *
+     * @return this
+     */
+    TradingRecordTestContext at(double price);
   }
 
-
-  public TradingRecordTestContext withStart(final Clock clock) {
-    this.clock = clock;
-    return this;
-  }
-
-
-  public class Operation {
+  public class EnterOperation implements Operation {
     private final double amount;
 
 
-    public Operation(final int amount) {
+    public EnterOperation(final double amount) {
       this.amount = amount;
     }
 
 
-    public TradingRecordTestContext at(final double price) {
-      TradingRecordTestContext.this.tradingRecord.operate(
-          Instant.now(
-              Clock.offset(
-                  TradingRecordTestContext.this.clock,
-                  getTimeDelay()
-              )
-          ),
-          TradingRecordTestContext.this.numFactory.numOf(price),
-          TradingRecordTestContext.this.numFactory.numOf(this.amount)
+    public TradingRecordTestContext after(final int countOfBars) {
+      TradingRecordTestContext.this.marketEvenTestContext.fastForward(countOfBars);
+
+      final var bar = TradingRecordTestContext.this.marketEvenTestContext.getBarSeries().getBar();
+      TradingRecordTestContext.this.tradingRecord.enter(
+          bar.endTime(),
+          bar.closePrice(),
+          getNumFactory().numOf(this.amount)
       );
+
+      // ad bar to positions history
+      TradingRecordTestContext.this.tradingRecord.onBar(bar);
+
+      return TradingRecordTestContext.this;
+    }
+
+
+    @Override
+    public TradingRecordTestContext at(final double price) {
+      TradingRecordTestContext.this.tradingRecord.enter(
+          Instant.MIN,
+          getNumFactory().numOf(price),
+          getNumFactory().numOf(this.amount)
+      );
+
       return TradingRecordTestContext.this;
     }
   }
 
+  public class ExitOperation implements Operation {
+    private final double amount;
 
-  private Duration getTimeDelay() {
-    if (this.duration != null) {
-      return this.duration.multipliedBy(TradingRecordTestContext.this.operationCount++);
+
+    public ExitOperation(final double amount) {
+      this.amount = amount;
     }
 
-    if (TradingRecordTestContext.this.useRandomDelays) {
-      return Duration.ofMinutes(ThreadLocalRandom.current().nextInt(10));
+
+    public TradingRecordTestContext after(final int orderOfReceivedCandle) {
+      TradingRecordTestContext.this.marketEvenTestContext.fastForward(orderOfReceivedCandle);
+
+      final var bar = TradingRecordTestContext.this.marketEvenTestContext.getBarSeries().getBar();
+      TradingRecordTestContext.this.tradingRecord.exit(
+          bar.endTime(),
+          bar.closePrice(),
+          getNumFactory().numOf(this.amount)
+      );
+
+      // ad bar to positions history
+      TradingRecordTestContext.this.tradingRecord.onBar(bar);
+
+      return TradingRecordTestContext.this;
     }
 
-    return Duration.ofMinutes(TradingRecordTestContext.this.operationCount++);
+
+    @Override
+    public TradingRecordTestContext at(final double price) {
+      TradingRecordTestContext.this.tradingRecord.exit(
+          Instant.MIN,
+          getNumFactory().numOf(price),
+          getNumFactory().numOf(this.amount)
+      );
+
+      return TradingRecordTestContext.this;
+    }
   }
 }

@@ -26,6 +26,8 @@ package org.ta4j.core.live;
 import org.ta4j.core.BarBuilderFactory;
 import org.ta4j.core.StrategyFactory;
 import org.ta4j.core.backtest.BacktestBarSeries;
+import org.ta4j.core.backtest.RuntimeContext;
+import org.ta4j.core.indicators.IndicatorContext;
 import org.ta4j.core.num.DecimalNumFactory;
 import org.ta4j.core.num.NumFactory;
 
@@ -41,6 +43,7 @@ public class LiveTradingBuilder {
   private NumFactory numFactory = DecimalNumFactory.getInstance();
   private BarBuilderFactory barBuilderFactory = new LiveBarBuilderFactory();
   private StrategyFactory strategyFactory;
+  private RuntimeContext runtimeContext;
 
 
   /**
@@ -82,19 +85,27 @@ public class LiveTradingBuilder {
   }
 
 
+  public LiveTradingBuilder withRuntimeContext(final RuntimeContext runtimeContext) {
+    this.runtimeContext = runtimeContext;
+    return this;
+  }
+
+
   public LiveTrading build() {
+    final var indicatorContext = IndicatorContext.empty();
     final var liveBarSeries = new LiveBarSeries(
         this.name == null ? UNNAMED_SERIES_NAME : this.name,
         this.numFactory,
-        this.barBuilderFactory
+        this.barBuilderFactory,
+        indicatorContext
     );
 
     if (this.strategyFactory == null) {
       throw new IllegalArgumentException("Strategy factory not set");
     }
 
-    final var strategy = this.strategyFactory.createStrategy(liveBarSeries);
-// FIXME   liveBarSeries.replaceStrategy(strategy);
+    final var strategy = this.strategyFactory.createStrategy(this.runtimeContext, indicatorContext);
+    // FIXME   liveBarSeries.replaceStrategy(strategy);
 
     return new LiveTrading(liveBarSeries, strategy);
   }
