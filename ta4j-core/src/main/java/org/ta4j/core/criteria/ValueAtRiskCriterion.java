@@ -26,6 +26,7 @@ package org.ta4j.core.criteria;
 import java.util.ArrayList;
 import java.util.Collections;
 
+import org.ta4j.core.AnalysisCriterion;
 import org.ta4j.core.Position;
 import org.ta4j.core.TradingRecord;
 import org.ta4j.core.analysis.Returns;
@@ -37,7 +38,7 @@ import org.ta4j.core.num.NumFactory;
  *
  * @see <a href="https://en.wikipedia.org/wiki/Value_at_risk">Value at Risk</a>
  */
-public class ValueAtRiskCriterion extends AbstractAnalysisCriterion {
+public class ValueAtRiskCriterion implements AnalysisCriterion {
 
   private final NumFactory numFactory;
   /** Confidence level as absolute value (e.g. 0.95). */

@@ -23,6 +23,7 @@
  */
 package org.ta4j.core.criteria;
 
+import org.ta4j.core.AnalysisCriterion;
 import org.ta4j.core.Position;
 import org.ta4j.core.TradingRecord;
 import org.ta4j.core.criteria.pnl.ProfitLossRatioCriterion;
@@ -40,7 +41,7 @@ import org.ta4j.core.num.NumFactoryProvider;
  * @see <a href=
  *     "https://www.straightforex.com/advanced-forex-course/money-management/two-important-things-to-be-considered/">https://www.straightforex.com/advanced-forex-course/money-management/two-important-things-to-be-considered/</a>
  */
-public class ExpectancyCriterion extends AbstractAnalysisCriterion {
+public class ExpectancyCriterion implements AnalysisCriterion {
 
   private final ProfitLossRatioCriterion profitLossRatioCriterion = new ProfitLossRatioCriterion();
   private final NumberOfPositionsCriterion numberOfPositionsCriterion = new NumberOfPositionsCriterion();

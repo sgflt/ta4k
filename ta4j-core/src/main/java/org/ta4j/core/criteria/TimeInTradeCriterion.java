@@ -25,6 +25,7 @@ package org.ta4j.core.criteria;
 
 import java.time.temporal.ChronoUnit;
 
+import org.ta4j.core.AnalysisCriterion;
 import org.ta4j.core.Position;
 import org.ta4j.core.TradingRecord;
 import org.ta4j.core.num.Num;
@@ -36,7 +37,7 @@ import org.ta4j.core.num.NumFactoryProvider;
  * <p>
  * Returns the total time in the market in seconds.
  */
-public class TimeInTradeCriterion extends AbstractAnalysisCriterion {
+public class TimeInTradeCriterion implements AnalysisCriterion {
 
   private final ChronoUnit unit;
 

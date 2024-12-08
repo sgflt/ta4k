@@ -26,7 +26,6 @@ package org.ta4j.core.criteria.helpers;
 import org.ta4j.core.AnalysisCriterion;
 import org.ta4j.core.Position;
 import org.ta4j.core.TradingRecord;
-import org.ta4j.core.criteria.AbstractAnalysisCriterion;
 import org.ta4j.core.num.Num;
 import org.ta4j.core.num.NumFactoryProvider;
 
@@ -40,7 +39,7 @@ import org.ta4j.core.num.NumFactoryProvider;
  * @see <a href=
  *     "https://www.investopedia.com/terms/c/coefficientofvariation.asp">https://www.investopedia.com/terms/c/coefficientofvariation.asp</a>
  */
-public class RelativeStandardDeviationCriterion extends AbstractAnalysisCriterion {
+public class RelativeStandardDeviationCriterion implements AnalysisCriterion {
 
   /**
    * If true, then the lower the criterion value the better, otherwise the higher

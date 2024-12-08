@@ -23,6 +23,7 @@
  */
 package org.ta4j.core.criteria;
 
+import org.ta4j.core.AnalysisCriterion;
 import org.ta4j.core.Position;
 import org.ta4j.core.TradingRecord;
 import org.ta4j.core.num.Num;
@@ -31,7 +32,7 @@ import org.ta4j.core.num.NumFactoryProvider;
 /**
  * Number of break even position criterion.
  */
-public class NumberOfBreakEvenPositionsCriterion extends AbstractAnalysisCriterion {
+public class NumberOfBreakEvenPositionsCriterion implements AnalysisCriterion {
 
   @Override
   public Num calculate(final Position position) {

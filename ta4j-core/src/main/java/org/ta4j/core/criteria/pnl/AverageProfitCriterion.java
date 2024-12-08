@@ -23,9 +23,9 @@
  */
 package org.ta4j.core.criteria.pnl;
 
+import org.ta4j.core.AnalysisCriterion;
 import org.ta4j.core.Position;
 import org.ta4j.core.TradingRecord;
-import org.ta4j.core.criteria.AbstractAnalysisCriterion;
 import org.ta4j.core.criteria.NumberOfWinningPositionsCriterion;
 import org.ta4j.core.num.Num;
 import org.ta4j.core.num.NumFactoryProvider;
@@ -33,7 +33,7 @@ import org.ta4j.core.num.NumFactoryProvider;
 /**
  * Average gross profit criterion (includes trading costs).
  */
-public class AverageProfitCriterion extends AbstractAnalysisCriterion {
+public class AverageProfitCriterion implements AnalysisCriterion {
 
   private final ProfitCriterion grossProfitCriterion = new ProfitCriterion(false);
   private final NumberOfWinningPositionsCriterion numberOfWinningPositionsCriterion =

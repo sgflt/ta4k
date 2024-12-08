@@ -23,6 +23,7 @@
  */
 package org.ta4j.core.criteria;
 
+import org.ta4j.core.AnalysisCriterion;
 import org.ta4j.core.Position;
 import org.ta4j.core.Trade;
 import org.ta4j.core.TradingRecord;
@@ -37,7 +38,7 @@ import org.ta4j.core.num.NumFactoryProvider;
  * Calculates the transaction cost according to an initial traded amount and a
  * linear function defined by a and b (a * x + b).
  */
-public class LinearTransactionCostCriterion extends AbstractAnalysisCriterion {
+public class LinearTransactionCostCriterion implements AnalysisCriterion {
 
   private final double initialAmount;
 

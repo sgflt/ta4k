@@ -23,6 +23,7 @@
  */
 package org.ta4j.core.criteria;
 
+import org.ta4j.core.AnalysisCriterion;
 import org.ta4j.core.Position;
 import org.ta4j.core.TradingRecord;
 import org.ta4j.core.num.Num;
@@ -31,7 +32,7 @@ import org.ta4j.core.num.NumFactoryProvider;
 /**
  * Number of position criterion.
  */
-public class NumberOfPositionsCriterion extends AbstractAnalysisCriterion {
+public class NumberOfPositionsCriterion implements AnalysisCriterion {
 
   /**
    * If true, then the lower the criterion value the better, otherwise the higher

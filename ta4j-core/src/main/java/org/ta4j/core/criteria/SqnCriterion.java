@@ -37,7 +37,7 @@ import org.ta4j.core.num.NumFactoryProvider;
  * @see <a href=
  *     "https://indextrader.com.au/van-tharps-sqn/">https://indextrader.com.au/van-tharps-sqn/</a>
  */
-public class SqnCriterion extends AbstractAnalysisCriterion {
+public class SqnCriterion implements AnalysisCriterion {
 
   private final AnalysisCriterion criterion;
   private final StandardDeviationCriterion standardDeviationCriterion;

@@ -40,7 +40,7 @@ import org.ta4j.core.num.NumFactoryProvider;
  * <code>number of losing positions / total number of positions</code>
  * </ul>
  */
-public class PositionsRatioCriterion extends AbstractAnalysisCriterion {
+public class PositionsRatioCriterion implements AnalysisCriterion {
 
   private final PositionFilter positionFilter;
   private final AnalysisCriterion numberOfPositionsCriterion;

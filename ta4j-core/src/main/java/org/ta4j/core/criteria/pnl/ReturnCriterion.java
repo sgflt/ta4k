@@ -23,10 +23,10 @@
  */
 package org.ta4j.core.criteria.pnl;
 
+import org.ta4j.core.AnalysisCriterion;
 import org.ta4j.core.BarSeries;
 import org.ta4j.core.Position;
 import org.ta4j.core.TradingRecord;
-import org.ta4j.core.criteria.AbstractAnalysisCriterion;
 import org.ta4j.core.num.Num;
 import org.ta4j.core.num.NumFactoryProvider;
 
@@ -38,7 +38,7 @@ import org.ta4j.core.num.NumFactoryProvider;
  * The return of the provided {@link Position position(s)} over the provided
  * {@link BarSeries series}.
  */
-public class ReturnCriterion extends AbstractAnalysisCriterion {
+public class ReturnCriterion implements AnalysisCriterion {
 
   /**
    * If true, then the base percentage of {@code 1} (equivalent to 100%) is added

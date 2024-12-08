@@ -23,9 +23,9 @@
  */
 package org.ta4j.core.criteria.pnl;
 
+import org.ta4j.core.AnalysisCriterion;
 import org.ta4j.core.Position;
 import org.ta4j.core.TradingRecord;
-import org.ta4j.core.criteria.AbstractAnalysisCriterion;
 import org.ta4j.core.criteria.NumberOfLosingPositionsCriterion;
 import org.ta4j.core.num.Num;
 import org.ta4j.core.num.NumFactoryProvider;
@@ -33,7 +33,7 @@ import org.ta4j.core.num.NumFactoryProvider;
 /**
  * Average gross loss criterion (includes trading costs).
  */
-public class AverageLossCriterion extends AbstractAnalysisCriterion {
+public class AverageLossCriterion implements AnalysisCriterion {
 
   private final LossCriterion grossLossCriterion = new LossCriterion(false);
   private final NumberOfLosingPositionsCriterion numberOfLosingPositionsCriterion =

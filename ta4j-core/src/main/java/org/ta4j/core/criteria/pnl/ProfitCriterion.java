@@ -23,10 +23,10 @@
  */
 package org.ta4j.core.criteria.pnl;
 
+import org.ta4j.core.AnalysisCriterion;
 import org.ta4j.core.BarSeries;
 import org.ta4j.core.Position;
 import org.ta4j.core.TradingRecord;
-import org.ta4j.core.criteria.AbstractAnalysisCriterion;
 import org.ta4j.core.num.Num;
 import org.ta4j.core.num.NumFactoryProvider;
 
@@ -38,7 +38,7 @@ import org.ta4j.core.num.NumFactoryProvider;
  * The profit of the provided {@link Position position(s)} over the provided
  * {@link BarSeries series}.
  */
-public class ProfitCriterion extends AbstractAnalysisCriterion {
+public class ProfitCriterion implements AnalysisCriterion {
 
   private final boolean excludeCosts;
 

@@ -23,16 +23,16 @@
  */
 package org.ta4j.core.criteria.pnl;
 
+import org.ta4j.core.AnalysisCriterion;
 import org.ta4j.core.Position;
 import org.ta4j.core.TradingRecord;
-import org.ta4j.core.criteria.AbstractAnalysisCriterion;
 import org.ta4j.core.num.Num;
 import org.ta4j.core.num.NumFactoryProvider;
 
 /**
  * Net Profit and loss criterion (absolute PnL, includes trading costs).
  */
-public class ProfitLossCriterion extends AbstractAnalysisCriterion {
+public class ProfitLossCriterion implements AnalysisCriterion {
 
   @Override
   public Num calculate(final Position position) {

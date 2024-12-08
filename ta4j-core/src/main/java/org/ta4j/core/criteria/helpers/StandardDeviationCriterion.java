@@ -26,7 +26,6 @@ package org.ta4j.core.criteria.helpers;
 import org.ta4j.core.AnalysisCriterion;
 import org.ta4j.core.Position;
 import org.ta4j.core.TradingRecord;
-import org.ta4j.core.criteria.AbstractAnalysisCriterion;
 import org.ta4j.core.num.Num;
 import org.ta4j.core.num.NumFactoryProvider;
 
@@ -36,7 +35,7 @@ import org.ta4j.core.num.NumFactoryProvider;
  * <p>
  * Calculates the standard deviation for a Criterion.
  */
-public class StandardDeviationCriterion extends AbstractAnalysisCriterion {
+public class StandardDeviationCriterion implements AnalysisCriterion {
 
   /**
    * If true, then the lower the criterion value the better, otherwise the higher

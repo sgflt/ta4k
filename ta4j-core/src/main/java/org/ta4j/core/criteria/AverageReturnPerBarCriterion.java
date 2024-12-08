@@ -25,6 +25,7 @@ package org.ta4j.core.criteria;
 
 import java.time.temporal.ChronoUnit;
 
+import org.ta4j.core.AnalysisCriterion;
 import org.ta4j.core.Position;
 import org.ta4j.core.TradingRecord;
 import org.ta4j.core.criteria.pnl.ReturnCriterion;
@@ -43,7 +44,7 @@ import org.ta4j.core.num.NumFactoryProvider;
  * AverageReturnPerBar = pow({@link ReturnCriterion gross return}, 1/ {@link TimeInTradeCriterion number of time units})
  * </pre>
  */
-public class AverageReturnPerBarCriterion extends AbstractAnalysisCriterion {
+public class AverageReturnPerBarCriterion implements AnalysisCriterion {
 
   private final ReturnCriterion grossReturn = new ReturnCriterion();
   private final NumFactory numFactory;

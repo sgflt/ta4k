@@ -45,7 +45,7 @@
 // * price of the first bar and buy with the close price of the last bar.
 // * </ul>
 // */
-//public class VersusEnterAndHoldCriterion extends AbstractAnalysisCriterion {
+//public class VersusEnterAndHoldCriterion implements AnalysisCriterion {
 //
 //    private final TradeType tradeType;
 //    private final AnalysisCriterion criterion;

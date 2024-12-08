@@ -23,9 +23,9 @@
  */
 package org.ta4j.core.criteria.pnl;
 
+import org.ta4j.core.AnalysisCriterion;
 import org.ta4j.core.Position;
 import org.ta4j.core.TradingRecord;
-import org.ta4j.core.criteria.AbstractAnalysisCriterion;
 import org.ta4j.core.num.Num;
 import org.ta4j.core.num.NumFactoryProvider;
 
@@ -34,7 +34,7 @@ import org.ta4j.core.num.NumFactoryProvider;
  * trading costs) / Average gross loss (includes trading costs), returned in
  * decimal format.
  */
-public class ProfitLossRatioCriterion extends AbstractAnalysisCriterion {
+public class ProfitLossRatioCriterion implements AnalysisCriterion {
 
   private final AverageProfitCriterion averageProfitCriterion = new AverageProfitCriterion();
   private final AverageLossCriterion averageLossCriterion = new AverageLossCriterion();

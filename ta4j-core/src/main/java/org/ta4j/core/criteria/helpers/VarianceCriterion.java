@@ -26,7 +26,6 @@ package org.ta4j.core.criteria.helpers;
 import org.ta4j.core.AnalysisCriterion;
 import org.ta4j.core.Position;
 import org.ta4j.core.TradingRecord;
-import org.ta4j.core.criteria.AbstractAnalysisCriterion;
 import org.ta4j.core.criteria.NumberOfPositionsCriterion;
 import org.ta4j.core.num.Num;
 import org.ta4j.core.num.NumFactoryProvider;
@@ -37,7 +36,7 @@ import org.ta4j.core.num.NumFactoryProvider;
  * <p>
  * Calculates the variance for a Criterion.
  */
-public class VarianceCriterion extends AbstractAnalysisCriterion {
+public class VarianceCriterion implements AnalysisCriterion {
 
   /**
    * If true, then the lower the criterion value the better, otherwise the higher
