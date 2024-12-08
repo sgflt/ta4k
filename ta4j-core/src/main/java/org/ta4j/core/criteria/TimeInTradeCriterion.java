@@ -41,7 +41,7 @@ public class TimeInTradeCriterion extends AbstractAnalysisCriterion {
   private final ChronoUnit unit;
 
 
-  private TimeInTradeCriterion(final ChronoUnit unit) {
+  public TimeInTradeCriterion(final ChronoUnit unit) {
     this.unit = unit;
   }
 

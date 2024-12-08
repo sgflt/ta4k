@@ -23,10 +23,13 @@
  */
 package org.ta4j.core.criteria;
 
+import java.time.temporal.ChronoUnit;
+
 import org.ta4j.core.Position;
 import org.ta4j.core.TradingRecord;
 import org.ta4j.core.criteria.pnl.ReturnCriterion;
 import org.ta4j.core.num.Num;
+import org.ta4j.core.num.NumFactory;
 import org.ta4j.core.num.NumFactoryProvider;
 
 /**
@@ -37,18 +40,25 @@ import org.ta4j.core.num.NumFactoryProvider;
  * returns over the specified number of bars:
  *
  * <pre>
- * AverageReturnPerBar = pow({@link ReturnCriterion gross return}, 1/ {@link NumberOfBarsCriterion number of bars})
+ * AverageReturnPerBar = pow({@link ReturnCriterion gross return}, 1/ {@link TimeInTradeCriterion number of time units})
  * </pre>
  */
 public class AverageReturnPerBarCriterion extends AbstractAnalysisCriterion {
 
   private final ReturnCriterion grossReturn = new ReturnCriterion();
-  private final NumberOfBarsCriterion numberOfBars = new NumberOfBarsCriterion();
+  private final NumFactory numFactory;
+  private final TimeInTradeCriterion timeInTradeCriterion;
+
+
+  public AverageReturnPerBarCriterion(final NumFactory numFactory, final ChronoUnit averagingUnit) {
+    this.numFactory = numFactory;
+    this.timeInTradeCriterion = new TimeInTradeCriterion(averagingUnit);
+  }
 
 
   @Override
   public Num calculate(final Position position) {
-    final Num bars = this.numberOfBars.calculate(position);
+    final Num bars = this.timeInTradeCriterion.calculate(position);
     // If a simple division was used (grossreturn/bars), compounding would not be
     // considered, leading to inaccuracies in the calculation.
     // Therefore we need to use "pow" to accurately capture the compounding effect.
@@ -60,10 +70,11 @@ public class AverageReturnPerBarCriterion extends AbstractAnalysisCriterion {
 
   @Override
   public Num calculate(final TradingRecord tradingRecord) {
-    final Num bars = this.numberOfBars.calculate(tradingRecord);
-    return bars.isZero() ? NumFactoryProvider.getDefaultNumFactory().one()
-                         : this.grossReturn.calculate(tradingRecord)
-               .pow(NumFactoryProvider.getDefaultNumFactory().one().dividedBy(bars));
+    final Num timeUnits = this.timeInTradeCriterion.calculate(tradingRecord);
+    return timeUnits.isZero()
+           ? this.numFactory.one()
+           : this.grossReturn.calculate(tradingRecord).pow(this.numFactory.one().dividedBy(timeUnits))
+        ;
   }
 
 
