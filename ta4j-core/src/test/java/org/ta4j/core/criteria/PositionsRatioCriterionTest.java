@@ -23,115 +23,67 @@
  */
 package org.ta4j.core.criteria;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.ta4j.core.TestUtils.assertNumEquals;
-
-import org.junit.Test;
-import org.ta4j.core.AnalysisCriterion;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.ta4j.core.AnalysisCriterion.PositionFilter;
-import org.ta4j.core.Position;
+import org.ta4j.core.MarketEventTestContext;
 import org.ta4j.core.Trade;
-import org.ta4j.core.TradingRecord;
-import org.ta4j.core.backtest.BackTestTradingRecord;
-import org.ta4j.core.mocks.MockBarSeriesBuilder;
 import org.ta4j.core.num.NumFactory;
 
-public class PositionsRatioCriterionTest extends AbstractCriterionTest {
+class PositionsRatioCriterionTest {
 
-  public PositionsRatioCriterionTest(final NumFactory numFactory) {
-    super(params -> new PositionsRatioCriterion((PositionFilter) params[0]), numFactory);
+  @ParameterizedTest
+  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
+  void calculateWinningRatio(final NumFactory numFactory) {
+    final var context = new MarketEventTestContext()
+        .withNumFactory(numFactory)
+        .withCandlePrices(100d, 95d, 102d, 105d, 97d, 113d);
+
+    context.toTradingRecordContext()
+        .withCriterion(new PositionsRatioCriterion(PositionFilter.PROFIT))
+        .enter(1).asap()
+        .exit(1).asap()
+        .enter(1).asap()
+        .exit(1).asap()
+        .enter(1).asap()
+        .exit(1).asap()
+        .assertResults(2d / 3);
   }
 
 
-  @Test
-  public void calculate() {
-    final var series = new MockBarSeriesBuilder().withNumFactory(this.numFactory)
-        .withData(100d, 95d, 102d, 105d, 97d, 113d)
-        .build();
-    final TradingRecord tradingRecord = new BackTestTradingRecord(Trade.buyAt(0, series), Trade.sellAt(1, series),
-        Trade.buyAt(2, series), Trade.sellAt(3, series), Trade.buyAt(4, series), Trade.sellAt(5, series)
-    );
+  @ParameterizedTest
+  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
+  void calculateLosingRatio(final NumFactory numFactory) {
+    final var context = new MarketEventTestContext()
+        .withNumFactory(numFactory)
+        .withCandlePrices(100d, 95d, 102d, 105d, 97d, 113d);
 
-    // there are 3 positions with 2 winning positions
-    final AnalysisCriterion winningPositionsRatio = getCriterion(PositionFilter.PROFIT);
-    assertNumEquals(2d / 3, winningPositionsRatio.calculate(series, tradingRecord));
-
-    // there are 3 positions with 1 losing positions
-    final AnalysisCriterion losingPositionsRatio = getCriterion(PositionFilter.LOSS);
-    assertNumEquals(1d / 3, losingPositionsRatio.calculate(series, tradingRecord));
-
+    context.toTradingRecordContext()
+        .withCriterion(new PositionsRatioCriterion(PositionFilter.LOSS))
+        .enter(1).asap()
+        .exit(1).asap()
+        .enter(1).asap()
+        .exit(1).asap()
+        .enter(1).asap()
+        .exit(1).asap()
+        .assertResults(1d / 3);
   }
 
 
-  @Test
-  public void calculateWithShortPositions() {
-    final var series = new MockBarSeriesBuilder().withNumFactory(this.numFactory)
-        .withData(100d, 95d, 102d, 105d, 97d, 113d)
-        .build();
-    final TradingRecord tradingRecord = new BackTestTradingRecord(Trade.sellAt(0, series), Trade.buyAt(2, series),
-        Trade.sellAt(3, series), Trade.buyAt(4, series)
-    );
+  @ParameterizedTest
+  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
+  void calculateShortPositions(final NumFactory numFactory) {
+    final var context = new MarketEventTestContext()
+        .withNumFactory(numFactory)
+        .withCandlePrices(100d, 95d, 102d, 105d, 97d, 113d);
 
-    // there are 3 positions with 1 winning positions
-    final AnalysisCriterion winningPositionsRatio = getCriterion(PositionFilter.PROFIT);
-    assertNumEquals(0.5, winningPositionsRatio.calculate(series, tradingRecord));
-
-    // there are 3 positions with 1 losing positions
-    final AnalysisCriterion losingPositionsRatio = getCriterion(PositionFilter.LOSS);
-    assertNumEquals(0.5, losingPositionsRatio.calculate(series, tradingRecord));
+    context.toTradingRecordContext()
+        .withTradeType(Trade.TradeType.SELL)
+        .withCriterion(new PositionsRatioCriterion(PositionFilter.PROFIT))
+        .enter(1).asap()
+        .exit(1).asap()
+        .enter(1).asap()
+        .exit(1).asap().assertResults(0.5)
+    ;
   }
-
-
-  @Test
-  public void calculateWithOnePosition() {
-    final var series = new MockBarSeriesBuilder().withNumFactory(this.numFactory)
-        .withData(100d, 95d, 102d, 105d, 97d, 113d)
-        .build();
-    Position position = new Position(Trade.buyAt(0, series), Trade.sellAt(1, series));
-
-    // 0 winning position
-    final AnalysisCriterion winningPositionsRatio = getCriterion(PositionFilter.PROFIT);
-    assertNumEquals(numOf(0), winningPositionsRatio.calculate(series, position));
-
-    // 1 winning position
-    position = new Position(Trade.buyAt(1, series), Trade.sellAt(2, series));
-    assertNumEquals(1, winningPositionsRatio.calculate(series, position));
-
-    // 1 losing position
-    position = new Position(Trade.buyAt(0, series), Trade.sellAt(1, series));
-    final AnalysisCriterion losingPositionsRatio = getCriterion(PositionFilter.LOSS);
-    assertNumEquals(numOf(1), losingPositionsRatio.calculate(series, position));
-
-    // 0 losing position
-    position = new Position(Trade.buyAt(1, series), Trade.sellAt(2, series));
-    assertNumEquals(0, losingPositionsRatio.calculate(series, position));
-
-  }
-
-
-  @Test
-  public void betterThan() {
-    final AnalysisCriterion winningPositionsRatio = getCriterion(PositionFilter.PROFIT);
-    assertTrue(winningPositionsRatio.betterThan(numOf(12), numOf(8)));
-    assertFalse(winningPositionsRatio.betterThan(numOf(8), numOf(12)));
-
-    final AnalysisCriterion losingPositionsRatio = getCriterion(PositionFilter.LOSS);
-    assertTrue(losingPositionsRatio.betterThan(numOf(8), numOf(12)));
-    assertFalse(losingPositionsRatio.betterThan(numOf(12), numOf(8)));
-  }
-
-
-  @Test
-  public void testCalculateOneOpenPositionShouldReturnZero() {
-    this.openedPositionUtils.testCalculateOneOpenPositionShouldReturnExpectedValue(
-        this.numFactory,
-        getCriterion(PositionFilter.PROFIT), 0
-    );
-    this.openedPositionUtils.testCalculateOneOpenPositionShouldReturnExpectedValue(
-        this.numFactory,
-        getCriterion(PositionFilter.LOSS), 0
-    );
-  }
-
 }

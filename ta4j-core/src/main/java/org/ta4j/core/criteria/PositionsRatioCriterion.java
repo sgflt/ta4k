@@ -49,7 +49,7 @@ public class PositionsRatioCriterion extends AbstractAnalysisCriterion {
   /**
    * @return {@link PositionsRatioCriterion} with {@link PositionFilter#PROFIT}
    */
-  public static PositionsRatioCriterion WinningPositionsRatioCriterion() {
+  public static PositionsRatioCriterion winningPositionsRatioCriterion() {
     return new PositionsRatioCriterion(PositionFilter.PROFIT);
   }
 
@@ -57,7 +57,7 @@ public class PositionsRatioCriterion extends AbstractAnalysisCriterion {
   /**
    * @return {@link PositionsRatioCriterion} with {@link PositionFilter#LOSS}
    */
-  public static PositionsRatioCriterion LosingPositionsRatioCriterion() {
+  public static PositionsRatioCriterion losingPositionsRatioCriterion() {
     return new PositionsRatioCriterion(PositionFilter.LOSS);
   }
 
