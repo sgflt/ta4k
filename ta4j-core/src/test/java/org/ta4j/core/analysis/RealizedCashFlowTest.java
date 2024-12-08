@@ -42,7 +42,7 @@ import org.ta4j.core.backtest.BackTestTradingRecord;
 import org.ta4j.core.num.Num;
 import org.ta4j.core.num.NumFactory;
 
-class RealizedRealizedCashFlowTest {
+class RealizedCashFlowTest {
 
   private final Clock clock = Clock.fixed(Instant.MIN, ZoneId.systemDefault());
 
