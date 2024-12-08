@@ -23,83 +23,99 @@
  */
 package org.ta4j.core.criteria;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.ta4j.core.TestUtils.assertNumEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.junit.Test;
-import org.ta4j.core.AnalysisCriterion;
-import org.ta4j.core.Position;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.ta4j.core.MarketEventTestContext;
 import org.ta4j.core.Trade;
-import org.ta4j.core.TradingRecord;
-import org.ta4j.core.backtest.BackTestTradingRecord;
-import org.ta4j.core.mocks.MockBarSeriesBuilder;
 import org.ta4j.core.num.NumFactory;
 
-public class NumberOfLosingPositionsCriterionTest extends AbstractCriterionTest {
+class NumberOfLosingPositionsCriterionTest {
 
-  public NumberOfLosingPositionsCriterionTest(final NumFactory numFactory) {
-    super(params -> new NumberOfLosingPositionsCriterion(), numFactory);
+  @ParameterizedTest
+  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
+  void calculateWithNoPositions(final NumFactory factory) {
+    final var context = new MarketEventTestContext()
+        .withNumFactory(factory)
+        .withCandlePrices(100, 105, 110, 100, 95, 105)
+        .toTradingRecordContext()
+        .withCriterion(new NumberOfLosingPositionsCriterion());
+
+    context.assertResults(0);
   }
 
+  @ParameterizedTest
+  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
+  void calculateWithTwoLongPositions(final NumFactory factory) {
+    final var context = new MarketEventTestContext()
+        .withNumFactory(factory)
+        .withCandlePrices(100, 105, 110, 99, 95, 91)
+        .toTradingRecordContext()
+        .withTradeType(Trade.TradeType.BUY)
+        .withCriterion(new NumberOfLosingPositionsCriterion());
 
-  @Test
-  public void calculateWithNoPositions() {
-    final var series = new MockBarSeriesBuilder().withNumFactory(this.numFactory)
-        .withData(100, 105, 110, 100, 95, 105)
-        .build();
+    context.enter(1).asap()
+        .exit(1).after(3)
+        .enter(1).asap()
+        .exit(1).asap();
 
-    assertNumEquals(0, getCriterion().calculate(series, new BackTestTradingRecord()));
+    context.assertResults(2);
   }
 
+  @ParameterizedTest
+  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
+  void calculateWithOneLongPosition(final NumFactory factory) {
+    final var context = new MarketEventTestContext()
+        .withNumFactory(factory)
+        .withCandlePrices(100, 105, 110, 100, 95, 105)
+        .toTradingRecordContext()
+        .withTradeType(Trade.TradeType.BUY)
+        .withCriterion(new NumberOfLosingPositionsCriterion());
 
-  @Test
-  public void calculateWithTwoLongPositions() {
-    final var series = new MockBarSeriesBuilder().withNumFactory(this.numFactory)
-        .withData(100, 105, 110, 100, 95, 105)
-        .build();
-    final TradingRecord tradingRecord = new BackTestTradingRecord(Trade.buyAt(1, series), Trade.sellAt(3, series),
-        Trade.buyAt(3, series), Trade.sellAt(4, series)
-    );
+    context.enter(1).asap()
+        .exit(1).after(4);
 
-    assertNumEquals(2, getCriterion().calculate(series, tradingRecord));
+    context.assertResults(1);
   }
 
+  @ParameterizedTest
+  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
+  void calculateWithTwoShortPositions(final NumFactory factory) {
+    final var context = new MarketEventTestContext()
+        .withNumFactory(factory)
+        .withCandlePrices(100, 105, 110, 100, 95, 105)
+        .toTradingRecordContext()
+        .withTradeType(Trade.TradeType.SELL)
+        .withCriterion(new NumberOfLosingPositionsCriterion());
 
-  @Test
-  public void calculateWithOneLongPosition() {
-    final var series = new MockBarSeriesBuilder().withNumFactory(this.numFactory)
-        .withData(100, 105, 110, 100, 95, 105)
-        .build();
-    final Position position = new Position(Trade.buyAt(1, series), Trade.sellAt(3, series));
+    context.enter(1).asap()
+        .exit(1).asap()
+        .enter(1).after(3)
+        .exit(1).asap();
 
-    assertNumEquals(1, getCriterion().calculate(series, position));
+    context.assertResults(2);
   }
 
-
-  @Test
-  public void calculateWithTwoShortPositions() {
-    final var series = new MockBarSeriesBuilder().withNumFactory(this.numFactory)
-        .withData(100, 105, 110, 100, 95, 105)
-        .build();
-    final TradingRecord tradingRecord = new BackTestTradingRecord(Trade.sellAt(0, series), Trade.buyAt(1, series),
-        Trade.sellAt(3, series), Trade.buyAt(5, series)
-    );
-
-    assertNumEquals(2, getCriterion().calculate(series, tradingRecord));
+  @ParameterizedTest
+  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
+  void betterThan(final NumFactory factory) {
+    final var criterion = new NumberOfLosingPositionsCriterion();
+    assertTrue(criterion.betterThan(factory.numOf(3), factory.numOf(6)));
+    assertFalse(criterion.betterThan(factory.numOf(7), factory.numOf(4)));
   }
 
+  @ParameterizedTest
+  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
+  void calculateOneOpenPositionShouldReturnZero(final NumFactory factory) {
+    final var context = new MarketEventTestContext()
+        .withNumFactory(factory)
+        .withCandlePrices(100, 105, 110)
+        .toTradingRecordContext()
+        .withCriterion(new NumberOfLosingPositionsCriterion());
 
-  @Test
-  public void betterThan() {
-    final AnalysisCriterion criterion = getCriterion();
-    assertTrue(criterion.betterThan(numOf(3), numOf(6)));
-    assertFalse(criterion.betterThan(numOf(7), numOf(4)));
-  }
-
-
-  @Test
-  public void testCalculateOneOpenPositionShouldReturnZero() {
-    this.openedPositionUtils.testCalculateOneOpenPositionShouldReturnExpectedValue(this.numFactory, getCriterion(), 0);
+    context.enter(1).asap();
+    context.assertResults(0);
   }
 }
