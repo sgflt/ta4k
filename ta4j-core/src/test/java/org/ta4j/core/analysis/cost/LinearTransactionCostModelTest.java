@@ -1,193 +1,157 @@
-///**
-// * The MIT License (MIT)
-// *
-// * Copyright (c) 2017-2023 Ta4j Organization & respective
-// * authors (see AUTHORS)
-// *
-// * Permission is hereby granted, free of charge, to any person obtaining a copy of
-// * this software and associated documentation files (the "Software"), to deal in
-// * the Software without restriction, including without limitation the rights to
-// * use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
-// * the Software, and to permit persons to whom the Software is furnished to do so,
-// * subject to the following conditions:
-// *
-// * The above copyright notice and this permission notice shall be included in all
-// * copies or substantial portions of the Software.
-// *
-// * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
-// * FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
-// * COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
-// * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
-// * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-// */
-//package org.ta4j.core.analysis.cost;
-//
-//import static org.junit.Assert.assertEquals;
-//import static org.junit.Assert.assertFalse;
-//import static org.junit.Assert.assertTrue;
-//import static org.ta4j.core.TestUtils.assertNumEquals;
-//
-//import java.math.BigDecimal;
-//import java.time.ZonedDateTime;
-//import java.util.LinkedList;
-//import java.util.List;
-//
-//import org.junit.Before;
-//import org.junit.Test;
-//import org.ta4j.core.backtest.BacktestBarSeries;
-//import org.ta4j.core.backtest.BacktestBarSeriesBuilder;
-//import org.ta4j.core.backtest.BacktestStrategy;
-//import org.ta4j.core.Position;
-//import org.ta4j.core.Rule;
-//import org.ta4j.core.Strategy;
-//import org.ta4j.core.Trade;
-//import org.ta4j.core.backtest.BacktestExecutor;
-//import org.ta4j.core.backtest.TradeOnCurrentCloseModel;
-//import org.ta4j.core.mocks.MockBarBuilderFactory;
-//import org.ta4j.core.num.DoubleNum;
-//import org.ta4j.core.num.Num;
-//import org.ta4j.core.reports.TradingStatement;
-//import org.ta4j.core.rules.FixedRule;
-//
-//public class LinearTransactionCostModelTest {
-//
-//    private CostModel transactionModel;
-//
-//    @Before
-//    public void setUp() throws Exception {
-//        transactionModel = new LinearTransactionCostModel(0.01);
-//    }
-//
-//    @Test
-//    public void calculateSingleTradeCost() {
-//        // Price - Amount calculation Test
-//        Num price = DoubleNum.valueOf(100);
-//        Num amount = DoubleNum.valueOf(2);
-//        Num cost = transactionModel.calculate(price, amount);
-//
-//        assertNumEquals(DoubleNum.valueOf(2), cost);
-//    }
-//
-//    @Test
-//    public void calculateBuyPosition() {
-//        // Calculate the transaction costs of a closed long position
-//        int holdingPeriod = 2;
-//        Trade entry = Trade.buyAt(0, DoubleNum.valueOf(100), DoubleNum.valueOf(1), transactionModel);
-//        Trade exit = Trade.sellAt(holdingPeriod, DoubleNum.valueOf(110), DoubleNum.valueOf(1), transactionModel);
-//
-//        Position position = new Position(entry, exit, transactionModel, new ZeroCostModel());
-//
-//        Num costFromBuy = entry.getCost();
-//        Num costFromSell = exit.getCost();
-//        Num costsFromModel = transactionModel.calculate(position, holdingPeriod);
-//
-//        assertNumEquals(costsFromModel, costFromBuy.plus(costFromSell));
-//        assertNumEquals(costsFromModel, DoubleNum.valueOf(2.1));
-//        assertNumEquals(costFromBuy, DoubleNum.valueOf(1));
-//    }
-//
-//    @Test
-//    public void calculateSellPosition() {
-//        // Calculate the transaction costs of a closed short position
-//        int holdingPeriod = 2;
-//        Trade entry = Trade.sellAt(0, DoubleNum.valueOf(100), DoubleNum.valueOf(1), transactionModel);
-//        Trade exit = Trade.buyAt(holdingPeriod, DoubleNum.valueOf(110), DoubleNum.valueOf(1), transactionModel);
-//
-//        Position position = new Position(entry, exit, transactionModel, new ZeroCostModel());
-//
-//        Num costFromBuy = entry.getCost();
-//        Num costFromSell = exit.getCost();
-//        Num costsFromModel = transactionModel.calculate(position, holdingPeriod);
-//
-//        assertNumEquals(costsFromModel, costFromBuy.plus(costFromSell));
-//        assertNumEquals(costsFromModel, DoubleNum.valueOf(2.1));
-//        assertNumEquals(costFromBuy, DoubleNum.valueOf(1));
-//    }
-//
-//    @Test
-//    public void calculateOpenSellPosition() {
-//        // Calculate the transaction costs of an open position
-//        int currentIndex = 4;
-//        Position position = new Position(Trade.TradeType.BUY, transactionModel, new ZeroCostModel());
-//        position.operate(0, DoubleNum.valueOf(100), DoubleNum.valueOf(1));
-//
-//        Num costsFromModel = transactionModel.calculate(position, currentIndex);
-//
-//        assertNumEquals(costsFromModel, DoubleNum.valueOf(1));
-//    }
-//
-//    @Test
-//    public void testEquality() {
-//        LinearTransactionCostModel model = new LinearTransactionCostModel(0.1);
-//        CostModel modelSameClass = new LinearTransactionCostModel(0.2);
-//        CostModel modelSameFee = new LinearTransactionCostModel(0.1);
-//        CostModel modelOther = new ZeroCostModel();
-//
-//        boolean equality = model.equals(modelSameFee);
-//        boolean inequality1 = model.equals(modelSameClass);
-//        boolean inequality2 = model.equals(modelOther);
-//
-//        assertTrue(equality);
-//        assertFalse(inequality1);
-//        assertFalse(inequality2);
-//    }
-//
-//    @Test
-//    public void testBacktesting() {
-//        BacktestBarSeries series = new BacktestBarSeriesBuilder().withName("CostModel test")
-//                .withBarBuilderFactory(new MockBarBuilderFactory())
-//                .build();
-//        ZonedDateTime now = ZonedDateTime.now();
-//        Num one = series.numFactory().one();
-//        Num two = series.numFactory().numOf(2);
-//        Num three = series.numFactory().numOf(3);
-//        Num four = series.numFactory().numOf(4);
-//        series.barBuilder().endTime(now).openPrice(one).closePrice(one).highPrice(one).lowPrice(one).onCandle();
-//        series.barBuilder()
-//                .endTime(now.plusSeconds(1))
-//                .openPrice(two)
-//                .closePrice(two)
-//                .highPrice(two)
-//                .lowPrice(two)
-//                .onCandle();
-//        series.barBuilder()
-//                .endTime(now.plusSeconds(2))
-//                .openPrice(three)
-//                .closePrice(three)
-//                .highPrice(three)
-//                .lowPrice(three)
-//                .onCandle();
-//        series.barBuilder()
-//                .endTime(now.plusSeconds(3))
-//                .openPrice(four)
-//                .closePrice(four)
-//                .highPrice(four)
-//                .lowPrice(four)
-//                .onCandle();
-//
-//        Rule entryRule = new FixedRule(0, 2);
-//        Rule exitRule = new FixedRule(1, 3);
-//        List<Strategy> strategies = new LinkedList<>();
-//        strategies.onCandle(new BacktestStrategy("Cost model test strategy", entryRule, exitRule));
-//
-//        Num orderFee = series.numFactory().numOf(new BigDecimal("0.0026"));
-//        BacktestExecutor executor = new BacktestExecutor(series, new LinearTransactionCostModel(orderFee.doubleValue()),
-//                new ZeroCostModel(), new TradeOnCurrentCloseModel());
-//
-//        Num amount = series.numFactory().numOf(25);
-//        TradingStatement strategyResult = executor.execute(strategies, amount).get(0);
-//
-//        Num firstPositionBuy = one.plus(one.multipliedBy(orderFee));
-//        Num firstPositionSell = two.minus(two.multipliedBy(orderFee));
-//        Num firstPositionProfit = firstPositionSell.minus(firstPositionBuy).multipliedBy(amount);
-//
-//        Num secondPositionBuy = three.plus(three.multipliedBy(orderFee));
-//        Num secondPositionSell = four.minus(four.multipliedBy(orderFee));
-//        Num secondPositionProfit = secondPositionSell.minus(secondPositionBuy).multipliedBy(amount);
-//
-//        Num overallProfit = firstPositionProfit.plus(secondPositionProfit);
-//
-//        assertEquals(overallProfit, strategyResult.getPerformanceReport().getTotalProfit());
-//    }
-//}
+/*
+ * The MIT License (MIT)
+ *
+ * Copyright (c) 2017-2024 Ta4j Organization & respective
+ * authors (see AUTHORS)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of
+ * this software and associated documentation files (the "Software"), to deal in
+ * the Software without restriction, including without limitation the rights to
+ * use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+ * the Software, and to permit persons to whom the Software is furnished to do so,
+ * subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+ * FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+ * COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+ * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+ * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ */
+package org.ta4j.core.analysis.cost;
+
+import static org.ta4j.core.TestUtils.assertNumEquals;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.ta4j.core.MarketEventTestContext;
+import org.ta4j.core.Position;
+import org.ta4j.core.Trade;
+import org.ta4j.core.TradingRecordTestContext;
+import org.ta4j.core.num.Num;
+import org.ta4j.core.num.NumFactory;
+
+class LinearTransactionCostModelTest {
+
+  private CostModel transactionModel;
+
+
+  @BeforeEach
+  void setUp() {
+    this.transactionModel = new LinearTransactionCostModel(0.01);
+  }
+
+
+  @ParameterizedTest
+  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
+  void calculateSingleTradeCost(final NumFactory numFactory) {
+    final var price = numFactory.numOf(100);
+    final var amount = numFactory.numOf(2);
+    final var cost = this.transactionModel.calculate(price, amount);
+
+    assertNumEquals(numFactory.numOf(2), cost);
+  }
+
+
+  @ParameterizedTest
+  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
+  void calculateBuyPosition(final NumFactory numFactory) {
+    final var context = new TradingRecordTestContext()
+        .withNumFactory(numFactory)
+        .withTransactionCostModel(this.transactionModel)
+        .withTradeType(Trade.TradeType.BUY);
+
+    context.enter(1).at(100)
+        .exit(1).at(110);
+
+    final var position = context.getTradingRecord().getPositions().getFirst();
+    final var costFromBuy = position.getEntry().getCost();
+    final var costFromSell = position.getExit().getCost();
+    final var costsFromModel = this.transactionModel.calculate(position);
+
+    assertNumEquals(costsFromModel, costFromBuy.plus(costFromSell));
+    assertNumEquals(costsFromModel, numFactory.numOf(2.1));
+    assertNumEquals(costFromBuy, numFactory.numOf(1));
+  }
+
+
+  @ParameterizedTest
+  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
+  void calculateSellPosition(final NumFactory numFactory) {
+    final var context = new TradingRecordTestContext()
+        .withNumFactory(numFactory)
+        .withTransactionCostModel(this.transactionModel)
+        .withTradeType(Trade.TradeType.SELL);
+
+    context.enter(1).at(100)
+        .exit(1).at(110);
+
+    final var position = context.getTradingRecord().getPositions().getFirst();
+    final var costFromSell = position.getEntry().getCost();
+    final var costFromBuy = position.getExit().getCost();
+    final var costsFromModel = this.transactionModel.calculate(position);
+
+    assertNumEquals(costsFromModel, costFromSell.plus(costFromBuy));
+    assertNumEquals(costsFromModel, numFactory.numOf(2.1));
+    assertNumEquals(costFromSell, numFactory.numOf(1));
+  }
+
+
+  @ParameterizedTest
+  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
+  void calculateOpenPosition(final NumFactory numFactory) {
+    final var context = new TradingRecordTestContext()
+        .withNumFactory(numFactory)
+        .withTransactionCostModel(this.transactionModel);
+
+    context.enter(1).at(100);
+
+    final var position = context.getTradingRecord().getCurrentPosition();
+    final var costsFromModel = this.transactionModel.calculate(position);
+
+    assertNumEquals(costsFromModel, numFactory.numOf(1));
+  }
+
+
+  @ParameterizedTest
+  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
+  void testStrategyExecution(final NumFactory numFactory) {
+    final var context = new MarketEventTestContext()
+        .withNumFactory(numFactory)
+        .withCandlePrices(1, 2, 3, 4)
+        .toTradingRecordContext()
+        .withTransactionCostModel(new LinearTransactionCostModel(0.0026));
+
+    context
+        .enter(25).after(1)
+        .exit(25).after(1)
+        .enter(25).after(1)
+        .exit(25).after(1);
+
+    final var firstPositionBuy = numFactory.one()
+        .plus(numFactory.one().multipliedBy(numFactory.numOf(0.0026)));
+    final var firstPositionSell = numFactory.two()
+        .minus(numFactory.two().multipliedBy(numFactory.numOf(0.0026)));
+    final var firstPositionProfit = firstPositionSell.minus(firstPositionBuy)
+        .multipliedBy(numFactory.numOf(25));
+
+    final var secondPositionBuy = numFactory.three()
+        .plus(numFactory.three().multipliedBy(numFactory.numOf(0.0026)));
+    final var secondPositionSell = numFactory.numOf(4)
+        .minus(numFactory.numOf(4).multipliedBy(numFactory.numOf(0.0026)));
+    final var secondPositionProfit = secondPositionSell.minus(secondPositionBuy)
+        .multipliedBy(numFactory.numOf(25));
+
+    final var overallProfit = firstPositionProfit.plus(secondPositionProfit);
+
+    assertNumEquals(
+        overallProfit, context.getTradingRecord().getPositions().stream()
+            .map(Position::getProfit)
+            .reduce(numFactory.zero(), Num::plus)
+    );
+  }
+}

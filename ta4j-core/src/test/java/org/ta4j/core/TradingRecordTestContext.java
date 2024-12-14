@@ -3,6 +3,7 @@ package org.ta4j.core;
 import static org.ta4j.core.TestUtils.assertNumEquals;
 
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.function.Function;
 
 import org.ta4j.core.analysis.cost.CostModel;
@@ -17,6 +18,7 @@ import org.ta4j.core.num.NumFactoryProvider;
  */
 public class TradingRecordTestContext {
 
+  private int simulationTime;
   private Trade.TradeType tradeType = Trade.TradeType.BUY;
   private BackTestTradingRecord tradingRecord;
   private AnalysisCriterion criterion;
@@ -24,6 +26,7 @@ public class TradingRecordTestContext {
   private CostModel holdingCostModel = new ZeroCostModel();
   private MarketEventTestContext marketEvenTestContext;
   private NumFactory numFactory = NumFactoryProvider.getDefaultNumFactory();
+  private ChronoUnit resolution = ChronoUnit.DAYS;
 
 
   public TradingRecordTestContext() {
@@ -124,7 +127,19 @@ public class TradingRecordTestContext {
 
 
   public TradingRecordTestContext forwardTime(final int countOfBars) {
-    this.marketEvenTestContext.fastForward(countOfBars);
+    if (this.marketEvenTestContext != null) {
+      this.marketEvenTestContext.fastForward(countOfBars);
+    } else {
+      this.simulationTime += countOfBars;
+    }
+
+
+    return this;
+  }
+
+
+  public TradingRecordTestContext withResolution(final ChronoUnit resolution) {
+    this.resolution = resolution;
     return this;
   }
 
@@ -192,7 +207,7 @@ public class TradingRecordTestContext {
     @Override
     public TradingRecordTestContext at(final double price) {
       TradingRecordTestContext.this.tradingRecord.enter(
-          Instant.MIN,
+          getSimulatedTime(),
           getNumFactory().numOf(price),
           getNumFactory().numOf(this.amount)
       );
@@ -230,12 +245,17 @@ public class TradingRecordTestContext {
     @Override
     public TradingRecordTestContext at(final double price) {
       TradingRecordTestContext.this.tradingRecord.exit(
-          Instant.MIN,
+          getSimulatedTime(),
           getNumFactory().numOf(price),
           getNumFactory().numOf(this.amount)
       );
 
       return TradingRecordTestContext.this;
     }
+  }
+
+
+  private Instant getSimulatedTime() {
+    return Instant.MIN.plus(this.resolution.getDuration().multipliedBy(this.simulationTime++));
   }
 }

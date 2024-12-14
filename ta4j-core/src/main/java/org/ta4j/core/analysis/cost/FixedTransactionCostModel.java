@@ -46,7 +46,7 @@ public class FixedTransactionCostModel implements CostModel {
      *
      * @param feePerTrade the fixed fee per {@link Trade trade}
      */
-    public FixedTransactionCostModel(double feePerTrade) {
+    public FixedTransactionCostModel(final double feePerTrade) {
         this.feePerTrade = feePerTrade;
     }
 
@@ -57,20 +57,20 @@ public class FixedTransactionCostModel implements CostModel {
      * @return the transaction cost of the single {@code position}
      */
     @Override
-    public Num calculate(Position position, int currentIndex) {
+    public Num calculate(final Position position, final int currentIndex) {
         final var numFactory = position.getEntry().getPricePerAsset().getNumFactory();
         Num multiplier = numFactory.one();
         if (position.isClosed()) {
             multiplier = numFactory.numOf(2);
         }
-        return numFactory.numOf(feePerTrade).multipliedBy(multiplier);
+        return numFactory.numOf(this.feePerTrade).multipliedBy(multiplier);
     }
 
     /**
      * @return the transaction cost of the single {@code position}
      */
     @Override
-    public Num calculate(Position position) {
+    public Num calculate(final Position position) {
         return this.calculate(position, 0);
     }
 
@@ -81,16 +81,7 @@ public class FixedTransactionCostModel implements CostModel {
      * @return {@link #feePerTrade}
      */
     @Override
-    public Num calculate(Num price, Num amount) {
-        return price.getNumFactory().numOf(feePerTrade);
-    }
-
-    @Override
-    public boolean equals(CostModel otherModel) {
-        boolean equality = false;
-        if (this.getClass().equals(otherModel.getClass())) {
-            equality = ((FixedTransactionCostModel) otherModel).feePerTrade == this.feePerTrade;
-        }
-        return equality;
+    public Num calculate(final Num price, final Num amount) {
+        return price.getNumFactory().numOf(this.feePerTrade);
     }
 }

@@ -23,8 +23,6 @@
  */
 package org.ta4j.core.analysis.cost;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.ta4j.core.TestUtils.assertNumEquals;
 
 import java.time.Instant;
@@ -86,19 +84,5 @@ class FixedTransactionCostModelTest {
     final Num cost = model.calculate(PRICE, AMOUNT);
 
     assertNumEquals(cost, DoubleNum.valueOf(feePerTrade));
-  }
-
-
-  @Test
-  void testEquality() {
-    final var randomFee = RANDOM.nextDouble();
-    final var model = new FixedTransactionCostModel(randomFee);
-    final var modelSame = new FixedTransactionCostModel(randomFee);
-    final var modelOther = new LinearTransactionCostModel(randomFee);
-    final var equality = model.equals(modelSame);
-    final var inequality = model.equals(modelOther);
-
-    assertTrue(equality);
-    assertFalse(inequality);
   }
 }

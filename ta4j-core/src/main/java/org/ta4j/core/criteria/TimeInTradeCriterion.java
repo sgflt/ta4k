@@ -70,9 +70,7 @@ public class TimeInTradeCriterion implements AnalysisCriterion {
   @Override
   public Num calculate(final Position position) {
     if (position.isClosed()) {
-      final var start = position.getEntry().getWhenExecuted();
-      final var end = position.getExit().getWhenExecuted();
-      return NumFactoryProvider.getDefaultNumFactory().numOf(this.unit.between(start, end));
+      return NumFactoryProvider.getDefaultNumFactory().numOf(position.getTimeInTrade(this.unit));
     }
 
     return NumFactoryProvider.getDefaultNumFactory().zero();

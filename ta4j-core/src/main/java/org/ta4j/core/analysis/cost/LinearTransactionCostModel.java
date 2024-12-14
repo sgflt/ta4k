@@ -80,14 +80,4 @@ public class LinearTransactionCostModel implements CostModel {
   public Num calculate(final Num price, final Num amount) {
     return amount.getNumFactory().numOf(this.feePerPosition).multipliedBy(price).multipliedBy(amount);
   }
-
-
-  @Override
-  public boolean equals(final CostModel otherModel) {
-    boolean equality = false;
-    if (this.getClass().equals(otherModel.getClass())) {
-      equality = ((LinearTransactionCostModel) otherModel).feePerPosition == this.feePerPosition;
-    }
-    return equality;
-  }
 }

@@ -24,6 +24,7 @@
 package org.ta4j.core;
 
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NavigableMap;
@@ -507,6 +508,19 @@ public class Position implements BarListener {
     }
 
     return returns;
+  }
+
+
+  public long getTimeInTrade(final ChronoUnit chronoUnit) {
+    if (isClosed()) {
+      return chronoUnit.between(this.entry.getWhenExecuted(), this.exit.getWhenExecuted());
+    }
+
+    if (isOpened() && !this.priceHistory.priceHistory.isEmpty()) {
+      return chronoUnit.between(this.entry.getWhenExecuted(), this.priceHistory.priceHistory.getLast().endTime());
+    }
+
+    return 0L;
   }
 
 
