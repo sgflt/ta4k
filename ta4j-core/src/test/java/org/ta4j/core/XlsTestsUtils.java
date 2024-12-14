@@ -179,7 +179,7 @@ public class XlsTestsUtils {
       final Instant endDateTime = Instant.ofEpochMilli(endDate.getTime());
       candleEvents.add(
           new CandleReceived(
-              duration,
+              endDateTime.minus(Duration.ofDays(1)),
               endDateTime,
               cellValues[1].getNumberValue(), // open
               cellValues[2].getNumberValue(), // high

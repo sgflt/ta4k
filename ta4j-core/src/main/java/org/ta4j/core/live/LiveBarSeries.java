@@ -101,8 +101,8 @@ class LiveBarSeries implements BarSeries {
 
   @Override
   public void onCandle(final CandleReceived event) {
-    barBuilder().
-        timePeriod(event.timePeriod())
+    barBuilder()
+        .startTime(event.beginTime())
         .endTime(event.beginTime())
         .openPrice(event.openPrice())
         .highPrice(event.highPrice())

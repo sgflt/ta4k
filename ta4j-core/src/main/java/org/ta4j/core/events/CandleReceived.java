@@ -24,15 +24,15 @@
 
 package org.ta4j.core.events;
 
-import java.time.Duration;
 import java.time.Instant;
 
 import lombok.Builder;
+import lombok.NonNull;
 
 @Builder
 public record CandleReceived(
-    Duration timePeriod, // FIXME for what is duration usable?
-    Instant beginTime,
+    @NonNull Instant beginTime,
+    @NonNull Instant endTime,
     double openPrice,
     double highPrice,
     double lowPrice,

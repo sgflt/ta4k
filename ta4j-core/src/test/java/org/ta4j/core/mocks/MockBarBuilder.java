@@ -37,41 +37,43 @@ import org.ta4j.core.backtest.BacktestBarBuilder;
  */
 public class MockBarBuilder extends BacktestBarBuilder {
 
-    private final Clock clock = Clock.fixed(Instant.ofEpochMilli(-1), ZoneId.systemDefault());
-    private boolean periodSet;
-    private boolean endTimeSet;
+  private final Clock clock = Clock.fixed(Instant.ofEpochMilli(-1), ZoneId.systemDefault());
+  private boolean periodSet;
+  private boolean endTimeSet;
 
-    private static long countOfProducedBars;
-    private Duration timePeriod;
+  private static long countOfProducedBars;
+  private Duration timePeriod;
 
-    public MockBarBuilder(final BarSeries series) {
-        super(series);
+
+  public MockBarBuilder(final BarSeries series) {
+    super(series);
+  }
+
+
+  @Override
+  public MockBarBuilder endTime(final Instant endTime) {
+    this.endTimeSet = true;
+    super.endTime(endTime);
+    return this;
+  }
+
+
+  public MockBarBuilder timePeriod(final Duration timePeriod) {
+    this.periodSet = true;
+    this.timePeriod = timePeriod;
+    return this;
+  }
+
+
+  @Override
+  public BacktestBar build() {
+    if (!this.periodSet) {
+      timePeriod(Duration.ofDays(1));
     }
 
-    @Override
-    public MockBarBuilder endTime(final Instant endTime) {
-      this.endTimeSet = true;
-        super.endTime(endTime);
-        return this;
+    if (!this.endTimeSet) {
+      endTime(Instant.now(Clock.offset(this.clock, this.timePeriod.multipliedBy(++countOfProducedBars))));
     }
-
-    @Override
-    public MockBarBuilder timePeriod(final Duration timePeriod) {
-      this.periodSet = true;
-        this.timePeriod = timePeriod;
-        super.timePeriod(this.timePeriod);
-        return this;
-    }
-
-    @Override
-    public BacktestBar build() {
-        if (!this.periodSet) {
-            timePeriod(Duration.ofDays(1));
-        }
-
-        if (!this.endTimeSet) {
-            endTime(Instant.now(Clock.offset(this.clock, this.timePeriod.multipliedBy(++countOfProducedBars))));
-        }
-        return super.build();
-    }
+    return super.build();
+  }
 }

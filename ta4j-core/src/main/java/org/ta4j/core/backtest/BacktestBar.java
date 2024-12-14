@@ -71,7 +71,7 @@ public class BacktestBar implements Bar {
   /**
    * Constructor.
    *
-   * @param timePeriod the time period
+   * @param startTime the end time of the bar period
    * @param endTime the end time of the bar period
    * @param openPrice the open price of the bar period
    * @param highPrice the highest price of the bar period
@@ -82,7 +82,7 @@ public class BacktestBar implements Bar {
    * @param trades the number of trades of the bar period
    */
   BacktestBar(
-      final Duration timePeriod,
+      final Instant startTime,
       final Instant endTime,
       final Num openPrice,
       final Num highPrice,
@@ -92,15 +92,14 @@ public class BacktestBar implements Bar {
       final Num amount,
       final long trades
   ) {
-    checkTimeArguments(timePeriod, endTime);
-    this.timePeriod = timePeriod;
-    this.endTime = endTime;
-    this.beginTime = endTime.minus(timePeriod);
-    this.openPrice = openPrice;
-    this.highPrice = highPrice;
-    this.lowPrice = lowPrice;
-    this.closePrice = closePrice;
-    this.volume = volume;
+    this.beginTime = Objects.requireNonNull(startTime, "Start time cannot be null");
+    this.endTime = Objects.requireNonNull(endTime, "End time cannot be null");
+    this.timePeriod = Duration.between(startTime, endTime);
+    this.openPrice = Objects.requireNonNull(openPrice);
+    this.highPrice = Objects.requireNonNull(highPrice);
+    this.lowPrice = Objects.requireNonNull(lowPrice);
+    this.closePrice = Objects.requireNonNull(closePrice);
+    this.volume = Objects.requireNonNull(volume);
     this.amount = amount;
     this.trades = trades;
   }
@@ -255,7 +254,7 @@ public class BacktestBar implements Bar {
    * @throws NullPointerException if one of the arguments is null
    */
   private static void checkTimeArguments(final Duration timePeriod, final Instant endTime) {
-    Objects.requireNonNull(timePeriod, "Time period cannot be null");
+    ;
     Objects.requireNonNull(endTime, "End time cannot be null");
   }
 

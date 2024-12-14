@@ -199,7 +199,7 @@ public class MarketEventTestContext {
 
 
   private NumericIndicator getNumericIndicator(final String indicatorName) {
-    return (NumericIndicator) this.indicatorContext.get(indicatorName);
+    return this.indicatorContext.getNumericIndicator(indicatorName);
   }
 
 

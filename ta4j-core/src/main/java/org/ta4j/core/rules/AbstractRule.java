@@ -23,8 +23,6 @@
  */
 package org.ta4j.core.rules;
 
-import java.time.Instant;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.ta4j.core.Rule;
@@ -35,10 +33,6 @@ import org.ta4j.core.Rule;
 public abstract class AbstractRule implements Rule {
 
   protected final Logger log = LoggerFactory.getLogger(getClass());
-
-  private final String className = getClass().getSimpleName();
-
-  private Instant currentTick;
 
 
   /**
@@ -51,10 +45,5 @@ public abstract class AbstractRule implements Rule {
       // TODO
       this.log.trace("{}", this);
     }
-  }
-
-
-  protected void setCurrentTick(final Instant currentTick) {
-    this.currentTick = currentTick;
   }
 }

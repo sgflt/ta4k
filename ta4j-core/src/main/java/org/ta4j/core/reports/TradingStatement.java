@@ -1,4 +1,4 @@
-/**
+/*
  * The MIT License (MIT)
  *
  * Copyright (c) 2017-2023 Ta4j Organization & respective
@@ -29,38 +29,9 @@ import org.ta4j.core.backtest.BacktestStrategy;
  * Represents a trading statement report containing position and performance
  * statistics.
  */
-public class TradingStatement {
-
-    private final BacktestStrategy strategy;
-    private final PositionStatsReport positionStatsReport;
-    private final PerformanceReport performanceReport;
-
-    /**
-     * Constructor.
-     *
-     * @param strategy            the {@link BacktestStrategy}
-     * @param positionStatsReport the {@link PositionStatsReport}
-     * @param performanceReport   the {@link PerformanceReport}
-     */
-    public TradingStatement(BacktestStrategy strategy, PositionStatsReport positionStatsReport,
-            PerformanceReport performanceReport) {
-        this.strategy = strategy;
-        this.positionStatsReport = positionStatsReport;
-        this.performanceReport = performanceReport;
-    }
-
-    /** @return {@link #strategy} */
-    public BacktestStrategy getStrategy() {
-        return strategy;
-    }
-
-    /** @return {@link #positionStatsReport} */
-    public PositionStatsReport getPositionStatsReport() {
-        return positionStatsReport;
-    }
-
-    /** @return {@link #performanceReport} */
-    public PerformanceReport getPerformanceReport() {
-        return performanceReport;
-    }
+public record TradingStatement(
+    BacktestStrategy strategy,
+    PositionStatsReport positionStatsReport,
+    PerformanceReport performanceReport
+) {
 }

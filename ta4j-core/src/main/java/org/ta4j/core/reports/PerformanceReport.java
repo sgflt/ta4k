@@ -1,4 +1,4 @@
-/**
+/*
  * The MIT License (MIT)
  *
  * Copyright (c) 2017-2023 Ta4j Organization & respective
@@ -27,53 +27,11 @@ import org.ta4j.core.num.Num;
 
 /**
  * Represents a report that contains performance statistics.
+ *
+ * @param totalProfitLoss The total PnL.
+ * @param totalProfitLossPercentage The total PnL in percent.
+ * @param totalProfit The total profit.
+ * @param totalLoss The total loss.
  */
-public class PerformanceReport {
-
-    /** The total PnL. */
-    private final Num totalProfitLoss;
-
-    /** The total PnL in percent. */
-    private final Num totalProfitLossPercentage;
-
-    /** The total profit. */
-    private final Num totalProfit;
-
-    /** The total loss. */
-    private final Num totalLoss;
-
-    /**
-     * Constructor.
-     *
-     * @param totalProfitLoss           the total PnL
-     * @param totalProfitLossPercentage the total PnL in percent
-     * @param totalProfit               the total profit
-     * @param totalLoss                 the total loss
-     */
-    public PerformanceReport(Num totalProfitLoss, Num totalProfitLossPercentage, Num totalProfit, Num totalLoss) {
-        this.totalProfitLoss = totalProfitLoss;
-        this.totalProfitLossPercentage = totalProfitLossPercentage;
-        this.totalProfit = totalProfit;
-        this.totalLoss = totalLoss;
-    }
-
-    /** @return {@link #totalProfitLoss} */
-    public Num getTotalProfitLoss() {
-        return totalProfitLoss;
-    }
-
-    /** @return {@link #totalProfitLossPercentage} */
-    public Num getTotalProfitLossPercentage() {
-        return totalProfitLossPercentage;
-    }
-
-    /** @return {@link #totalProfit} */
-    public Num getTotalProfit() {
-        return totalProfit;
-    }
-
-    /** @return {@link #totalLoss} */
-    public Num getTotalLoss() {
-        return totalLoss;
-    }
+public record PerformanceReport(Num totalProfitLoss, Num totalProfitLossPercentage, Num totalProfit, Num totalLoss) {
 }

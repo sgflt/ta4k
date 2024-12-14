@@ -23,16 +23,15 @@
  */
 package org.ta4j.core;
 
-import java.time.Duration;
 import java.time.Instant;
 
 /**
  * @author Lukáš Kvídera
  */
 public interface BarBuilder {
-  BarBuilder timePeriod(Duration timePeriod);
+  BarBuilder startTime(Instant startTime);
 
-  BarBuilder endTime(Instant zonedDateTime);
+  BarBuilder endTime(Instant endTime);
 
   BarBuilder openPrice(Number openPrice);
 

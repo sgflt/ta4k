@@ -19,10 +19,6 @@ public class BacktestExecutorBuilder {
   private TradeExecutionModel tradeExecutionModel = new TradeOnCurrentCloseModel();
 
 
-  public BacktestExecutorBuilder() {
-  }
-
-
   public BacktestExecutorBuilder numFactory(final NumFactory numFactory) {
     this.numFactory = numFactory;
     return this;

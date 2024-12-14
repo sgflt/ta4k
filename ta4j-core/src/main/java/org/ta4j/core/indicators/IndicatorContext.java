@@ -33,11 +33,14 @@ import java.util.function.Consumer;
 
 import org.ta4j.core.Bar;
 import org.ta4j.core.BarListener;
+import org.ta4j.core.indicators.bool.BooleanIndicator;
+import org.ta4j.core.indicators.numeric.NumericIndicator;
 
 /**
  * @author Lukáš Kvídera
  */
 public class IndicatorContext implements BarListener {
+  private boolean isStable;
   private final LinkedHashMap<String, Indicator<?>> indicators;
   private final Set<IndicatorChangeListener> changeListeners = new HashSet<>();
 
@@ -102,8 +105,18 @@ public class IndicatorContext implements BarListener {
   }
 
 
-  public Indicator<?> get(final String name) {
+  private Indicator<?> get(final String name) {
     return this.indicators.get(name);
+  }
+
+
+  public NumericIndicator getNumericIndicator(final String indicatorName) {
+    return (NumericIndicator) get(indicatorName);
+  }
+
+
+  public BooleanIndicator getBooleanIndicator(final String indicatorName) {
+    return (BooleanIndicator) get(indicatorName);
   }
 
 
@@ -133,7 +146,12 @@ public class IndicatorContext implements BarListener {
 
 
   public boolean isStable() {
-    return this.indicators.values().stream().allMatch(Indicator::isStable);
+    if (this.isStable) {
+      return this.isStable;
+    }
+
+    this.isStable = this.indicators.values().stream().allMatch(Indicator::isStable);
+    return this.isStable;
   }
 
 

@@ -60,10 +60,11 @@ public class MockMarketEventBuilder {
   public MockMarketEventBuilder withCandlePrices(final List<Double> data) {
 
     data.forEach(d -> {
+      final var startTime = this.startTime.plus(this.candleDuration.multipliedBy(createCandleSerialNumber()));
       this.candleEvents.add(
           new CandleReceived(
-              this.candleDuration,
-              this.startTime.plus(this.candleDuration.multipliedBy(createCandleSerialNumber())),
+              startTime,
+              startTime.plus(this.candleDuration.multipliedBy(this.candlesProduced)),
               d,
               d,
               d,
@@ -103,10 +104,11 @@ public class MockMarketEventBuilder {
     final var timePeriod = Duration.ofDays(1);
 
     for (int i = 0; i < dataSetSize; i++) {
+      final var beginTime = this.startTime.plus(timePeriod.multipliedBy(createCandleSerialNumber()));
       candleEvents.add(
           new CandleReceived(
-              timePeriod,
-              this.startTime.plus(timePeriod.multipliedBy(createCandleSerialNumber())),
+              beginTime,
+              beginTime.plus(timePeriod.multipliedBy(this.candlesProduced)),
               i + 1,
               i + 2,
               i + 3,

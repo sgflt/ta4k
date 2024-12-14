@@ -219,7 +219,7 @@ class AroonOscillatorIndicatorTest {
               final var tickData = dataLine.split(",");
               final var date = LocalDate.parse(tickData[0], dtf).atStartOfDay(ZoneId.systemDefault()).toInstant();
               return CandleReceived.builder()
-                  .timePeriod(Duration.ofDays(1))
+                  .endTime(date.plus(Duration.ofDays(1)))
                   .beginTime(date)
                   .openPrice(Double.parseDouble(tickData[3]))
                   .highPrice(Double.parseDouble(tickData[4]))

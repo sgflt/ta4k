@@ -151,8 +151,8 @@ public class BacktestBarSeries implements BarSeries {
 
   public void onCandle(final CandleReceived candleReceived) {
     barBuilder()
-        .timePeriod(candleReceived.timePeriod())
-        .endTime(candleReceived.beginTime()) // FIXME
+        .startTime(candleReceived.beginTime())
+        .endTime(candleReceived.beginTime())
         .openPrice(candleReceived.openPrice())
         .highPrice(candleReceived.highPrice())
         .lowPrice(candleReceived.lowPrice())

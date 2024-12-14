@@ -34,7 +34,6 @@ import org.ta4j.core.num.Num;
  * Live trading implementation of a {@link Bar}.
  */
 record LiveBar(
-    Duration timePeriod,
     Instant beginTime,
     Instant endTime,
     Num openPrice,
@@ -56,5 +55,11 @@ record LiveBar(
         this.highPrice.doubleValue(),
         this.volume.doubleValue()
     );
+  }
+
+
+  @Override
+  public Duration timePeriod() {
+    return Duration.between(this.beginTime, this.endTime);
   }
 }

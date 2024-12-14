@@ -23,7 +23,6 @@
  */
 package org.ta4j.core.live;
 
-import java.time.Duration;
 import java.time.Instant;
 
 import org.ta4j.core.BarBuilder;
@@ -39,7 +38,7 @@ class LiveBarBuilder implements BarBuilder {
 
   private final NumFactory numFactory;
   private final BarSeries series;
-  private Duration timePeriod;
+  private Instant startTime;
   private Instant endTime;
   private Num openPrice;
   private Num highPrice;
@@ -54,10 +53,11 @@ class LiveBarBuilder implements BarBuilder {
   }
 
 
-  public LiveBarBuilder timePeriod(final Duration timePeriod) {
-    this.timePeriod = timePeriod;
+  public LiveBarBuilder startTime(final Instant startTimer) {
+    this.startTime = startTimer;
     return this;
   }
+
 
   public LiveBarBuilder endTime(final Instant endTime) {
     this.endTime = endTime;
@@ -177,8 +177,7 @@ class LiveBarBuilder implements BarBuilder {
 
   public LiveBar build() {
     return new LiveBar(
-        this.timePeriod,
-        this.endTime.minus(this.timePeriod),
+        this.startTime,
         this.endTime,
         this.openPrice,
         this.highPrice,
@@ -187,6 +186,7 @@ class LiveBarBuilder implements BarBuilder {
         this.volume
     );
   }
+
 
   public void add() {
     this.series.addBar(build());

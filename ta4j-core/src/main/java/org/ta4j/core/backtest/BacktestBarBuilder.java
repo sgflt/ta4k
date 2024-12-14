@@ -23,7 +23,6 @@
  */
 package org.ta4j.core.backtest;
 
-import java.time.Duration;
 import java.time.Instant;
 
 import org.ta4j.core.BarBuilder;
@@ -36,7 +35,7 @@ import org.ta4j.core.num.NumFactory;
  */
 public class BacktestBarBuilder implements BarBuilder {
 
-  private Duration timePeriod;
+  private Instant startTime;
   private Instant endTime;
   private Num openPrice;
   private Num highPrice;
@@ -196,12 +195,12 @@ public class BacktestBarBuilder implements BarBuilder {
 
 
   /**
-   * @param timePeriod the time period
+   * @param startTime the end time of the bar period
    *
    * @return {@code this}
    */
-  public BacktestBarBuilder timePeriod(final Duration timePeriod) {
-    this.timePeriod = timePeriod;
+  public BacktestBarBuilder startTime(final Instant startTime) {
+    this.startTime = startTime;
     return this;
   }
 
@@ -295,8 +294,8 @@ public class BacktestBarBuilder implements BarBuilder {
 
 
   public BacktestBar build() {
-    return new BacktestBar(
-        this.timePeriod,
+    final var backtestBar = new BacktestBar(
+        this.startTime,
         this.endTime,
         this.openPrice,
         this.highPrice,
@@ -306,6 +305,21 @@ public class BacktestBarBuilder implements BarBuilder {
         this.amount,
         this.trades
     );
+    reset();
+    return backtestBar;
+  }
+
+
+  private void reset() {
+    this.startTime = null;
+    this.endTime = null;
+    this.openPrice = null;
+    this.highPrice = null;
+    this.lowPrice = null;
+    this.closePrice = null;
+    this.volume = null;
+    this.amount = null;
+    this.trades = 0;
   }
 
 

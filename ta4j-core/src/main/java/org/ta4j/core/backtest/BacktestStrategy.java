@@ -24,7 +24,9 @@
 package org.ta4j.core.backtest;
 
 import java.time.Instant;
+import java.util.Objects;
 
+import lombok.ToString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.ta4j.core.Bar;
@@ -33,25 +35,24 @@ import org.ta4j.core.Position;
 import org.ta4j.core.Rule;
 import org.ta4j.core.Strategy;
 import org.ta4j.core.TradingRecord;
-import org.ta4j.core.indicators.IndicatorContext;
 
 /**
- * Base implementation of a {@link Strategy}.
+ * This implementation is designed for backtesting of custom strategy.
+ *
+ * It adds trading record for performance analysis.
+ *
+ * Tested strategy is wrapped into this adaptation class.
  */
+@ToString
 public class BacktestStrategy implements Strategy, BarListener {
 
   /** The logger. */
   protected final Logger log = LoggerFactory.getLogger(getClass());
 
-  /** The name of the strategy. */
-  private final String name;
-
-  /** The entry rule. */
-  private final Rule entryRule;
-
-  /** The exit rule. */
-  private final Rule exitRule;
-  private final IndicatorContext indicatorContext;
+  /**
+   * Tested strategy
+   */
+  private final Strategy testedStrategy;
 
   /** Recording of execution of this strategy */
   private final BackTestTradingRecord tradingRecord;
@@ -60,60 +61,42 @@ public class BacktestStrategy implements Strategy, BarListener {
   private Instant currentTick;
 
 
-  /**
-   * Constructor.
-   *
-   * @param name the name of the strategy
-   * @param entryRule the entry rule
-   * @param exitRule the exit rule
-   */
   public BacktestStrategy(
-      final String name,
-      final Rule entryRule,
-      final Rule exitRule,
-      final IndicatorContext indicatorContext,
+      final Strategy testedStrategy,
       final BackTestTradingRecord tradingRecord
   ) {
-    if (entryRule == null || exitRule == null) {
-      throw new IllegalArgumentException("Rules cannot be null");
-    }
-    if (indicatorContext == null) {
-      throw new IllegalArgumentException("IndicatorContext cannot be null");
-    }
-    this.name = name;
-    this.entryRule = entryRule;
-    this.exitRule = exitRule;
-    this.indicatorContext = indicatorContext;
-    this.tradingRecord = tradingRecord;
+    this.testedStrategy = testedStrategy;
+    this.tradingRecord = Objects.requireNonNull(tradingRecord, "TradingRecord cannot be null");
   }
 
 
   @Override
   public String getName() {
-    return this.name;
+    return this.testedStrategy.getName();
   }
 
 
   @Override
   public Rule getEntryRule() {
-    return this.entryRule;
+    return this.testedStrategy.getEntryRule();
   }
 
 
   @Override
   public Rule getExitRule() {
-    return this.exitRule;
+    return this.testedStrategy.getExitRule();
   }
 
 
   @Override
   public boolean isStable() {
-    return this.indicatorContext.isStable();
+    return this.testedStrategy.isStable();
   }
 
 
   /**
-   * @return {@link OperationType#ENTER} to recommend entering, {@link OperationType#EXIT} to recommend exit, otherwise (no recommendation)
+   * @return {@link OperationType#ENTER} to recommend entering, {@link OperationType#EXIT} to recommend exit, otherwise
+   *     (no recommendation)
    */
   public OperationType shouldOperate() {
     final Position position = this.tradingRecord.getCurrentPosition();
@@ -121,7 +104,7 @@ public class BacktestStrategy implements Strategy, BarListener {
       if (shouldEnter()) {
         return OperationType.ENTER;
       }
-    } else if (position.isOpened()) {
+    } else if (position.isOpened() && shouldExit()) {
       return OperationType.EXIT;
     }
     return OperationType.NOOP;
@@ -130,7 +113,7 @@ public class BacktestStrategy implements Strategy, BarListener {
 
   @Override
   public boolean shouldEnter() {
-    final boolean enter = Strategy.super.shouldEnter();
+    final boolean enter = this.testedStrategy.shouldEnter();
     traceShouldEnter(enter);
     return enter;
   }
@@ -138,7 +121,7 @@ public class BacktestStrategy implements Strategy, BarListener {
 
   @Override
   public boolean shouldExit() {
-    final boolean exit = Strategy.super.shouldExit();
+    final boolean exit = this.testedStrategy.shouldExit();
     traceShouldExit(exit);
     return exit;
   }
@@ -148,7 +131,6 @@ public class BacktestStrategy implements Strategy, BarListener {
   public void onBar(final Bar bar) {
     this.currentTick = bar.endTime();
     this.tradingRecord.onBar(bar);
-    this.indicatorContext.onBar(bar);
   }
 
 
@@ -178,12 +160,5 @@ public class BacktestStrategy implements Strategy, BarListener {
 
   public TradingRecord getTradeRecord() {
     return this.tradingRecord;
-  }
-
-
-  @Override
-  public String toString() {
-    return "BacktestStrategy{" + "className='" + getClass().getSimpleName() + '\'' + ", name='" + this.name + '\''
-           + ", entryRule=" + this.entryRule + ", exitRule=" + this.exitRule + '}';
   }
 }

@@ -27,7 +27,6 @@ import java.util.Comparator;
 import java.util.List;
 
 import org.ta4j.core.StrategyFactory;
-import org.ta4j.core.Trade;
 import org.ta4j.core.events.CandleReceived;
 import org.ta4j.core.events.MarketEvent;
 import org.ta4j.core.events.NewsReceived;
@@ -131,7 +130,7 @@ public class BacktestExecutor {
         final IndicatorContext indicatorContext
     ) {
       final var backTestTradingRecord = new BackTestTradingRecord(
-          Trade.TradeType.BUY,    // TODO sell
+          s.getTradeType(),
           BacktestExecutor.this.configuration.transactionCostModel(),
           BacktestExecutor.this.configuration.holdingCostModel(),
           BacktestExecutor.this.configuration.numFactory()
@@ -146,7 +145,8 @@ public class BacktestExecutor {
     @Override
     public void onCandle(final CandleReceived event) {
       this.series.barBuilder()
-          .endTime(event.beginTime())  // FIXME
+          .startTime(event.beginTime())
+          .endTime(event.endTime())
           .openPrice(event.openPrice())
           .highPrice(event.highPrice())
           .lowPrice(event.lowPrice())

@@ -27,7 +27,6 @@ import org.ta4j.core.TradingRecord;
 import org.ta4j.core.criteria.NumberOfBreakEvenPositionsCriterion;
 import org.ta4j.core.criteria.NumberOfLosingPositionsCriterion;
 import org.ta4j.core.criteria.NumberOfWinningPositionsCriterion;
-import org.ta4j.core.num.Num;
 
 /**
  * Generates a {@link PositionStatsReport} based on provided trading record and
@@ -37,9 +36,9 @@ public class PositionStatsReportGenerator implements ReportGenerator<PositionSta
 
   @Override
   public PositionStatsReport generate(final TradingRecord tradingRecord) {
-    final Num winningPositions = new NumberOfWinningPositionsCriterion().calculate(tradingRecord);
-    final Num losingPositions = new NumberOfLosingPositionsCriterion().calculate(tradingRecord);
-    final Num breakEvenPositions = new NumberOfBreakEvenPositionsCriterion().calculate(tradingRecord);
+    final var winningPositions = new NumberOfWinningPositionsCriterion().calculate(tradingRecord);
+    final var losingPositions = new NumberOfLosingPositionsCriterion().calculate(tradingRecord);
+    final var breakEvenPositions = new NumberOfBreakEvenPositionsCriterion().calculate(tradingRecord);
     return new PositionStatsReport(winningPositions, losingPositions, breakEvenPositions);
   }
 }

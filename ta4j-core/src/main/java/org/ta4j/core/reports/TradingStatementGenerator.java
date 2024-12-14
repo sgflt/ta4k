@@ -60,9 +60,8 @@ public class TradingStatementGenerator {
 
 
   public TradingStatement generate(final BacktestStrategy strategy) {
-    final PerformanceReport performanceReport = this.performanceReportGenerator.generate(strategy.getTradeRecord());
-    final PositionStatsReport positionStatsReport =
-        this.positionStatsReportGenerator.generate(strategy.getTradeRecord());
+    final var performanceReport = this.performanceReportGenerator.generate(strategy.getTradeRecord());
+    final var positionStatsReport = this.positionStatsReportGenerator.generate(strategy.getTradeRecord());
     return new TradingStatement(strategy, positionStatsReport, performanceReport);
   }
 }

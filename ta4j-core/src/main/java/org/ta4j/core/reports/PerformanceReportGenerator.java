@@ -1,4 +1,4 @@
-/**
+/*
  * The MIT License (MIT)
  *
  * Copyright (c) 2017-2023 Ta4j Organization & respective
@@ -28,7 +28,6 @@ import org.ta4j.core.criteria.pnl.LossCriterion;
 import org.ta4j.core.criteria.pnl.ProfitCriterion;
 import org.ta4j.core.criteria.pnl.ProfitLossCriterion;
 import org.ta4j.core.criteria.pnl.ProfitLossPercentageCriterion;
-import org.ta4j.core.num.Num;
 
 /**
  * Generates a {@link PerformanceReport} based on the provided trading record
@@ -38,10 +37,10 @@ public class PerformanceReportGenerator implements ReportGenerator<PerformanceRe
 
   @Override
   public PerformanceReport generate(final TradingRecord tradingRecord) {
-    final Num pnl = new ProfitLossCriterion().calculate(tradingRecord);
-    final Num pnlPercentage = new ProfitLossPercentageCriterion().calculate(tradingRecord);
-    final Num netProfit = new ProfitCriterion(false).calculate(tradingRecord);
-    final Num netLoss = new LossCriterion(false).calculate(tradingRecord);
+    final var pnl = new ProfitLossCriterion().calculate(tradingRecord);
+    final var pnlPercentage = new ProfitLossPercentageCriterion().calculate(tradingRecord);
+    final var netProfit = new ProfitCriterion(false).calculate(tradingRecord);
+    final var netLoss = new LossCriterion(false).calculate(tradingRecord);
     return new PerformanceReport(pnl, pnlPercentage, netProfit, netLoss);
   }
 }
