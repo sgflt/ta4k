@@ -24,12 +24,12 @@
 package org.ta4j.core.indicators;
 
 import org.ta4j.core.Bar;
-import org.ta4j.core.BarSeries;
 import org.ta4j.core.indicators.numeric.Indicators;
 import org.ta4j.core.indicators.numeric.NumericIndicator;
 import org.ta4j.core.indicators.numeric.average.SMAIndicator;
 import org.ta4j.core.indicators.numeric.oscilators.AwesomeOscillatorIndicator;
 import org.ta4j.core.num.Num;
+import org.ta4j.core.num.NumFactory;
 
 /**
  * Acceleration-deceleration indicator.
@@ -43,12 +43,16 @@ public class AccelerationDecelerationIndicator extends NumericIndicator {
   /**
    * Constructor.
    *
-   * @param series the bar series
+   * @param numFactory the numFactory
    * @param shortBarCount the bar count for {@link #awesome}
    * @param longBarCount the bar count for {@link #sma}
    */
-  public AccelerationDecelerationIndicator(final BarSeries series, final int shortBarCount, final int longBarCount) {
-    super(series.numFactory());
+  public AccelerationDecelerationIndicator(
+      final NumFactory numFactory,
+      final int shortBarCount,
+      final int longBarCount
+  ) {
+    super(numFactory);
     this.awesome = Indicators.awesomeOscillator(shortBarCount, longBarCount);
     this.sma = this.awesome.sma(shortBarCount);
   }
@@ -57,10 +61,10 @@ public class AccelerationDecelerationIndicator extends NumericIndicator {
   /**
    * Constructor with {@code barCountSma1} = 5 and {@code barCountSma2} = 34.
    *
-   * @param series the bar series
+   * @param numFactory the numFactory
    */
-  public AccelerationDecelerationIndicator(final BarSeries series) {
-    this(series, 5, 34);
+  public AccelerationDecelerationIndicator(final NumFactory numFactory) {
+    this(numFactory, 5, 34);
   }
 
 
