@@ -69,7 +69,7 @@ class PreviousValueHelper<T> implements Indicator<T> {
 
   @Override
   public String toString() {
-    return String.format("PREV(%s) => %s", this.indicator, getValue());
+    return String.format("PREV(%d, %s) => %s", this.n, this.indicator, getValue());
   }
 
 

@@ -61,4 +61,10 @@ public class PreviousNumericValueIndicator extends NumericIndicator {
   public boolean isStable() {
     return this.previousValueHelper.isStable();
   }
+
+
+  @Override
+  public String toString() {
+    return this.previousValueHelper.toString();
+  }
 }
