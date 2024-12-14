@@ -23,65 +23,65 @@
  */
 package org.ta4j.core.criteria.helpers;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.ta4j.core.TestUtils.assertNumEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.junit.Test;
-import org.ta4j.core.AnalysisCriterion;
-import org.ta4j.core.Trade;
-import org.ta4j.core.TradingRecord;
-import org.ta4j.core.backtest.BackTestTradingRecord;
-import org.ta4j.core.criteria.AbstractCriterionTest;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.ta4j.core.MarketEventTestContext;
+import org.ta4j.core.TradingRecordTestContext;
 import org.ta4j.core.criteria.pnl.ProfitLossCriterion;
-import org.ta4j.core.mocks.MockBarSeriesBuilder;
 import org.ta4j.core.num.NumFactory;
 
-public class AverageCriterionTest extends AbstractCriterionTest {
+class AverageCriterionTest {
 
-  public AverageCriterionTest(final NumFactory numFactory) {
-    super(params -> params.length == 2 ? new AverageCriterion((AnalysisCriterion) params[0], (boolean) params[1])
-                                       : new AverageCriterion((AnalysisCriterion) params[0]), numFactory);
+  @ParameterizedTest
+  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
+  void calculateStandardErrorPnL(final NumFactory numFactory) {
+    final var context = new MarketEventTestContext()
+        .withNumFactory(numFactory)
+        .withCandlePrices(100, 105, 110, 100, 95, 105)
+        .toTradingRecordContext();
+
+    context.enter(1).asap()
+        .exit(1).after(2) // +10
+        .enter(1).asap()
+        .exit(1).after(2) // +5
+    ;
+
+    final var criterion = new AverageCriterion(new ProfitLossCriterion());
+    assertEquals(7.5, criterion.calculate(context.getTradingRecord()).doubleValue());
   }
 
 
-  @Test
-  public void calculateStandardErrorPnL() {
-    final var series = new MockBarSeriesBuilder().withNumFactory(this.numFactory)
-        .withData(100, 105, 110, 100, 95, 105)
-        .build();
-    final TradingRecord tradingRecord = new BackTestTradingRecord(Trade.buyAt(0, series, series.numFactory().one()),
-        Trade.sellAt(2, series, series.numFactory().one()), Trade.buyAt(3, series, series.numFactory().one()),
-        Trade.sellAt(5, series, series.numFactory().one())
-    );
-
-    final AnalysisCriterion criterion = getCriterion(new ProfitLossCriterion());
-    assertNumEquals(7.5, criterion.calculate(series, tradingRecord));
+  @ParameterizedTest
+  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
+  void betterThanWithLessIsBetter(final NumFactory numFactory) {
+    final var criterion = new AverageCriterion(new ProfitLossCriterion(), true);
+    assertFalse(criterion.betterThan(numFactory.numOf(5000), numFactory.numOf(4500)));
+    assertTrue(criterion.betterThan(numFactory.numOf(4500), numFactory.numOf(5000)));
   }
 
 
-  @Test
-  public void betterThanWithLessIsBetter() {
-    final AnalysisCriterion criterion = getCriterion(new ProfitLossCriterion(), true);
-    assertFalse(criterion.betterThan(numOf(5000), numOf(4500)));
-    assertTrue(criterion.betterThan(numOf(4500), numOf(5000)));
+  @ParameterizedTest
+  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
+  void betterThanWithLessIsNotBetter(final NumFactory numFactory) {
+    final var criterion = new AverageCriterion(new ProfitLossCriterion());
+    assertTrue(criterion.betterThan(numFactory.numOf(5000), numFactory.numOf(4500)));
+    assertFalse(criterion.betterThan(numFactory.numOf(4500), numFactory.numOf(5000)));
   }
 
 
-  @Test
-  public void betterThanWithLessIsNotBetter() {
-    final AnalysisCriterion criterion = getCriterion(new ProfitLossCriterion());
-    assertTrue(criterion.betterThan(numOf(5000), numOf(4500)));
-    assertFalse(criterion.betterThan(numOf(4500), numOf(5000)));
+  @ParameterizedTest
+  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
+  void testCalculateOneOpenPositionShouldReturnZero(final NumFactory numFactory) {
+    final var context = new TradingRecordTestContext(
+        new MarketEventTestContext().withNumFactory(numFactory).withDefaultMarketEvents());
+
+    context.enter(1).at(2.0);
+
+    final var criterion = new AverageCriterion(new ProfitLossCriterion());
+    assertEquals(0.0, criterion.calculate(context.getTradingRecord()).doubleValue());
   }
-
-
-  @Test
-  public void testCalculateOneOpenPositionShouldReturnZero() {
-    this.openedPositionUtils.testCalculateOneOpenPositionShouldReturnExpectedValue(
-        this.numFactory,
-        getCriterion(new ProfitLossCriterion()), 0
-    );
-  }
-
 }
