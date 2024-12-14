@@ -23,42 +23,33 @@
  */
 package org.ta4j.core.rules;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
-import org.junit.Before;
-import org.junit.Test;
-import org.ta4j.core.MockStrategy;
-import org.ta4j.core.backtest.BacktestBarSeries;
-import org.ta4j.core.indicators.bool.BooleanIndicator;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.ta4j.core.MarketEventTestContext;
 import org.ta4j.core.indicators.helpers.FixedBooleanIndicator;
-import org.ta4j.core.mocks.MockBarSeriesBuilder;
 
-public class BooleanIndicatorRuleTest {
+class BooleanIndicatorRuleTest {
 
-  private BooleanIndicator indicator;
-  private BacktestBarSeries data;
+  private MarketEventTestContext context;
 
 
-  @Before
-  public void setUp() {
-    this.data = new MockBarSeriesBuilder().withData(1, 2, 3, 4, 5).build();
-    this.indicator = new FixedBooleanIndicator(true, true, false, false, true);
-    this.data.replaceStrategy(new MockStrategy(this.indicator));
+  @BeforeEach
+  void setUp() {
+    this.context = new MarketEventTestContext()
+        .withCandlePrices(1, 2, 3, 4, 5)
+        .withIndicator(new FixedBooleanIndicator(true, true, false, false, true))
+    ;
   }
 
 
   @Test
-  public void isSatisfied() {
-    this.data.advance();
-    assertTrue(this.indicator.toRule().isSatisfied());
-    this.data.advance();
-    assertTrue(this.indicator.toRule().isSatisfied());
-    this.data.advance();
-    assertFalse(this.indicator.toRule().isSatisfied());
-    this.data.advance();
-    assertFalse(this.indicator.toRule().isSatisfied());
-    this.data.advance();
-    assertTrue(this.indicator.toRule().isSatisfied());
+  void isSatisfied() {
+    this.context
+        .assertNextTrue()
+        .assertNextTrue()
+        .assertNextFalse()
+        .assertNextFalse()
+        .assertNextTrue()
+    ;
   }
 }

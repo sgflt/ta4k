@@ -34,7 +34,7 @@ import org.ta4j.core.rules.BooleanIndicatorRule;
 
 public abstract class BooleanIndicator implements Indicator<Boolean> {
 
-  private Instant currentBeginTime = Instant.EPOCH;
+  private Instant currentBeginTime = Instant.MIN;
 
   protected boolean value;
 

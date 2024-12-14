@@ -149,21 +149,24 @@ public class MarketEventTestContext {
   }
 
 
-  public static void assertNextNaN(final MarketEventTestContext context, final NumericIndicator indicator) {
+  public MarketEventTestContext assertNextNaN(final MarketEventTestContext context, final NumericIndicator indicator) {
     context.advance();
     assertNumEquals(NaN.NaN, indicator.getValue());
+    return this;
   }
 
 
-  public static void assertNextFalse(final MarketEventTestContext context) {
-    context.advance();
-    assertThat(context.getFisrtBooleanIndicator().getValue()).isFalse();
+  public MarketEventTestContext assertNextFalse() {
+    advance();
+    assertThat(getFisrtBooleanIndicator().getValue()).isFalse();
+    return this;
   }
 
 
-  public static void assertNextTrue(final MarketEventTestContext context) {
-    context.advance();
-    assertThat(context.getFisrtBooleanIndicator().getValue()).isTrue();
+  public MarketEventTestContext assertNextTrue() {
+    advance();
+    assertThat(getFisrtBooleanIndicator().getValue()).isTrue();
+    return this;
   }
 
 
