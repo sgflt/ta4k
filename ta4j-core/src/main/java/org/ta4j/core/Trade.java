@@ -126,10 +126,10 @@ public class Trade {
       final Num amount,
       final CostModel transactionCostModel
   ) {
-    this.type = type;
-    this.orderType = orderType;
-    this.whenExecuted = whenExecuted;
-    this.amount = amount;
+    this.type = Objects.requireNonNull(type);
+    this.orderType = Objects.requireNonNull(orderType);
+    this.whenExecuted = Objects.requireNonNull(whenExecuted);
+    this.amount = Objects.requireNonNull(amount);
 
     setPricesAndCost(pricePerAsset, amount, transactionCostModel);
   }
