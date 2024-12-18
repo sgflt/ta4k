@@ -1,7 +1,6 @@
 package org.ta4j.core.indicators.numeric;
 
 import lombok.experimental.UtilityClass;
-import org.ta4j.core.BarSeries;
 import org.ta4j.core.indicators.helpers.MedianPriceIndicator;
 import org.ta4j.core.indicators.helpers.TypicalPriceIndicator;
 import org.ta4j.core.indicators.helpers.VolumeIndicator;
@@ -100,8 +99,13 @@ public final class Indicators {
   }
 
 
-  public static ADXIndicator adx(final BarSeries series, final int diBarCount, final int adxBarCount) {
-    return new ADXIndicator(series, diBarCount, adxBarCount);
+  public static ADXIndicator adx(final int diBarCount, final int adxBarCount) {
+    return new ADXIndicator(NumFactoryProvider.getDefaultNumFactory(), diBarCount, adxBarCount);
+  }
+
+
+  public static ADXIndicator adx(final int barCount) {
+    return adx(barCount, barCount);
   }
 
 

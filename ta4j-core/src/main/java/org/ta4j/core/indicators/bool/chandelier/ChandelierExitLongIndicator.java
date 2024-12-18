@@ -24,13 +24,13 @@
 package org.ta4j.core.indicators.bool.chandelier;
 
 import org.ta4j.core.Bar;
-import org.ta4j.core.BarSeries;
 import org.ta4j.core.indicators.bool.BooleanIndicator;
 import org.ta4j.core.indicators.helpers.HighestValueIndicator;
 import org.ta4j.core.indicators.numeric.ATRIndicator;
 import org.ta4j.core.indicators.numeric.Indicators;
 import org.ta4j.core.indicators.numeric.candles.price.ClosePriceIndicator;
 import org.ta4j.core.num.Num;
+import org.ta4j.core.num.NumFactory;
 
 /**
  * The Chandelier Exit (long) Indicator.
@@ -55,25 +55,25 @@ public class ChandelierExitLongIndicator extends BooleanIndicator {
    * <li>{@code k} = 3
    * </ul>
    *
-   * @param series the bar series
+   * @param numFactory the bar series
    */
-  public ChandelierExitLongIndicator(final BarSeries series) {
-    this(series, 22, 3);
+  public ChandelierExitLongIndicator(final NumFactory numFactory) {
+    this(numFactory, 22, 3);
   }
 
 
   /**
    * Constructor.
    *
-   * @param series the bar series
+   * @param numFactory the num factory
    * @param barCount the time frame (usually 22)
    * @param k the K multiplier for ATR (usually 3.0)
    */
-  public ChandelierExitLongIndicator(final BarSeries series, final int barCount, final double k) {
+  public ChandelierExitLongIndicator(final NumFactory numFactory, final int barCount, final double k) {
     this.close = Indicators.closePrice();
     this.high = Indicators.highPrice().highest(barCount);
     this.atr = Indicators.atr(barCount);
-    this.k = series.numFactory().numOf(k);
+    this.k = numFactory.numOf(k);
   }
 
 

@@ -22,42 +22,14 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.ta4j.core.backtest;
+package org.ta4j.core.indicators;
 
-import java.time.Duration;
+import java.time.Instant;
 
-import org.ta4j.core.num.Num;
-
-public interface RuntimeContext {
-  /**
-   * @return count of currently opened positions
-   */
-  int getCountOfOpenedPositions();
+public interface IndicatorContextUpdateListener {
 
   /**
-   * @return maximum profit in currency (including costs) as sum of all opened positions at the peak.
+   * Called after whole context has been update on Bar
    */
-  Num getMaxTotalProfit();
-
-  /**
-   * @return maximum profit in currency (including costs) from all of opened positions. Only one position with max profit is chosen.
-   */
-  Num getMaxProfit();
-
-  /**
-   * @return how long we have opened first position
-   */
-  Duration getTimeInTrade();
-
-  /**
-   * 100 -> 90 = (100 - 90) / 100 = 0.1
-   * @return in percent how much the worst position fell
-   */
-  Num getMaxDrawDown();
-
-  /**
-   * 100 -> 110 = 110 / 100 - 1 = 0.1
-   * @return in percent how much the best position flew
-   */
-  Num getMaxGain();
+  void onContextUpdate(Instant time);
 }

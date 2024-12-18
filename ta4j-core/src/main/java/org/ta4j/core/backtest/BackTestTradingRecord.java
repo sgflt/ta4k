@@ -23,7 +23,6 @@
  */
 package org.ta4j.core.backtest;
 
-import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -33,6 +32,7 @@ import java.util.Objects;
 import org.ta4j.core.Bar;
 import org.ta4j.core.BarListener;
 import org.ta4j.core.Position;
+import org.ta4j.core.RuntimeContext;
 import org.ta4j.core.Trade;
 import org.ta4j.core.Trade.TradeType;
 import org.ta4j.core.TradingRecord;
@@ -286,39 +286,8 @@ public class BackTestTradingRecord implements TradingRecord, BarListener, Runtim
 
 
   @Override
-  public Num getMaxDrawDown() {
-    return null;
-    //    TODO return this.positions.stream()
-    //        .filter(Position::isOpened)
-    //        .max();
-  }
-
-
-  @Override
-  public Duration getTimeInTrade() {
-    return null;
-  }
-
-
-  @Override
-  public int getCountOfOpenedPositions() {
-    return 0;
-  }
-
-
-  @Override
-  public Num getMaxProfit() {
-    return null;
-  }
-
-
-  @Override
-  public Num getMaxGain() {
-    return null;
-  }
-
-
-  public Num getMaxTotalProfit() {
+  public Object getValue(final String key) {
+    // nothing interesting
     return null;
   }
 }

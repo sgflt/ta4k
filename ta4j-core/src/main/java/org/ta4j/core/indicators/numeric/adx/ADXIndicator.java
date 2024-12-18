@@ -24,10 +24,10 @@
 package org.ta4j.core.indicators.numeric.adx;
 
 import org.ta4j.core.Bar;
-import org.ta4j.core.BarSeries;
 import org.ta4j.core.indicators.numeric.NumericIndicator;
 import org.ta4j.core.indicators.numeric.average.MMAIndicator;
 import org.ta4j.core.num.Num;
+import org.ta4j.core.num.NumFactory;
 
 /**
  * ADX indicator.
@@ -48,27 +48,27 @@ public class ADXIndicator extends NumericIndicator {
   /**
    * Constructor.
    *
-   * @param series the bar series
+   * @param numFactory the bar numFactory
    * @param diBarCount the bar count for {@link DXIndicator}
    * @param adxBarCount the bar count for {@link #averageDXIndicator}
    */
-  public ADXIndicator(final BarSeries series, final int diBarCount, final int adxBarCount) {
-    super(series.numFactory());
+  public ADXIndicator(final NumFactory numFactory, final int diBarCount, final int adxBarCount) {
+    super(numFactory);
     this.diBarCount = diBarCount;
     this.adxBarCount = adxBarCount;
-    this.averageDXIndicator = new MMAIndicator(new DXIndicator(series, diBarCount), adxBarCount);
+    this.averageDXIndicator = new MMAIndicator(new DXIndicator(numFactory, diBarCount), adxBarCount);
   }
 
 
   /**
    * Constructor.
    *
-   * @param series the bar series
+   * @param numFactory the bar numFactory
    * @param barCount the bar count for {@link DXIndicator} and
    *     {@link #averageDXIndicator}
    */
-  public ADXIndicator(final BarSeries series, final int barCount) {
-    this(series, barCount, barCount);
+  public ADXIndicator(final NumFactory numFactory, final int barCount) {
+    this(numFactory, barCount, barCount);
   }
 
 

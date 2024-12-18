@@ -24,10 +24,10 @@
 package org.ta4j.core.indicators.numeric.adx;
 
 import org.ta4j.core.Bar;
-import org.ta4j.core.BarSeries;
 import org.ta4j.core.indicators.numeric.Indicators;
 import org.ta4j.core.indicators.numeric.NumericIndicator;
 import org.ta4j.core.num.Num;
+import org.ta4j.core.num.NumFactory;
 
 /**
  * DX indicator.
@@ -44,12 +44,12 @@ public class DXIndicator extends NumericIndicator {
   /**
    * Constructor.
    *
-   * @param series the bar series
+   * @param numFactory the numFactory
    * @param barCount the bar count for {@link #plusDIIndicator} and
    *     {@link #minusDIIndicator}
    */
-  public DXIndicator(final BarSeries series, final int barCount) {
-    super(series.numFactory());
+  public DXIndicator(final NumFactory numFactory, final int barCount) {
+    super(numFactory);
     this.plusDIIndicator = Indicators.plusDII(barCount);
     this.minusDIIndicator = Indicators.minusDII(barCount);
   }

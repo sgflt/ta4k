@@ -30,7 +30,7 @@ import org.ta4j.core.backtest.BacktestBar;
 import org.ta4j.core.backtest.BacktestBarSeries;
 
 public class GsonBarData {
-  private long endTime;
+  private long startTime;
   private Number openPrice;
   private Number highPrice;
   private Number lowPrice;
@@ -41,7 +41,7 @@ public class GsonBarData {
 
   public static GsonBarData from(final BacktestBar bar) {
     final var result = new GsonBarData();
-    result.endTime = bar.endTime().toEpochMilli();
+    result.startTime = bar.endTime().toEpochMilli();
     result.openPrice = bar.openPrice().getDelegate();
     result.highPrice = bar.highPrice().getDelegate();
     result.lowPrice = bar.lowPrice().getDelegate();
@@ -53,10 +53,10 @@ public class GsonBarData {
 
 
   public void addTo(final BacktestBarSeries barSeries) {
-    final var endTimeInstant = Instant.ofEpochMilli(this.endTime);
+    final var startTime = Instant.ofEpochMilli(this.startTime);
     barSeries.barBuilder()
-        .timePeriod(Duration.ofDays(1))
-        .endTime(endTimeInstant)
+        .startTime(startTime)
+        .endTime(startTime.plus(Duration.ofDays(1)))
         .openPrice(this.openPrice)
         .highPrice(this.highPrice)
         .lowPrice(this.lowPrice)

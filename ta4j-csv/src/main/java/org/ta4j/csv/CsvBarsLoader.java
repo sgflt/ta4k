@@ -102,8 +102,8 @@ public final class CsvBarsLoader {
       final double volume
   ) {
     return new CandleReceived(
-        Duration.ofDays(1),
         start,
+        start.plus(Duration.ofDays(1)),
         open,
         high,
         low,

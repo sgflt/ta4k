@@ -86,8 +86,8 @@ public final class JdbcBarsLoader {
           final var volume = rs.getBigDecimal(context.volumeColumnName());
 
           series.barBuilder()
-              .timePeriod(Duration.ofDays(1))
-              .endTime(date)
+              .startTime(date)
+              .endTime(date.plus(Duration.ofDays(1)))
               .openPrice(open)
               .closePrice(close)
               .highPrice(high)

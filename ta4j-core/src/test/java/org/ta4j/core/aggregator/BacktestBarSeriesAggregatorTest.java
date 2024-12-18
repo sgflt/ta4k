@@ -92,7 +92,7 @@
 //
 //        final BarSeries aggregated = baseBarSeriesAggregator.aggregate(barSeries, "newName");
 //
-//        assertEquals("newName", aggregated.getName());
+//        assertEquals("newName", aggregated.name());
 //        assertEquals(2, aggregated.getBarCount());
 //        assertSame(bar0, aggregated.getBar(0));
 //        assertSame(bar2, aggregated.getBar(1));
@@ -139,7 +139,7 @@
 //
 //        final BarSeries aggregated = baseBarSeriesAggregator.aggregate(barSeries);
 //
-//        assertEquals("name", aggregated.getName());
+//        assertEquals("name", aggregated.name());
 //        assertEquals(2, aggregated.getBarCount());
 //        assertSame(bar0, aggregated.getBar(0));
 //        assertSame(bar2, aggregated.getBar(1));

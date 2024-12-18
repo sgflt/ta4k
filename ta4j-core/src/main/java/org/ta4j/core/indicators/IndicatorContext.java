@@ -43,6 +43,7 @@ public class IndicatorContext implements BarListener {
   private boolean isStable;
   private final LinkedHashMap<String, Indicator<?>> indicators;
   private final Set<IndicatorChangeListener> changeListeners = new HashSet<>();
+  private final Set<IndicatorContextUpdateListener> updateListeners = new HashSet<>();
 
 
   private IndicatorContext(final Indicator<?>... indicators) {
@@ -87,6 +88,11 @@ public class IndicatorContext implements BarListener {
 
   public void register(final IndicatorChangeListener changeListener) {
     this.changeListeners.add(changeListener);
+  }
+
+
+  public void register(final IndicatorContextUpdateListener updateListener) {
+    this.updateListeners.add(updateListener);
   }
 
 

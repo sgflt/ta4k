@@ -25,11 +25,11 @@ package org.ta4j.core.indicators.bool;
 import java.time.Instant;
 
 import org.ta4j.core.Bar;
-import org.ta4j.core.BarSeries;
 import org.ta4j.core.indicators.Indicator;
 import org.ta4j.core.indicators.bool.chandelier.ChandelierExitLongIndicator;
 import org.ta4j.core.indicators.bool.chandelier.ChandelierExitShortIndicator;
 import org.ta4j.core.indicators.helpers.previous.PreviousBooleanValueIndicator;
+import org.ta4j.core.num.NumFactoryProvider;
 import org.ta4j.core.rules.BooleanIndicatorRule;
 
 public abstract class BooleanIndicator implements Indicator<Boolean> {
@@ -50,20 +50,18 @@ public abstract class BooleanIndicator implements Indicator<Boolean> {
 
 
   public static ChandelierExitLongIndicator chandelierExitLong(
-      final BarSeries series,
       final int barCount,
       final double coefficient
   ) {
-    return new ChandelierExitLongIndicator(series, barCount, coefficient);
+    return new ChandelierExitLongIndicator(NumFactoryProvider.getDefaultNumFactory(), barCount, coefficient);
   }
 
 
   public static ChandelierExitShortIndicator chandelierExitShort(
-      final BarSeries series,
       final int barCount,
       final double coefficient
   ) {
-    return new ChandelierExitShortIndicator(series, barCount, coefficient);
+    return new ChandelierExitShortIndicator(NumFactoryProvider.getDefaultNumFactory(), barCount, coefficient);
   }
 
 

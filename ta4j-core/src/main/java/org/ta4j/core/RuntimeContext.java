@@ -1,8 +1,8 @@
+
 /*
  * The MIT License (MIT)
  *
- * Copyright (c) 2017-2024 Ta4j Organization & respective
- * authors (see AUTHORS)
+ * Copyright (c) 2024 Lukáš Kvídera
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -21,49 +21,15 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
+
 package org.ta4j.core;
 
-/**
- * A {@code Strategy} (also called "trading strategy") is a pair of
- * complementary (entry and exit) {@link Rule rules}. It may recommend to enter
- * or to exit. Recommendations are based respectively on the entry rule or on
- * the exit rule.
- */
-public interface Strategy {
+public interface RuntimeContext {
 
   /**
-   * @return the name of the strategy
+   * @param key that defines some measured runtime variable
+   *
+   * @return value of that variable
    */
-  String name();
-
-  /**
-   * @return the entry rule
-   */
-  Rule entryRule();
-
-  /**
-   * @return the exit rule
-   */
-  Rule exitRule();
-
-  /**
-   * @return true if this strategy is stable at current moment, false otherwise
-   *     (unstable)
-   */
-  boolean isStable();
-
-  /**
-   * @return true to recommend to enter, false otherwise
-   */
-  default boolean shouldEnter() {
-    return isStable() && entryRule().isSatisfied();
-  }
-
-
-  /**
-   * @return true to recommend to exit, false otherwise
-   */
-  default boolean shouldExit() {
-    return isStable() && exitRule().isSatisfied();
-  }
+  Object getValue(String key);
 }

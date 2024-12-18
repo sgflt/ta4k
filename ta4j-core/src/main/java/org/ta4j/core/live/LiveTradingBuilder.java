@@ -1,4 +1,4 @@
-/**
+/*
  * The MIT License (MIT)
  *
  * Copyright (c) 2017-2024 Ta4j Organization & respective
@@ -24,12 +24,13 @@
 package org.ta4j.core.live;
 
 import org.ta4j.core.BarBuilderFactory;
+import org.ta4j.core.RuntimeContext;
+import org.ta4j.core.Strategy;
 import org.ta4j.core.StrategyFactory;
 import org.ta4j.core.backtest.BacktestBarSeries;
-import org.ta4j.core.backtest.RuntimeContext;
 import org.ta4j.core.indicators.IndicatorContext;
-import org.ta4j.core.num.DecimalNumFactory;
 import org.ta4j.core.num.NumFactory;
+import org.ta4j.core.num.NumFactoryProvider;
 
 /**
  * A builder to build a new {@link BacktestBarSeries}.
@@ -40,10 +41,11 @@ public class LiveTradingBuilder {
   private static final String UNNAMED_SERIES_NAME = "unnamed_series";
 
   private String name;
-  private NumFactory numFactory = DecimalNumFactory.getInstance();
+  private NumFactory numFactory = NumFactoryProvider.getDefaultNumFactory();
   private BarBuilderFactory barBuilderFactory = new LiveBarBuilderFactory();
-  private StrategyFactory strategyFactory;
+  private StrategyFactory<Strategy> strategyFactory;
   private RuntimeContext runtimeContext;
+  private IndicatorContext indicatorContext = IndicatorContext.empty();
 
 
   /**
@@ -79,7 +81,7 @@ public class LiveTradingBuilder {
   }
 
 
-  public LiveTradingBuilder withStrategyFactory(final StrategyFactory strategy) {
+  public LiveTradingBuilder withStrategyFactory(final StrategyFactory<Strategy> strategy) {
     this.strategyFactory = strategy;
     return this;
   }
@@ -91,21 +93,24 @@ public class LiveTradingBuilder {
   }
 
 
-  public LiveTrading build() {
-    final var indicatorContext = IndicatorContext.empty();
-    final var liveBarSeries = new LiveBarSeries(
-        this.name == null ? UNNAMED_SERIES_NAME : this.name,
-        this.numFactory,
-        this.barBuilderFactory,
-        indicatorContext
-    );
+  public LiveTradingBuilder withIndicatorContext(final IndicatorContext indicatorContext) {
+    this.indicatorContext = indicatorContext;
+    return this;
+  }
 
+
+  public LiveTrading build() {
     if (this.strategyFactory == null) {
       throw new IllegalArgumentException("Strategy factory not set");
     }
 
-    final var strategy = this.strategyFactory.createStrategy(this.runtimeContext, indicatorContext);
-    // FIXME   liveBarSeries.replaceStrategy(strategy);
+    final var strategy = this.strategyFactory.createStrategy(this.runtimeContext, this.indicatorContext);
+    final var liveBarSeries = new LiveBarSeries(
+        this.name == null ? UNNAMED_SERIES_NAME : this.name,
+        this.numFactory,
+        this.barBuilderFactory,
+        this.indicatorContext
+    );
 
     return new LiveTrading(liveBarSeries, strategy);
   }

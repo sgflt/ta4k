@@ -1,6 +1,5 @@
 package org.ta4j.core;
 
-import org.ta4j.core.backtest.RuntimeContext;
 import org.ta4j.core.indicators.IndicatorContext;
 
 public interface StrategyFactory<T extends Strategy> {

@@ -35,15 +35,15 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.ta4j.core.DefaultStrategy;
 import org.ta4j.core.Rule;
-import org.ta4j.core.Strategy;
+import org.ta4j.core.RuntimeContext;
 import org.ta4j.core.StrategyFactory;
 import org.ta4j.core.Trade;
 import org.ta4j.core.events.CandleReceived;
 import org.ta4j.core.events.MarketEvent;
 import org.ta4j.core.indicators.IndicatorContext;
 import org.ta4j.core.indicators.numeric.Indicators;
-import org.ta4j.core.indicators.numeric.candles.price.ClosePriceIndicator;
 import org.ta4j.core.num.NumFactory;
 
 @Slf4j
@@ -106,88 +106,62 @@ class BacktestExecutorTest {
     return CandleReceived.builder()
         .beginTime(previous.endTime())
         .endTime(previous.endTime().plus(Duration.ofDays(1)))
-        .closePrice(Math.max(0.0, previous.closePrice() + random.nextDouble(-1.0, 1.2)))
+        .closePrice(Math.max(0.0, previous.closePrice() + this.random.nextDouble(-1.0, 1.2)))
         .build();
   }
 
 
   private static List<StrategyFactory<BacktestStrategy>> getStrategyFactories() {
-    return List.of(new StrategyFactory<>() {
-      @Override
-      public Trade.TradeType getTradeType() {
-        return Trade.TradeType.BUY;
-      }
-
-
-      @Override
-      public BacktestStrategy createStrategy(
-          final RuntimeContext runtimeContext,
-          final IndicatorContext indicatorContext
-      ) {
-        return new BacktestStrategy(
-            getTestedStrategy(indicatorContext),
-            (BackTestTradingRecord) runtimeContext
-        );
-      }
-    });
+    return List.of(new TestStrategyFactory());
   }
 
 
-  private static Strategy getTestedStrategy(final IndicatorContext indicatorContext) {
-    return new Strategy() {
-      private static final String SMA_FAST = "smaFast";
-      private static final String SMA_SLOW = "smaSlow";
-
-      private final Rule entryRule;
-      private final Rule exitRule;
-      private final ClosePriceIndicator closePrice = Indicators.closePrice();
-
-      {
-        indicatorContext.add(this.closePrice.sma(11), SMA_FAST);
-        indicatorContext.add(this.closePrice.sma(200), SMA_SLOW);
-        this.entryRule = createEntryRule();
-        this.exitRule = createExitRule();
-      }
-
-      // TODO better Supplier way?
-      private Rule createEntryRule() {
-        final var smaFast = indicatorContext.getNumericIndicator(SMA_FAST);
-        final var crossIndicator = smaFast.crossedOver(indicatorContext.getNumericIndicator(SMA_SLOW));
-        indicatorContext.add(crossIndicator);
-        return crossIndicator.toRule();
-      }
+  private static class TestStrategyFactory implements StrategyFactory<BacktestStrategy> {
+    private static final String SMA_FAST = "smaFast";
+    private static final String SMA_SLOW = "smaSlow";
 
 
-      private Rule createExitRule() {
-        final var smaFast = indicatorContext.getNumericIndicator(SMA_FAST);
-        final var crossIndicator = smaFast.crossedUnder(indicatorContext.getNumericIndicator(SMA_SLOW));
-        indicatorContext.add(crossIndicator);
-        return crossIndicator.toRule();
-      }
+    @Override
+    public Trade.TradeType getTradeType() {
+      return Trade.TradeType.BUY;
+    }
 
 
-      @Override
-      public String getName() {
-        return "test-strategy";
-      }
+    @Override
+    public BacktestStrategy createStrategy(
+        final RuntimeContext runtimeContext,
+        final IndicatorContext indicatorContext
+    ) {
+
+      final var closePrice = Indicators.closePrice();
+      indicatorContext.add(closePrice.sma(11), SMA_FAST);
+      indicatorContext.add(closePrice.sma(200), SMA_SLOW);
+
+      return new BacktestStrategy(
+          DefaultStrategy.builder()
+              .name("test-strategy")
+              .entryRule(createEntryRule(indicatorContext))
+              .exitRule(createExitRule(indicatorContext))
+              .indicatorContext(indicatorContext)
+              .build(),
+          (BackTestTradingRecord) runtimeContext
+      );
+    }
 
 
-      @Override
-      public Rule getEntryRule() {
-        return this.entryRule;
-      }
+    private Rule createEntryRule(final IndicatorContext indicatorContext) {
+      final var smaFast = indicatorContext.getNumericIndicator(SMA_FAST);
+      final var crossIndicator = smaFast.crossedOver(indicatorContext.getNumericIndicator(SMA_SLOW));
+      indicatorContext.add(crossIndicator);
+      return crossIndicator.toRule();
+    }
 
 
-      @Override
-      public Rule getExitRule() {
-        return this.exitRule;
-      }
-
-
-      @Override
-      public boolean isStable() {
-        return indicatorContext.isStable();
-      }
-    };
+    private Rule createExitRule(final IndicatorContext indicatorContext) {
+      final var smaFast = indicatorContext.getNumericIndicator(SMA_FAST);
+      final var crossIndicator = smaFast.crossedUnder(indicatorContext.getNumericIndicator(SMA_SLOW));
+      indicatorContext.add(crossIndicator);
+      return crossIndicator.toRule();
+    }
   }
 }

@@ -71,20 +71,20 @@ public class BacktestStrategy implements Strategy, BarListener {
 
 
   @Override
-  public String getName() {
-    return this.testedStrategy.getName();
+  public String name() {
+    return this.testedStrategy.name();
   }
 
 
   @Override
-  public Rule getEntryRule() {
-    return this.testedStrategy.getEntryRule();
+  public Rule entryRule() {
+    return this.testedStrategy.entryRule();
   }
 
 
   @Override
-  public Rule getExitRule() {
-    return this.testedStrategy.getExitRule();
+  public Rule exitRule() {
+    return this.testedStrategy.exitRule();
   }
 
 
@@ -141,7 +141,7 @@ public class BacktestStrategy implements Strategy, BarListener {
    */
   protected void traceShouldEnter(final boolean enter) {
     if (this.log.isTraceEnabled()) {
-      this.log.trace(">>> {}#shouldEnter({}): {}", getName(), this.currentTick, enter);
+      this.log.trace(">>> {}#shouldEnter({}): {}", name(), this.currentTick, enter);
     }
   }
 
@@ -153,7 +153,7 @@ public class BacktestStrategy implements Strategy, BarListener {
    */
   protected void traceShouldExit(final boolean exit) {
     if (this.log.isTraceEnabled()) {
-      this.log.trace(">>> {}#shouldExit({}): {}", getName(), this.currentTick, exit);
+      this.log.trace(">>> {}#shouldExit({}): {}", name(), this.currentTick, exit);
     }
   }
 
