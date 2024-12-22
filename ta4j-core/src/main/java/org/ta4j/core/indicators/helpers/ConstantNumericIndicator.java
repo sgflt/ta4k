@@ -42,7 +42,7 @@ public class ConstantNumericIndicator extends NumericIndicator {
    */
   public ConstantNumericIndicator(final Num t) {
     super(t.getNumFactory());
-    this.value = t;
+    setValue(t);
   }
 
 
@@ -60,6 +60,6 @@ public class ConstantNumericIndicator extends NumericIndicator {
 
   @Override
   public String toString() {
-    return getClass().getSimpleName() + " Value: " + this.value;
+    return "C => %s".formatted(getValue());
   }
 }
