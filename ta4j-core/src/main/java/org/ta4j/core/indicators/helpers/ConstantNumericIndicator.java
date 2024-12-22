@@ -42,7 +42,7 @@ public class ConstantNumericIndicator extends NumericIndicator {
    */
   public ConstantNumericIndicator(final Num t) {
     super(t.getNumFactory());
-    setValue(t);
+    this.value = t;
   }
 
 
