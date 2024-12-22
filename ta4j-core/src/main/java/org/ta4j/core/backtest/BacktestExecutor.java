@@ -78,16 +78,16 @@ public class BacktestExecutor {
 
   private void replay(
       final List<MarketEvent> marketEvents,
-      final MarketEventHandler runtimeContext
+      final MarketEventHandler marketEventHandler
   ) {
 
     marketEvents.stream()
         .sorted(Comparator.comparing(MarketEvent::beginTime))
         .forEach(marketEvent -> {
               switch (marketEvent) {
-                case final CandleReceived c -> runtimeContext.onCandle(c);
-                case final NewsReceived n -> runtimeContext.onNews(n);
-                case final TickReceived t -> runtimeContext.onTick(t);
+                case final CandleReceived c -> marketEventHandler.onCandle(c);
+                case final NewsReceived n -> marketEventHandler.onNews(n);
+                case final TickReceived t -> marketEventHandler.onTick(t);
                 default -> throw new IllegalStateException("Unexpected value: " + marketEvent);
               }
             }
