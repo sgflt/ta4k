@@ -32,8 +32,20 @@ import org.ta4j.core.num.Num;
  * @param totalProfitLossPercentage The total PnL in percent.
  * @param totalProfit The total profit.
  * @param totalLoss The total loss.
+ * @param averageLoss
  */
-public record PerformanceReport(Num totalProfitLoss, Num totalProfitLossPercentage, Num totalProfit, Num totalLoss) {
+public record PerformanceReport(
+    Num totalProfitLoss,
+    Num totalProfitLossPercentage,
+    Num totalProfit,
+    Num totalLoss,
+    Num averageProfit,
+    Num averageLoss,
+    Num totalPositions,
+    Num winningPositions,
+    Num losingPositions,
+    Num maximumDrawdown
+) {
   @Override
   public String toString() {
     return """
@@ -41,11 +53,23 @@ public record PerformanceReport(Num totalProfitLoss, Num totalProfitLossPercenta
         totalProfitLossPercentage: %.2f
         totalProfit: %.2f
         totalLoss: %.2f
+        totalPositions: %.0f
+        averageProfit: %.2f
+        averageLoss: %.2f
+        winningPositions: %.0f
+        losingPositions: %.0f
+        maximumDrawdown: %.2f
         """.formatted(
         this.totalProfitLoss.doubleValue(),
         this.totalProfitLossPercentage.doubleValue(),
         this.totalProfit.doubleValue(),
-        this.totalLoss.doubleValue()
+        this.totalLoss.doubleValue(),
+        this.averageProfit.doubleValue(),
+        this.averageLoss.doubleValue(),
+        this.totalPositions.doubleValue(),
+        this.winningPositions.doubleValue(),
+        this.losingPositions.doubleValue(),
+        this.maximumDrawdown.doubleValue()
     );
   }
 }
