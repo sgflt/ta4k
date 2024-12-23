@@ -247,18 +247,6 @@ public class BacktestBar implements Bar {
   }
 
 
-  /**
-   * @param timePeriod the time period
-   * @param endTime the end time of the bar
-   *
-   * @throws NullPointerException if one of the arguments is null
-   */
-  private static void checkTimeArguments(final Duration timePeriod, final Instant endTime) {
-    ;
-    Objects.requireNonNull(endTime, "End time cannot be null");
-  }
-
-
   @Override
   public int hashCode() {
     return Objects.hash(
