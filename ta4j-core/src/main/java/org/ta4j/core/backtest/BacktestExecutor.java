@@ -183,7 +183,8 @@ public class BacktestExecutor {
 
     @Override
     public void onTick(final TickReceived event) {
-      // TODO
+      this.strategies.forEach(strategy -> strategy.getTradeRecord().onTick(event));
+      reevaluate(this.series, this.amount);
     }
 
 

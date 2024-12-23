@@ -133,6 +133,7 @@ public interface TradingRecord {
 
   boolean isEmpty();
 
+
   // TODO   /**
   //     * @param series the bar series, not null
   //     * @return the {@link #getStartIndex()} if not null and greater than

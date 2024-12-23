@@ -24,7 +24,7 @@
 
 package org.ta4j.core;
 
-public interface RuntimeContext {
+public interface RuntimeContext extends BarListener, TickListener {
 
   /**
    * @param key that defines some measured runtime variable

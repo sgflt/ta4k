@@ -22,30 +22,15 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.ta4j.core.backtest;
+package org.ta4j.core;
 
-import org.ta4j.core.events.CandleReceived;
-import org.ta4j.core.events.NewsReceived;
 import org.ta4j.core.events.TickReceived;
 
-public interface MarketEventHandler {
+/**
+ * @author Lukáš Kvídera
+ */
+@FunctionalInterface
+public interface TickListener {
 
-  /**
-   * Processes candle
-   *
-   * Whole candle refreshes {@link org.ta4j.core.indicators.IndicatorContext}
-   */
-  void onCandle(CandleReceived event);
-
-  /**
-   * Processes tick
-   *
-   * tick refreshes {@link org.ta4j.core.RuntimeContext}
-   */
-  void onTick(TickReceived event);
-
-  /**
-   * Processes news. Usually AI analysis.
-   */
-  void onNews(NewsReceived event);
+  void onTick(TickReceived tick);
 }

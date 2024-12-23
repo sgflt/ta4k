@@ -34,7 +34,6 @@ import org.ta4j.core.BarListener;
 import org.ta4j.core.Position;
 import org.ta4j.core.Rule;
 import org.ta4j.core.Strategy;
-import org.ta4j.core.TradingRecord;
 
 /**
  * This implementation is designed for backtesting of custom strategy.
@@ -158,7 +157,7 @@ public class BacktestStrategy implements Strategy, BarListener {
   }
 
 
-  public TradingRecord getTradeRecord() {
+  public BackTestTradingRecord getTradeRecord() {
     return this.tradingRecord;
   }
 }

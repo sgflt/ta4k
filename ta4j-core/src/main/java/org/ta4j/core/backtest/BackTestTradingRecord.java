@@ -29,8 +29,8 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 
+import lombok.extern.slf4j.Slf4j;
 import org.ta4j.core.Bar;
-import org.ta4j.core.BarListener;
 import org.ta4j.core.Position;
 import org.ta4j.core.RuntimeContext;
 import org.ta4j.core.Trade;
@@ -38,13 +38,15 @@ import org.ta4j.core.Trade.TradeType;
 import org.ta4j.core.TradingRecord;
 import org.ta4j.core.analysis.cost.CostModel;
 import org.ta4j.core.analysis.cost.ZeroCostModel;
+import org.ta4j.core.events.TickReceived;
 import org.ta4j.core.num.Num;
 import org.ta4j.core.num.NumFactory;
 
 /**
  * Base implementation of a {@link TradingRecord}.
  */
-public class BackTestTradingRecord implements TradingRecord, BarListener, RuntimeContext {
+@Slf4j
+public class BackTestTradingRecord implements TradingRecord, RuntimeContext {
 
   private final TradeType startingType;
   /** The name of the trading record. */
@@ -282,6 +284,12 @@ public class BackTestTradingRecord implements TradingRecord, BarListener, Runtim
   @Override
   public void onBar(final Bar bar) {
     this.currentPosition.onBar(bar);  // TODO allow DCA
+  }
+
+
+  @Override
+  public void onTick(final TickReceived event) {
+    log.debug("onTick: {}", event);
   }
 
 
