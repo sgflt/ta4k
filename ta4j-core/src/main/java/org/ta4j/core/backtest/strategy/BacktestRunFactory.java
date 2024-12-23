@@ -2,7 +2,7 @@
 /*
  * The MIT License (MIT)
  *
- * Copyright (c) 2024 Lukáš Kvídera
+ * Copyright (c) 2017-2024 Ta4j Organization & respective authors (see AUTHORS)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -22,13 +22,22 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.ta4j.core.events;
+package org.ta4j.core.backtest.strategy;
 
-import java.time.Instant;
+import org.ta4j.core.StrategyFactory;
 
-public record TickReceived(
-    Instant beginTime,
-    double ask,
-    double bid
-) implements MarketEvent {
+/**
+ * This class encapsulates classes that are required for backtesting.
+ */
+public interface BacktestRunFactory {
+
+  /**
+   * @return context that holds relevant data for strategy
+   */
+  RuntimeContextFactory getRuntimeContextFactory();
+
+  /**
+   * @return factory that accepts related runtime context
+   */
+  StrategyFactory<BacktestStrategy> getStrategyFactory();
 }

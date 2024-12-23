@@ -27,9 +27,14 @@ package org.ta4j.core;
 public interface RuntimeContext extends BarListener, TickListener {
 
   /**
-   * @param key that defines some measured runtime variable
+   * Type-safe value resolution using visitor pattern
    *
-   * @return value of that variable
+   * @param resolver the value resolver for the specific type
+   * @param <T> the type of value to resolve
+   *
+   * @return resolved value of type T
    */
+  <T> T getValue(final RuntimeValueResolver<T> resolver);
+
   Object getValue(String key);
 }

@@ -26,7 +26,10 @@ package org.ta4j.core.backtest;
 import java.util.Comparator;
 import java.util.List;
 
-import org.ta4j.core.StrategyFactory;
+import org.ta4j.core.CompoundRuntimeContext;
+import org.ta4j.core.backtest.strategy.BackTestTradingRecord;
+import org.ta4j.core.backtest.strategy.BacktestRunFactory;
+import org.ta4j.core.backtest.strategy.BacktestStrategy;
 import org.ta4j.core.events.CandleReceived;
 import org.ta4j.core.events.MarketEvent;
 import org.ta4j.core.events.NewsReceived;
@@ -54,18 +57,18 @@ public class BacktestExecutor {
    * Executes given strategies with specified trade type to open the position and
    * return the trading statements.
    *
-   * @param strategyFactories that creates strategies to test
+   * @param backtestRunFactories that creates strategies to test and their contexts
    * @param amount the amount used to open/close the position
    *
    * @return a list of TradingStatements
    */
   public List<TradingStatement> execute(
-      final List<StrategyFactory<BacktestStrategy>> strategyFactories,
+      final List<BacktestRunFactory> backtestRunFactories,
       final List<MarketEvent> marketEvents,
       final Number amount
   ) {
     final var marketEventHandler =
-        new DefaultMarketEventHandler(strategyFactories, this.configuration.numFactory().numOf(amount));
+        new DefaultMarketEventHandler(backtestRunFactories, this.configuration.numFactory().numOf(amount));
 
     replay(
         marketEvents,
@@ -106,10 +109,9 @@ public class BacktestExecutor {
 
 
     public DefaultMarketEventHandler(
-        final List<StrategyFactory<BacktestStrategy>> strategyFactories,
+        final List<BacktestRunFactory> backtestRunFactories,
         final Num amount
     ) {
-
       final var indicatorContext = IndicatorContext.empty();
       this.series = new BacktestBarSeriesBuilder()
           .withIndicatorContext(indicatorContext)
@@ -117,8 +119,8 @@ public class BacktestExecutor {
           .build();
 
       this.strategies =
-          strategyFactories.stream()
-              .map(s -> createStrategy(s, indicatorContext))
+          backtestRunFactories.stream()
+              .map(backtestRunFactory -> createStrategy(backtestRunFactory, indicatorContext))
               .toList();
 
       this.amount = amount;
@@ -126,17 +128,22 @@ public class BacktestExecutor {
 
 
     private BacktestStrategy createStrategy(
-        final StrategyFactory<BacktestStrategy> s,
+        final BacktestRunFactory backtestRunFactory,
         final IndicatorContext indicatorContext
     ) {
+      final var strategyFactory = backtestRunFactory.getStrategyFactory();
+
       final var backTestTradingRecord = new BackTestTradingRecord(
-          s.getTradeType(),
+          strategyFactory.getTradeType(),
           BacktestExecutor.this.configuration.transactionCostModel(),
           BacktestExecutor.this.configuration.holdingCostModel(),
           BacktestExecutor.this.configuration.numFactory()
       );
 
-      final var strategy = s.createStrategy(backTestTradingRecord, indicatorContext);
+      final var runtimeContextFactory = backtestRunFactory.getRuntimeContextFactory();
+      final var runtimeContext =
+          CompoundRuntimeContext.of(runtimeContextFactory.createRuntimeContext(), backTestTradingRecord);
+      final var strategy = strategyFactory.createStrategy(runtimeContext, indicatorContext);
       this.series.addListener(strategy);
       return strategy;
     }

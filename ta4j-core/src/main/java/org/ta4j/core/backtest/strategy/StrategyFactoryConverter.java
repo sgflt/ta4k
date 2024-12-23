@@ -21,7 +21,7 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.ta4j.core.backtest;
+package org.ta4j.core.backtest.strategy;
 
 import org.ta4j.core.RuntimeContext;
 import org.ta4j.core.Strategy;
@@ -85,7 +85,7 @@ public final class StrategyFactoryConverter {
 
       return new BacktestStrategy(
           originalStrategy,
-          (BackTestTradingRecord) runtimeContext
+          runtimeContext
       );
     }
   }

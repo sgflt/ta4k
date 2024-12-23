@@ -49,7 +49,7 @@
 //import static org.junit.Assert.assertTrue;
 //
 //import org.junit.Test;
-//import org.ta4j.core.backtest.BackTestTradingRecord;
+//import org.ta4j.core.backtest.strategy.BackTestTradingRecord;
 //import org.ta4j.core.Trade.TradeType;
 //import org.ta4j.core.indicators.AbstractIndicatorTest;
 //import org.ta4j.core.indicators.candles.price.ClosePriceIndicator;

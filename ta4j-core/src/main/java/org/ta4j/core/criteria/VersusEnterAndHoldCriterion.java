@@ -25,7 +25,7 @@
 //
 //import org.ta4j.core.AnalysisCriterion;
 //import org.ta4j.core.BarSeries;
-//import org.ta4j.core.backtest.BackTestTradingRecord;
+//import org.ta4j.core.backtest.strategy.BackTestTradingRecord;
 //import org.ta4j.core.Position;
 //import org.ta4j.core.Trade.TradeType;
 //import org.ta4j.core.TradingRecord;

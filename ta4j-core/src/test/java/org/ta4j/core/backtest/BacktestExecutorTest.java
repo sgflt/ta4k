@@ -38,8 +38,14 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.ta4j.core.DefaultStrategy;
 import org.ta4j.core.Rule;
 import org.ta4j.core.RuntimeContext;
+import org.ta4j.core.Strategy;
 import org.ta4j.core.StrategyFactory;
 import org.ta4j.core.Trade;
+import org.ta4j.core.backtest.strategy.BacktestRunFactory;
+import org.ta4j.core.backtest.strategy.BacktestStrategy;
+import org.ta4j.core.backtest.strategy.NOOPRuntimeContextFactory;
+import org.ta4j.core.backtest.strategy.RuntimeContextFactory;
+import org.ta4j.core.backtest.strategy.StrategyFactoryConverter;
 import org.ta4j.core.events.CandleReceived;
 import org.ta4j.core.events.MarketEvent;
 import org.ta4j.core.indicators.IndicatorContext;
@@ -67,7 +73,7 @@ class BacktestExecutorTest {
         .build();
 
     final var tradingStatements = executor.execute(
-        getStrategyFactories(),
+        getBacktestRunFactories(),
         getMarketEvents(),
         1.0
     );
@@ -111,12 +117,26 @@ class BacktestExecutorTest {
   }
 
 
-  private static List<StrategyFactory<BacktestStrategy>> getStrategyFactories() {
-    return List.of(new TestStrategyFactory());
+  private static List<BacktestRunFactory> getBacktestRunFactories() {
+    return List.of(new TestBacktestRunFactory());
   }
 
 
-  private static class TestStrategyFactory implements StrategyFactory<BacktestStrategy> {
+  private static class TestBacktestRunFactory implements BacktestRunFactory {
+    @Override
+    public RuntimeContextFactory getRuntimeContextFactory() {
+      return new NOOPRuntimeContextFactory();
+    }
+
+
+    @Override
+    public StrategyFactory<BacktestStrategy> getStrategyFactory() {
+      return StrategyFactoryConverter.convert(new TestStrategyFactory());
+    }
+  }
+
+
+  private static class TestStrategyFactory implements StrategyFactory<Strategy> {
     private static final String SMA_FAST = "smaFast";
     private static final String SMA_SLOW = "smaSlow";
 
@@ -128,7 +148,7 @@ class BacktestExecutorTest {
 
 
     @Override
-    public BacktestStrategy createStrategy(
+    public Strategy createStrategy(
         final RuntimeContext runtimeContext,
         final IndicatorContext indicatorContext
     ) {
@@ -137,15 +157,12 @@ class BacktestExecutorTest {
       indicatorContext.add(closePrice.sma(11), SMA_FAST);
       indicatorContext.add(closePrice.sma(200), SMA_SLOW);
 
-      return new BacktestStrategy(
-          DefaultStrategy.builder()
-              .name("test-strategy")
-              .entryRule(createEntryRule(indicatorContext))
-              .exitRule(createExitRule(indicatorContext))
-              .indicatorContext(indicatorContext)
-              .build(),
-          (BackTestTradingRecord) runtimeContext
-      );
+      return DefaultStrategy.builder()
+          .name("test-strategy")
+          .entryRule(createEntryRule(indicatorContext))
+          .exitRule(createExitRule(indicatorContext))
+          .indicatorContext(indicatorContext)
+          .build();
     }
 
 

@@ -38,7 +38,7 @@ import org.ta4j.core.MarketEventTestContext;
 import org.ta4j.core.Position;
 import org.ta4j.core.Trade;
 import org.ta4j.core.TradingRecordTestContext;
-import org.ta4j.core.backtest.BackTestTradingRecord;
+import org.ta4j.core.backtest.strategy.BackTestTradingRecord;
 import org.ta4j.core.num.Num;
 import org.ta4j.core.num.NumFactory;
 

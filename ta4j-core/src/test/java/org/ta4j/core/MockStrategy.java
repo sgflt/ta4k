@@ -1,6 +1,6 @@
 //package org.ta4j.core;
 //
-//import org.ta4j.core.backtest.BacktestStrategy;
+//import org.ta4j.core.backtest.strategy.BacktestStrategy;
 //import org.ta4j.core.indicators.Indicator;
 //import org.ta4j.core.indicators.IndicatorContext;
 //

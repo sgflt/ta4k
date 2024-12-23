@@ -1,8 +1,7 @@
-
 /*
  * The MIT License (MIT)
  *
- * Copyright (c) 2024 Lukáš Kvídera
+ * Copyright (c) 2017-2024 Ta4j Organization & respective authors (see AUTHORS)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -22,13 +21,21 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.ta4j.core.events;
+package org.ta4j.core;
 
-import java.time.Instant;
-
-public record TickReceived(
-    Instant beginTime,
-    double ask,
-    double bid
-) implements MarketEvent {
+/**
+ * Interface for type-safe runtime value resolution
+ *
+ * @param <T> the type of value to resolve
+ */
+@FunctionalInterface
+public interface RuntimeValueResolver<T> {
+  /**
+   * Resolves a value from a RuntimeContext
+   *
+   * @param context the context to resolve from
+   *
+   * @return the resolved value, or null if not available
+   */
+  T resolve(RuntimeContext context);
 }

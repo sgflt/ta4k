@@ -8,8 +8,8 @@ import java.util.function.Function;
 
 import org.ta4j.core.analysis.cost.CostModel;
 import org.ta4j.core.analysis.cost.ZeroCostModel;
-import org.ta4j.core.backtest.BackTestTradingRecord;
 import org.ta4j.core.backtest.BacktestBarSeries;
+import org.ta4j.core.backtest.strategy.BackTestTradingRecord;
 import org.ta4j.core.num.NumFactory;
 import org.ta4j.core.num.NumFactoryProvider;
 

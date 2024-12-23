@@ -27,7 +27,7 @@
 //import static org.junit.Assert.assertTrue;
 //
 //import org.junit.Test;
-//import org.ta4j.core.backtest.BackTestTradingRecord;
+//import org.ta4j.core.backtest.strategy.BackTestTradingRecord;
 //import org.ta4j.core.Trade;
 //import org.ta4j.core.mocks.MockBarSeriesBuilder;
 //import org.ta4j.core.num.DecimalNumFactory;

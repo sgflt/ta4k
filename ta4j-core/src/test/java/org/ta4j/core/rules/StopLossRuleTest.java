@@ -29,7 +29,7 @@
 //import org.junit.Before;
 //import org.junit.Test;
 //import org.ta4j.core.BarSeries;
-//import org.ta4j.core.backtest.BackTestTradingRecord;
+//import org.ta4j.core.backtest.strategy.BackTestTradingRecord;
 //import org.ta4j.core.Trade;
 //import org.ta4j.core.indicators.AbstractIndicatorTest;
 //import org.ta4j.core.indicators.candles.price.ClosePriceIndicator;

@@ -23,7 +23,7 @@
  */
 package org.ta4j.core.reports;
 
-import org.ta4j.core.backtest.BacktestStrategy;
+import org.ta4j.core.backtest.strategy.BacktestStrategy;
 
 /**
  * Generates a {@link TradingStatement} based on the provided trading record and

@@ -25,7 +25,7 @@ package org.ta4j.core.mocks;
 
 import java.util.List;
 
-import org.ta4j.core.backtest.BackTestTradingRecord;
+import org.ta4j.core.backtest.strategy.BackTestTradingRecord;
 import org.ta4j.core.num.Num;
 import org.ta4j.core.num.NumFactoryProvider;
 

@@ -1,8 +1,7 @@
 /*
  * The MIT License (MIT)
  *
- * Copyright (c) 2017-2024 Ta4j Organization & respective
- * authors (see AUTHORS)
+ * Copyright (c) 2017-2024 Ta4j Organization & respective authors (see AUTHORS)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -21,7 +20,7 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.ta4j.core.backtest;
+package org.ta4j.core.backtest.strategy;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -29,10 +28,12 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 
+import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 import org.ta4j.core.Bar;
 import org.ta4j.core.Position;
 import org.ta4j.core.RuntimeContext;
+import org.ta4j.core.RuntimeValueResolver;
 import org.ta4j.core.Trade;
 import org.ta4j.core.Trade.TradeType;
 import org.ta4j.core.TradingRecord;
@@ -294,8 +295,40 @@ public class BackTestTradingRecord implements TradingRecord, RuntimeContext {
 
 
   @Override
-  public Object getValue(final String key) {
-    // nothing interesting
-    return null;
+  public <T> T getValue(final RuntimeValueResolver<T> resolver) {
+    return resolver.resolve(this);
   }
+
+
+  @Override
+  public Object getValue(final String key) {
+    return switch (key) {
+      case RuntimeContextKeys.CURRENT_POSITION -> this.currentPosition;
+      case RuntimeContextKeys.BACKTEST_TRADING_RECORD -> this;
+      default -> null;
+    };
+  }
+
+
+  @UtilityClass
+  public static final class RuntimeContextKeys {
+    public static final String CURRENT_POSITION = "currentPosition";
+    public static final String BACKTEST_TRADING_RECORD = "backtestTradingRecord";
+  }
+
+
+  public static final class CurrentPositionResolver implements RuntimeValueResolver<Position> {
+    @Override
+    public Position resolve(final RuntimeContext context) {
+      return (Position) context.getValue(RuntimeContextKeys.CURRENT_POSITION);
+    }
+  }
+
+  public static final class TradeRecordResolver implements RuntimeValueResolver<BackTestTradingRecord> {
+    @Override
+    public BackTestTradingRecord resolve(final RuntimeContext context) {
+      return (BackTestTradingRecord) context.getValue(RuntimeContextKeys.BACKTEST_TRADING_RECORD);
+    }
+  }
+
 }

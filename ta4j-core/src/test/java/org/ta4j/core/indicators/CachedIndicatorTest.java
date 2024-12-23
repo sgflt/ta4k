@@ -36,7 +36,7 @@
 //import org.junit.Test;
 //import org.ta4j.core.BarSeries;
 //import org.ta4j.core.backtest.BacktestBarSeriesBuilder;
-//import org.ta4j.core.backtest.BacktestStrategy;
+//import org.ta4j.core.backtest.strategy.BacktestStrategy;
 //import org.ta4j.core.Strategy;
 //import org.ta4j.core.indicators.numeric.average.SMAIndicator;
 //import org.ta4j.core.indicators.numeric.average.ZLEMAIndicator;

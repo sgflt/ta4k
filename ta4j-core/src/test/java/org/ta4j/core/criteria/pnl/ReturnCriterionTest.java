@@ -36,7 +36,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.ta4j.core.Position;
 import org.ta4j.core.Trade;
 import org.ta4j.core.TradingRecordTestContext;
-import org.ta4j.core.backtest.BackTestTradingRecord;
+import org.ta4j.core.backtest.strategy.BackTestTradingRecord;
 import org.ta4j.core.criteria.AbstractCriterionTest;
 import org.ta4j.core.num.NumFactory;
 

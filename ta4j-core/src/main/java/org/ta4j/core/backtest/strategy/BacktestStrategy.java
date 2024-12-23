@@ -1,8 +1,7 @@
 /*
  * The MIT License (MIT)
  *
- * Copyright (c) 2017-2024 Ta4j Organization & respective
- * authors (see AUTHORS)
+ * Copyright (c) 2017-2024 Ta4j Organization & respective authors (see AUTHORS)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -21,7 +20,7 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.ta4j.core.backtest;
+package org.ta4j.core.backtest.strategy;
 
 import java.time.Instant;
 import java.util.Objects;
@@ -33,7 +32,9 @@ import org.ta4j.core.Bar;
 import org.ta4j.core.BarListener;
 import org.ta4j.core.Position;
 import org.ta4j.core.Rule;
+import org.ta4j.core.RuntimeContext;
 import org.ta4j.core.Strategy;
+import org.ta4j.core.backtest.OperationType;
 
 /**
  * This implementation is designed for backtesting of custom strategy.
@@ -54,7 +55,7 @@ public class BacktestStrategy implements Strategy, BarListener {
   private final Strategy testedStrategy;
 
   /** Recording of execution of this strategy */
-  private final BackTestTradingRecord tradingRecord;
+  private final RuntimeContext runtimeContext;
 
   /** Current time */
   private Instant currentTick;
@@ -62,10 +63,10 @@ public class BacktestStrategy implements Strategy, BarListener {
 
   public BacktestStrategy(
       final Strategy testedStrategy,
-      final BackTestTradingRecord tradingRecord
+      final RuntimeContext runtimeContext
   ) {
     this.testedStrategy = testedStrategy;
-    this.tradingRecord = Objects.requireNonNull(tradingRecord, "TradingRecord cannot be null");
+    this.runtimeContext = Objects.requireNonNull(runtimeContext, "RuntimeContext cannot be null");
   }
 
 
@@ -98,7 +99,7 @@ public class BacktestStrategy implements Strategy, BarListener {
    *     (no recommendation)
    */
   public OperationType shouldOperate() {
-    final Position position = this.tradingRecord.getCurrentPosition();
+    final Position position = this.runtimeContext.getValue(new BackTestTradingRecord.CurrentPositionResolver());
     if (position.isNew()) {
       if (shouldEnter()) {
         return OperationType.ENTER;
@@ -129,7 +130,7 @@ public class BacktestStrategy implements Strategy, BarListener {
   @Override
   public void onBar(final Bar bar) {
     this.currentTick = bar.endTime();
-    this.tradingRecord.onBar(bar);
+    this.runtimeContext.onBar(bar);
   }
 
 
@@ -158,6 +159,6 @@ public class BacktestStrategy implements Strategy, BarListener {
 
 
   public BackTestTradingRecord getTradeRecord() {
-    return this.tradingRecord;
+    return this.runtimeContext.getValue(new BackTestTradingRecord.TradeRecordResolver());
   }
 }

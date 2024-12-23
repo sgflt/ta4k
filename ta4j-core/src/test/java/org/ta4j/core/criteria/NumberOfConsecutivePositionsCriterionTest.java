@@ -7,7 +7,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.ta4j.core.AnalysisCriterion.PositionFilter;
 import org.ta4j.core.TradingRecordTestContext;
-import org.ta4j.core.backtest.BackTestTradingRecord;
+import org.ta4j.core.backtest.strategy.BackTestTradingRecord;
 import org.ta4j.core.num.NumFactory;
 
 class NumberOfConsecutivePositionsCriterionTest {
