@@ -239,10 +239,14 @@ public class BacktestBar implements Bar {
   @Override
   public String toString() {
     return String.format(
-        "{end time: %1s, close price: %2$f, open price: %3$f, low price: %4$f, high price: %5$f, volume: %6$f}",
+        "{begin time: %1s, end time: %1s, close price: %2$f, open price: %3$f, low price: %4$f, high price: %5$f, volume: %6$f}",
+        this.beginTime,
         this.endTime,
-        this.closePrice.doubleValue(), this.openPrice.doubleValue(),
-        this.lowPrice.doubleValue(), this.highPrice.doubleValue(), this.volume.doubleValue()
+        this.closePrice.doubleValue(),
+        this.openPrice.doubleValue(),
+        this.lowPrice.doubleValue(),
+        this.highPrice.doubleValue(),
+        this.volume.doubleValue()
     );
   }
 
