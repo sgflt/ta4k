@@ -33,4 +33,12 @@ import org.ta4j.core.num.Num;
  * @param breakEvenCount The number of positions with a break even.
  */
 public record PositionStatsReport(Num profitCount, Num lossCount, Num breakEvenCount) {
+  @Override
+  public String toString() {
+    return """
+        profits: %s
+        losses: %s
+        breakEvens: %s
+        """.formatted(this.profitCount, this.lossCount, this.breakEvenCount);
+  }
 }

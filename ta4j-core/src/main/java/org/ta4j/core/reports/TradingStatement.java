@@ -23,7 +23,7 @@
  */
 package org.ta4j.core.reports;
 
-import org.ta4j.core.backtest.BacktestStrategy;
+import org.ta4j.core.backtest.strategy.BacktestStrategy;
 
 /**
  * Represents a trading statement report containing position and performance
@@ -34,4 +34,18 @@ public record TradingStatement(
     PositionStatsReport positionStatsReport,
     PerformanceReport performanceReport
 ) {
+
+  @Override
+  public String toString() {
+    return """
+        
+        Strategy: %s
+        =======================
+        Positions:
+        %s
+        =======================
+        Performance:
+        %s
+        """.formatted(this.strategy.name(), this.positionStatsReport, this.performanceReport);
+  }
 }

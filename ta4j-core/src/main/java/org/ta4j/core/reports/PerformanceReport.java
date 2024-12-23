@@ -34,4 +34,18 @@ import org.ta4j.core.num.Num;
  * @param totalLoss The total loss.
  */
 public record PerformanceReport(Num totalProfitLoss, Num totalProfitLossPercentage, Num totalProfit, Num totalLoss) {
+  @Override
+  public String toString() {
+    return """
+        totalProfitLoss: %.2f
+        totalProfitLossPercentage: %.2f
+        totalProfit: %.2f
+        totalLoss: %.2f
+        """.formatted(
+        this.totalProfitLoss.doubleValue(),
+        this.totalProfitLossPercentage.doubleValue(),
+        this.totalProfit.doubleValue(),
+        this.totalLoss.doubleValue()
+    );
+  }
 }
