@@ -48,7 +48,7 @@ import org.slf4j.LoggerFactory;
  */
 public final class DecimalNum implements Num {
 
-  static final int DEFAULT_PRECISION = 32;
+  static final int DEFAULT_PRECISION = 20;
   private static final Logger log = LoggerFactory.getLogger(DecimalNum.class);
 
   private final MathContext mathContext;
