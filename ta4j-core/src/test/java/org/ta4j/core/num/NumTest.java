@@ -23,6 +23,7 @@
  */
 package org.ta4j.core.num;
 
+import static java.math.RoundingMode.HALF_UP;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.ta4j.core.TestUtils.assertNumEquals;
@@ -32,7 +33,6 @@ import static org.ta4j.core.num.NaN.NaN;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.MathContext;
-import java.math.RoundingMode;
 import java.util.Properties;
 
 import org.junit.jupiter.api.Test;
@@ -42,6 +42,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 class NumTest {
 
   private static final int HIGH_PRECISION = 128;
+  private static final MathContext HIGH_PRECISION_CONTEXT = new MathContext(HIGH_PRECISION, HALF_UP);
 
 
   @ParameterizedTest
@@ -104,7 +105,7 @@ class NumTest {
     final var highPrecisionString =
         "1.928749238479283749238472398472936872364823749823749238749238749283749238472983749238749832749274";
     final var num = DecimalNumFactory.getInstance(HIGH_PRECISION).numOf(highPrecisionString);
-    final var highPrecisionNum = DecimalNum.valueOf(highPrecisionString, HIGH_PRECISION);
+    final var highPrecisionNum = DecimalNum.valueOf(highPrecisionString, HIGH_PRECISION_CONTEXT);
 
     assertThat(highPrecisionNum.matches(num, 17)).isTrue();
 
@@ -273,7 +274,7 @@ class NumTest {
                           + "766797379907324784621070388503875343276415727350138462309122970249248360"
                           + "558507372126441214970999358314132226659275055927557999505011527820605715";
 
-    assertNumEquals(sqrtOfTwo, numFactory.numOf(2).sqrt(200));
+    assertNumEquals(sqrtOfTwo, numFactory.numOf(2).sqrt(new MathContext(200)));
   }
 
 
@@ -283,14 +284,14 @@ class NumTest {
     final var sqrtOfOnePointTwo =
         "1.095445115010332226913939565601604267905489389995966508453788899464986554245445467601716872327741252";
 
-    assertNumEquals(sqrtOfOnePointTwo, numFactory.numOf(1.2).sqrt(100));
+    assertNumEquals(sqrtOfOnePointTwo, numFactory.numOf(1.2).sqrt(new MathContext(100)));
   }
 
 
   @ParameterizedTest
   @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
   void testSqrtOfNegativeDouble(final NumFactory numFactory) {
-    assertThat(numFactory.numOf(-1.2).sqrt(12).isNaN()).isTrue();
+    assertThat(numFactory.numOf(-1.2).sqrt(new MathContext(12)).isNaN()).isTrue();
     assertThat(numFactory.numOf(-1.2).sqrt().isNaN()).isTrue();
   }
 
@@ -298,7 +299,7 @@ class NumTest {
   @ParameterizedTest
   @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
   void testSqrtOfZero(final NumFactory numFactory) {
-    assertNumEquals(0, numFactory.numOf(0).sqrt(12));
+    assertNumEquals(0, numFactory.numOf(0).sqrt(new MathContext(12)));
     assertNumEquals(0, numFactory.numOf(0).sqrt());
   }
 
@@ -310,10 +311,10 @@ class NumTest {
         .multiply(BigDecimal.valueOf(Double.MAX_VALUE).add(BigDecimal.ONE));
 
     if (numFactory instanceof DoubleNumFactory) {
-      final var sqrt = DoubleNum.valueOf(numBD).sqrt(100000);
+      final var sqrt = DoubleNum.valueOf(numBD).sqrt(new MathContext(100000));
       assertThat(sqrt.toString()).isEqualTo("Infinity");
     } else if (numFactory instanceof DecimalNumFactory) {
-      final var sqrt = DecimalNum.valueOf(numBD, 100000).sqrt(100000);
+      final var sqrt = DecimalNum.valueOf(numBD, new MathContext(100000)).sqrt(new MathContext(100000));
       final var props = new Properties();
 
       try (final var is = getClass().getResourceAsStream("numTest.properties")) {
@@ -326,7 +327,7 @@ class NumTest {
         final var sqrtBD = new BigDecimal(sqrt.toString());
         assertNumEquals(
             numFactory.numOf(numBD),
-            numFactory.numOf(sqrtBD.multiply(sqrtBD, new MathContext(99999, RoundingMode.HALF_UP)))
+            numFactory.numOf(sqrtBD.multiply(sqrtBD, new MathContext(99999, HALF_UP)))
         );
         assertNumNotEquals(numFactory.numOf(numBD), sqrt.multipliedBy(sqrt));
       }

@@ -81,46 +81,46 @@ public final class DecimalNum implements Num {
    * {@code precision}; only a string parameter can accurately represent a value.
    *
    * @param val the string representation of the Num value
-   * @param precision the int precision of the Num value
+   * @param mathContext the int precision of the Num value
    */
-  private DecimalNum(final String val, final int precision) {
-    this.mathContext = new MathContext(precision, RoundingMode.HALF_UP);
-    this.delegate = new BigDecimal(val, new MathContext(precision, RoundingMode.HALF_UP));
+  private DecimalNum(final String val, final MathContext mathContext) {
+    this.mathContext = mathContext;
+    this.delegate = new BigDecimal(val, mathContext);
   }
 
 
-  private DecimalNum(final short val) {
-    this.mathContext = new MathContext(DEFAULT_PRECISION, RoundingMode.HALF_UP);
-    this.delegate = new BigDecimal(val, this.mathContext);
+  private DecimalNum(final short val, final MathContext mathContext) {
+    this.mathContext = mathContext;
+    this.delegate = new BigDecimal(val, mathContext);
   }
 
 
-  private DecimalNum(final int val) {
-    this.mathContext = new MathContext(DEFAULT_PRECISION, RoundingMode.HALF_UP);
+  private DecimalNum(final int val, final MathContext mathContext) {
+    this.mathContext = mathContext;
     this.delegate = BigDecimal.valueOf(val);
   }
 
 
-  private DecimalNum(final long val) {
-    this.mathContext = new MathContext(DEFAULT_PRECISION, RoundingMode.HALF_UP);
+  private DecimalNum(final long val, final MathContext mathContext) {
+    this.mathContext = mathContext;
     this.delegate = BigDecimal.valueOf(val);
   }
 
 
-  private DecimalNum(final float val) {
-    this.mathContext = new MathContext(DEFAULT_PRECISION, RoundingMode.HALF_UP);
-    this.delegate = new BigDecimal(val, this.mathContext);
-  }
-
-
-  private DecimalNum(final double val) {
-    this.mathContext = new MathContext(DEFAULT_PRECISION, RoundingMode.HALF_UP);
+  private DecimalNum(final float val, final MathContext mathContext) {
+    this.mathContext = mathContext;
     this.delegate = BigDecimal.valueOf(val);
   }
 
 
-  private DecimalNum(final BigDecimal val, final int precision) {
-    this.mathContext = new MathContext(precision, RoundingMode.HALF_UP);
+  private DecimalNum(final double val, final MathContext mathContext) {
+    this.mathContext = mathContext;
+    this.delegate = BigDecimal.valueOf(val);
+  }
+
+
+  private DecimalNum(final BigDecimal val, final MathContext mathContext) {
+    this.mathContext = mathContext;
     this.delegate = Objects.requireNonNull(val);
   }
 
@@ -152,17 +152,17 @@ public final class DecimalNum implements Num {
    * {@code precision}.
    *
    * @param val the number
-   * @param precision the precision
+   * @param mathContext with the precision
    *
    * @return the {@code Num} with a precision of {@code precision}
    *
    * @throws NumberFormatException if {@code val} is {@code "NaN"}
    */
-  public static DecimalNum valueOf(final String val, final int precision) {
+  public static DecimalNum valueOf(final String val, final MathContext mathContext) {
     if (val.equalsIgnoreCase("NAN")) {
       throw new NumberFormatException();
     }
-    return new DecimalNum(val, precision);
+    return new DecimalNum(val, mathContext);
   }
 
 
@@ -213,8 +213,8 @@ public final class DecimalNum implements Num {
    *
    * @return the {@code Num}
    */
-  public static DecimalNum valueOf(final int val) {
-    return new DecimalNum(val);
+  public static DecimalNum valueOf(final int val, final MathContext mathContext) {
+    return new DecimalNum(val, mathContext);
   }
 
 
@@ -225,8 +225,8 @@ public final class DecimalNum implements Num {
    *
    * @return the {@code Num}
    */
-  public static DecimalNum valueOf(final long val) {
-    return new DecimalNum(val);
+  public static DecimalNum valueOf(final long val, final MathContext mathContext) {
+    return new DecimalNum(val, mathContext);
   }
 
 
@@ -237,8 +237,8 @@ public final class DecimalNum implements Num {
    *
    * @return the {@code Num}
    */
-  public static DecimalNum valueOf(final short val) {
-    return new DecimalNum(val);
+  public static DecimalNum valueOf(final short val, final MathContext mathContext) {
+    return new DecimalNum(val, mathContext);
   }
 
 
@@ -255,11 +255,11 @@ public final class DecimalNum implements Num {
    *
    * @throws NumberFormatException if {@code val} is {@code Float.NaN}
    */
-  public static DecimalNum valueOf(final float val) {
+  public static DecimalNum valueOf(final float val, final MathContext mathContext) {
     if (Float.isNaN(val)) {
       throw new NumberFormatException();
     }
-    return new DecimalNum(val);
+    return new DecimalNum(val, mathContext);
   }
 
 
@@ -276,11 +276,11 @@ public final class DecimalNum implements Num {
    *
    * @throws NumberFormatException if {@code val} is {@code Double.NaN}
    */
-  public static DecimalNum valueOf(final double val) {
+  public static DecimalNum valueOf(final double val, final MathContext mathContext) {
     if (Double.isNaN(val)) {
       throw new NumberFormatException();
     }
-    return new DecimalNum(val);
+    return new DecimalNum(val, mathContext);
   }
 
 
@@ -295,22 +295,8 @@ public final class DecimalNum implements Num {
    *
    * @return the {@code Num}
    */
-  public static DecimalNum valueOf(final BigDecimal val) {
-    return new DecimalNum(val, val.precision());
-  }
-
-
-  /**
-   * Returns a {@code Num} version of the given {@code BigDecimal} with a
-   * precision of {@code precision}.
-   *
-   * @param val the number
-   * @param precision the precision
-   *
-   * @return the {@code Num}
-   */
-  public static DecimalNum valueOf(final BigDecimal val, final int precision) {
-    return new DecimalNum(val, precision);
+  public static DecimalNum valueOf(final BigDecimal val, final MathContext mathContext) {
+    return new DecimalNum(val, mathContext);
   }
 
 
@@ -353,9 +339,8 @@ public final class DecimalNum implements Num {
       return NaN;
     }
     final BigDecimal bigDecimal = ((DecimalNum) augend).delegate;
-    final int precision = this.mathContext.getPrecision();
     final BigDecimal result = this.delegate.add(bigDecimal, this.mathContext);
-    return new DecimalNum(result, precision);
+    return new DecimalNum(result, this.mathContext);
   }
 
 
@@ -371,9 +356,8 @@ public final class DecimalNum implements Num {
       return NaN;
     }
     final BigDecimal bigDecimal = ((DecimalNum) subtrahend).delegate;
-    final int precision = this.mathContext.getPrecision();
     final BigDecimal result = this.delegate.subtract(bigDecimal, this.mathContext);
-    return new DecimalNum(result, precision);
+    return new DecimalNum(result, this.mathContext);
   }
 
 
@@ -389,9 +373,8 @@ public final class DecimalNum implements Num {
       return NaN;
     }
     final BigDecimal bigDecimal = ((DecimalNum) multiplicand).delegate;
-    final int precision = this.mathContext.getPrecision();
-    final BigDecimal result = this.delegate.multiply(bigDecimal, new MathContext(precision, RoundingMode.HALF_UP));
-    return new DecimalNum(result, precision);
+    final BigDecimal result = this.delegate.multiply(bigDecimal, this.mathContext);
+    return new DecimalNum(result, this.mathContext);
   }
 
 
@@ -407,9 +390,8 @@ public final class DecimalNum implements Num {
       return NaN;
     }
     final BigDecimal bigDecimal = ((DecimalNum) divisor).delegate;
-    final int precision = this.mathContext.getPrecision();
-    final BigDecimal result = this.delegate.divide(bigDecimal, new MathContext(precision, RoundingMode.HALF_UP));
-    return new DecimalNum(result, precision);
+    final BigDecimal result = this.delegate.divide(bigDecimal, this.mathContext);
+    return new DecimalNum(result, this.mathContext);
   }
 
 
@@ -425,23 +407,20 @@ public final class DecimalNum implements Num {
       return NaN;
     }
     final BigDecimal bigDecimal = ((DecimalNum) divisor).delegate;
-    final int precision = this.mathContext.getPrecision();
-    final BigDecimal result = this.delegate.remainder(bigDecimal, new MathContext(precision, RoundingMode.HALF_UP));
-    return new DecimalNum(result, precision);
+    final BigDecimal result = this.delegate.remainder(bigDecimal, this.mathContext);
+    return new DecimalNum(result, this.mathContext);
   }
 
 
   @Override
   public Num floor() {
-    final int precision = Math.max(this.mathContext.getPrecision(), DEFAULT_PRECISION);
-    return new DecimalNum(this.delegate.setScale(0, RoundingMode.FLOOR), precision);
+    return new DecimalNum(this.delegate.setScale(0, RoundingMode.FLOOR), this.mathContext);
   }
 
 
   @Override
   public Num ceil() {
-    final int precision = Math.max(this.mathContext.getPrecision(), DEFAULT_PRECISION);
-    return new DecimalNum(this.delegate.setScale(0, RoundingMode.CEILING), precision);
+    return new DecimalNum(this.delegate.setScale(0, RoundingMode.CEILING), this.mathContext);
   }
 
 
@@ -450,9 +429,8 @@ public final class DecimalNum implements Num {
    */
   @Override
   public Num pow(final int n) {
-    final int precision = this.mathContext.getPrecision();
-    final BigDecimal result = this.delegate.pow(n, new MathContext(precision, RoundingMode.HALF_UP));
-    return new DecimalNum(result, precision);
+    final BigDecimal result = this.delegate.pow(n, this.mathContext);
+    return new DecimalNum(result, this.mathContext);
   }
 
 
@@ -460,16 +438,16 @@ public final class DecimalNum implements Num {
    * Returns a {@code Num} whose value is {@code √(this)} with {@code precision} =
    * {@link #DEFAULT_PRECISION}.
    *
-   * @see DecimalNum#sqrt(int)
+   * @see DecimalNum#sqrt(MathContext)
    */
   @Override
   public Num sqrt() {
-    return sqrt(DEFAULT_PRECISION);
+    return sqrt(this.mathContext);
   }
 
 
   @Override
-  public Num sqrt(final int precision) {
+  public Num sqrt(final MathContext precisionContext) {
     log.trace("delegate {}", this.delegate);
     final int comparedToZero = this.delegate.compareTo(BigDecimal.ZERO);
     switch (comparedToZero) {
@@ -481,7 +459,6 @@ public final class DecimalNum implements Num {
 
     // Direct implementation of the example in:
     // https://en.wikipedia.org/wiki/Methods_of_computing_square_roots#Babylonian_method
-    final MathContext precisionContext = new MathContext(precision, RoundingMode.HALF_UP);
     BigDecimal estimate = new BigDecimal(this.delegate.toString(), precisionContext);
     final String string = String.format(Locale.ROOT, "%1.1e", estimate);
     log.trace("scientific notation {}", string);
@@ -526,17 +503,18 @@ public final class DecimalNum implements Num {
       delta = newEstimate.subtract(estimate).abs();
       estimate = newEstimate;
       if (log.isTraceEnabled()) {
-        estimateString = String.format("%1." + precision + "e", estimate);
+        estimateString = String.format("%1." + precisionContext.getPrecision() + "e", estimate);
         endIndex = estimateString.length();
         frontEndIndex = 20 > endIndex ? endIndex : 20;
         backStartIndex = 20 > endIndex ? 0 : endIndex - 20;
-        log.trace("x[{}] = {}..{}, delta = {}", i, estimateString.substring(0, frontEndIndex),
+        log.trace(
+            "x[{}] = {}..{}, delta = {}", i, estimateString.substring(0, frontEndIndex),
             estimateString.substring(backStartIndex, endIndex), String.format("%1.1e", delta)
         );
         i++;
       }
     } while (delta.compareTo(BigDecimal.ZERO) > 0);
-    return DecimalNum.valueOf(estimate, precision);
+    return DecimalNum.valueOf(estimate, precisionContext);
   }
 
 
@@ -550,7 +528,7 @@ public final class DecimalNum implements Num {
     }
 
     if (this.delegate.equals(BigDecimal.ONE)) {
-      logx = DecimalNum.valueOf(BigDecimal.ZERO, this.mathContext.getPrecision());
+      logx = DecimalNum.valueOf(BigDecimal.ZERO, this.mathContext);
     } else {
       final long ITER = 1000;
       final BigDecimal x = this.delegate.subtract(BigDecimal.ONE);
@@ -566,7 +544,7 @@ public final class DecimalNum implements Num {
       }
       ret = x.divide(ret, this.mathContext);
 
-      logx = DecimalNum.valueOf(ret, this.mathContext.getPrecision());
+      logx = DecimalNum.valueOf(ret, this.mathContext);
     }
     return logx;
   }
@@ -574,13 +552,13 @@ public final class DecimalNum implements Num {
 
   @Override
   public Num abs() {
-    return new DecimalNum(this.delegate.abs(), this.mathContext.getPrecision());
+    return new DecimalNum(this.delegate.abs(), this.mathContext);
   }
 
 
   @Override
   public Num negate() {
-    return new DecimalNum(this.delegate.negate(), this.mathContext.getPrecision());
+    return new DecimalNum(this.delegate.negate(), this.mathContext);
   }
 
 
@@ -630,8 +608,8 @@ public final class DecimalNum implements Num {
    *     otherwise
    */
   public boolean matches(final Num other, final int precision) {
-    final Num otherNum = DecimalNum.valueOf(other.toString(), precision);
-    final Num thisNum = DecimalNum.valueOf(this.toString(), precision);
+    final Num otherNum = DecimalNum.valueOf(other.toString(), this.mathContext);
+    final Num thisNum = DecimalNum.valueOf(this.toString(), this.mathContext);
     if (thisNum.toString().equals(otherNum.toString())) {
       return true;
     }

@@ -23,6 +23,8 @@
  */
 package org.ta4j.core.num;
 
+import java.math.MathContext;
+
 /**
  * Ta4js definition of operations that must be fulfilled by an object that
  * should be used as base for calculations.
@@ -138,10 +140,10 @@ public interface Num extends Comparable<Num> {
     /**
      * Returns a {@code Num} whose value is {@code √(this)}.
      *
-     * @param precision to calculate.
+     * @param mathContext to calculate.
      * @return {@code √(this)}
      */
-    Num sqrt(int precision);
+    Num sqrt(MathContext mathContext);
 
     /**
      * Returns a {@code Num} whose value is the absolute value of this {@code Num}.
