@@ -255,7 +255,7 @@ public class MarketEventTestContext {
 
   public void withBarListener(final BarListener barListener) {
     this.barSeries.clearListeners();
-    this.barSeries.addListener(barListener);
+    this.barSeries.addBarListener(barListener);
   }
 
 

@@ -359,7 +359,7 @@ public class BacktestBarSeries implements BarSeries {
   }
 
 
-  public void addListener(final BarListener barListener) {
+  public void addBarListener(final BarListener barListener) {
     this.barListeners.add(barListener);
   }
 

@@ -23,10 +23,12 @@
  */
 package org.ta4j.core.backtest;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
 import org.ta4j.core.CompoundRuntimeContext;
+import org.ta4j.core.TickListener;
 import org.ta4j.core.backtest.strategy.BackTestTradingRecord;
 import org.ta4j.core.backtest.strategy.BacktestRunFactory;
 import org.ta4j.core.backtest.strategy.BacktestStrategy;
@@ -106,6 +108,7 @@ public class BacktestExecutor {
     private final BacktestBarSeries series;
     private final Num amount;
     private final List<BacktestStrategy> strategies;
+    private final List<TickListener> tickListeners = new ArrayList<>();
 
 
     public DefaultMarketEventHandler(
@@ -144,7 +147,10 @@ public class BacktestExecutor {
       final var runtimeContext =
           CompoundRuntimeContext.of(runtimeContextFactory.createRuntimeContext(), backTestTradingRecord);
       final var strategy = strategyFactory.createStrategy(runtimeContext, indicatorContext);
-      this.series.addListener(strategy);
+      this.series.addBarListener(strategy);
+      this.series.addBarListener(runtimeContext);
+      this.tickListeners.add(strategy);
+      this.tickListeners.add(runtimeContext);
       return strategy;
     }
 
@@ -190,7 +196,7 @@ public class BacktestExecutor {
 
     @Override
     public void onTick(final TickReceived event) {
-      this.strategies.forEach(strategy -> strategy.getTradeRecord().onTick(event));
+      this.tickListeners.forEach(listener -> listener.onTick(event));
       reevaluate(this.series, this.amount);
     }
 

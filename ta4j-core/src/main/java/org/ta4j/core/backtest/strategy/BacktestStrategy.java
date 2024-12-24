@@ -34,7 +34,9 @@ import org.ta4j.core.Position;
 import org.ta4j.core.Rule;
 import org.ta4j.core.RuntimeContext;
 import org.ta4j.core.Strategy;
+import org.ta4j.core.TickListener;
 import org.ta4j.core.backtest.OperationType;
+import org.ta4j.core.events.TickReceived;
 
 /**
  * This implementation is designed for backtesting of custom strategy.
@@ -44,7 +46,7 @@ import org.ta4j.core.backtest.OperationType;
  * Tested strategy is wrapped into this adaptation class.
  */
 @ToString
-public class BacktestStrategy implements Strategy, BarListener {
+public class BacktestStrategy implements Strategy, BarListener, TickListener {
 
   /** The logger. */
   protected final Logger log = LoggerFactory.getLogger(getClass());
@@ -58,7 +60,7 @@ public class BacktestStrategy implements Strategy, BarListener {
   private final RuntimeContext runtimeContext;
 
   /** Current time */
-  private Instant currentTick;
+  private Instant currentTime;
 
 
   public BacktestStrategy(
@@ -129,8 +131,13 @@ public class BacktestStrategy implements Strategy, BarListener {
 
   @Override
   public void onBar(final Bar bar) {
-    this.currentTick = bar.endTime();
-    this.runtimeContext.onBar(bar);
+    this.currentTime = bar.endTime();
+  }
+
+
+  @Override
+  public void onTick(final TickReceived tick) {
+    this.currentTime = tick.beginTime();
   }
 
 
@@ -141,7 +148,7 @@ public class BacktestStrategy implements Strategy, BarListener {
    */
   protected void traceShouldEnter(final boolean enter) {
     if (this.log.isTraceEnabled()) {
-      this.log.trace(">>> {}#shouldEnter({}): {}", name(), this.currentTick, enter);
+      this.log.trace(">>> {}#shouldEnter({}): {}", name(), this.currentTime, enter);
     }
   }
 
@@ -153,7 +160,7 @@ public class BacktestStrategy implements Strategy, BarListener {
    */
   protected void traceShouldExit(final boolean exit) {
     if (this.log.isTraceEnabled()) {
-      this.log.trace(">>> {}#shouldExit({}): {}", name(), this.currentTick, exit);
+      this.log.trace(">>> {}#shouldExit({}): {}", name(), this.currentTime, exit);
     }
   }
 
