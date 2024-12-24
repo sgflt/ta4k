@@ -26,7 +26,8 @@ package org.ta4j.core.criteria;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.ta4j.core.MarketEventTestContext;
-import org.ta4j.core.Trade.TradeType;
+import org.ta4j.core.TradeType;
+import org.ta4j.core.backtest.criteria.ReturnOverMaxDrawdownCriterion;
 import org.ta4j.core.num.NumFactory;
 
 class ReturnOverMaxDrawdownCriterionTest {

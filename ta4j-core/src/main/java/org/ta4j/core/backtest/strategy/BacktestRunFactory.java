@@ -24,7 +24,7 @@
 
 package org.ta4j.core.backtest.strategy;
 
-import org.ta4j.core.StrategyFactory;
+import org.ta4j.core.api.strategy.StrategyFactory;
 
 /**
  * This class encapsulates classes that are required for backtesting.

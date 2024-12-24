@@ -31,8 +31,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.ta4j.core.Trade.TradeType;
-import org.ta4j.core.analysis.cost.LinearTransactionCostModel;
+import org.ta4j.core.backtest.Position;
+import org.ta4j.core.backtest.analysis.cost.LinearTransactionCostModel;
 import org.ta4j.core.num.DecimalNumFactory;
 import org.ta4j.core.num.NumFactory;
 

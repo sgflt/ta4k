@@ -23,7 +23,7 @@
  */
 package org.ta4j.core.aggregator;
 
-import org.ta4j.core.BarSeries;
+import org.ta4j.core.api.series.BarSeries;
 
 /**
  * Aggregates a {@link BarSeries} into another one.

@@ -25,7 +25,7 @@ package org.ta4j.core.rules;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.ta4j.core.Rule;
+import org.ta4j.core.api.strategy.Rule;
 
 /**
  * An abstract trading {@link Rule rule}.

@@ -26,7 +26,8 @@ package org.ta4j.core.indicators;
 
 import java.util.Optional;
 
-import org.ta4j.core.Bar;
+import org.ta4j.core.api.Indicator;
+import org.ta4j.core.api.series.Bar;
 import org.ta4j.core.indicators.numeric.NumericIndicator;
 
 /**

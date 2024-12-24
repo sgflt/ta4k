@@ -34,13 +34,13 @@
 //
 //import org.slf4j.Logger;
 //import org.slf4j.LoggerFactory;
-//import org.ta4j.core.BarSeries;
+//import org.ta4j.core.api.bar.BarSeries;
 //import org.ta4j.core.backtest.BacktestBarSeries;
-//import org.ta4j.core.backtest.BacktestStrategy;
-//import org.ta4j.core.indicators.Indicator;
-//import org.ta4j.core.Rule;
-//import org.ta4j.core.Strategy;
-//import org.ta4j.core.Trade;
+//import org.ta4j.core.backtest.strategy.BacktestStrategy;
+//import org.ta4j.core.api.Indicator;
+//import org.ta4j.core.api.strategy.Rule;
+//import org.ta4j.core.api.strategy.Strategy;
+//import org.ta4j.core.backtest.Trade;
 //import org.ta4j.core.backtest.BacktestExecutor;
 //import org.ta4j.core.indicators.numeric.average.SMAIndicator;
 //import org.ta4j.core.indicators.helpers.ClosePriceIndicator;
@@ -121,7 +121,7 @@
 //    private static StringBuilder printStatementReport(TradingStatement statement) {
 //        StringBuilder resultBuilder = new StringBuilder();
 //        resultBuilder.append("######### ")
-//                .append(statement.getStrategy().getName())
+//                .append(statement.getStrategy().name())
 //                .append(" #########")
 //                .append(System.lineSeparator())
 //                .append(printPerformanceReport(statement.getPerformanceReport()))

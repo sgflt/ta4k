@@ -23,7 +23,7 @@
 // */
 //package org.ta4j.core.indicators.ichimoku;
 //
-//import org.ta4j.core.BarSeries;
+//import org.ta4j.core.api.bar.BarSeries;
 //
 ///**
 // * Ichimoku clouds: Kijun-sen (Base line) indicator.

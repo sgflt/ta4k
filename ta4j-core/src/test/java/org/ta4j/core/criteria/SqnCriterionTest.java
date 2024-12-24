@@ -28,7 +28,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.ta4j.core.MarketEventTestContext;
-import org.ta4j.core.Trade;
+import org.ta4j.core.TradeType;
+import org.ta4j.core.backtest.criteria.SqnCriterion;
 import org.ta4j.core.num.NumFactory;
 
 class SqnCriterionTest {
@@ -95,7 +96,7 @@ class SqnCriterionTest {
         .withCandlePrices(100, 90, 100, 95, 95, 100);
 
     final var tradingContext = context.toTradingRecordContext()
-        .withTradeType(Trade.TradeType.SELL)
+        .withTradeType(TradeType.SELL)
         .withCriterion(new SqnCriterion())
         .enter(1.0).asap()
         .exit(1.0).asap()
@@ -114,7 +115,7 @@ class SqnCriterionTest {
         .withCandlePrices(100, 110, 100, 105, 95, 105);
 
     final var tradingContext = context.toTradingRecordContext()
-        .withTradeType(Trade.TradeType.SELL)
+        .withTradeType(TradeType.SELL)
         .withCriterion(new SqnCriterion())
         .enter(1.0).asap()
         .exit(1.0).asap()

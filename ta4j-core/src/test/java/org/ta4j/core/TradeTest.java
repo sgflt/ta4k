@@ -30,10 +30,10 @@ import java.time.Instant;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.ta4j.core.Trade.OrderType;
-import org.ta4j.core.Trade.TradeType;
-import org.ta4j.core.analysis.cost.LinearTransactionCostModel;
-import org.ta4j.core.analysis.cost.ZeroCostModel;
+import org.ta4j.core.backtest.Trade;
+import org.ta4j.core.backtest.Trade.OrderType;
+import org.ta4j.core.backtest.analysis.cost.LinearTransactionCostModel;
+import org.ta4j.core.backtest.analysis.cost.ZeroCostModel;
 import org.ta4j.core.num.DoubleNum;
 import org.ta4j.core.num.NumFactory;
 

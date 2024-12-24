@@ -23,10 +23,10 @@
 // */
 //package org.ta4j.core.rules;
 //
-//import org.ta4j.core.Bar;
-//import org.ta4j.core.Trade;
-//import org.ta4j.core.Trade.TradeType;
-//import org.ta4j.core.TradingRecord;
+//import org.ta4j.core.api.bar.Bar;
+//import org.ta4j.core.backtest.Trade;
+//import org.ta4j.core.backtest.Trade.TradeType;
+//import org.ta4j.core.backtest.TradingRecord;
 //
 ///**
 // * A rule that waits for a number of {@link Bar bars} after a trade of a

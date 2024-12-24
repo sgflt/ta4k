@@ -28,6 +28,12 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.ta4j.core.api.callback.EntrySignalListener;
+import org.ta4j.core.api.callback.ExitSignalListener;
+import org.ta4j.core.api.strategy.Rule;
+import org.ta4j.core.api.strategy.RuntimeContext;
+import org.ta4j.core.api.strategy.Strategy;
+import org.ta4j.core.api.strategy.StrategyFactory;
 import org.ta4j.core.indicators.IndicatorContext;
 import org.ta4j.core.indicators.IndicatorContextUpdateListener;
 
@@ -84,7 +90,7 @@ public class ObservableStrategyFactoryBuilder {
     return new StrategyFactory<>() {
 
       @Override
-      public Trade.TradeType getTradeType() {
+      public TradeType getTradeType() {
         return null;
       }
 

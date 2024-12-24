@@ -27,18 +27,18 @@
 //import java.time.ZonedDateTime;
 //import java.util.Random;
 //
-//import org.ta4j.core.BarSeries;
+//import org.ta4j.core.api.bar.BarSeries;
 //import org.ta4j.core.backtest.BacktestBarSeriesBuilder;
-//import org.ta4j.core.backtest.BacktestStrategy;
-//import org.ta4j.core.Rule;
-//import org.ta4j.core.Strategy;
-//import org.ta4j.core.TradingRecord;
+//import org.ta4j.core.backtest.strategy.BacktestStrategy;
+//import org.ta4j.core.api.strategy.Rule;
+//import org.ta4j.core.api.strategy.Strategy;
+//import org.ta4j.core.backtest.TradingRecord;
 //import org.ta4j.core.criteria.pnl.ReturnCriterion;
 //import org.ta4j.core.indicators.numeric.average.EMAIndicator;
 //import org.ta4j.core.indicators.MACDIndicator;
-//import org.ta4j.core.indicators.RSIIndicator;
+//import org.ta4j.core.indicators.numeric.momentum.RSIIndicator;
 //import org.ta4j.core.indicators.helpers.ClosePriceIndicator;
-//import org.ta4j.core.indicators.helpers.CombineIndicator;
+//import org.ta4j.core.indicators.numeric.operation.CombineIndicator;
 //import org.ta4j.core.indicators.helpers.HighPriceIndicator;
 //import org.ta4j.core.indicators.helpers.LowPriceIndicator;
 //import org.ta4j.core.num.DecimalNum;
@@ -95,9 +95,9 @@
 //        Num D = DecimalNum.valueOf(test(seriesD).toString(), 256);
 //        Num P = DecimalNum.valueOf(test(seriesP).toString(), 256);
 //        Num standard = DecimalNum.valueOf(test(seriesPH).toString(), 256);
-//        System.out.println(seriesD.getName() + " error: "
+//        System.out.println(seriesD.name() + " error: "
 //                + D.minus(standard).dividedBy(standard).multipliedBy(DecimalNum.valueOf(100)));
-//        System.out.println(seriesP.getName() + " error: "
+//        System.out.println(seriesP.name() + " error: "
 //                + P.minus(standard).dividedBy(standard).multipliedBy(DecimalNum.valueOf(100)));
 //    }
 //
@@ -121,7 +121,7 @@
 //        long end = System.currentTimeMillis();
 //
 //        System.out.printf("[%s]\n" + "    -Time:   %s ms.\n" + "    -Profit: %s \n" + "    -Bars:   %s\n \n",
-//                series.getName(), (end - start), returnResult1, series.getBarCount());
+//                series.name(), (end - start), returnResult1, series.getBarCount());
 //        return returnResult1;
 //    }
 //}

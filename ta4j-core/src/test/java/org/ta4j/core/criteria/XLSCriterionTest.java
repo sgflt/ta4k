@@ -26,8 +26,8 @@ package org.ta4j.core.criteria;
 import java.util.List;
 
 import org.ta4j.core.ExternalCriterionTest;
-import org.ta4j.core.TradingRecord;
 import org.ta4j.core.XlsTestsUtils;
+import org.ta4j.core.backtest.TradingRecord;
 import org.ta4j.core.events.MarketEvent;
 import org.ta4j.core.num.Num;
 import org.ta4j.core.num.NumFactory;

@@ -23,8 +23,8 @@
  */
 package org.ta4j.core;
 
+import org.ta4j.core.api.Indicator;
 import org.ta4j.core.backtest.BacktestBarSeries;
-import org.ta4j.core.indicators.Indicator;
 
 @FunctionalInterface
 public interface IndicatorFactory<I> {

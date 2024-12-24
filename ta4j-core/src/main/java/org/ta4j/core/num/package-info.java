@@ -29,8 +29,8 @@
  * <p>
  * The {@link org.ta4j.core.num.Num Num interface} enables the use of different
  * delegates (Double, {@link java.math.BigDecimal BigDecimal}, ...) for storage
- * and calculations in {@link org.ta4j.core.BarSeries BarSeries},
- * {@link org.ta4j.core.Bar Bars}, {@link org.ta4j.core.indicators.Indicator
+ * and calculations in {@link org.ta4j.core.api.series.BarSeries BarSeries},
+ * {@link org.ta4j.core.api.series.Bar Bars}, {@link org.ta4j.core.api.Indicator
  * Indicators} and {@link org.ta4j.core.criteria.AbstractAnalysisCriterion
  * AnalysisCriterions}.
  */

@@ -29,7 +29,7 @@
 //import java.util.HashSet;
 //import java.util.Set;
 //
-//import org.ta4j.core.TradingRecord;
+//import org.ta4j.core.backtest.TradingRecord;
 //import org.ta4j.core.indicators.helpers.DateTimeIndicator;
 //
 ///**

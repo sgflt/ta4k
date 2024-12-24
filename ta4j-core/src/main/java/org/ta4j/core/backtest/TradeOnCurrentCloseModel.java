@@ -23,8 +23,7 @@
  */
 package org.ta4j.core.backtest;
 
-import org.ta4j.core.Bar;
-import org.ta4j.core.TradingRecord;
+import org.ta4j.core.api.series.Bar;
 import org.ta4j.core.num.Num;
 
 /**

@@ -24,8 +24,8 @@ package org.ta4j.core.indicators.bool;
 
 import java.time.Instant;
 
-import org.ta4j.core.Bar;
-import org.ta4j.core.indicators.Indicator;
+import org.ta4j.core.api.Indicator;
+import org.ta4j.core.api.series.Bar;
 import org.ta4j.core.indicators.bool.chandelier.ChandelierExitLongIndicator;
 import org.ta4j.core.indicators.bool.chandelier.ChandelierExitShortIndicator;
 import org.ta4j.core.indicators.helpers.previous.PreviousBooleanValueIndicator;

@@ -28,6 +28,7 @@ import static org.ta4j.core.TestUtils.assertNumEquals;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.ta4j.core.TradingRecordTestContext;
+import org.ta4j.core.backtest.analysis.cost.ZeroCostModel;
 import org.ta4j.core.num.NumFactory;
 
 class ZeroCostModelTest {

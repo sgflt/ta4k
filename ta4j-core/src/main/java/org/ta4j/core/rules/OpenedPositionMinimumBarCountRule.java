@@ -23,7 +23,7 @@
 // */
 //package org.ta4j.core.rules;
 //
-//import org.ta4j.core.TradingRecord;
+//import org.ta4j.core.backtest.TradingRecord;
 //
 ///**
 // * A rule for setting the minimum number of bars up to which an open position

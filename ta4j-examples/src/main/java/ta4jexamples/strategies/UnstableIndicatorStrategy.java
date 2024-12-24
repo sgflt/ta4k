@@ -28,13 +28,13 @@
 //import java.time.ZonedDateTime;
 //import java.util.stream.Stream;
 //
-//import org.ta4j.core.BarSeries;
+//import org.ta4j.core.api.bar.BarSeries;
 //import org.ta4j.core.backtest.BacktestBarSeriesBuilder;
-//import org.ta4j.core.backtest.BacktestStrategy;
-//import org.ta4j.core.indicators.Indicator;
-//import org.ta4j.core.Rule;
-//import org.ta4j.core.Strategy;
-//import org.ta4j.core.TradingRecord;
+//import org.ta4j.core.backtest.strategy.BacktestStrategy;
+//import org.ta4j.core.api.Indicator;
+//import org.ta4j.core.api.strategy.Rule;
+//import org.ta4j.core.api.strategy.Strategy;
+//import org.ta4j.core.backtest.TradingRecord;
 //import org.ta4j.core.indicators.numeric.average.SMAIndicator;
 //import org.ta4j.core.indicators.helpers.ClosePriceIndicator;
 //import org.ta4j.core.indicators.helpers.UnstableIndicator;

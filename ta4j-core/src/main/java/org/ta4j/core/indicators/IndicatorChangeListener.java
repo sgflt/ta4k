@@ -26,6 +26,8 @@ package org.ta4j.core.indicators;
 
 import java.time.Instant;
 
+import org.ta4j.core.api.Indicator;
+
 /**
  * @author Lukáš Kvídera
  */

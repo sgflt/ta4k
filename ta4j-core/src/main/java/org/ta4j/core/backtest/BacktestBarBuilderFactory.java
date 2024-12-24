@@ -1,7 +1,7 @@
 package org.ta4j.core.backtest;
 
-import org.ta4j.core.BarBuilderFactory;
-import org.ta4j.core.BarSeries;
+import org.ta4j.core.api.series.BarBuilderFactory;
+import org.ta4j.core.api.series.BarSeries;
 
 /**
  * @author Lukáš Kvídera

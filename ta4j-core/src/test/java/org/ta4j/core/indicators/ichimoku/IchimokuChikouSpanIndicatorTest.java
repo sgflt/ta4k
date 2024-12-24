@@ -29,7 +29,7 @@
 //import java.util.stream.IntStream;
 //
 //import org.junit.Test;
-//import org.ta4j.core.BarSeries;
+//import org.ta4j.core.api.bar.BarSeries;
 //import org.ta4j.core.indicators.AbstractIndicatorTest;
 //import org.ta4j.core.mocks.MockBarSeriesBuilder;
 //import org.ta4j.core.num.NaN;
@@ -44,7 +44,7 @@
 //
 //    private BarSeries barSeries(int count) {
 //        return new MockBarSeriesBuilder().withNumFactory(numFactory)
-//                .withCandleClosePrices(IntStream.range(0, count).mapToDouble(Double::valueOf).boxed().collect(toList()))
+//                .withCandlePrices(IntStream.range(0, count).mapToDouble(Double::valueOf).boxed().collect(toList()))
 //                .build();
 //    }
 //

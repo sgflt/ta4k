@@ -25,7 +25,7 @@
 //
 //import static org.ta4j.core.num.NaN.NaN;
 //
-//import org.ta4j.core.indicators.Indicator;
+//import org.ta4j.core.api.Indicator;
 //import org.ta4j.core.num.Num;
 //
 ///**

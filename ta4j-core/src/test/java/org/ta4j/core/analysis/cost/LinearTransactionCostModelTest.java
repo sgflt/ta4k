@@ -29,9 +29,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.ta4j.core.MarketEventTestContext;
-import org.ta4j.core.Position;
-import org.ta4j.core.Trade;
+import org.ta4j.core.TradeType;
 import org.ta4j.core.TradingRecordTestContext;
+import org.ta4j.core.backtest.Position;
+import org.ta4j.core.backtest.analysis.cost.CostModel;
+import org.ta4j.core.backtest.analysis.cost.LinearTransactionCostModel;
 import org.ta4j.core.num.Num;
 import org.ta4j.core.num.NumFactory;
 
@@ -63,7 +65,7 @@ class LinearTransactionCostModelTest {
     final var context = new TradingRecordTestContext()
         .withNumFactory(numFactory)
         .withTransactionCostModel(this.transactionModel)
-        .withTradeType(Trade.TradeType.BUY);
+        .withTradeType(TradeType.BUY);
 
     context.enter(1).at(100)
         .exit(1).at(110);
@@ -85,7 +87,7 @@ class LinearTransactionCostModelTest {
     final var context = new TradingRecordTestContext()
         .withNumFactory(numFactory)
         .withTransactionCostModel(this.transactionModel)
-        .withTradeType(Trade.TradeType.SELL);
+        .withTradeType(TradeType.SELL);
 
     context.enter(1).at(100)
         .exit(1).at(110);

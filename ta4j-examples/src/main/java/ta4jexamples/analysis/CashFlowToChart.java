@@ -39,11 +39,11 @@
 //import org.jfree.chart.ui.UIUtils;
 //import org.jfree.data.time.Minute;
 //import org.jfree.data.time.TimeSeriesCollection;
-//import org.ta4j.core.Bar;
-//import org.ta4j.core.BarSeries;
-//import org.ta4j.core.indicators.Indicator;
-//import org.ta4j.core.Strategy;
-//import org.ta4j.core.TradingRecord;
+//import org.ta4j.core.api.bar.Bar;
+//import org.ta4j.core.api.bar.BarSeries;
+//import org.ta4j.core.api.Indicator;
+//import org.ta4j.core.api.strategy.Strategy;
+//import org.ta4j.core.backtest.TradingRecord;
 //import org.ta4j.core.analysis.CashFlow;
 //import org.ta4j.core.indicators.helpers.ClosePriceIndicator;
 //import org.ta4j.core.num.Num;

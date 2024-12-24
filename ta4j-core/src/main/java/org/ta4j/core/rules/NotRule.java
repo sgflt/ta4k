@@ -23,7 +23,7 @@
  */
 package org.ta4j.core.rules;
 
-import org.ta4j.core.Rule;
+import org.ta4j.core.api.strategy.Rule;
 
 /**
  * An opposite (logical operator: NOT) rule (i.e. a rule that is the negation of

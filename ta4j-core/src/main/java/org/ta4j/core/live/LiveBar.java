@@ -27,7 +27,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneId;
 
-import org.ta4j.core.Bar;
+import org.ta4j.core.api.series.Bar;
 import org.ta4j.core.num.Num;
 
 /**

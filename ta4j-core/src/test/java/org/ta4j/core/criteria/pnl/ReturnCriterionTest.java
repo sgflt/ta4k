@@ -33,9 +33,10 @@ import java.time.ZoneId;
 
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.ta4j.core.Position;
-import org.ta4j.core.Trade;
+import org.ta4j.core.TradeType;
 import org.ta4j.core.TradingRecordTestContext;
+import org.ta4j.core.backtest.Position;
+import org.ta4j.core.backtest.criteria.pnl.ReturnCriterion;
 import org.ta4j.core.backtest.strategy.BackTestTradingRecord;
 import org.ta4j.core.criteria.AbstractCriterionTest;
 import org.ta4j.core.num.NumFactory;
@@ -50,7 +51,7 @@ class ReturnCriterionTest extends AbstractCriterionTest {
   void calculateWithWinningLongPositions(final NumFactory numFactory) {
     final var context = new TradingRecordTestContext()
         .withNumFactory(numFactory)
-        .withTradeType(Trade.TradeType.BUY);
+        .withTradeType(TradeType.BUY);
 
     // First trade: buy at 100, sell at 110 (return: 1.10)
     context.enter(1).at(100)
@@ -75,7 +76,7 @@ class ReturnCriterionTest extends AbstractCriterionTest {
   void calculateWithLosingLongPositions(final NumFactory numFactory) {
     final var context = new TradingRecordTestContext()
         .withNumFactory(numFactory)
-        .withTradeType(Trade.TradeType.BUY);
+        .withTradeType(TradeType.BUY);
 
     // First trade: buy at 100, sell at 95 (return: 0.95)
     context.enter(1).at(100)
@@ -100,7 +101,7 @@ class ReturnCriterionTest extends AbstractCriterionTest {
   void calculateReturnWithWinningShortPositions(final NumFactory numFactory) {
     final var context = new TradingRecordTestContext()
         .withNumFactory(numFactory)
-        .withTradeType(Trade.TradeType.SELL);
+        .withTradeType(TradeType.SELL);
 
     // First trade: sell at 100, buy at 95 (return: 1.05)
     context.enter(1).at(100)
@@ -125,7 +126,7 @@ class ReturnCriterionTest extends AbstractCriterionTest {
   void calculateReturnWithLosingShortPositions(final NumFactory numFactory) {
     final var context = new TradingRecordTestContext()
         .withNumFactory(numFactory)
-        .withTradeType(Trade.TradeType.SELL);
+        .withTradeType(TradeType.SELL);
 
     // First trade: sell at 100, buy at 105 (return: 0.95)
     context.enter(1).at(100)
@@ -161,7 +162,7 @@ class ReturnCriterionTest extends AbstractCriterionTest {
   @ParameterizedTest
   @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
   void calculateWithOpenedPosition(final NumFactory numFactory) {
-    var position = new Position(Trade.TradeType.BUY, numFactory);
+    var position = new Position(TradeType.BUY, numFactory);
 
     // Test with base percentage
     final var withBase = new ReturnCriterion();
@@ -173,7 +174,7 @@ class ReturnCriterionTest extends AbstractCriterionTest {
     assertNumEquals(1d, withBase.calculate(position));
 
     // Test without base percentage
-    position = new Position(Trade.TradeType.BUY, numFactory);
+    position = new Position(TradeType.BUY, numFactory);
     final var withoutBase = new ReturnCriterion(false);
     assertNumEquals(0d, withoutBase.calculate(position));
 

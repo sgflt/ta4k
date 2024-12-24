@@ -23,9 +23,9 @@
  */
 package org.ta4j.core.live;
 
-import org.ta4j.core.Bar;
-import org.ta4j.core.BarBuilderFactory;
-import org.ta4j.core.BarSeries;
+import org.ta4j.core.api.series.Bar;
+import org.ta4j.core.api.series.BarBuilderFactory;
+import org.ta4j.core.api.series.BarSeries;
 import org.ta4j.core.events.CandleReceived;
 import org.ta4j.core.indicators.IndicatorContext;
 import org.ta4j.core.num.NumFactory;

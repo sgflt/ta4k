@@ -28,9 +28,9 @@
 //
 //import org.junit.Before;
 //import org.junit.Test;
-//import org.ta4j.core.BarSeries;
+//import org.ta4j.core.api.bar.BarSeries;
 //import org.ta4j.core.backtest.strategy.BackTestTradingRecord;
-//import org.ta4j.core.Trade;
+//import org.ta4j.core.backtest.Trade;
 //import org.ta4j.core.indicators.AbstractIndicatorTest;
 //import org.ta4j.core.indicators.candles.price.ClosePriceIndicator;
 //import org.ta4j.core.mocks.MockBarSeriesBuilder;
@@ -48,7 +48,7 @@
 //    @Before
 //    public void setUp() {
 //        closePrice = new ClosePriceIndicator(new MockBarSeriesBuilder().withNumFactory(numFactory)
-//                .withCandleClosePrices(100, 105, 110, 120, 100, 150, 110, 100)
+//                .withCandlePrices(100, 105, 110, 120, 100, 150, 110, 100)
 //                .build());
 //    }
 //

@@ -34,14 +34,14 @@
 //
 //import org.junit.Before;
 //import org.junit.Test;
-//import org.ta4j.core.BarSeries;
+//import org.ta4j.core.api.bar.BarSeries;
 //import org.ta4j.core.backtest.BacktestBarSeriesBuilder;
 //import org.ta4j.core.backtest.strategy.BacktestStrategy;
-//import org.ta4j.core.Strategy;
+//import org.ta4j.core.api.strategy.Strategy;
 //import org.ta4j.core.indicators.numeric.average.SMAIndicator;
 //import org.ta4j.core.indicators.numeric.average.ZLEMAIndicator;
 //import org.ta4j.core.indicators.candles.price.ClosePriceIndicator;
-//import org.ta4j.core.indicators.helpers.ConstantNumericIndicator;
+//import org.ta4j.core.indicators.numeric.ConstantNumericIndicator;
 //import org.ta4j.core.mocks.MockBarSeriesBuilder;
 //import org.ta4j.core.num.Num;
 //import org.ta4j.core.num.NumFactory;
@@ -59,7 +59,7 @@
 //    @Before
 //    public void setUp() {
 //        series = new MockBarSeriesBuilder().withNumFactory(numFactory)
-//                .withCandleClosePrices(1, 2, 3, 4, 3, 4, 5, 4, 3, 3, 4, 3, 2)
+//                .withCandlePrices(1, 2, 3, 4, 3, 4, 5, 4, 3, 3, 4, 3, 2)
 //                .build();
 //    }
 //
@@ -91,7 +91,7 @@
 //        double[] data = new double[200];
 //        Arrays.fill(data, 10);
 //        SMAIndicator sma = new SMAIndicator(
-//                new ClosePriceIndicator(new MockBarSeriesBuilder().withNumFactory(numFactory).withCandleClosePrices(data).build()),
+//                new ClosePriceIndicator(new MockBarSeriesBuilder().withNumFactory(numFactory).withCandlePrices(data).build()),
 //                100);
 //        assertNumEquals(10, sma.getValue(105));
 //    }
@@ -100,7 +100,7 @@
 //    public void getValueWithOldResultsRemoval() {
 //        double[] data = new double[20];
 //        Arrays.fill(data, 1);
-//        BarSeries barSeries = new MockBarSeriesBuilder().withNumFactory(numFactory).withCandleClosePrices(data).build();
+//        BarSeries barSeries = new MockBarSeriesBuilder().withNumFactory(numFactory).withCandlePrices(data).build();
 //        SMAIndicator sma = new SMAIndicator(new ClosePriceIndicator(barSeries), 10);
 //        assertNumEquals(1, sma.getValue(5));
 //        assertNumEquals(1, sma.getValue(10));
@@ -111,7 +111,7 @@
 //    @Test
 //    public void strategyExecutionOnCachedIndicatorAndLimitedBarSeries() {
 //        BarSeries barSeries = new MockBarSeriesBuilder().withNumFactory(numFactory)
-//                .withCandleClosePrices(0, 1, 2, 3, 4, 5, 6, 7)
+//                .withCandlePrices(0, 1, 2, 3, 4, 5, 6, 7)
 //                .build();
 //        SMAIndicator sma = new SMAIndicator(new ClosePriceIndicator(barSeries), 2);
 //        // Theoretical values for SMA(2) cache: 0, 0.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5
@@ -157,7 +157,7 @@
 //
 //    @Test
 //    public void getValueOnResultsCalculatedFromRemovedBarsShouldReturnFirstRemainingResult() {
-//        BarSeries barSeries = new MockBarSeriesBuilder().withNumFactory(numFactory).withCandleClosePrices(1, 1, 1, 1, 1).build();
+//        BarSeries barSeries = new MockBarSeriesBuilder().withNumFactory(numFactory).withCandlePrices(1, 1, 1, 1, 1).build();
 //        barSeries.setMaximumBarCount(3);
 //        assertEquals(2, barSeries.getRemovedBarsCount());
 //

@@ -26,6 +26,8 @@ package org.ta4j.core;
 
 import lombok.Builder;
 import lombok.NonNull;
+import org.ta4j.core.api.strategy.Rule;
+import org.ta4j.core.api.strategy.Strategy;
 import org.ta4j.core.indicators.IndicatorContext;
 
 @Builder

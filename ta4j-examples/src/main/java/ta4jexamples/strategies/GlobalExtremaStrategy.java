@@ -23,18 +23,18 @@
 // */
 //package ta4jexamples.strategies;
 //
-//import org.ta4j.core.BarSeries;
-//import org.ta4j.core.backtest.BacktestStrategy;
-//import org.ta4j.core.Rule;
-//import org.ta4j.core.Strategy;
-//import org.ta4j.core.TradingRecord;
+//import org.ta4j.core.api.bar.BarSeries;
+//import org.ta4j.core.backtest.strategy.BacktestStrategy;
+//import org.ta4j.core.api.strategy.Rule;
+//import org.ta4j.core.api.strategy.Strategy;
+//import org.ta4j.core.backtest.TradingRecord;
 //import org.ta4j.core.criteria.pnl.ReturnCriterion;
 //import org.ta4j.core.indicators.helpers.ClosePriceIndicator;
 //import org.ta4j.core.indicators.helpers.HighPriceIndicator;
-//import org.ta4j.core.indicators.helpers.HighestValueIndicator;
+//import org.ta4j.core.indicators.numeric.helpers.HighestValueIndicator;
 //import org.ta4j.core.indicators.helpers.LowPriceIndicator;
-//import org.ta4j.core.indicators.helpers.LowestValueIndicator;
-//import org.ta4j.core.indicators.helpers.TransformIndicator;
+//import org.ta4j.core.indicators.numeric.helpers.LowestValueIndicator;
+//import org.ta4j.core.indicators.numeric.helpers.TransformIndicator;
 //import org.ta4j.core.rules.OverIndicatorRule;
 //import org.ta4j.core.rules.UnderIndicatorRule;
 //

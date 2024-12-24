@@ -30,17 +30,17 @@
 //import java.util.logging.Level;
 //import java.util.logging.Logger;
 //
-//import org.ta4j.core.BarSeries;
-//import org.ta4j.core.indicators.numeric.ATRIndicator;
+//import org.ta4j.core.api.bar.BarSeries;
+//import org.ta4j.core.indicators.numeric.momentum.ATRIndicator;
 //import org.ta4j.core.indicators.numeric.average.EMAIndicator;
 //import org.ta4j.core.indicators.PPOIndicator;
 //import org.ta4j.core.indicators.ROCIndicator;
-//import org.ta4j.core.indicators.RSIIndicator;
+//import org.ta4j.core.indicators.numeric.momentum.RSIIndicator;
 //import org.ta4j.core.indicators.numeric.average.SMAIndicator;
 //import org.ta4j.core.indicators.WilliamsRIndicator;
 //import org.ta4j.core.indicators.helpers.ClosePriceIndicator;
 //import org.ta4j.core.indicators.helpers.RatioIndicator;
-//import org.ta4j.core.indicators.helpers.TypicalPriceIndicator;
+//import org.ta4j.core.indicators.numeric.candles.price.TypicalPriceIndicator;
 //import org.ta4j.core.indicators.numeric.statistics.StandardDeviationIndicator;
 //
 //import ta4jexamples.loaders.CsvTradesLoader;
@@ -134,7 +134,7 @@
 //            writer = new BufferedWriter(new FileWriter(new File("target", "indicators.csv")));
 //            writer.write(sb.toString());
 //        } catch (IOException ioe) {
-//            Logger.getLogger(IndicatorsToCsv.class.getName()).log(Level.SEVERE, "Unable to write CSV file", ioe);
+//            Logger.getLogger(IndicatorsToCsv.class.name()).log(Level.SEVERE, "Unable to write CSV file", ioe);
 //        } finally {
 //            try {
 //                if (writer != null) {

@@ -96,7 +96,7 @@
 //
 //        assertNumEquals(0, defaultSeries.getBar(1000).closePrice());
 //        assertNumEquals(1000, defaultSeries.getBar(0).closePrice());
-//        assertEquals(defaultSeriesName.getName(), "default");
+//        assertEquals(defaultSeriesName.name(), "default");
 //        assertNumEquals(99, doubleSeries.getBar(0).closePrice());
 //        assertNumEquals(99, precisionSeries.getBar(0).closePrice());
 //    }

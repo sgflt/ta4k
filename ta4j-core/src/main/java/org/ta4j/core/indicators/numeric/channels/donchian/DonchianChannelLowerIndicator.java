@@ -23,9 +23,9 @@
 // */
 //package org.ta4j.core.indicators.donchian;
 //
-//import org.ta4j.core.BarSeries;
+//import org.ta4j.core.api.bar.BarSeries;
 //import org.ta4j.core.indicators.helpers.LowPriceIndicator;
-//import org.ta4j.core.indicators.helpers.LowestValueIndicator;
+//import org.ta4j.core.indicators.numeric.helpers.LowestValueIndicator;
 //import org.ta4j.core.num.Num;
 //
 ///***

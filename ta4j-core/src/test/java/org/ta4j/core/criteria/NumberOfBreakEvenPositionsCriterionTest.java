@@ -24,8 +24,9 @@
 package org.ta4j.core.criteria;
 
 import org.junit.jupiter.api.Test;
-import org.ta4j.core.Trade;
+import org.ta4j.core.TradeType;
 import org.ta4j.core.TradingRecordTestContext;
+import org.ta4j.core.backtest.criteria.NumberOfBreakEvenPositionsCriterion;
 
 class NumberOfBreakEvenPositionsCriterionTest {
 
@@ -62,7 +63,7 @@ class NumberOfBreakEvenPositionsCriterionTest {
   @Test
   void calculateWithTwoShortPositions() {
     new TradingRecordTestContext()
-        .withTradeType(Trade.TradeType.SELL)
+        .withTradeType(TradeType.SELL)
         .withCriterion(new NumberOfBreakEvenPositionsCriterion())
         .enter(1).at(100)
         .exit(1).at(100)

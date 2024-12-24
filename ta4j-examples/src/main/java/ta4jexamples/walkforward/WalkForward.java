@@ -30,11 +30,11 @@
 //import java.util.List;
 //import java.util.Map;
 //
-//import org.ta4j.core.AnalysisCriterion;
-//import org.ta4j.core.BarSeries;
-//import org.ta4j.core.Strategy;
-//import org.ta4j.core.Trade.TradeType;
-//import org.ta4j.core.TradingRecord;
+//import org.ta4j.core.backtest.criteria.AnalysisCriterion;
+//import org.ta4j.core.api.bar.BarSeries;
+//import org.ta4j.core.api.strategy.Strategy;
+//import org.ta4j.core.backtest.Trade.TradeType;
+//import org.ta4j.core.backtest.TradingRecord;
 //import org.ta4j.core.backtest.BacktestBarSeries;
 //import org.ta4j.core.backtest.BacktestExecutor;
 //import org.ta4j.core.criteria.pnl.ReturnCriterion;

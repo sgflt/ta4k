@@ -35,7 +35,7 @@
 //import java.util.ArrayList;
 //
 //import org.junit.Test;
-//import org.ta4j.core.Rule;
+//import org.ta4j.core.api.strategy.Rule;
 //import org.ta4j.core.backtest.strategy.BacktestStrategy;
 //import org.ta4j.core.indicators.AbstractIndicatorTest;
 //import org.ta4j.core.indicators.IndicatorContext;

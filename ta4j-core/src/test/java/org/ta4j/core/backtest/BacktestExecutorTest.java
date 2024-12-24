@@ -36,11 +36,12 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.ta4j.core.DefaultStrategy;
-import org.ta4j.core.Rule;
-import org.ta4j.core.RuntimeContext;
-import org.ta4j.core.Strategy;
-import org.ta4j.core.StrategyFactory;
-import org.ta4j.core.Trade;
+import org.ta4j.core.TradeType;
+import org.ta4j.core.api.Indicators;
+import org.ta4j.core.api.strategy.Rule;
+import org.ta4j.core.api.strategy.RuntimeContext;
+import org.ta4j.core.api.strategy.Strategy;
+import org.ta4j.core.api.strategy.StrategyFactory;
 import org.ta4j.core.backtest.strategy.BacktestRunFactory;
 import org.ta4j.core.backtest.strategy.BacktestStrategy;
 import org.ta4j.core.backtest.strategy.NOOPRuntimeContextFactory;
@@ -49,7 +50,6 @@ import org.ta4j.core.backtest.strategy.StrategyFactoryConverter;
 import org.ta4j.core.events.CandleReceived;
 import org.ta4j.core.events.MarketEvent;
 import org.ta4j.core.indicators.IndicatorContext;
-import org.ta4j.core.indicators.numeric.Indicators;
 import org.ta4j.core.num.NumFactory;
 
 @Slf4j
@@ -142,8 +142,8 @@ class BacktestExecutorTest {
 
 
     @Override
-    public Trade.TradeType getTradeType() {
-      return Trade.TradeType.BUY;
+    public TradeType getTradeType() {
+      return TradeType.BUY;
     }
 
 

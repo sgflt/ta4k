@@ -25,7 +25,7 @@ package org.ta4j.core.aggregator;
 
 import java.util.List;
 
-import org.ta4j.core.Bar;
+import org.ta4j.core.api.series.Bar;
 
 /**
  * Aggregates a list of {@link Bar bars} into another one.

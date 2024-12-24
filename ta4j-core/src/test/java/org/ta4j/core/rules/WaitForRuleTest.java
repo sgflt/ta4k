@@ -29,8 +29,8 @@
 //import org.junit.Before;
 //import org.junit.Test;
 //import org.ta4j.core.backtest.strategy.BackTestTradingRecord;
-//import org.ta4j.core.Trade;
-//import org.ta4j.core.TradingRecord;
+//import org.ta4j.core.backtest.Trade;
+//import org.ta4j.core.backtest.TradingRecord;
 //
 //public class WaitForRuleTest {
 //

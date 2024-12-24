@@ -35,9 +35,10 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.ta4j.core.MarketEventTestContext;
-import org.ta4j.core.Position;
-import org.ta4j.core.Trade;
+import org.ta4j.core.TradeType;
 import org.ta4j.core.TradingRecordTestContext;
+import org.ta4j.core.backtest.Position;
+import org.ta4j.core.backtest.analysis.RealizedCashFlow;
 import org.ta4j.core.backtest.strategy.BackTestTradingRecord;
 import org.ta4j.core.num.Num;
 import org.ta4j.core.num.NumFactory;
@@ -50,7 +51,7 @@ class RealizedCashFlowTest {
   @ParameterizedTest
   @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
   void cashFlowBuyWithOnlyOnePosition(final NumFactory numFactory) {
-    final var position = new Position(Trade.TradeType.BUY, numFactory);
+    final var position = new Position(TradeType.BUY, numFactory);
     final var now = Instant.now(this.clock);
 
     // Execute buy at price 1
@@ -72,7 +73,7 @@ class RealizedCashFlowTest {
   void cashFlowWithSellAndBuyTrades(final NumFactory numFactory) {
     final var buyContext = new TradingRecordTestContext()
         .withNumFactory(numFactory)
-        .withTradeType(Trade.TradeType.BUY);
+        .withTradeType(TradeType.BUY);
 
     // First trade: buy at 2, sell at 1 (loss: 50%)
     buyContext.enter(1).at(2);
@@ -85,7 +86,7 @@ class RealizedCashFlowTest {
     // Switch to sell context for the third trade
     final var sellContext = new TradingRecordTestContext()
         .withNumFactory(numFactory)
-        .withTradeType(Trade.TradeType.SELL);
+        .withTradeType(TradeType.SELL);
 
     // Third trade: sell at 3, buy at 20 (loss: large)
     sellContext.enter(1).at(3);
@@ -124,7 +125,7 @@ class RealizedCashFlowTest {
   @ParameterizedTest
   @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
   void cashFlowShortSellWith20PercentGain(final NumFactory numFactory) {
-    final var position = new Position(Trade.TradeType.SELL, numFactory);
+    final var position = new Position(TradeType.SELL, numFactory);
     final var now = Instant.now(this.clock);
 
     // Short sell at 100
@@ -145,7 +146,7 @@ class RealizedCashFlowTest {
   @ParameterizedTest
   @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
   void cashFlowShortSellWith100PercentLoss(final NumFactory numFactory) {
-    final var position = new Position(Trade.TradeType.SELL, numFactory);
+    final var position = new Position(TradeType.SELL, numFactory);
     final var now = Instant.now(this.clock);
 
     // Short sell at 100
@@ -198,7 +199,7 @@ class RealizedCashFlowTest {
         .withCandleDuration(ChronoUnit.MINUTES)
         .withCandlePrices(100, 120, 150, 135, 100, 100, 100, 200, 200, 160)
         .toTradingRecordContext()
-        .withTradeType(Trade.TradeType.BUY);
+        .withTradeType(TradeType.BUY);
 
 
     // Position 1: 100 -> 120 (profit: +20%)

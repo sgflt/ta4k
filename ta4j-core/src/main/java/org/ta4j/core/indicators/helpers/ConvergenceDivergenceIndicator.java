@@ -23,9 +23,9 @@
 // */
 //package org.ta4j.core.indicators.helpers;
 //
-//import org.ta4j.core.Rule;
+//import org.ta4j.core.api.strategy.Rule;
 //import org.ta4j.core.indicators.AbstractIndicator;
-//import org.ta4j.core.indicators.Indicator;
+//import org.ta4j.core.api.Indicator;
 //import org.ta4j.core.indicators.numeric.statistics.CorrelationCoefficientIndicator;
 //import org.ta4j.core.num.Num;
 //import org.ta4j.core.rules.IsFallingRule;

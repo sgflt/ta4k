@@ -25,7 +25,7 @@
 //
 //import java.util.Arrays;
 //
-//import org.ta4j.core.TradingRecord;
+//import org.ta4j.core.backtest.TradingRecord;
 //
 ///**
 // * Satisfied when any of the specified {@code indexes} match the current bar

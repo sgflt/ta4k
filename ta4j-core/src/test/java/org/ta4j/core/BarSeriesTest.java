@@ -212,8 +212,8 @@
 //
 //    @Test
 //    public void getNameTest() {
-//        assertEquals(defaultName, defaultSeries.getName());
-//        assertEquals(defaultName, subSeries.getName());
+//        assertEquals(defaultName, defaultSeries.name());
+//        assertEquals(defaultName, subSeries.name());
 //    }
 //
 //    @Test
@@ -257,7 +257,7 @@
 //    public void subSeriesCreationTest() {
 //        BarSeries subSeries = defaultSeries.getSubSeries(2, 5);
 //        assertEquals(3, subSeries.getBarCount());
-//        assertEquals(defaultSeries.getName(), subSeries.getName());
+//        assertEquals(defaultSeries.name(), subSeries.name());
 //        assertEquals(0, subSeries.getBeginIndex());
 //        assertEquals(defaultSeries.getBeginIndex(), subSeries.getBeginIndex());
 //        assertEquals(2, subSeries.getEndIndex());

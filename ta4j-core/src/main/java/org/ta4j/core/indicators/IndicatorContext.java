@@ -31,8 +31,9 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.function.Consumer;
 
-import org.ta4j.core.Bar;
-import org.ta4j.core.BarListener;
+import org.ta4j.core.api.Indicator;
+import org.ta4j.core.api.callback.BarListener;
+import org.ta4j.core.api.series.Bar;
 import org.ta4j.core.indicators.bool.BooleanIndicator;
 import org.ta4j.core.indicators.numeric.NumericIndicator;
 

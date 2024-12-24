@@ -23,8 +23,8 @@
 // */
 //package org.ta4j.core.rules;
 //
-//import org.ta4j.core.indicators.Indicator;
-//import org.ta4j.core.TradingRecord;
+//import org.ta4j.core.api.Indicator;
+//import org.ta4j.core.backtest.TradingRecord;
 //import org.ta4j.core.num.Num;
 //
 ///**

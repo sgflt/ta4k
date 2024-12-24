@@ -23,9 +23,9 @@
  */
 package org.ta4j.core.live;
 
-import org.ta4j.core.BarBuilder;
-import org.ta4j.core.BarSeries;
-import org.ta4j.core.Strategy;
+import org.ta4j.core.api.series.BarBuilder;
+import org.ta4j.core.api.series.BarSeries;
+import org.ta4j.core.api.strategy.Strategy;
 
 /**
  * Trading contest that traces bars and respective strategy

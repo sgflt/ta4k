@@ -27,7 +27,7 @@
 //
 //import org.junit.Before;
 //import org.junit.Test;
-//import org.ta4j.core.BarSeries;
+//import org.ta4j.core.api.bar.BarSeries;
 //import org.ta4j.core.mocks.MockBarSeriesBuilder;
 //import org.ta4j.core.num.Num;
 //import org.ta4j.core.num.NumFactory;

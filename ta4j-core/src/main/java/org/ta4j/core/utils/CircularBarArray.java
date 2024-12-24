@@ -25,7 +25,7 @@ package org.ta4j.core.utils;
 
 import java.util.Iterator;
 
-import org.ta4j.core.Bar;
+import org.ta4j.core.api.series.Bar;
 
 public class CircularBarArray extends CircularArray<Bar> {
 

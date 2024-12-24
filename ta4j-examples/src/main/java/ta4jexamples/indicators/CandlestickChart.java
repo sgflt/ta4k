@@ -40,8 +40,8 @@
 //import org.jfree.data.time.TimeSeriesCollection;
 //import org.jfree.data.xy.DefaultHighLowDataset;
 //import org.jfree.data.xy.OHLCDataset;
-//import org.ta4j.core.Bar;
-//import org.ta4j.core.BarSeries;
+//import org.ta4j.core.api.bar.Bar;
+//import org.ta4j.core.api.bar.BarSeries;
 //import org.ta4j.core.indicators.helpers.ClosePriceIndicator;
 //
 //import ta4jexamples.loaders.CsvTradesLoader;

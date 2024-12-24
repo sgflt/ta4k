@@ -28,7 +28,7 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.ta4j.core.Rule;
+import org.ta4j.core.api.strategy.Rule;
 
 public class AndRuleTest {
 

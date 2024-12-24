@@ -23,12 +23,12 @@
 // */
 //package org.ta4j.core.indicators.ichimoku;
 //
-//import org.ta4j.core.BarSeries;
-//import org.ta4j.core.indicators.Indicator;
+//import org.ta4j.core.api.bar.BarSeries;
+//import org.ta4j.core.api.Indicator;
 //import org.ta4j.core.indicators.helpers.HighPriceIndicator;
-//import org.ta4j.core.indicators.helpers.HighestValueIndicator;
+//import org.ta4j.core.indicators.numeric.helpers.HighestValueIndicator;
 //import org.ta4j.core.indicators.helpers.LowPriceIndicator;
-//import org.ta4j.core.indicators.helpers.LowestValueIndicator;
+//import org.ta4j.core.indicators.numeric.helpers.LowestValueIndicator;
 //import org.ta4j.core.num.Num;
 //
 ///**

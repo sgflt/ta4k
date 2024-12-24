@@ -30,10 +30,10 @@
 //import java.util.List;
 //
 //import org.junit.Test;
-//import org.ta4j.core.BarSeries;
-//import org.ta4j.core.Position;
-//import org.ta4j.core.Trade;
-//import org.ta4j.core.Trade.TradeType;
+//import org.ta4j.core.api.bar.BarSeries;
+//import org.ta4j.core.backtest.Position;
+//import org.ta4j.core.backtest.Trade;
+//import org.ta4j.core.backtest.Trade.TradeType;
 //import org.ta4j.core.backtest.strategy.BackTestTradingRecord;
 //import org.ta4j.core.mocks.MockBarSeriesBuilder;
 //import org.ta4j.core.num.NumFactory;

@@ -28,8 +28,9 @@ import java.time.temporal.ChronoUnit;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.ta4j.core.MarketEventTestContext;
-import org.ta4j.core.Trade;
+import org.ta4j.core.TradeType;
 import org.ta4j.core.TradingRecordTestContext;
+import org.ta4j.core.backtest.criteria.TimeInTradeCriterion;
 import org.ta4j.core.num.DoubleNumFactory;
 
 class TimeInTradeCriterionTest {
@@ -58,7 +59,7 @@ class TimeInTradeCriterionTest {
         .withCandlePrices(100.0, 0, 110.0, 100.0, 0, 0, 105.0)
         .toTradingRecordContext()
         .withCriterion(TimeInTradeCriterion.minutes())
-        .withTradeType(Trade.TradeType.BUY);
+        .withTradeType(TradeType.BUY);
 
     this.context
         .enter(100).after(1)
@@ -79,7 +80,7 @@ class TimeInTradeCriterionTest {
         .withNumFactory(DoubleNumFactory.getInstance())
         .toTradingRecordContext()
         .withCriterion(TimeInTradeCriterion.minutes())
-        .withTradeType(Trade.TradeType.BUY);
+        .withTradeType(TradeType.BUY);
 
     this.context
         .enter(100).after(1)
@@ -98,7 +99,7 @@ class TimeInTradeCriterionTest {
         .withNumFactory(DoubleNumFactory.getInstance())
         .toTradingRecordContext()
         .withCriterion(TimeInTradeCriterion.minutes())
-        .withTradeType(Trade.TradeType.BUY);
+        .withTradeType(TradeType.BUY);
 
     this.context
         .enter(100).after(1)

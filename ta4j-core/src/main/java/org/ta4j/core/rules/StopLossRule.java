@@ -23,8 +23,8 @@
 // */
 //package org.ta4j.core.rules;
 //
-//import org.ta4j.core.Position;
-//import org.ta4j.core.TradingRecord;
+//import org.ta4j.core.backtest.Position;
+//import org.ta4j.core.backtest.TradingRecord;
 //import org.ta4j.core.indicators.candles.price.ClosePriceIndicator;
 //import org.ta4j.core.num.Num;
 //

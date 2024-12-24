@@ -23,8 +23,8 @@
  */
 package org.ta4j.core.indicators.numeric.candles;
 
-import org.ta4j.core.Bar;
-import org.ta4j.core.BarSeries;
+import org.ta4j.core.api.series.Bar;
+import org.ta4j.core.api.series.BarSeries;
 import org.ta4j.core.indicators.SeriesRelatedBooleanIndicator;
 import org.ta4j.core.num.Num;
 

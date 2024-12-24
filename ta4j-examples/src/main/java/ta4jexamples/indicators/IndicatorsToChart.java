@@ -35,9 +35,9 @@
 //import org.jfree.chart.ui.UIUtils;
 //import org.jfree.data.time.Day;
 //import org.jfree.data.time.TimeSeriesCollection;
-//import org.ta4j.core.Bar;
-//import org.ta4j.core.BarSeries;
-//import org.ta4j.core.indicators.Indicator;
+//import org.ta4j.core.api.bar.Bar;
+//import org.ta4j.core.api.bar.BarSeries;
+//import org.ta4j.core.api.Indicator;
 //import org.ta4j.core.indicators.numeric.average.EMAIndicator;
 //import org.ta4j.core.indicators.numeric.channels.bollinger.BollingerBandsLowerIndicator;
 //import org.ta4j.core.indicators.numeric.channels.bollinger.BollingerBandsMiddleIndicator;

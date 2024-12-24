@@ -27,7 +27,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.ta4j.core.MarketEventTestContext;
-import org.ta4j.core.indicators.numeric.Indicators;
+import org.ta4j.core.api.Indicators;
 import org.ta4j.core.num.NumFactory;
 
 class BollingerBandsLowerIndicatorTest {

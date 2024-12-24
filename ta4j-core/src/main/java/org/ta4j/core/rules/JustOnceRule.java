@@ -23,7 +23,7 @@
  */
 package org.ta4j.core.rules;
 
-import org.ta4j.core.Rule;
+import org.ta4j.core.api.strategy.Rule;
 
 /**
  * A one-shot rule.

@@ -32,12 +32,12 @@
 //
 //import org.junit.Before;
 //import org.junit.Test;
-//import org.ta4j.core.BarSeries;
-//import org.ta4j.core.Position;
-//import org.ta4j.core.Strategy;
-//import org.ta4j.core.Trade;
-//import org.ta4j.core.Trade.TradeType;
-//import org.ta4j.core.TradingRecord;
+//import org.ta4j.core.api.bar.BarSeries;
+//import org.ta4j.core.backtest.Position;
+//import org.ta4j.core.api.strategy.Strategy;
+//import org.ta4j.core.backtest.Trade;
+//import org.ta4j.core.backtest.Trade.TradeType;
+//import org.ta4j.core.backtest.TradingRecord;
 //import org.ta4j.core.indicators.AbstractIndicatorTest;
 //import org.ta4j.core.mocks.MockBarSeriesBuilder;
 //import org.ta4j.core.num.Num;
@@ -83,7 +83,7 @@
 //    @Test
 //    public void runOnWholeSeries() {
 //        var series = new MockBarSeriesBuilder().withNumFactory(numFactory)
-//                .withCandleClosePrices(20d, 40d, 60d, 10d, 30d, 50d, 0d, 20d, 40d)
+//                .withCandlePrices(20d, 40d, 60d, 10d, 30d, 50d, 0d, 20d, 40d)
 //                .build();
 //        manager = new BarSeriesManager(series, new TradeOnCurrentCloseModel());
 //        List<Position> allPositions = manager.run(strategy).getPositions();
@@ -93,7 +93,7 @@
 //    @Test
 //    public void runOnWholeSeriesWithAmount() {
 //        var series = new MockBarSeriesBuilder().withNumFactory(numFactory)
-//                .withCandleClosePrices(20d, 40d, 60d, 10d, 30d, 50d, 0d, 20d, 40d)
+//                .withCandlePrices(20d, 40d, 60d, 10d, 30d, 50d, 0d, 20d, 40d)
 //                .build();
 //        manager = new BarSeriesManager(series, new TradeOnCurrentCloseModel());
 //        List<Position> allPositions = manager.run(strategy, TradeType.BUY, HUNDRED).getPositions();

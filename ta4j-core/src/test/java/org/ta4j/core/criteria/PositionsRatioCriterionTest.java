@@ -25,9 +25,10 @@ package org.ta4j.core.criteria;
 
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.ta4j.core.AnalysisCriterion.PositionFilter;
 import org.ta4j.core.MarketEventTestContext;
-import org.ta4j.core.Trade;
+import org.ta4j.core.TradeType;
+import org.ta4j.core.backtest.criteria.AnalysisCriterion.PositionFilter;
+import org.ta4j.core.backtest.criteria.PositionsRatioCriterion;
 import org.ta4j.core.num.NumFactory;
 
 class PositionsRatioCriterionTest {
@@ -78,7 +79,7 @@ class PositionsRatioCriterionTest {
         .withCandlePrices(100d, 95d, 102d, 105d, 97d, 113d);
 
     context.toTradingRecordContext()
-        .withTradeType(Trade.TradeType.SELL)
+        .withTradeType(TradeType.SELL)
         .withCriterion(new PositionsRatioCriterion(PositionFilter.PROFIT))
         .enter(1).asap()
         .exit(1).asap()

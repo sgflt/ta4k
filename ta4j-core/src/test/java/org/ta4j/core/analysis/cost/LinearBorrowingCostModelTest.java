@@ -31,8 +31,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.ta4j.core.MarketEventTestContext;
-import org.ta4j.core.Trade;
+import org.ta4j.core.TradeType;
 import org.ta4j.core.TradingRecordTestContext;
+import org.ta4j.core.backtest.analysis.cost.CostModel;
+import org.ta4j.core.backtest.analysis.cost.LinearBorrowingCostModel;
 import org.ta4j.core.num.NumFactory;
 
 class LinearBorrowingCostModelTest {
@@ -68,7 +70,7 @@ class LinearBorrowingCostModelTest {
     this.context.withNumFactory(numFactory);
 
     this.context
-        .withTradeType(Trade.TradeType.BUY)
+        .withTradeType(TradeType.BUY)
         .enter(1).at(100)
         .exit(1).at(110)
     ;
@@ -88,7 +90,7 @@ class LinearBorrowingCostModelTest {
     this.context.withNumFactory(numFactory);
 
     this.context
-        .withTradeType(Trade.TradeType.SELL)
+        .withTradeType(TradeType.SELL)
         .enter(1).at(100)
         .forwardTime(2)
         .exit(1).at(110);
@@ -115,7 +117,7 @@ class LinearBorrowingCostModelTest {
         .withResolution(ChronoUnit.DAYS);
 
     this.context
-        .withTradeType(Trade.TradeType.SELL)
+        .withTradeType(TradeType.SELL)
         .enter(1).asap()
         .forwardTime(4);
 

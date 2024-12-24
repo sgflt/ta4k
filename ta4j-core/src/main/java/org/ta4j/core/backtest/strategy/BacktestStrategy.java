@@ -28,14 +28,14 @@ import java.util.Objects;
 import lombok.ToString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.ta4j.core.Bar;
-import org.ta4j.core.BarListener;
-import org.ta4j.core.Position;
-import org.ta4j.core.Rule;
-import org.ta4j.core.RuntimeContext;
-import org.ta4j.core.Strategy;
-import org.ta4j.core.TickListener;
+import org.ta4j.core.api.callback.BarListener;
+import org.ta4j.core.api.callback.TickListener;
+import org.ta4j.core.api.series.Bar;
+import org.ta4j.core.api.strategy.Rule;
+import org.ta4j.core.api.strategy.RuntimeContext;
+import org.ta4j.core.api.strategy.Strategy;
 import org.ta4j.core.backtest.OperationType;
+import org.ta4j.core.backtest.Position;
 import org.ta4j.core.events.TickReceived;
 
 /**

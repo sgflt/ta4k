@@ -34,7 +34,7 @@ import java.math.BigDecimal;
 import org.assertj.core.data.Offset;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.ta4j.core.indicators.Indicator;
+import org.ta4j.core.api.Indicator;
 import org.ta4j.core.num.Num;
 
 /**

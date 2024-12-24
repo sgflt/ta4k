@@ -1,0 +1,88 @@
+/*
+ * The MIT License (MIT)
+ *
+ * Copyright (c) 2017-2024 Ta4j Organization & respective authors (see AUTHORS)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of
+ * this software and associated documentation files (the "Software"), to deal in
+ * the Software without restriction, including without limitation the rights to
+ * use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+ * the Software, and to permit persons to whom the Software is furnished to do so,
+ * subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+ * FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+ * COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+ * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+ * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ */
+package org.ta4j.core.backtest.criteria;
+
+import org.ta4j.core.backtest.Position;
+import org.ta4j.core.backtest.TradingRecord;
+import org.ta4j.core.backtest.criteria.pnl.ProfitLossRatioCriterion;
+import org.ta4j.core.num.Num;
+import org.ta4j.core.num.NumFactoryProvider;
+
+/**
+ * Expectancy criterion (also called "Kelly Criterion").
+ *
+ * <p>
+ * Measures the positive or negative expectancy. The higher the positive number,
+ * the better a winning expectation. A negative number means there is only
+ * losing expectations.
+ *
+ * @see <a href=
+ *     "https://www.straightforex.com/advanced-forex-course/money-management/two-important-things-to-be-considered/">https://www.straightforex.com/advanced-forex-course/money-management/two-important-things-to-be-considered/</a>
+ */
+public class ExpectancyCriterion implements AnalysisCriterion {
+
+  private final ProfitLossRatioCriterion profitLossRatioCriterion = new ProfitLossRatioCriterion();
+  private final NumberOfPositionsCriterion numberOfPositionsCriterion = new NumberOfPositionsCriterion();
+  private final NumberOfWinningPositionsCriterion numberOfWinningPositionsCriterion =
+      new NumberOfWinningPositionsCriterion();
+
+
+  @Override
+  public Num calculate(final Position position) {
+    final Num profitLossRatio = this.profitLossRatioCriterion.calculate(position);
+    final Num numberOfPositions = this.numberOfPositionsCriterion.calculate(position);
+    final Num numberOfWinningPositions = this.numberOfWinningPositionsCriterion.calculate(position);
+    return calculate(profitLossRatio, numberOfWinningPositions, numberOfPositions);
+  }
+
+
+  @Override
+  public Num calculate(final TradingRecord tradingRecord) {
+    final Num profitLossRatio = this.profitLossRatioCriterion.calculate(tradingRecord);
+    final Num numberOfPositions = this.numberOfPositionsCriterion.calculate(tradingRecord);
+    final Num numberOfWinningPositions = this.numberOfWinningPositionsCriterion.calculate(tradingRecord);
+    return calculate(profitLossRatio, numberOfWinningPositions, numberOfPositions);
+  }
+
+
+  /** The higher the criterion value, the better. */
+  @Override
+  public boolean betterThan(final Num criterionValue1, final Num criterionValue2) {
+    return criterionValue1.isGreaterThan(criterionValue2);
+  }
+
+
+  private Num calculate(
+      final Num profitLossRatio, final Num numberOfWinningPositions,
+      final Num numberOfAllPositions
+  ) {
+    if (numberOfAllPositions.isZero() || profitLossRatio.isZero()) {
+      return NumFactoryProvider.getDefaultNumFactory().zero();
+    }
+    // Expectancy = ((1 + AW/AL) * ProbabilityToWinOnePosition) - 1
+    final Num one = NumFactoryProvider.getDefaultNumFactory().one();
+    final Num probabiltyToWinOnePosition = numberOfWinningPositions.dividedBy(numberOfAllPositions);
+    return (one.plus(profitLossRatio)).multipliedBy(probabiltyToWinOnePosition).minus(one);
+  }
+
+}

@@ -24,9 +24,9 @@
 
 package org.ta4j.core.backtest.strategy;
 
-import org.ta4j.core.Bar;
-import org.ta4j.core.RuntimeContext;
-import org.ta4j.core.RuntimeValueResolver;
+import org.ta4j.core.api.series.Bar;
+import org.ta4j.core.api.strategy.RuntimeContext;
+import org.ta4j.core.api.strategy.RuntimeValueResolver;
 import org.ta4j.core.events.TickReceived;
 
 /**

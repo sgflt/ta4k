@@ -28,7 +28,10 @@ import java.util.Comparator;
 import java.util.List;
 
 import org.ta4j.core.CompoundRuntimeContext;
-import org.ta4j.core.TickListener;
+import org.ta4j.core.api.callback.MarketEventHandler;
+import org.ta4j.core.api.callback.TickListener;
+import org.ta4j.core.backtest.reports.TradingStatement;
+import org.ta4j.core.backtest.reports.TradingStatementGenerator;
 import org.ta4j.core.backtest.strategy.BackTestTradingRecord;
 import org.ta4j.core.backtest.strategy.BacktestRunFactory;
 import org.ta4j.core.backtest.strategy.BacktestStrategy;
@@ -38,8 +41,6 @@ import org.ta4j.core.events.NewsReceived;
 import org.ta4j.core.events.TickReceived;
 import org.ta4j.core.indicators.IndicatorContext;
 import org.ta4j.core.num.Num;
-import org.ta4j.core.reports.TradingStatement;
-import org.ta4j.core.reports.TradingStatementGenerator;
 
 /**
  * Allows backtesting multiple strategies and comparing them to find out which

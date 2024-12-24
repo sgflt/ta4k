@@ -23,7 +23,7 @@
  */
 package org.ta4j.core.rules;
 
-import org.ta4j.core.indicators.Indicator;
+import org.ta4j.core.api.Indicator;
 import org.ta4j.core.indicators.bool.BooleanIndicator;
 
 /**

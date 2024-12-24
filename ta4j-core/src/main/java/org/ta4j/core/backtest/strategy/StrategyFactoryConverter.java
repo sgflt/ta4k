@@ -23,10 +23,10 @@
 
 package org.ta4j.core.backtest.strategy;
 
-import org.ta4j.core.RuntimeContext;
-import org.ta4j.core.Strategy;
-import org.ta4j.core.StrategyFactory;
-import org.ta4j.core.Trade;
+import org.ta4j.core.TradeType;
+import org.ta4j.core.api.strategy.RuntimeContext;
+import org.ta4j.core.api.strategy.Strategy;
+import org.ta4j.core.api.strategy.StrategyFactory;
 import org.ta4j.core.indicators.IndicatorContext;
 
 /**
@@ -62,7 +62,7 @@ public final class StrategyFactoryConverter {
 
 
     @Override
-    public Trade.TradeType getTradeType() {
+    public TradeType getTradeType() {
       return this.originalFactory.getTradeType();
     }
 

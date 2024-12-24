@@ -23,10 +23,10 @@
  */
 package org.ta4j.core.indicators.numeric.candles;
 
-import org.ta4j.core.Bar;
+import org.ta4j.core.api.Indicators;
+import org.ta4j.core.api.series.Bar;
 import org.ta4j.core.indicators.bool.BooleanIndicator;
 import org.ta4j.core.indicators.helpers.previous.PreviousNumericValueIndicator;
-import org.ta4j.core.indicators.numeric.Indicators;
 import org.ta4j.core.num.Num;
 import org.ta4j.core.num.NumFactory;
 import org.ta4j.core.utils.CircularBarArray;

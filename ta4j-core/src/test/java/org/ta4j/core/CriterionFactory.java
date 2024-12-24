@@ -23,6 +23,8 @@
  */
 package org.ta4j.core;
 
+import org.ta4j.core.backtest.criteria.AnalysisCriterion;
+
 @FunctionalInterface
 public interface CriterionFactory {
 

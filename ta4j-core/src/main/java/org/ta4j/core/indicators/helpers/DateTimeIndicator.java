@@ -26,8 +26,8 @@
 //import java.time.ZonedDateTime;
 //import java.util.function.Function;
 //
-//import org.ta4j.core.Bar;
-//import org.ta4j.core.BarSeries;
+//import org.ta4j.core.api.bar.Bar;
+//import org.ta4j.core.api.bar.BarSeries;
 //import org.ta4j.core.indicators.AbstractIndicator;
 //
 ///**

@@ -23,7 +23,7 @@
  */
 package org.ta4j.core.rules;
 
-import org.ta4j.core.Rule;
+import org.ta4j.core.api.strategy.Rule;
 
 /**
  * An AND combination of two {@link Rule rules}.

@@ -23,10 +23,10 @@
  */
 package org.ta4j.core.indicators.numeric.channels.keltner;
 
-import org.ta4j.core.Bar;
-import org.ta4j.core.BarSeries;
-import org.ta4j.core.indicators.Indicator;
-import org.ta4j.core.indicators.numeric.Indicators;
+import org.ta4j.core.api.Indicator;
+import org.ta4j.core.api.Indicators;
+import org.ta4j.core.api.series.Bar;
+import org.ta4j.core.api.series.BarSeries;
 import org.ta4j.core.indicators.numeric.NumericIndicator;
 import org.ta4j.core.indicators.numeric.average.EMAIndicator;
 import org.ta4j.core.num.Num;

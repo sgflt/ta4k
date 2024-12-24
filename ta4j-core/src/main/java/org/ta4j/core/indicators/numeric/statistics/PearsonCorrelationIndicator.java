@@ -28,7 +28,7 @@ import static org.ta4j.core.num.NaN.NaN;
 import java.util.ArrayDeque;
 import java.util.Deque;
 
-import org.ta4j.core.Bar;
+import org.ta4j.core.api.series.Bar;
 import org.ta4j.core.indicators.numeric.NumericIndicator;
 import org.ta4j.core.num.Num;
 

@@ -30,8 +30,8 @@
 //import java.util.Comparator;
 //import java.util.List;
 //
-//import org.ta4j.core.Bar;
-//import org.ta4j.core.BarSeries;
+//import org.ta4j.core.api.bar.Bar;
+//import org.ta4j.core.api.bar.BarSeries;
 //import org.ta4j.core.backtest.BacktestBarSeriesBuilder;
 //import org.ta4j.core.aggregator.BarAggregator;
 //import org.ta4j.core.aggregator.BarSeriesAggregator;
@@ -154,7 +154,7 @@
 //        List<Bar> bars = barSeries.getBarData();
 //        if (bars == null || bars.isEmpty())
 //            return barSeries;
-//        var convertedBarSeries = new BacktestBarSeriesBuilder().withName(barSeries.getName())
+//        var convertedBarSeries = new BacktestBarSeriesBuilder().withName(barSeries.name())
 //                .withNumFactory(numFactory)
 //                .build();
 //        for (int i = barSeries.getBeginIndex(); i <= barSeries.getEndIndex(); i++) {

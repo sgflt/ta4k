@@ -23,10 +23,10 @@
  */
 package org.ta4j.core.live;
 
-import org.ta4j.core.BarBuilderFactory;
-import org.ta4j.core.RuntimeContext;
-import org.ta4j.core.Strategy;
-import org.ta4j.core.StrategyFactory;
+import org.ta4j.core.api.series.BarBuilderFactory;
+import org.ta4j.core.api.strategy.RuntimeContext;
+import org.ta4j.core.api.strategy.Strategy;
+import org.ta4j.core.api.strategy.StrategyFactory;
 import org.ta4j.core.backtest.BacktestBarSeries;
 import org.ta4j.core.indicators.IndicatorContext;
 import org.ta4j.core.num.NumFactory;

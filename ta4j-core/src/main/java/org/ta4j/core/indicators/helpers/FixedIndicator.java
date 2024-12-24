@@ -26,8 +26,8 @@ package org.ta4j.core.indicators.helpers;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.ta4j.core.Bar;
-import org.ta4j.core.indicators.Indicator;
+import org.ta4j.core.api.Indicator;
+import org.ta4j.core.api.series.Bar;
 
 /**
  * A fixed indicator.

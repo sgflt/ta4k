@@ -34,10 +34,10 @@
 //import java.time.ZonedDateTime;
 //
 //import org.junit.Test;
-//import org.ta4j.core.BarSeries;
+//import org.ta4j.core.api.bar.BarSeries;
 //import org.ta4j.core.backtest.BacktestBarSeriesBuilder;
-//import org.ta4j.core.indicators.Indicator;
-//import org.ta4j.core.indicators.RSIIndicator;
+//import org.ta4j.core.api.Indicator;
+//import org.ta4j.core.indicators.numeric.momentum.RSIIndicator;
 //import org.ta4j.core.indicators.candles.price.ClosePriceIndicator;
 //
 //public class DecimalNumTest {

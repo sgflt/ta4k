@@ -28,8 +28,8 @@
 //import java.util.logging.Logger;
 //
 //import org.slf4j.LoggerFactory;
-//import org.ta4j.core.BarSeries;
-//import org.ta4j.core.Strategy;
+//import org.ta4j.core.api.bar.BarSeries;
+//import org.ta4j.core.api.strategy.Strategy;
 //
 //import ch.qos.logback.classic.LoggerContext;
 //import ch.qos.logback.classic.joran.JoranConfigurator;
@@ -59,7 +59,7 @@
 //        try {
 //            configurator.doConfigure(LOGBACK_CONF_FILE);
 //        } catch (JoranException je) {
-//            Logger.getLogger(StrategyExecutionLogging.class.getName())
+//            Logger.getLogger(StrategyExecutionLogging.class.name())
 //                    .log(Level.SEVERE, "Unable to load Logback configuration", je);
 //        }
 //    }

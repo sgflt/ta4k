@@ -23,7 +23,7 @@
  */
 package org.ta4j.core.indicators.numeric.average;
 
-import org.ta4j.core.indicators.Indicator;
+import org.ta4j.core.api.Indicator;
 import org.ta4j.core.indicators.numeric.NumericIndicator;
 
 /**

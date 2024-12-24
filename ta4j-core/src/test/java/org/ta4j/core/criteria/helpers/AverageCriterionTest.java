@@ -31,7 +31,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.ta4j.core.MarketEventTestContext;
 import org.ta4j.core.TradingRecordTestContext;
-import org.ta4j.core.criteria.pnl.ProfitLossCriterion;
+import org.ta4j.core.backtest.criteria.helpers.AverageCriterion;
+import org.ta4j.core.backtest.criteria.pnl.ProfitLossCriterion;
 import org.ta4j.core.num.NumFactory;
 
 class AverageCriterionTest {

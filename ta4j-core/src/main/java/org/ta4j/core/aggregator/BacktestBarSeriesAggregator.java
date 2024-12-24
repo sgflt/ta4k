@@ -25,8 +25,8 @@
 //
 //import java.util.List;
 //
-//import org.ta4j.core.Bar;
-//import org.ta4j.core.BarSeries;
+//import org.ta4j.core.api.bar.Bar;
+//import org.ta4j.core.api.bar.BarSeries;
 //import org.ta4j.core.backtest.BacktestBarSeries;
 //import org.ta4j.core.backtest.BacktestBarSeriesBuilder;
 //

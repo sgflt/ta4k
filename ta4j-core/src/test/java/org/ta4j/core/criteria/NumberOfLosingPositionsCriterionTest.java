@@ -29,7 +29,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.ta4j.core.MarketEventTestContext;
-import org.ta4j.core.Trade;
+import org.ta4j.core.TradeType;
+import org.ta4j.core.backtest.criteria.NumberOfLosingPositionsCriterion;
 import org.ta4j.core.num.NumFactory;
 
 class NumberOfLosingPositionsCriterionTest {
@@ -53,7 +54,7 @@ class NumberOfLosingPositionsCriterionTest {
         .withNumFactory(factory)
         .withCandlePrices(100, 105, 110, 99, 95, 91)
         .toTradingRecordContext()
-        .withTradeType(Trade.TradeType.BUY)
+        .withTradeType(TradeType.BUY)
         .withCriterion(new NumberOfLosingPositionsCriterion());
 
     context.enter(1).asap()
@@ -71,7 +72,7 @@ class NumberOfLosingPositionsCriterionTest {
         .withNumFactory(factory)
         .withCandlePrices(100, 105, 110, 100, 95, 105)
         .toTradingRecordContext()
-        .withTradeType(Trade.TradeType.BUY)
+        .withTradeType(TradeType.BUY)
         .withCriterion(new NumberOfLosingPositionsCriterion());
 
     context.enter(1).asap()
@@ -87,7 +88,7 @@ class NumberOfLosingPositionsCriterionTest {
         .withNumFactory(factory)
         .withCandlePrices(100, 105, 110, 100, 95, 105)
         .toTradingRecordContext()
-        .withTradeType(Trade.TradeType.SELL)
+        .withTradeType(TradeType.SELL)
         .withCriterion(new NumberOfLosingPositionsCriterion());
 
     context.enter(1).asap()

@@ -1,7 +1,7 @@
 //package org.ta4j.core;
 //
 //import org.ta4j.core.backtest.strategy.BacktestStrategy;
-//import org.ta4j.core.indicators.Indicator;
+//import org.ta4j.core.api.Indicator;
 //import org.ta4j.core.indicators.IndicatorContext;
 //
 // TODO delete?
@@ -13,19 +13,19 @@
 //    super(
 //        new Strategy() {
 //          @Override
-//          public String getName() {
+//          public String name() {
 //            return "mock strategy";
 //          }
 //
 //
 //          @Override
-//          public Rule getEntryRule() {
+//          public Rule entryRule() {
 //            return Rule.NOOP;
 //          }
 //
 //
 //          @Override
-//          public Rule getExitRule() {
+//          public Rule exitRule() {
 //            return Rule.NOOP;
 //          }
 //

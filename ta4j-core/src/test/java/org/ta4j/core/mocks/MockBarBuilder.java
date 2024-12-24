@@ -28,7 +28,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneId;
 
-import org.ta4j.core.BarSeries;
+import org.ta4j.core.api.series.BarSeries;
 import org.ta4j.core.backtest.BacktestBar;
 import org.ta4j.core.backtest.BacktestBarBuilder;
 

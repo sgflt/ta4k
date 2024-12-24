@@ -25,8 +25,8 @@ package org.ta4j.core.indicators.helpers.previous;
 
 import java.util.LinkedList;
 
-import org.ta4j.core.Bar;
-import org.ta4j.core.indicators.Indicator;
+import org.ta4j.core.api.Indicator;
+import org.ta4j.core.api.series.Bar;
 
 /**
  * Returns the (n-th) previous value of an indicator.

@@ -30,8 +30,9 @@ import static org.ta4j.core.TestUtils.assertNumEquals;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.ta4j.core.MarketEventTestContext;
-import org.ta4j.core.Trade;
+import org.ta4j.core.TradeType;
 import org.ta4j.core.backtest.BacktestBarSeriesBuilder;
+import org.ta4j.core.backtest.criteria.ExpectedShortfallCriterion;
 import org.ta4j.core.backtest.strategy.BackTestTradingRecord;
 import org.ta4j.core.num.NumFactory;
 
@@ -44,7 +45,7 @@ class ExpectedShortfallCriterionTest {
         .withNumFactory(numFactory)
         .withCandlePrices(100.0, 102.0, 98.0, 97.0, 103.0, 95.0, 105.0, 100.0, 100., 10., 10., 10., 10., 10.)
         .toTradingRecordContext()
-        .withTradeType(Trade.TradeType.BUY)
+        .withTradeType(TradeType.BUY)
         .withSeriesRelatedCriterion(series -> new ExpectedShortfallCriterion(series, 0.95));
 
 
@@ -71,7 +72,7 @@ class ExpectedShortfallCriterionTest {
         .withNumFactory(numFactory)
         .withCandlePrices(100.0, 95.0, 90.0, 85.0, 80.0)
         .toTradingRecordContext()
-        .withTradeType(Trade.TradeType.BUY)
+        .withTradeType(TradeType.BUY)
         .withSeriesRelatedCriterion(series -> new ExpectedShortfallCriterion(series, 0.95));
 
     // First position: Loss  100 -> 95
@@ -93,7 +94,7 @@ class ExpectedShortfallCriterionTest {
         .withNumFactory(numFactory)
         .withCandlePrices(100.0, 105.0, 110.0, 115.0, 120.0)
         .toTradingRecordContext()
-        .withTradeType(Trade.TradeType.BUY)
+        .withTradeType(TradeType.BUY)
         .withSeriesRelatedCriterion(series -> new ExpectedShortfallCriterion(series, 0.95));
 
     // First position: Profit
@@ -115,7 +116,7 @@ class ExpectedShortfallCriterionTest {
         .withNumFactory(numFactory)
         .withCandlePrices(100.0, 105.0, 100.0, 100.0, 100.0, 95.0)
         .toTradingRecordContext()
-        .withTradeType(Trade.TradeType.BUY)
+        .withTradeType(TradeType.BUY)
         .withSeriesRelatedCriterion(series -> new ExpectedShortfallCriterion(series, 0.95));
 
     // First position: Profit
@@ -141,7 +142,7 @@ class ExpectedShortfallCriterionTest {
         .withNumFactory(numFactory)
         .withCandlePrices(100, 106, 107, 115)
         .toTradingRecordContext()
-        .withTradeType(Trade.TradeType.BUY)
+        .withTradeType(TradeType.BUY)
         .withSeriesRelatedCriterion(series -> new ExpectedShortfallCriterion(series, 0.95));
 
     // First trade: buy at 100, sell at 106 (gain: +6%)

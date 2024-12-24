@@ -28,18 +28,18 @@
 //import java.util.ArrayList;
 //import java.util.List;
 //
-//import org.ta4j.core.BarSeries;
-//import org.ta4j.core.Rule;
-//import org.ta4j.core.Strategy;
-//import org.ta4j.core.Trade;
-//import org.ta4j.core.backtest.BackTestTradingRecord;
+//import org.ta4j.core.api.bar.BarSeries;
+//import org.ta4j.core.api.strategy.Rule;
+//import org.ta4j.core.api.strategy.Strategy;
+//import org.ta4j.core.backtest.Trade;
+//import org.ta4j.core.backtest.strategy.BackTestTradingRecord;
 //import org.ta4j.core.backtest.BacktestExecutorBuilder;
-//import org.ta4j.core.backtest.BacktestStrategy;
+//import org.ta4j.core.backtest.strategy.BacktestStrategy;
 //import org.ta4j.core.criteria.pnl.ReturnCriterion;
 //import org.ta4j.core.events.CandleReceived;
 //import org.ta4j.core.events.MarketEvent;
 //import org.ta4j.core.indicators.IndicatorContext;
-//import org.ta4j.core.indicators.numeric.Indicators;
+//import org.ta4j.core.api.Indicators;
 //import org.ta4j.core.num.DoubleNumFactory;
 //import org.ta4j.core.reports.TradingStatement;
 //

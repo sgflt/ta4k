@@ -23,15 +23,15 @@
 // */
 //package ta4jexamples.analysis;
 //
-//import org.ta4j.core.AnalysisCriterion.PositionFilter;
-//import org.ta4j.core.BarSeries;
-//import org.ta4j.core.Strategy;
-//import org.ta4j.core.TradingRecord;
+//import org.ta4j.core.backtest.criteria.AnalysisCriterion.PositionFilter;
+//import org.ta4j.core.api.bar.BarSeries;
+//import org.ta4j.core.api.strategy.Strategy;
+//import org.ta4j.core.backtest.TradingRecord;
 //import org.ta4j.core.criteria.AverageReturnPerBarCriterion;
 //import org.ta4j.core.criteria.EnterAndHoldReturnCriterion;
 //import org.ta4j.core.criteria.LinearTransactionCostCriterion;
 //import org.ta4j.core.criteria.MaximumDrawdownCriterion;
-//import org.ta4j.core.criteria.NumberOfBarsCriterion;
+//import org.ta4j.core.criteria.TimeInTradeCriterion;
 //import org.ta4j.core.criteria.NumberOfPositionsCriterion;
 //import org.ta4j.core.criteria.PositionsRatioCriterion;
 //import org.ta4j.core.criteria.ReturnOverMaxDrawdownCriterion;
@@ -65,7 +65,7 @@
 //        ReturnCriterion totalReturn = new ReturnCriterion();
 //        System.out.println("Total return: " + totalReturn.calculate(series, tradingRecord));
 //        // Number of bars
-//        System.out.println("Number of bars: " + new NumberOfBarsCriterion().calculate(series, tradingRecord));
+//        System.out.println("Number of bars: " + new TimeInTradeCriterion().calculate(series, tradingRecord));
 //        // Average profit (per bar)
 //        System.out.println(
 //                "Average return (per bar): " + new AverageReturnPerBarCriterion().calculate(series, tradingRecord));

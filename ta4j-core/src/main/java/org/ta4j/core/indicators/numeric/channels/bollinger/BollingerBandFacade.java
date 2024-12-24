@@ -23,7 +23,7 @@
  */
 package org.ta4j.core.indicators.numeric.channels.bollinger;
 
-import org.ta4j.core.indicators.numeric.Indicators;
+import org.ta4j.core.api.Indicators;
 import org.ta4j.core.indicators.numeric.NumericIndicator;
 
 /**

@@ -28,7 +28,8 @@ import java.time.temporal.ChronoUnit;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.ta4j.core.MarketEventTestContext;
-import org.ta4j.core.Trade;
+import org.ta4j.core.TradeType;
+import org.ta4j.core.backtest.criteria.AverageReturnPerBarCriterion;
 import org.ta4j.core.num.NumFactory;
 
 class AverageReturnPerBarCriterionTest {
@@ -95,7 +96,7 @@ class AverageReturnPerBarCriterionTest {
         .withNumFactory(numFactory)
         .withCandlePrices(100., 105., 90.)
         .toTradingRecordContext()
-        .withTradeType(Trade.TradeType.SELL)
+        .withTradeType(TradeType.SELL)
         .withCriterion(new AverageReturnPerBarCriterion(numFactory, ChronoUnit.DAYS))
         .enter(1).asap()
         .exit(1).after(2);

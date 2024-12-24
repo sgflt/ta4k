@@ -25,6 +25,7 @@ package org.ta4j.core.criteria;
 
 import org.junit.jupiter.api.Test;
 import org.ta4j.core.MarketEventTestContext;
+import org.ta4j.core.backtest.criteria.ValueAtRiskCriterion;
 import org.ta4j.core.num.DoubleNumFactory;
 
 class ValueAtRiskCriterionTest {

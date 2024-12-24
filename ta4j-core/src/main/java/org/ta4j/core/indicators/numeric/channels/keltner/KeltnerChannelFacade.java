@@ -23,7 +23,7 @@
  */
 package org.ta4j.core.indicators.numeric.channels.keltner;
 
-import org.ta4j.core.indicators.numeric.Indicators;
+import org.ta4j.core.api.Indicators;
 import org.ta4j.core.indicators.numeric.NumericIndicator;
 import org.ta4j.core.indicators.numeric.average.EMAIndicator;
 

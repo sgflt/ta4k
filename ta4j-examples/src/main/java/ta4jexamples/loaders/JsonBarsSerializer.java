@@ -30,11 +30,9 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.ta4j.core.BarSeries;
-
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-
+import org.ta4j.core.api.series.BarSeries;
 import org.ta4j.core.backtest.BacktestBarSeries;
 import ta4jexamples.loaders.jsonhelper.GsonBarSeries;
 

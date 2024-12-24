@@ -28,9 +28,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.ta4j.core.Trade;
+import org.ta4j.core.TradeType;
 import org.ta4j.core.TradingRecordTestContext;
-import org.ta4j.core.analysis.cost.FixedTransactionCostModel;
+import org.ta4j.core.backtest.analysis.cost.FixedTransactionCostModel;
+import org.ta4j.core.backtest.criteria.pnl.ProfitCriterion;
 import org.ta4j.core.criteria.AbstractCriterionTest;
 import org.ta4j.core.num.NumFactory;
 
@@ -79,7 +80,7 @@ class ProfitCriterionTest extends AbstractCriterionTest {
   void calculateProfitWithShortPositions(final NumFactory numFactory) {
     final var context = new TradingRecordTestContext()
         .withNumFactory(numFactory)
-        .withTradeType(Trade.TradeType.SELL)
+        .withTradeType(TradeType.SELL)
         .withCriterion(new ProfitCriterion(false));
 
     // Simulating short positions:
@@ -100,7 +101,7 @@ class ProfitCriterionTest extends AbstractCriterionTest {
   void calculateProfitWithShortPositionsIncludingCosts(final NumFactory numFactory) {
     final var context = new TradingRecordTestContext()
         .withNumFactory(numFactory)
-        .withTradeType(Trade.TradeType.SELL)
+        .withTradeType(TradeType.SELL)
         .withTransactionCostModel(new FixedTransactionCostModel(1))
         .withCriterion(new ProfitCriterion(false));
 

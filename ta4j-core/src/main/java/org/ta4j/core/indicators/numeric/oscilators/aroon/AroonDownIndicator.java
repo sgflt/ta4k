@@ -25,12 +25,12 @@ package org.ta4j.core.indicators.numeric.oscilators.aroon;
 
 import java.util.ArrayList;
 
-import org.ta4j.core.Bar;
-import org.ta4j.core.indicators.Indicator;
-import org.ta4j.core.indicators.helpers.LowestValueIndicator;
-import org.ta4j.core.indicators.numeric.Indicators;
+import org.ta4j.core.api.Indicator;
+import org.ta4j.core.api.Indicators;
+import org.ta4j.core.api.series.Bar;
 import org.ta4j.core.indicators.numeric.NumericIndicator;
 import org.ta4j.core.indicators.numeric.candles.price.LowPriceIndicator;
+import org.ta4j.core.indicators.numeric.helpers.LowestValueIndicator;
 import org.ta4j.core.num.NaN;
 import org.ta4j.core.num.Num;
 import org.ta4j.core.num.NumFactory;

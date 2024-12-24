@@ -31,7 +31,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.ta4j.core.MarketEventTestContext;
-import org.ta4j.core.Trade;
+import org.ta4j.core.TradeType;
+import org.ta4j.core.backtest.analysis.CashFlow;
 import org.ta4j.core.num.NumFactory;
 
 @Slf4j
@@ -61,7 +62,7 @@ class CashFlowTest {
         .withNumFactory(numFactory)
         .withCandlePrices(100, 90, 80)
         .toTradingRecordContext()
-        .withTradeType(Trade.TradeType.SELL)
+        .withTradeType(TradeType.SELL)
         .enter(1).after(1)
         .exit(1).after(2);
 
@@ -81,7 +82,7 @@ class CashFlowTest {
         .withNumFactory(numFactory)
         .withCandlePrices(200, 190, 180, 170, 160, 150, 140, 130, 120, 110, 100)
         .toTradingRecordContext()
-        .withTradeType(Trade.TradeType.BUY);
+        .withTradeType(TradeType.BUY);
 
     tradingContext.enter(1).after(1);
     tradingContext.exit(1).after(10);
@@ -111,7 +112,7 @@ class CashFlowTest {
         .withNumFactory(numFactory)
         .withCandlePrices(100, 110, 120, 130, 140, 150, 160, 170, 180, 190, 200)
         .toTradingRecordContext()
-        .withTradeType(Trade.TradeType.SELL)
+        .withTradeType(TradeType.SELL)
         .enter(1).after(1)
         .exit(1).after(10);
 
@@ -152,7 +153,7 @@ class CashFlowTest {
         .withNumFactory(numFactory)
         .withCandlePrices(100, 120, 150, 135, 100, 100, 100, 200, 200, 160)
         .toTradingRecordContext()
-        .withTradeType(Trade.TradeType.BUY);
+        .withTradeType(TradeType.BUY);
 
     // Position 1: 100 -> 160 (profit: +60%)
     tradingContext.enter(1).after(1);
@@ -189,7 +190,7 @@ class CashFlowTest {
         .withNumFactory(numFactory)
         .withCandlePrices(100, 120, 150, 135, 100, 100, 100, 200, 200, 160)
         .toTradingRecordContext()
-        .withTradeType(Trade.TradeType.BUY);
+        .withTradeType(TradeType.BUY);
 
     // Position 1: 100 -> 120 (profit: +20%)
     tradingContext.enter(1).after(1);

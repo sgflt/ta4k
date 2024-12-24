@@ -5,8 +5,9 @@ import static org.ta4j.core.TestUtils.assertNumEquals;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.ta4j.core.AnalysisCriterion.PositionFilter;
 import org.ta4j.core.TradingRecordTestContext;
+import org.ta4j.core.backtest.criteria.AnalysisCriterion.PositionFilter;
+import org.ta4j.core.backtest.criteria.NumberOfConsecutivePositionsCriterion;
 import org.ta4j.core.backtest.strategy.BackTestTradingRecord;
 import org.ta4j.core.num.NumFactory;
 

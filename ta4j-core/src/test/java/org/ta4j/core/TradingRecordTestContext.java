@@ -6,9 +6,11 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.function.Function;
 
-import org.ta4j.core.analysis.cost.CostModel;
-import org.ta4j.core.analysis.cost.ZeroCostModel;
 import org.ta4j.core.backtest.BacktestBarSeries;
+import org.ta4j.core.backtest.TradingRecord;
+import org.ta4j.core.backtest.analysis.cost.CostModel;
+import org.ta4j.core.backtest.analysis.cost.ZeroCostModel;
+import org.ta4j.core.backtest.criteria.AnalysisCriterion;
 import org.ta4j.core.backtest.strategy.BackTestTradingRecord;
 import org.ta4j.core.num.NumFactory;
 import org.ta4j.core.num.NumFactoryProvider;
@@ -19,7 +21,7 @@ import org.ta4j.core.num.NumFactoryProvider;
 public class TradingRecordTestContext {
 
   private int simulationTime;
-  private Trade.TradeType tradeType = Trade.TradeType.BUY;
+  private TradeType tradeType = TradeType.BUY;
   private BackTestTradingRecord tradingRecord;
   private AnalysisCriterion criterion;
   private CostModel transactionCostModel = new ZeroCostModel();
@@ -41,7 +43,7 @@ public class TradingRecordTestContext {
   }
 
 
-  public TradingRecordTestContext withTradeType(final Trade.TradeType tradeType) {
+  public TradingRecordTestContext withTradeType(final TradeType tradeType) {
     this.tradeType = tradeType;
     reinitalizeTradingRecord();
     return this;

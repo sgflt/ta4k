@@ -25,7 +25,7 @@ package org.ta4j.core.rules.helper;
 
 import java.util.Objects;
 
-import org.ta4j.core.Rule;
+import org.ta4j.core.api.strategy.Rule;
 
 /**
  * A {@code ChainLink} is part of a {@link org.ta4j.core.rules.ChainRule

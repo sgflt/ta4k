@@ -23,8 +23,8 @@
  */
 package org.ta4j.core.indicators.helpers;
 
-import org.ta4j.core.Bar;
-import org.ta4j.core.BarSeries;
+import org.ta4j.core.api.series.Bar;
+import org.ta4j.core.api.series.BarSeries;
 import org.ta4j.core.indicators.numeric.NumericIndicator;
 import org.ta4j.core.num.Num;
 

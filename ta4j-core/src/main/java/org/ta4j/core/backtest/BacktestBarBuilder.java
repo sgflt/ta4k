@@ -25,8 +25,8 @@ package org.ta4j.core.backtest;
 
 import java.time.Instant;
 
-import org.ta4j.core.BarBuilder;
-import org.ta4j.core.BarSeries;
+import org.ta4j.core.api.series.BarBuilder;
+import org.ta4j.core.api.series.BarSeries;
 import org.ta4j.core.num.Num;
 import org.ta4j.core.num.NumFactory;
 

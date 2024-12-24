@@ -31,7 +31,7 @@
 //import java.time.format.DateTimeFormatter;
 //
 //import org.junit.Test;
-//import org.ta4j.core.Bar;
+//import org.ta4j.core.api.bar.Bar;
 //import org.ta4j.core.indicators.AbstractIndicatorTest;
 //import org.ta4j.core.indicators.helpers.DateTimeIndicator;
 //import org.ta4j.core.mocks.MockBarSeriesBuilder;

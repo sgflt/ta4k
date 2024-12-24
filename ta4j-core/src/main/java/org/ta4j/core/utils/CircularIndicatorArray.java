@@ -25,8 +25,8 @@ package org.ta4j.core.utils;
 
 import java.util.Iterator;
 
-import org.ta4j.core.Bar;
-import org.ta4j.core.indicators.Indicator;
+import org.ta4j.core.api.Indicator;
+import org.ta4j.core.api.series.Bar;
 import org.ta4j.core.num.Num;
 
 public class CircularIndicatorArray extends CircularArray<Indicator<Num>> {

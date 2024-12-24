@@ -29,8 +29,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.ta4j.core.MarketEventTestContext;
-import org.ta4j.core.Trade;
+import org.ta4j.core.TradeType;
 import org.ta4j.core.TradingRecordTestContext;
+import org.ta4j.core.backtest.criteria.ExpectancyCriterion;
 import org.ta4j.core.num.NumFactory;
 
 class ExpectancyCriterionTest extends AbstractCriterionTest {
@@ -41,7 +42,7 @@ class ExpectancyCriterionTest extends AbstractCriterionTest {
     final var context = new MarketEventTestContext()
         .withNumFactory(numFactory)
         .toTradingRecordContext()
-        .withTradeType(Trade.TradeType.BUY)
+        .withTradeType(TradeType.BUY)
         .withCriterion(new ExpectancyCriterion());
 
     // First trade: buy at 100, sell at 120 (profit: +20%)
@@ -62,7 +63,7 @@ class ExpectancyCriterionTest extends AbstractCriterionTest {
   void calculateWithMixedPositions(final NumFactory numFactory) {
     final var context = new TradingRecordTestContext()
         .withNumFactory(numFactory)
-        .withTradeType(Trade.TradeType.BUY)
+        .withTradeType(TradeType.BUY)
         .withCriterion(new ExpectancyCriterion());
 
     // First trade: buy at 100, sell at 80 (loss: -20%)
@@ -84,7 +85,7 @@ class ExpectancyCriterionTest extends AbstractCriterionTest {
   void calculateOnlyWithLossPositions(final NumFactory numFactory) {
     final var context = new TradingRecordTestContext()
         .withNumFactory(numFactory)
-        .withTradeType(Trade.TradeType.BUY)
+        .withTradeType(TradeType.BUY)
         .withCriterion(new ExpectancyCriterion());
 
     // First trade: buy at 100, sell at 95 (loss: -5%)
@@ -105,7 +106,7 @@ class ExpectancyCriterionTest extends AbstractCriterionTest {
   void calculateProfitWithShortPositions(final NumFactory numFactory) {
     final var context = new TradingRecordTestContext()
         .withNumFactory(numFactory)
-        .withTradeType(Trade.TradeType.SELL)
+        .withTradeType(TradeType.SELL)
         .withCriterion(new ExpectancyCriterion());
 
     // First trade: sell at 160, buy at 140 (profit: +12.5%)
@@ -126,7 +127,7 @@ class ExpectancyCriterionTest extends AbstractCriterionTest {
   void calculateProfitWithMixedShortPositions(final NumFactory numFactory) {
     final var context = new TradingRecordTestContext()
         .withNumFactory(numFactory)
-        .withTradeType(Trade.TradeType.SELL)
+        .withTradeType(TradeType.SELL)
         .withCriterion(new ExpectancyCriterion());
 
     // First trade: sell at 160, buy at 200 (loss: -25%)
@@ -157,7 +158,7 @@ class ExpectancyCriterionTest extends AbstractCriterionTest {
   void calculateOneOpenPosition(final NumFactory numFactory) {
     final var context = new TradingRecordTestContext()
         .withNumFactory(numFactory)
-        .withTradeType(Trade.TradeType.BUY)
+        .withTradeType(TradeType.BUY)
         .withCriterion(new ExpectancyCriterion());
 
     // Open position without closing it

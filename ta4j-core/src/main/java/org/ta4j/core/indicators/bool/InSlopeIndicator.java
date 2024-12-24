@@ -24,11 +24,11 @@ package org.ta4j.core.indicators.bool;
 
 import static org.ta4j.core.num.NaN.NaN;
 
-import org.ta4j.core.Bar;
-import org.ta4j.core.indicators.Indicator;
-import org.ta4j.core.indicators.helpers.CombineIndicator;
+import org.ta4j.core.api.Indicator;
+import org.ta4j.core.api.series.Bar;
 import org.ta4j.core.indicators.helpers.previous.PreviousNumericValueIndicator;
 import org.ta4j.core.indicators.numeric.NumericIndicator;
+import org.ta4j.core.indicators.numeric.operation.CombineIndicator;
 import org.ta4j.core.num.Num;
 
 /**

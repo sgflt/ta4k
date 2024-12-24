@@ -23,8 +23,8 @@
  */
 package org.ta4j.core.indicators.numeric.oscilators.aroon;
 
-import org.ta4j.core.Bar;
-import org.ta4j.core.indicators.numeric.Indicators;
+import org.ta4j.core.api.Indicators;
+import org.ta4j.core.api.series.Bar;
 import org.ta4j.core.indicators.numeric.NumericIndicator;
 import org.ta4j.core.num.Num;
 import org.ta4j.core.num.NumFactory;

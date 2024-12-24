@@ -1,7 +1,7 @@
 package org.ta4j.core.backtest;
 
-import org.ta4j.core.analysis.cost.CostModel;
-import org.ta4j.core.analysis.cost.ZeroCostModel;
+import org.ta4j.core.backtest.analysis.cost.CostModel;
+import org.ta4j.core.backtest.analysis.cost.ZeroCostModel;
 import org.ta4j.core.num.DoubleNumFactory;
 import org.ta4j.core.num.NumFactory;
 

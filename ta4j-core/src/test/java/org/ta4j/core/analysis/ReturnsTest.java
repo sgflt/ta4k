@@ -12,8 +12,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.ta4j.core.MarketEventTestContext;
-import org.ta4j.core.Trade;
+import org.ta4j.core.TradeType;
 import org.ta4j.core.TradingRecordTestContext;
+import org.ta4j.core.backtest.analysis.Returns;
 import org.ta4j.core.num.NumFactory;
 
 class ReturnsTest {
@@ -67,7 +68,7 @@ class ReturnsTest {
     void shouldCalculateArithmeticReturnsForShortPosition() {
       // Given
       ReturnsTest.this.tradingContext
-          .withTradeType(Trade.TradeType.SELL)
+          .withTradeType(TradeType.SELL)
           .enter(1).asap()
           .exit(1).after(4);
 
@@ -118,7 +119,7 @@ class ReturnsTest {
     void shouldCalculateLogReturnsForShortPosition() {
       // Given
       ReturnsTest.this.tradingContext
-          .withTradeType(Trade.TradeType.SELL)
+          .withTradeType(TradeType.SELL)
           .enter(1).asap()
           .exit(1).after(4);
 

@@ -26,7 +26,7 @@
 //import static org.ta4j.core.TestUtils.assertIndicatorEquals;
 //
 //import org.junit.Test;
-//import org.ta4j.core.BarSeries;
+//import org.ta4j.core.api.bar.BarSeries;
 //import org.ta4j.core.ExternalIndicatorTest;
 //import org.ta4j.core.num.Num;
 //import org.ta4j.core.num.NumFactory;

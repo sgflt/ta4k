@@ -47,8 +47,8 @@
 //import org.jfree.data.xy.DefaultHighLowDataset;
 //import org.jfree.data.xy.OHLCDataset;
 //import org.jfree.data.xy.XYDataset;
-//import org.ta4j.core.Bar;
-//import org.ta4j.core.BarSeries;
+//import org.ta4j.core.api.bar.Bar;
+//import org.ta4j.core.api.bar.BarSeries;
 //import org.ta4j.core.indicators.ChopIndicator;
 //import org.ta4j.core.indicators.helpers.ClosePriceIndicator;
 //

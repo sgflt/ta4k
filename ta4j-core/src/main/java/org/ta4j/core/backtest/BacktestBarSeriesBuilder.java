@@ -25,7 +25,7 @@ package org.ta4j.core.backtest;
 
 import java.util.List;
 
-import org.ta4j.core.BarBuilderFactory;
+import org.ta4j.core.api.series.BarBuilderFactory;
 import org.ta4j.core.indicators.IndicatorContext;
 import org.ta4j.core.num.NumFactory;
 import org.ta4j.core.num.NumFactoryProvider;

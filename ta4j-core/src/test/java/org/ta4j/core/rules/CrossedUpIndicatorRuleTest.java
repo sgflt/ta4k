@@ -28,7 +28,7 @@
 //
 //import org.junit.Before;
 //import org.junit.Test;
-//import org.ta4j.core.BarSeries;
+//import org.ta4j.core.api.bar.BarSeries;
 //import org.ta4j.core.indicators.helpers.FixedDecimalIndicator;
 //import org.ta4j.core.mocks.MockBarSeriesBuilder;
 //

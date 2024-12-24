@@ -34,8 +34,8 @@
 //import java.util.List;
 //
 //import org.junit.Test;
-//import org.ta4j.core.Bar;
-//import org.ta4j.core.BarSeries;
+//import org.ta4j.core.api.bar.Bar;
+//import org.ta4j.core.api.bar.BarSeries;
 //import org.ta4j.core.backtest.BacktestBarSeriesBuilder;
 //import org.ta4j.core.indicators.AbstractIndicatorTest;
 //import org.ta4j.core.mocks.MockBarBuilder;

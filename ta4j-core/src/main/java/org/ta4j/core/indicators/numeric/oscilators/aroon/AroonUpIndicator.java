@@ -27,12 +27,12 @@ import static org.ta4j.core.num.NaN.NaN;
 
 import java.util.ArrayList;
 
-import org.ta4j.core.Bar;
-import org.ta4j.core.indicators.Indicator;
-import org.ta4j.core.indicators.helpers.HighestValueIndicator;
-import org.ta4j.core.indicators.numeric.Indicators;
+import org.ta4j.core.api.Indicator;
+import org.ta4j.core.api.Indicators;
+import org.ta4j.core.api.series.Bar;
 import org.ta4j.core.indicators.numeric.NumericIndicator;
 import org.ta4j.core.indicators.numeric.candles.price.HighPriceIndicator;
+import org.ta4j.core.indicators.numeric.helpers.HighestValueIndicator;
 import org.ta4j.core.num.Num;
 import org.ta4j.core.num.NumFactory;
 

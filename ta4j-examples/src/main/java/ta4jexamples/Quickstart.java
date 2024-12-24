@@ -23,12 +23,12 @@
 // */
 //package ta4jexamples;
 //
-//import org.ta4j.core.AnalysisCriterion;
-//import org.ta4j.core.AnalysisCriterion.PositionFilter;
-//import org.ta4j.core.backtest.BacktestStrategy;
-//import org.ta4j.core.BarSeries;
-//import org.ta4j.core.Rule;
-//import org.ta4j.core.TradingRecord;
+//import org.ta4j.core.backtest.criteria.AnalysisCriterion;
+//import org.ta4j.core.backtest.criteria.AnalysisCriterion.PositionFilter;
+//import org.ta4j.core.backtest.strategy.BacktestStrategy;
+//import org.ta4j.core.api.bar.BarSeries;
+//import org.ta4j.core.api.strategy.Rule;
+//import org.ta4j.core.backtest.TradingRecord;
 //import org.ta4j.core.criteria.PositionsRatioCriterion;
 //import org.ta4j.core.criteria.ReturnOverMaxDrawdownCriterion;
 //import org.ta4j.core.criteria.VersusEnterAndHoldCriterion;
