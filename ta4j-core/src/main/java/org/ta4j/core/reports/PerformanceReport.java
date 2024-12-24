@@ -53,9 +53,9 @@ public record PerformanceReport(
         totalProfitLossPercentage: %.2f
         totalProfit: %.2f
         totalLoss: %.2f
-        totalPositions: %.0f
         averageProfit: %.2f
         averageLoss: %.2f
+        totalPositions: %.0f
         winningPositions: %.0f
         losingPositions: %.0f
         maximumDrawdown: %.2f
