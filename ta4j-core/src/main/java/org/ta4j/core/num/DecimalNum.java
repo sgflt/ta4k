@@ -301,6 +301,28 @@ public final class DecimalNum implements Num {
 
 
   /**
+   * If there are operations between constant that have precision 0 and other number we need to preserve bigger
+   * precision.
+   *
+   * If we do not provide math context that sets upper bound, BigDecimal chooses "infinity" precision, that may be too
+   * much.
+   *
+   * @param first decimal num
+   * @param second decimal num
+   *
+   * @return math context with bigger precision
+   */
+  private static MathContext chooseMathContextWithGreaterPrecision(final DecimalNum first, final DecimalNum second) {
+    final var firstMathContext = first.getMathContext();
+    final var secondMathContext = second.getMathContext();
+    return firstMathContext.getPrecision() > secondMathContext.getPrecision()
+           ? firstMathContext
+           : secondMathContext
+        ;
+  }
+
+
+  /**
    * Returns the underlying {@link BigDecimal} delegate.
    *
    * @return BigDecimal delegate instance of this instance
@@ -338,9 +360,10 @@ public final class DecimalNum implements Num {
     if (augend.isNaN()) {
       return NaN;
     }
-    final BigDecimal bigDecimal = ((DecimalNum) augend).delegate;
-    final BigDecimal result = this.delegate.add(bigDecimal, this.mathContext);
-    return new DecimalNum(result, this.mathContext);
+    final var decimalNum = (DecimalNum) augend;
+    final var sumContext = chooseMathContextWithGreaterPrecision(decimalNum, this);
+    final var result = this.delegate.add(decimalNum.delegate, sumContext);
+    return new DecimalNum(result, sumContext);
   }
 
 
@@ -355,9 +378,10 @@ public final class DecimalNum implements Num {
     if (subtrahend.isNaN()) {
       return NaN;
     }
-    final BigDecimal bigDecimal = ((DecimalNum) subtrahend).delegate;
-    final BigDecimal result = this.delegate.subtract(bigDecimal, this.mathContext);
-    return new DecimalNum(result, this.mathContext);
+    final var decimalNum = (DecimalNum) subtrahend;
+    final var subContext = chooseMathContextWithGreaterPrecision(decimalNum, this);
+    final var result = this.delegate.subtract(decimalNum.delegate, subContext);
+    return new DecimalNum(result, subContext);
   }
 
 
@@ -372,9 +396,10 @@ public final class DecimalNum implements Num {
     if (multiplicand.isNaN()) {
       return NaN;
     }
-    final BigDecimal bigDecimal = ((DecimalNum) multiplicand).delegate;
-    final BigDecimal result = this.delegate.multiply(bigDecimal, this.mathContext);
-    return new DecimalNum(result, this.mathContext);
+    final var decimalNum = (DecimalNum) multiplicand;
+    final var multiplicationContext = chooseMathContextWithGreaterPrecision(decimalNum, this);
+    final var result = this.delegate.multiply(decimalNum.delegate, multiplicationContext);
+    return new DecimalNum(result, multiplicationContext);
   }
 
 
@@ -389,9 +414,10 @@ public final class DecimalNum implements Num {
     if (divisor.isNaN() || divisor.isZero()) {
       return NaN;
     }
-    final BigDecimal bigDecimal = ((DecimalNum) divisor).delegate;
-    final BigDecimal result = this.delegate.divide(bigDecimal, this.mathContext);
-    return new DecimalNum(result, this.mathContext);
+    final var decimalNum = (DecimalNum) divisor;
+    final var divisionMathContext = chooseMathContextWithGreaterPrecision(decimalNum, this);
+    final var result = this.delegate.divide(decimalNum.delegate, divisionMathContext);
+    return new DecimalNum(result, divisionMathContext);
   }
 
 
@@ -406,9 +432,10 @@ public final class DecimalNum implements Num {
     if (divisor.isNaN()) {
       return NaN;
     }
-    final BigDecimal bigDecimal = ((DecimalNum) divisor).delegate;
-    final BigDecimal result = this.delegate.remainder(bigDecimal, this.mathContext);
-    return new DecimalNum(result, this.mathContext);
+    final var decimalNum = (DecimalNum) divisor;
+    final var moduloContext = chooseMathContextWithGreaterPrecision(decimalNum, this);
+    final var result = this.delegate.remainder(decimalNum.delegate, moduloContext);
+    return new DecimalNum(result, moduloContext);
   }
 
 
@@ -459,7 +486,7 @@ public final class DecimalNum implements Num {
       return NaN;
     }
     if (comparedToZero == 0) {
-      return DecimalNum.valueOf(0);
+      return DecimalNumFactory.getInstance().zero();
     }
 
     // Initial estimate calculation
@@ -784,7 +811,7 @@ public final class DecimalNum implements Num {
     // use double pow(double, double)
     final double xpowb = Math.pow(this.delegate.doubleValue(), bDouble);
     // use PrecisionNum.multiply(PrecisionNum)
-    final BigDecimal result = xpowa.multiply(new BigDecimal(xpowb));
+    final BigDecimal result = xpowa.multiply(BigDecimal.valueOf(xpowb));
     return new DecimalNum(result.toString());
   }
 
