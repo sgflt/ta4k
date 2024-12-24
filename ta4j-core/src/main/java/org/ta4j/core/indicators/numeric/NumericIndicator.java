@@ -24,7 +24,6 @@
 package org.ta4j.core.indicators.numeric;
 
 import java.time.Instant;
-import java.util.Objects;
 
 import lombok.extern.slf4j.Slf4j;
 import org.ta4j.core.Bar;
@@ -569,10 +568,13 @@ public abstract class NumericIndicator implements Indicator<Num> {
   public Num getValue() {
     log.debug("{}", this);
 
-    return Objects.requireNonNull(
-        this.value,
-        "Calling getValue() on uninitialized instance %s. Did you register it into IndicatorContext?".formatted(getClass().getSimpleName())
-    );
+    if (this.value == null) {
+      throw new IllegalStateException(
+          "Calling getValue() on uninitialized instance %s. Did you register it into IndicatorContext?".formatted(
+              getClass().getSimpleName()));
+    }
+
+    return this.value;
   }
 
 
