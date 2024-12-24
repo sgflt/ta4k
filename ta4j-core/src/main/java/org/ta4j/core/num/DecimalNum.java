@@ -28,10 +28,8 @@ import static org.ta4j.core.num.NaN.NaN;
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.math.RoundingMode;
-import java.text.DecimalFormat;
-import java.text.ParseException;
-import java.util.Locale;
 import java.util.Objects;
+import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,6 +45,8 @@ import org.slf4j.LoggerFactory;
  * @see Num
  */
 public final class DecimalNum implements Num {
+  private static final Pattern SCIENTIFIC_NOTATION_PATTERN = Pattern.compile("^([+-]?\\d*\\.?\\d+)E([+-]?\\d+)$");
+  private static final Pattern EXPONENT_PATTERN = Pattern.compile("E\\d+");
 
   static final int DEFAULT_PRECISION = 20;
   private static final Logger log = LoggerFactory.getLogger(DecimalNum.class);
@@ -448,73 +448,101 @@ public final class DecimalNum implements Num {
 
   @Override
   public Num sqrt(final MathContext precisionContext) {
-    log.trace("delegate {}", this.delegate);
-    final int comparedToZero = this.delegate.compareTo(BigDecimal.ZERO);
-    switch (comparedToZero) {
-      case -1:
-        return NaN;
-      case 0:
-        return DecimalNum.valueOf(0);
+    // Early validation
+    if (this.delegate == null || precisionContext == null) {
+      throw new IllegalArgumentException("Delegate and precision context must not be null");
     }
 
-    // Direct implementation of the example in:
-    // https://en.wikipedia.org/wiki/Methods_of_computing_square_roots#Babylonian_method
-    BigDecimal estimate = new BigDecimal(this.delegate.toString(), precisionContext);
-    final String string = String.format(Locale.ROOT, "%1.1e", estimate);
-    log.trace("scientific notation {}", string);
-    if (string.contains("e")) {
-      final String[] parts = string.split("e");
-      BigDecimal mantissa = new BigDecimal(parts[0]);
-      BigDecimal exponent = new BigDecimal(parts[1]);
-      if (exponent.remainder(new BigDecimal(2)).compareTo(BigDecimal.ZERO) > 0) {
-        exponent = exponent.subtract(BigDecimal.ONE);
-        mantissa = mantissa.multiply(BigDecimal.TEN);
-        log.trace("modified notatation {}e{}", mantissa, exponent);
-      }
-      final BigDecimal estimatedMantissa = mantissa.compareTo(BigDecimal.TEN) < 0 ? new BigDecimal(2)
-                                                                                  : new BigDecimal(6);
-      final BigDecimal estimatedExponent = exponent.divide(new BigDecimal(2));
-      final String estimateString = String.format("%sE%s", estimatedMantissa, estimatedExponent);
-      if (log.isTraceEnabled()) {
-        log.trace("x[0] =~ sqrt({}...*10^{}) =~ {}", mantissa, exponent, estimateString);
-      }
-      final DecimalFormat format = new DecimalFormat();
-      format.setParseBigDecimal(true);
-      try {
-        estimate = (BigDecimal) format.parse(estimateString);
-      } catch (final ParseException e) {
-        log.error("PrecicionNum ParseException:", e);
-      }
+    // Handle special cases
+    final int comparedToZero = this.delegate.compareTo(BigDecimal.ZERO);
+    if (comparedToZero < 0) {
+      return NaN;
     }
-    BigDecimal delta;
-    BigDecimal test;
-    BigDecimal sum;
-    BigDecimal newEstimate;
-    final BigDecimal two = new BigDecimal(2);
-    String estimateString;
-    int endIndex;
-    int frontEndIndex;
-    int backStartIndex;
-    int i = 1;
+    if (comparedToZero == 0) {
+      return DecimalNum.valueOf(0);
+    }
+
+    // Initial estimate calculation
+    BigDecimal estimate = calculateInitialEstimate(this.delegate, precisionContext);
+
+    // Newton-Raphson iteration
+    BigDecimal lastEstimate;
+    final int maxIterations = precisionContext.getPrecision() + 2; // Prevent infinite loops
+    int iteration = 0;
+
     do {
-      test = this.delegate.divide(estimate, precisionContext);
-      sum = estimate.add(test);
-      newEstimate = sum.divide(two, precisionContext);
-      delta = newEstimate.subtract(estimate).abs();
-      estimate = newEstimate;
-      if (log.isTraceEnabled()) {
-        estimateString = String.format("%1." + precisionContext.getPrecision() + "e", estimate);
-        endIndex = estimateString.length();
-        frontEndIndex = 20 > endIndex ? endIndex : 20;
-        backStartIndex = 20 > endIndex ? 0 : endIndex - 20;
-        log.trace(
-            "x[{}] = {}..{}, delta = {}", i, estimateString.substring(0, frontEndIndex),
-            estimateString.substring(backStartIndex, endIndex), String.format("%1.1e", delta)
-        );
-        i++;
+      lastEstimate = estimate;
+      // x[n+1] = (x[n] + S/x[n])/2
+      estimate = this.delegate.divide(estimate, precisionContext)
+          .add(estimate)
+          .divide(BigDecimal.TWO, precisionContext);
+
+      if (++iteration >= maxIterations) {
+        break;
       }
-    } while (delta.compareTo(BigDecimal.ZERO) > 0);
+
+      // Log iteration progress if needed
+      if (log.isTraceEnabled()) {
+        logIterationProgress(iteration, estimate, lastEstimate.subtract(estimate).abs());
+      }
+    } while (estimate.subtract(lastEstimate).abs().compareTo(getConvergenceThreshold(precisionContext)) > 0);
+
     return DecimalNum.valueOf(estimate, precisionContext);
+  }
+
+
+  private BigDecimal calculateInitialEstimate(final BigDecimal value, final MathContext mc) {
+    // Use simple bit-shifting for initial estimate
+    String scientificStr = value.round(new MathContext(1, RoundingMode.HALF_UP))
+        .toString()
+        .toUpperCase();
+
+    int exponent = 0;
+    final var matcher = SCIENTIFIC_NOTATION_PATTERN.matcher(scientificStr);
+    if (matcher.matches()) {
+      exponent = Integer.parseInt(matcher.group(2));
+    }
+
+    // Adjust exponent to be even
+    if (exponent % 2 != 0) {
+      exponent--;
+      scientificStr = scientificStr.contains("E")
+                      ? EXPONENT_PATTERN.matcher(scientificStr).replaceFirst("E".concat(String.valueOf(exponent)))
+                      : scientificStr.concat("E").concat(String.valueOf(exponent));
+    }
+
+    // Initial estimate: if n is even, sqrt(a×10^n) ≈ sqrt(a)×10^(n/2)
+    final BigDecimal initialEstimate = BigDecimal.valueOf(Math.sqrt(
+            Double.parseDouble(scientificStr.split("E")[0])))
+        .scaleByPowerOfTen(exponent / 2);
+
+    return initialEstimate.round(mc);
+  }
+
+
+  private BigDecimal getConvergenceThreshold(final MathContext mc) {
+    // Set convergence threshold based on precision
+    return BigDecimal.ONE.movePointLeft(mc.getPrecision() + 1);
+  }
+
+
+  private void logIterationProgress(final int iteration, final BigDecimal estimate, final BigDecimal delta) {
+    if (!log.isTraceEnabled()) {
+      return;
+    }
+
+    final String estimateStr = estimate.toString();
+    final int maxLength = 20;
+    final String prefix = estimateStr.length() > maxLength
+                          ? estimateStr.substring(0, maxLength) + "..."
+                          : estimateStr;
+
+    log.trace(
+        "x[{}] = {}, delta = {}",
+        iteration,
+        prefix,
+        delta
+    );
   }
 
 
