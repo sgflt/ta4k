@@ -60,7 +60,6 @@ import org.ta4j.core.indicators.numeric.statistics.StandardErrorIndicator;
 import org.ta4j.core.indicators.numeric.statistics.VarianceIndicator;
 import org.ta4j.core.num.Num;
 import org.ta4j.core.num.NumFactory;
-import org.ta4j.core.num.NumFactoryProvider;
 import org.ta4j.core.rules.OverIndicatorRule;
 import org.ta4j.core.rules.UnderIndicatorRule;
 
@@ -102,12 +101,12 @@ public abstract class NumericIndicator implements Indicator<Num> {
 
 
   public AroonUpIndicator aroonUp(final int barCount) {
-    return new AroonUpIndicator(NumFactoryProvider.getDefaultNumFactory(), this, barCount);
+    return new AroonUpIndicator(this.numFactory, this, barCount);
   }
 
 
   public AroonDownIndicator aroonDown(final int barCount) {
-    return new AroonDownIndicator(NumFactoryProvider.getDefaultNumFactory(), this, barCount);
+    return new AroonDownIndicator(this.numFactory, this, barCount);
   }
 
 

@@ -24,6 +24,7 @@
 package org.ta4j.core.api;
 
 import lombok.experimental.UtilityClass;
+import org.ta4j.core.indicators.numeric.NumericIndicator;
 import org.ta4j.core.indicators.numeric.candles.LowerShadowIndicator;
 import org.ta4j.core.indicators.numeric.candles.RealBodyIndicator;
 import org.ta4j.core.indicators.numeric.candles.VolumeIndicator;
@@ -44,6 +45,7 @@ import org.ta4j.core.indicators.numeric.oscilators.AwesomeOscillatorIndicator;
 import org.ta4j.core.indicators.numeric.oscilators.aroon.AroonDownIndicator;
 import org.ta4j.core.indicators.numeric.oscilators.aroon.AroonOscillatorIndicator;
 import org.ta4j.core.indicators.numeric.oscilators.aroon.AroonUpIndicator;
+import org.ta4j.core.num.NumFactory;
 import org.ta4j.core.num.NumFactoryProvider;
 
 /**
@@ -54,77 +56,72 @@ public final class Indicators {
 
 
   public static MedianPriceIndicator medianPrice() {
-    return new MedianPriceIndicator(NumFactoryProvider.getDefaultNumFactory());
+    return extended().medianPrice();
   }
 
 
   public static ClosePriceIndicator closePrice() {
-    return new ClosePriceIndicator(NumFactoryProvider.getDefaultNumFactory());
+    return extended().closePrice();
   }
 
 
   public static OpenPriceIndicator openPrice() {
-    return new OpenPriceIndicator(NumFactoryProvider.getDefaultNumFactory());
+    return extended().openPrice();
   }
 
 
   public static LowPriceIndicator lowPrice() {
-    return new LowPriceIndicator(NumFactoryProvider.getDefaultNumFactory());
+    return extended().lowPrice();
   }
 
 
   public static HighPriceIndicator highPrice() {
-    return new HighPriceIndicator(NumFactoryProvider.getDefaultNumFactory());
+    return extended().highPrice();
   }
 
 
   public static TypicalPriceIndicator typicalPrice() {
-    return new TypicalPriceIndicator(NumFactoryProvider.getDefaultNumFactory());
+    return extended().typicalPrice();
   }
 
 
-  /**
-   * Creates a fluent version of the VolumeIndicator.
-   *
-   * @return a Indicators wrapped around a VolumeIndicator
-   */
   public static VolumeIndicator volume() {
-    return new VolumeIndicator(NumFactoryProvider.getDefaultNumFactory());
+    return extended().volume();
   }
 
 
   public static BollingerBandFacade bollingerBands(final int barCount, final Number k) {
-    return new BollingerBandFacade(barCount, k);
+    return extended().bollingerBands(barCount, k);
   }
 
 
   public static RealBodyIndicator realBody() {
-    return new RealBodyIndicator(NumFactoryProvider.getDefaultNumFactory());
+    return extended().realBody();
   }
 
 
   public static AroonOscillatorIndicator aroonOscillator(final int barCount) {
-    return new AroonOscillatorIndicator(NumFactoryProvider.getDefaultNumFactory(), barCount);
+    return extended().aroonOscillator(barCount);
   }
 
 
   public static AroonUpIndicator aroonUp(final int barCount) {
-    return new AroonUpIndicator(NumFactoryProvider.getDefaultNumFactory(), barCount);
+    return extended().aroonUp(barCount);
   }
 
 
   public static AroonDownIndicator aroonDown(final int barCount) {
-    return new AroonDownIndicator(NumFactoryProvider.getDefaultNumFactory(), barCount);
+    return extended().aroonDown(barCount);
   }
 
 
   public static ATRIndicator atr(final int barCount) {
-    return new ATRIndicator(NumFactoryProvider.getDefaultNumFactory(), barCount);
+    return extended().atr(barCount);
   }
 
 
   public static ADXIndicator adx(final int diBarCount, final int adxBarCount) {
-    return new ADXIndicator(NumFactoryProvider.getDefaultNumFactory(), diBarCount, adxBarCount);
+    return extended().adx(diBarCount, adxBarCount);
   }
 
 
@@ -134,31 +131,166 @@ public final class Indicators {
 
 
   public static PlusDMIndicator plusDMI() {
-    return new PlusDMIndicator(NumFactoryProvider.getDefaultNumFactory());
+    return extended().plusDMI();
   }
 
 
   public static PlusDIIndicator plusDII(final int barCount) {
-    return new PlusDIIndicator(NumFactoryProvider.getDefaultNumFactory(), barCount);
+    return extended().plusDII(barCount);
   }
 
 
   public static MinusDMIndicator minusDMI() {
-    return new MinusDMIndicator(NumFactoryProvider.getDefaultNumFactory());
+    return extended().minusDMI();
   }
 
 
   public static MinusDIIndicator minusDII(final int barCount) {
-    return new MinusDIIndicator(NumFactoryProvider.getDefaultNumFactory(), barCount);
+    return extended().minusDII(barCount);
   }
 
 
   public static LowerShadowIndicator lowerShadow() {
-    return new LowerShadowIndicator(NumFactoryProvider.getDefaultNumFactory());
+    return extended().lowerShadow();
   }
 
 
   public static AwesomeOscillatorIndicator awesomeOscillator(final int shortBarCount, final int longBarCount) {
-    return new AwesomeOscillatorIndicator(Indicators.medianPrice(), shortBarCount, longBarCount);
+    return extended().awesomeOscillator(shortBarCount, longBarCount);
+  }
+
+
+  private static ExtendedIndicatorFactory extended() {
+    return extended(NumFactoryProvider.getDefaultNumFactory());
+  }
+
+
+  public static ExtendedIndicatorFactory extended(final NumFactory numFactory) {
+    return new ExtendedIndicatorFactory(numFactory);
+  }
+
+
+  public static class ExtendedIndicatorFactory {
+    private final NumFactory numFactory;
+
+
+    public ExtendedIndicatorFactory(final NumFactory numFactory) {
+      this.numFactory = numFactory;
+    }
+
+
+    public MedianPriceIndicator medianPrice() {
+      return new MedianPriceIndicator(this.numFactory);
+    }
+
+
+    public ClosePriceIndicator closePrice() {
+      return new ClosePriceIndicator(this.numFactory);
+    }
+
+
+    public OpenPriceIndicator openPrice() {
+      return new OpenPriceIndicator(this.numFactory);
+    }
+
+
+    public LowPriceIndicator lowPrice() {
+      return new LowPriceIndicator(this.numFactory);
+    }
+
+
+    public HighPriceIndicator highPrice() {
+      return new HighPriceIndicator(this.numFactory);
+    }
+
+
+    public TypicalPriceIndicator typicalPrice() {
+      return new TypicalPriceIndicator(this.numFactory);
+    }
+
+
+    public VolumeIndicator volume() {
+      return new VolumeIndicator(this.numFactory);
+    }
+
+
+    public BollingerBandFacade bollingerBands(final int barCount, final Number k) {
+      return new BollingerBandFacade(closePrice(), barCount, k);
+    }
+
+
+    public RealBodyIndicator realBody() {
+      return new RealBodyIndicator(this.numFactory);
+    }
+
+
+    public AroonOscillatorIndicator aroonOscillator(final int barCount) {
+      return new AroonOscillatorIndicator(this.numFactory, barCount);
+    }
+
+
+    public AroonUpIndicator aroonUp(final int barCount) {
+      return new AroonUpIndicator(this.numFactory, barCount);
+    }
+
+
+    public AroonDownIndicator aroonDown(final int barCount) {
+      return new AroonDownIndicator(this.numFactory, barCount);
+    }
+
+
+    public ATRIndicator atr(final int barCount) {
+      return new ATRIndicator(this.numFactory, barCount);
+    }
+
+
+    public ADXIndicator adx(final int diBarCount, final int adxBarCount) {
+      return new ADXIndicator(this.numFactory, diBarCount, adxBarCount);
+    }
+
+
+    public ADXIndicator adx(final int barCount) {
+      return adx(barCount, barCount);
+    }
+
+
+    public PlusDMIndicator plusDMI() {
+      return new PlusDMIndicator(this.numFactory);
+    }
+
+
+    public PlusDIIndicator plusDII(final int barCount) {
+      return new PlusDIIndicator(this.numFactory, barCount);
+    }
+
+
+    public MinusDMIndicator minusDMI() {
+      return new MinusDMIndicator(this.numFactory);
+    }
+
+
+    public MinusDIIndicator minusDII(final int barCount) {
+      return new MinusDIIndicator(this.numFactory, barCount);
+    }
+
+
+    public LowerShadowIndicator lowerShadow() {
+      return new LowerShadowIndicator(this.numFactory);
+    }
+
+
+    public AwesomeOscillatorIndicator awesomeOscillator(
+        final NumericIndicator indicator,
+        final int shortBarCount,
+        final int longBarCount
+    ) {
+      return new AwesomeOscillatorIndicator(this.numFactory, indicator, shortBarCount, longBarCount);
+    }
+
+
+    public AwesomeOscillatorIndicator awesomeOscillator(final int shortBarCount, final int longBarCount) {
+      return awesomeOscillator(medianPrice(), shortBarCount, longBarCount);
+    }
+
   }
 }

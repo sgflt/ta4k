@@ -29,6 +29,7 @@ import org.ta4j.core.indicators.numeric.NumericIndicator;
 import org.ta4j.core.indicators.numeric.average.SMAIndicator;
 import org.ta4j.core.indicators.numeric.candles.price.MedianPriceIndicator;
 import org.ta4j.core.num.Num;
+import org.ta4j.core.num.NumFactory;
 
 /**
  * Awesome oscillator (AO) indicator.
@@ -48,8 +49,13 @@ public class AwesomeOscillatorIndicator extends NumericIndicator {
    * @param shortBarCount (normally 5)
    * @param longBarCOunt (normally 34)
    */
-  public AwesomeOscillatorIndicator(final NumericIndicator indicator, final int shortBarCount, final int longBarCOunt) {
-    super(indicator.getNumFactory());
+  public AwesomeOscillatorIndicator(
+      final NumFactory numFactory,
+      final NumericIndicator indicator,
+      final int shortBarCount,
+      final int longBarCOunt
+  ) {
+    super(numFactory);
     this.shortSma = indicator.sma(shortBarCount);
     this.longSma = indicator.sma(longBarCOunt);
   }
@@ -65,8 +71,8 @@ public class AwesomeOscillatorIndicator extends NumericIndicator {
    *
    * @param indicator (normally {@link MedianPriceIndicator})
    */
-  public AwesomeOscillatorIndicator(final NumericIndicator indicator) {
-    this(indicator, 5, 34);
+  public AwesomeOscillatorIndicator(final NumFactory numFactory, final NumericIndicator indicator) {
+    this(numFactory, indicator, 5, 34);
   }
 
 
@@ -79,8 +85,8 @@ public class AwesomeOscillatorIndicator extends NumericIndicator {
    * <li>{@code barCountSma2} = 34
    * </ul>
    */
-  public AwesomeOscillatorIndicator() {
-    this(Indicators.medianPrice(), 5, 34);
+  public AwesomeOscillatorIndicator(final NumFactory numFactory) {
+    this(numFactory, Indicators.medianPrice(), 5, 34);
   }
 
 

@@ -23,7 +23,6 @@
  */
 package org.ta4j.core.indicators.numeric.channels.bollinger;
 
-import org.ta4j.core.api.Indicators;
 import org.ta4j.core.indicators.numeric.NumericIndicator;
 
 /**
@@ -42,21 +41,6 @@ public class BollingerBandFacade {
   private final NumericIndicator middle;
   private final NumericIndicator upper;
   private final NumericIndicator lower;
-
-
-  /**
-   * Create the BollingerBands facade based on the close price of a bar series
-   *
-   * @param barCount the number of periods used for the indicators
-   * @param k the multiplier used to calculate the upper and lower bands
-   */
-  public BollingerBandFacade(final int barCount, final Number k) {
-    this.price = Indicators.closePrice();
-    this.middle = this.price.sma(barCount);
-    final var stdev = this.price.stddev(barCount);
-    this.upper = this.middle.plus(stdev.multipliedBy(k));
-    this.lower = this.middle.minus(stdev.multipliedBy(k));
-  }
 
 
   /**

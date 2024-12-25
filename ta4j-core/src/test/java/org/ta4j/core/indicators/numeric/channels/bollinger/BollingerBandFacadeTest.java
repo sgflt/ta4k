@@ -55,7 +55,7 @@ class BollingerBandFacadeTest {
     final var closePriceIndicator = Indicators.closePrice();
 
     final var pcb = new PercentBIndicator(closePriceIndicator, 5, 2);
-    final var pcbNumeric = new BollingerBandFacade(5, 2).percentB();
+    final var pcbNumeric = Indicators.bollingerBands(5, 2).percentB();
 
     this.testContext.withIndicators(pcb, pcbNumeric)
         .assertIndicatorEquals(pcb, pcbNumeric);
@@ -72,7 +72,7 @@ class BollingerBandFacadeTest {
     final var sma = new SMAIndicator(closePriceIndicator, 3);
 
     final var middleBB = new BollingerBandsMiddleIndicator(sma);
-    final var bollingerBandFacade = new BollingerBandFacade(barCount, 2);
+    final var bollingerBandFacade = Indicators.bollingerBands(barCount, 2);
     final var middleBBNumeric = bollingerBandFacade.middle();
 
     this.testContext.withIndicators(middleBB, middleBBNumeric)
@@ -93,7 +93,7 @@ class BollingerBandFacadeTest {
     final var standardDeviation = new StandardDeviationIndicator(closePriceIndicator, barCount);
     final var lowerBB = new BollingerBandsLowerIndicator(middleBB, standardDeviation);
 
-    final var bollingerBandFacade = new BollingerBandFacade(barCount, 2);
+    final var bollingerBandFacade = Indicators.bollingerBands(barCount, 2);
     final var lowerBBNumeric = bollingerBandFacade.lower();
 
     this.testContext.withIndicators(lowerBB, lowerBBNumeric)
@@ -114,7 +114,7 @@ class BollingerBandFacadeTest {
     final var standardDeviation = new StandardDeviationIndicator(closePriceIndicator, barCount);
     final var upperBB = new BollingerBandsUpperIndicator(middleBB, standardDeviation);
 
-    final var bollingerBandFacade = new BollingerBandFacade(barCount, 2);
+    final var bollingerBandFacade = Indicators.bollingerBands(barCount, 2);
     final var upperBBNumeric = bollingerBandFacade.upper();
 
     this.testContext.withIndicators(upperBB, upperBBNumeric)
@@ -137,7 +137,7 @@ class BollingerBandFacadeTest {
     final var upperBB = new BollingerBandsUpperIndicator(middleBB, standardDeviation);
     final var widthBB = new BollingerBandWidthIndicator(upperBB, middleBB, lowerBB);
 
-    final var bollingerBandFacade = new BollingerBandFacade(barCount, 2);
+    final var bollingerBandFacade = Indicators.bollingerBands(barCount, 2);
     final var widthBBNumeric = bollingerBandFacade.bandwidth();
 
     this.testContext.withIndicators(widthBB, widthBBNumeric)
