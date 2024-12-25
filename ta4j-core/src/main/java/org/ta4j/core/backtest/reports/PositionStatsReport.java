@@ -30,14 +30,33 @@ import org.ta4j.core.num.Num;
  * @param profitCount The number of positions making a profit.
  * @param lossCount The number of positions making a loss.
  * @param breakEvenCount The number of positions with a break even.
+ * @param winningPositionsRatio
+ * @param losingPositionsRatio
  */
-public record PositionStatsReport(Num profitCount, Num lossCount, Num breakEvenCount) {
+public record PositionStatsReport(
+    Num totalPositions,
+    Num profitCount,
+    Num lossCount,
+    Num winningPositionsRatio,
+    Num losingPositionsRatio,
+    Num breakEvenCount
+) {
   @Override
   public String toString() {
     return """
+        total positions: %s
         profits: %s
         losses: %s
+        profitsRatio: %s
+        lossesRatio: %s
         breakEvens: %s
-        """.formatted(this.profitCount, this.lossCount, this.breakEvenCount);
+        """.formatted(
+        this.totalPositions,
+        this.profitCount,
+        this.lossCount,
+        this.winningPositionsRatio,
+        this.losingPositionsRatio,
+        this.breakEvenCount
+    );
   }
 }

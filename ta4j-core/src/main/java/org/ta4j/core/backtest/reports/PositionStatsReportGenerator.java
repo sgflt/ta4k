@@ -25,7 +25,9 @@ package org.ta4j.core.backtest.reports;
 import org.ta4j.core.backtest.TradingRecord;
 import org.ta4j.core.backtest.criteria.NumberOfBreakEvenPositionsCriterion;
 import org.ta4j.core.backtest.criteria.NumberOfLosingPositionsCriterion;
+import org.ta4j.core.backtest.criteria.NumberOfPositionsCriterion;
 import org.ta4j.core.backtest.criteria.NumberOfWinningPositionsCriterion;
+import org.ta4j.core.backtest.criteria.PositionsRatioCriterion;
 
 /**
  * Generates a {@link PositionStatsReport} based on provided trading record and
@@ -35,9 +37,19 @@ public class PositionStatsReportGenerator implements ReportGenerator<PositionSta
 
   @Override
   public PositionStatsReport generate(final TradingRecord tradingRecord) {
+    final var totalPositions = new NumberOfPositionsCriterion().calculate(tradingRecord);
     final var winningPositions = new NumberOfWinningPositionsCriterion().calculate(tradingRecord);
     final var losingPositions = new NumberOfLosingPositionsCriterion().calculate(tradingRecord);
     final var breakEvenPositions = new NumberOfBreakEvenPositionsCriterion().calculate(tradingRecord);
-    return new PositionStatsReport(winningPositions, losingPositions, breakEvenPositions);
+    final var losingPositionsRatio = PositionsRatioCriterion.losingPositionsRatioCriterion().calculate(tradingRecord);
+    final var winningPositionsRatio = PositionsRatioCriterion.winningPositionsRatioCriterion().calculate(tradingRecord);
+    return new PositionStatsReport(
+        totalPositions,
+        winningPositions,
+        losingPositions,
+        winningPositionsRatio,
+        losingPositionsRatio,
+        breakEvenPositions
+    );
   }
 }

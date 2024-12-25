@@ -31,7 +31,8 @@ import org.ta4j.core.num.Num;
  * @param totalProfitLossPercentage The total PnL in percent.
  * @param totalProfit The total profit.
  * @param totalLoss The total loss.
- * @param averageLoss
+ * @param expectedShortfall
+ * @param minutesInMarket
  */
 public record PerformanceReport(
     Num totalProfitLoss,
@@ -41,23 +42,25 @@ public record PerformanceReport(
     Num averageProfit,
     Num averageLoss,
     Num totalPositions,
-    Num winningPositions,
-    Num losingPositions,
-    Num maximumDrawdown
+    Num valueAtRisk,
+    Num maximumDrawdown,
+    Num expectedShortfall,
+    Num minutesInMarket
 ) {
   @Override
   public String toString() {
     return """
-        totalProfitLoss: %.2f
-        totalProfitLossPercentage: %.2f
-        totalProfit: %.2f
-        totalLoss: %.2f
-        averageProfit: %.2f
-        averageLoss: %.2f
-        totalPositions: %.0f
-        winningPositions: %.0f
-        losingPositions: %.0f
-        maximumDrawdown: %.2f
+        totalProfitLoss:\t\t%.2f
+        totalProfitLossPercentage:\t%.2f
+        totalProfit:\t\t%.2f
+        totalLoss:\t\t%.2f
+        averageProfit:\t%.2f
+        averageLoss:\t%.2f
+        totalPositions:\t%d
+        valueAtRisk:\t%.2f
+        maximumDrawdown:\t%.2f
+        expectedShortfall:\t%.2f
+        minutesInMarket:\t%d
         """.formatted(
         this.totalProfitLoss.doubleValue(),
         this.totalProfitLossPercentage.doubleValue(),
@@ -65,10 +68,11 @@ public record PerformanceReport(
         this.totalLoss.doubleValue(),
         this.averageProfit.doubleValue(),
         this.averageLoss.doubleValue(),
-        this.totalPositions.doubleValue(),
-        this.winningPositions.doubleValue(),
-        this.losingPositions.doubleValue(),
-        this.maximumDrawdown.doubleValue()
+        this.totalPositions.intValue(),
+        this.valueAtRisk.doubleValue(),
+        this.maximumDrawdown.doubleValue(),
+        this.expectedShortfall.doubleValue(),
+        this.minutesInMarket.intValue()
     );
   }
 }

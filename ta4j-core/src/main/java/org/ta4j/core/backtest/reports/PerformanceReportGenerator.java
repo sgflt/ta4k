@@ -22,16 +22,20 @@
  */
 package org.ta4j.core.backtest.reports;
 
+import java.time.temporal.ChronoUnit;
+
 import org.ta4j.core.backtest.TradingRecord;
-import org.ta4j.core.backtest.criteria.NumberOfLosingPositionsCriterion;
+import org.ta4j.core.backtest.criteria.ExpectedShortfallCriterion;
 import org.ta4j.core.backtest.criteria.NumberOfPositionsCriterion;
-import org.ta4j.core.backtest.criteria.NumberOfWinningPositionsCriterion;
+import org.ta4j.core.backtest.criteria.TimeInTradeCriterion;
+import org.ta4j.core.backtest.criteria.ValueAtRiskCriterion;
 import org.ta4j.core.backtest.criteria.pnl.AverageLossCriterion;
 import org.ta4j.core.backtest.criteria.pnl.AverageProfitCriterion;
 import org.ta4j.core.backtest.criteria.pnl.LossCriterion;
 import org.ta4j.core.backtest.criteria.pnl.ProfitCriterion;
 import org.ta4j.core.backtest.criteria.pnl.ProfitLossCriterion;
 import org.ta4j.core.backtest.criteria.pnl.ProfitLossPercentageCriterion;
+import org.ta4j.core.num.NumFactoryProvider;
 
 /**
  * Generates a {@link PerformanceReport} based on the provided trading record
@@ -48,8 +52,11 @@ public class PerformanceReportGenerator implements ReportGenerator<PerformanceRe
     final var averageLoss = new AverageLossCriterion().calculate(tradingRecord);
     final var netLoss = new LossCriterion(false).calculate(tradingRecord);
     final var numberOfPositions = new NumberOfPositionsCriterion().calculate(tradingRecord);
-    final var winningPOsitions = new NumberOfWinningPositionsCriterion().calculate(tradingRecord);
-    final var losingPositions = new NumberOfLosingPositionsCriterion().calculate(tradingRecord);
+    final var valueAtRisk =
+        new ValueAtRiskCriterion(NumFactoryProvider.getDefaultNumFactory(), 0.95).calculate(tradingRecord);
+    final var expectedShortfall =
+        new ExpectedShortfallCriterion(NumFactoryProvider.getDefaultNumFactory(), 0.95).calculate(tradingRecord);
+    final var minutesInMarket = new TimeInTradeCriterion(ChronoUnit.MINUTES).calculate(tradingRecord);
     return new PerformanceReport(
         pnl,
         pnlPercentage,
@@ -58,9 +65,10 @@ public class PerformanceReportGenerator implements ReportGenerator<PerformanceRe
         averageProfit,
         averageLoss,
         numberOfPositions,
-        winningPOsitions,
-        losingPositions,
-        tradingRecord.getMaximumDrawdown()
+        valueAtRisk,
+        tradingRecord.getMaximumDrawdown(),
+        expectedShortfall,
+        minutesInMarket
     );
   }
 }

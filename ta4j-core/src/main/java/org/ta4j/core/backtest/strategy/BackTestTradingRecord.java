@@ -28,6 +28,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 
+import lombok.Getter;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 import org.ta4j.core.TradeType;
@@ -54,6 +55,7 @@ public class BackTestTradingRecord implements TradingRecord, RuntimeContext {
   private String name;
 
   /** The recorded trades. */
+  @Getter
   private final List<Trade> trades = new ArrayList<>();
 
   /** The recorded positions. */

@@ -26,11 +26,11 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.ta4j.core.backtest.BacktestBarSeries;
 import org.ta4j.core.backtest.Position;
 import org.ta4j.core.backtest.TradingRecord;
 import org.ta4j.core.backtest.analysis.Returns;
 import org.ta4j.core.num.Num;
+import org.ta4j.core.num.NumFactory;
 
 /**
  * Expected Shortfall criterion.
@@ -41,18 +41,18 @@ import org.ta4j.core.num.Num;
 public class ExpectedShortfallCriterion implements AnalysisCriterion {
 
   private static final Logger log = LoggerFactory.getLogger(ExpectedShortfallCriterion.class);
-  private final BacktestBarSeries series;
+  private final NumFactory numFactory;
   private final double confidenceLevel;
 
 
   /**
    * Constructor.
    *
-   * @param series the bar series
+   * @param numFactory the bar numFactory
    * @param confidenceLevel the confidence level (e.g. 0.95 for 95%)
    */
-  public ExpectedShortfallCriterion(final BacktestBarSeries series, final double confidenceLevel) {
-    this.series = series;
+  public ExpectedShortfallCriterion(final NumFactory numFactory, final double confidenceLevel) {
+    this.numFactory = numFactory;
     this.confidenceLevel = confidenceLevel;
   }
 
@@ -61,10 +61,10 @@ public class ExpectedShortfallCriterion implements AnalysisCriterion {
   public Num calculate(final Position position) {
     if (position.getEntry() == null || position.getExit() == null) {
       log.debug("Position has no entry or exit");
-      return this.series.numFactory().zero();
+      return this.numFactory.zero();
     }
     // TODO extract ReturnType to parameter
-    final var returns = new Returns(this.series.numFactory(), position, Returns.ReturnType.ARITHMETIC);
+    final var returns = new Returns(this.numFactory, position, Returns.ReturnType.ARITHMETIC);
     final var returnValues = returns.getValues().stream()
         .filter(num -> !num.isZero()) // Remove zero returns
         .toList();
@@ -78,10 +78,10 @@ public class ExpectedShortfallCriterion implements AnalysisCriterion {
   public Num calculate(final TradingRecord tradingRecord) {
     if (tradingRecord.getPositions().isEmpty()) {
       log.debug("Trading record is empty");
-      return this.series.numFactory().zero();
+      return this.numFactory.zero();
     }
 
-    final var returns = new Returns(this.series.numFactory(), tradingRecord, Returns.ReturnType.ARITHMETIC);
+    final var returns = new Returns(this.numFactory, tradingRecord, Returns.ReturnType.ARITHMETIC);
     final var returnValues = returns.getValues().stream()
         .filter(num -> !num.isZero()) // Remove zero returns
         .toList();
@@ -103,7 +103,7 @@ public class ExpectedShortfallCriterion implements AnalysisCriterion {
 
     if (returns.isEmpty()) {
       log.debug("Returns list is empty");
-      return this.series.numFactory().zero();
+      return this.numFactory.zero();
     }
 
     // Sort returns in ascending order (worst to best)
@@ -120,13 +120,13 @@ public class ExpectedShortfallCriterion implements AnalysisCriterion {
     );
 
     // Calculate average of values below threshold (worst returns)
-    var sum = this.series.numFactory().zero();
+    var sum = this.numFactory.zero();
     for (int i = 0; i < numberOfReturns; i++) {
       sum = sum.plus(sortedReturns.get(i));
       log.debug("Adding return at index {}: {}, running sum: {}", i, sortedReturns.get(i), sum);
     }
 
-    final var result = sum.dividedBy(this.series.numFactory().numOf(numberOfReturns));
+    final var result = sum.dividedBy(this.numFactory.numOf(numberOfReturns));
     log.debug("Final ES result: {}", result);
     return result;
   }
