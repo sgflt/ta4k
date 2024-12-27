@@ -27,7 +27,7 @@ import org.ta4j.core.TradeType;
 import org.ta4j.core.api.strategy.RuntimeContext;
 import org.ta4j.core.api.strategy.Strategy;
 import org.ta4j.core.api.strategy.StrategyFactory;
-import org.ta4j.core.indicators.IndicatorContext;
+import org.ta4j.core.indicators.IndicatorContexts;
 
 /**
  * Converts standard StrategyFactory<Strategy> to StrategyFactory<BacktestStrategy>
@@ -76,7 +76,7 @@ public final class StrategyFactoryConverter {
     @Override
     public BacktestStrategy createStrategy(
         final RuntimeContext runtimeContext,
-        final IndicatorContext indicatorContext
+        final IndicatorContexts indicatorContext
     ) {
       final var originalStrategy = this.originalFactory.createStrategy(
           runtimeContext,

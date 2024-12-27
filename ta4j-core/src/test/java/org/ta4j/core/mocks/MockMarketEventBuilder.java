@@ -31,6 +31,7 @@ import java.util.stream.DoubleStream;
 
 import org.ta4j.core.events.CandleReceived;
 import org.ta4j.core.events.MarketEvent;
+import org.ta4j.core.indicators.TimeFrame;
 
 /**
  * Generates BacktestBar implementations with mocked time or duration if not set
@@ -63,14 +64,14 @@ public class MockMarketEventBuilder {
       final var startTime = this.startTime.plus(this.candleDuration.multipliedBy(createCandleSerialNumber()));
       this.candleEvents.add(
           new CandleReceived(
+              TimeFrame.DAY,
               startTime,
               startTime.plus(this.candleDuration.multipliedBy(this.candlesProduced)),
               d,
               d,
               d,
               d,
-              d,
-              0.0
+              d
           )
       );
     });
@@ -107,14 +108,14 @@ public class MockMarketEventBuilder {
       final var beginTime = this.startTime.plus(timePeriod.multipliedBy(createCandleSerialNumber()));
       candleEvents.add(
           new CandleReceived(
+              TimeFrame.DAY,
               beginTime,
               beginTime.plus(timePeriod.multipliedBy(this.candlesProduced)),
               i + 1,
               i + 2,
               i + 3,
               i + 4,
-              i + 5,
-              0.0
+              i + 5
           )
       );
     }

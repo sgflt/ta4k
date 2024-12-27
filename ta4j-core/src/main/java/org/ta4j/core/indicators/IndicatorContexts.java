@@ -2,7 +2,7 @@
 /*
  * The MIT License (MIT)
  *
- * Copyright (c) 2017-2024 Ta4j Organization & respective authors (see AUTHORS)
+ * Copyright (c) 2024 Lukáš Kvídera
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -22,14 +22,40 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.ta4j.core.backtest.strategy;
+package org.ta4j.core.indicators;
 
-import org.ta4j.core.api.strategy.RuntimeContext;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.ta4j.core.ObservableStrategyFactoryBuilder;
 
 /**
- * Creates RuntimeContext related to some strategy or multiple strategies.
+ * Aggregation class that stores indicator contexts related to defined timeframes.
  */
-public interface RuntimeContextFactory {
+public class IndicatorContexts {
+  private final Map<TimeFrame, IndicatorContext> timeFramedContexts = new HashMap<>();
 
-  RuntimeContext createRuntimeContext();
+
+  private IndicatorContexts() {
+  }
+
+
+  public static IndicatorContexts empty() {
+    return new IndicatorContexts();
+  }
+
+
+  public void add(final IndicatorContext context) {
+    this.timeFramedContexts.put(context.timeFrame(), context);
+  }
+
+
+  public IndicatorContext get(final TimeFrame timeFrame) {
+    return this.timeFramedContexts.computeIfAbsent(timeFrame, IndicatorContext::empty);
+  }
+
+
+  public void register(final ObservableStrategyFactoryBuilder.ObservableStrategy observableStrategy) {
+    this.timeFramedContexts.values().forEach(indicatorContext -> indicatorContext.register(observableStrategy));
+  }
 }

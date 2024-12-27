@@ -24,15 +24,19 @@
 
 package org.ta4j.core;
 
+import java.util.Set;
+
 import lombok.Builder;
 import lombok.NonNull;
 import org.ta4j.core.api.strategy.Rule;
 import org.ta4j.core.api.strategy.Strategy;
 import org.ta4j.core.indicators.IndicatorContext;
+import org.ta4j.core.indicators.TimeFrame;
 
 @Builder
 public record DefaultStrategy(
     @NonNull String name,
+    @NonNull Set<TimeFrame> timeFrames,
     @NonNull Rule entryRule,
     @NonNull Rule exitRule,
     @NonNull IndicatorContext indicatorContext

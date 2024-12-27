@@ -40,6 +40,7 @@ import org.ta4j.core.backtest.Trade;
 import org.ta4j.core.backtest.TradingRecord;
 import org.ta4j.core.backtest.analysis.cost.CostModel;
 import org.ta4j.core.backtest.analysis.cost.ZeroCostModel;
+import org.ta4j.core.backtest.strategy.runtime.RuntimeContextKeys;
 import org.ta4j.core.events.TickReceived;
 import org.ta4j.core.num.Num;
 import org.ta4j.core.num.NumFactory;
@@ -70,6 +71,9 @@ public class BackTestTradingRecord implements TradingRecord, RuntimeContext {
   /** The cost model for holding asset (e.g. borrowing). */
   private final CostModel holdingCostModel;
   private final NumFactory numFactory;
+
+  private Instant currentTime = Instant.MIN;
+  private Num currentPrice;
 
 
   /** Constructor with {@link #startingType} = BUY. */
@@ -135,6 +139,7 @@ public class BackTestTradingRecord implements TradingRecord, RuntimeContext {
     this.holdingCostModel = holdingCostModel;
     this.numFactory = numFactory;
     this.currentPosition = new Position(entryTradeType, transactionCostModel, holdingCostModel, numFactory);
+    this.currentPrice = numFactory.zero();
   }
 
 
@@ -287,12 +292,18 @@ public class BackTestTradingRecord implements TradingRecord, RuntimeContext {
   @Override
   public void onBar(final Bar bar) {
     this.currentPosition.onBar(bar);  // TODO allow DCA
+
+    this.currentTime = bar.endTime();
+    this.currentPrice = bar.closePrice();
   }
 
 
   @Override
   public void onTick(final TickReceived event) {
     log.debug("onTick: {}", event);
+
+    this.currentTime = event.beginTime();
+    this.currentPrice = this.numFactory.numOf(event.ask());
   }
 
 
@@ -305,31 +316,33 @@ public class BackTestTradingRecord implements TradingRecord, RuntimeContext {
   @Override
   public Object getValue(final String key) {
     return switch (key) {
-      case RuntimeContextKeys.CURRENT_POSITION -> this.currentPosition;
-      case RuntimeContextKeys.BACKTEST_TRADING_RECORD -> this;
+      case TradingRecordContextKeys.CURRENT_POSITION -> this.currentPosition;
+      case TradingRecordContextKeys.BACKTEST_TRADING_RECORD -> this;
+      case RuntimeContextKeys.CURRENT_PRICE -> this.currentPrice;
+      case RuntimeContextKeys.CURRENT_TIME -> this.currentTime;
       default -> null;
     };
   }
 
 
   @UtilityClass
-  public static final class RuntimeContextKeys {
-    public static final String CURRENT_POSITION = "currentPosition";
-    public static final String BACKTEST_TRADING_RECORD = "backtestTradingRecord";
+  public static final class TradingRecordContextKeys {
+    public static final String CURRENT_POSITION = "ta4j-currentPosition";
+    public static final String BACKTEST_TRADING_RECORD = "ta4j-backtestTradingRecord";
   }
 
 
   public static final class CurrentPositionResolver implements RuntimeValueResolver<Position> {
     @Override
     public Position resolve(final RuntimeContext context) {
-      return (Position) context.getValue(RuntimeContextKeys.CURRENT_POSITION);
+      return (Position) context.getValue(TradingRecordContextKeys.CURRENT_POSITION);
     }
   }
 
   public static final class TradeRecordResolver implements RuntimeValueResolver<BackTestTradingRecord> {
     @Override
     public BackTestTradingRecord resolve(final RuntimeContext context) {
-      return (BackTestTradingRecord) context.getValue(RuntimeContextKeys.BACKTEST_TRADING_RECORD);
+      return (BackTestTradingRecord) context.getValue(TradingRecordContextKeys.BACKTEST_TRADING_RECORD);
     }
   }
 

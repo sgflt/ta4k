@@ -39,6 +39,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.ta4j.core.MarketEventTestContext;
 import org.ta4j.core.api.Indicators;
 import org.ta4j.core.events.CandleReceived;
+import org.ta4j.core.indicators.TimeFrame;
 import org.ta4j.core.num.NumFactory;
 
 class AroonOscillatorIndicatorTest {
@@ -221,6 +222,7 @@ class AroonOscillatorIndicatorTest {
               return CandleReceived.builder()
                   .endTime(date.plus(Duration.ofDays(1)))
                   .beginTime(date)
+                  .timeFrame(TimeFrame.DAY)
                   .openPrice(Double.parseDouble(tickData[3]))
                   .highPrice(Double.parseDouble(tickData[4]))
                   .lowPrice(Double.parseDouble(tickData[5]))
@@ -236,7 +238,7 @@ class AroonOscillatorIndicatorTest {
 
   @ParameterizedTest(name = "External data with bar count 25 [{index}] {0}")
   @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
-  void test(NumFactory numFactory) {
+  void test(final NumFactory numFactory) {
     final var aroonOscillator = Indicators.aroonOscillator(25);
     assertNotNull(aroonOscillator.getAroonUpIndicator());
     assertNotNull(aroonOscillator.getAroonDownIndicator());
@@ -253,7 +255,6 @@ class AroonOscillatorIndicatorTest {
         .assertNext(48)
         .assertNext(44)
         .assertNext(40)
-        // FIXME    assertNumEquals(32d, aroonOscillator.getValue());
         .assertNext(32)
     ;
   }

@@ -23,9 +23,9 @@
  */
 package org.ta4j.core.live;
 
-import org.ta4j.core.api.series.BarBuilder;
-import org.ta4j.core.api.series.BarSeries;
+import org.ta4j.core.MultiTimeFrameSeries;
 import org.ta4j.core.api.strategy.Strategy;
+import org.ta4j.core.events.CandleReceived;
 
 /**
  * Trading contest that traces bars and respective strategy
@@ -33,28 +33,18 @@ import org.ta4j.core.api.strategy.Strategy;
  * @author Lukáš Kvídera
  */
 public class LiveTrading {
-  private final BarSeries series;
-  private Strategy strategy;
+  private final MultiTimeFrameSeries<LiveBarSeries> series;
+  private final Strategy strategy;
 
 
-  public LiveTrading(final BarSeries series, final Strategy strategy) {
+  public LiveTrading(final MultiTimeFrameSeries<LiveBarSeries> series, final Strategy strategy) {
     this.series = series;
     this.strategy = strategy;
   }
 
 
-  public BarBuilder barBuilder() {
-    return this.series.barBuilder();
-  }
-
-
-  public Strategy getStrategy() {
-    return this.strategy;
-  }
-
-
-  public void replaceStrategy(final Strategy strategy) {
-    this.strategy = strategy;
+  public void onCandle(final CandleReceived candle) {
+    this.series.onCandle(candle);
   }
 
 

@@ -24,6 +24,7 @@ package org.ta4j.core.backtest.strategy;
 
 import java.time.Instant;
 import java.util.Objects;
+import java.util.Set;
 
 import lombok.ToString;
 import org.slf4j.Logger;
@@ -37,6 +38,7 @@ import org.ta4j.core.api.strategy.Strategy;
 import org.ta4j.core.backtest.OperationType;
 import org.ta4j.core.backtest.Position;
 import org.ta4j.core.events.TickReceived;
+import org.ta4j.core.indicators.TimeFrame;
 
 /**
  * This implementation is designed for backtesting of custom strategy.
@@ -75,6 +77,12 @@ public class BacktestStrategy implements Strategy, BarListener, TickListener {
   @Override
   public String name() {
     return this.testedStrategy.name();
+  }
+
+
+  @Override
+  public Set<TimeFrame> timeFrames() {
+    return this.testedStrategy.timeFrames();
   }
 
 

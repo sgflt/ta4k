@@ -22,23 +22,18 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.ta4j.core.backtest.strategy;
+package org.ta4j.core.backtest.strategy.runtime;
 
-import org.ta4j.core.api.strategy.StrategyFactory;
-import org.ta4j.core.backtest.strategy.runtime.RuntimeContextFactory;
+import org.ta4j.core.api.strategy.RuntimeContext;
+import org.ta4j.core.api.strategy.RuntimeValueResolver;
+import org.ta4j.core.num.Num;
 
 /**
- * This class encapsulates classes that are required for backtesting.
+ * @author Lukáš Kvídera
  */
-public interface BacktestRunFactory {
-
-  /**
-   * @return context that holds relevant data for strategy
-   */
-  RuntimeContextFactory getRuntimeContextFactory();
-
-  /**
-   * @return factory that accepts related runtime context
-   */
-  StrategyFactory<BacktestStrategy> getStrategyFactory();
+public final class CurrentPriceResolver implements RuntimeValueResolver<Num> {
+  @Override
+  public Num resolve(final RuntimeContext context) {
+    return (Num) context.getValue(RuntimeContextKeys.CURRENT_PRICE);
+  }
 }

@@ -28,16 +28,17 @@ import java.time.Instant;
 
 import lombok.Builder;
 import lombok.NonNull;
+import org.ta4j.core.indicators.TimeFrame;
 
 @Builder
 public record CandleReceived(
+    @NonNull TimeFrame timeFrame,
     @NonNull Instant beginTime,
     @NonNull Instant endTime,
     double openPrice,
     double highPrice,
     double lowPrice,
     double closePrice,
-    double volume,
-    double amount
+    double volume
 ) implements MarketEvent {
 }

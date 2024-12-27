@@ -28,8 +28,11 @@ import java.util.Comparator;
 import java.util.List;
 
 import org.ta4j.core.CompoundRuntimeContext;
+import org.ta4j.core.MultiTimeFrameSeries;
 import org.ta4j.core.api.callback.MarketEventHandler;
 import org.ta4j.core.api.callback.TickListener;
+import org.ta4j.core.api.strategy.RuntimeContext;
+import org.ta4j.core.api.strategy.StrategyFactory;
 import org.ta4j.core.backtest.reports.TradingStatement;
 import org.ta4j.core.backtest.reports.TradingStatementGenerator;
 import org.ta4j.core.backtest.strategy.BackTestTradingRecord;
@@ -39,7 +42,7 @@ import org.ta4j.core.events.CandleReceived;
 import org.ta4j.core.events.MarketEvent;
 import org.ta4j.core.events.NewsReceived;
 import org.ta4j.core.events.TickReceived;
-import org.ta4j.core.indicators.IndicatorContext;
+import org.ta4j.core.indicators.IndicatorContexts;
 import org.ta4j.core.num.Num;
 
 /**
@@ -60,6 +63,24 @@ public class BacktestExecutor {
    * Executes given strategies with specified trade type to open the position and
    * return the trading statements.
    *
+   * @param backtestRunFactory that creates strategies to test and their contexts
+   * @param amount the amount used to open/close the position
+   *
+   * @return a list of TradingStatements
+   */
+  public TradingStatement execute(
+      final BacktestRunFactory backtestRunFactory,
+      final List<MarketEvent> marketEvents,
+      final Number amount
+  ) {
+    return execute(List.of(backtestRunFactory), marketEvents, amount).getFirst();
+  }
+
+
+  /**
+   * Executes given strategies with specified trade type to open the position and
+   * return the trading statements.
+   *
    * @param backtestRunFactories that creates strategies to test and their contexts
    * @param amount the amount used to open/close the position
    *
@@ -70,15 +91,18 @@ public class BacktestExecutor {
       final List<MarketEvent> marketEvents,
       final Number amount
   ) {
-    final var marketEventHandler =
-        new DefaultMarketEventHandler(backtestRunFactories, this.configuration.numFactory().numOf(amount));
+    return backtestRunFactories.parallelStream()
+        .map(backtestRunFactory -> {
+          final var marketEventHandler =
+              new DefaultMarketEventHandler(backtestRunFactory, this.configuration.numFactory().numOf(amount));
 
-    replay(
-        marketEvents,
-        marketEventHandler
-    );
-
-    return marketEventHandler.getTradintStatements();
+          replay(
+              marketEvents,
+              marketEventHandler
+          );
+          return marketEventHandler.getTradingStatement();
+        })
+        .toList();
   }
 
 
@@ -86,7 +110,6 @@ public class BacktestExecutor {
       final List<MarketEvent> marketEvents,
       final MarketEventHandler marketEventHandler
   ) {
-
     marketEvents.stream()
         .sorted(Comparator.comparing(MarketEvent::beginTime))
         .forEach(marketEvent -> {
@@ -106,37 +129,52 @@ public class BacktestExecutor {
    */
   private class DefaultMarketEventHandler implements MarketEventHandler {
 
-    private final BacktestBarSeries series;
+    private final MultiTimeFrameSeries<BacktestBarSeries> multiTimeFrameSeries = new MultiTimeFrameSeries<>();
     private final Num amount;
-    private final List<BacktestStrategy> strategies;
+    private final BacktestStrategy strategy;
     private final List<TickListener> tickListeners = new ArrayList<>();
+    private RuntimeContext runtimeContext;
 
 
     public DefaultMarketEventHandler(
-        final List<BacktestRunFactory> backtestRunFactories,
+        final BacktestRunFactory backtestRunFactory,
         final Num amount
     ) {
-      final var indicatorContext = IndicatorContext.empty();
-      this.series = new BacktestBarSeriesBuilder()
-          .withIndicatorContext(indicatorContext)
-          .withNumFactory(BacktestExecutor.this.configuration.numFactory())
-          .build();
-
-      this.strategies =
-          backtestRunFactories.stream()
-              .map(backtestRunFactory -> createStrategy(backtestRunFactory, indicatorContext))
-              .toList();
-
+      this.strategy = createStrategy(backtestRunFactory);
       this.amount = amount;
     }
 
 
-    private BacktestStrategy createStrategy(
-        final BacktestRunFactory backtestRunFactory,
-        final IndicatorContext indicatorContext
-    ) {
+    private BacktestStrategy createStrategy(final BacktestRunFactory backtestRunFactory) {
       final var strategyFactory = backtestRunFactory.getStrategyFactory();
 
+      final var runtimeContext = getCompoundRuntimeContext(backtestRunFactory, strategyFactory);
+      final var indicatorContexts = IndicatorContexts.empty();
+      final var strategy = strategyFactory.createStrategy(runtimeContext, indicatorContexts);
+
+      strategy.timeFrames().forEach(
+          timeFrame -> {
+            final var series = new BacktestBarSeriesBuilder()
+                .withIndicatorContext(indicatorContexts.get(timeFrame))
+                .withNumFactory(BacktestExecutor.this.configuration.numFactory())
+                .build();
+            series.addBarListener(strategy);
+            series.addBarListener(runtimeContext);
+            this.multiTimeFrameSeries.add(series);
+          }
+      );
+
+      this.runtimeContext = runtimeContext;
+      this.tickListeners.add(strategy);
+      this.tickListeners.add(runtimeContext);
+      return strategy;
+    }
+
+
+    private CompoundRuntimeContext getCompoundRuntimeContext(
+        final BacktestRunFactory backtestRunFactory,
+        final StrategyFactory<BacktestStrategy> strategyFactory
+    ) {
       final var backTestTradingRecord = new BackTestTradingRecord(
           strategyFactory.getTradeType(),
           BacktestExecutor.this.configuration.transactionCostModel(),
@@ -145,60 +183,43 @@ public class BacktestExecutor {
       );
 
       final var runtimeContextFactory = backtestRunFactory.getRuntimeContextFactory();
-      final var runtimeContext =
-          CompoundRuntimeContext.of(runtimeContextFactory.createRuntimeContext(), backTestTradingRecord);
-      final var strategy = strategyFactory.createStrategy(runtimeContext, indicatorContext);
-      this.series.addBarListener(strategy);
-      this.series.addBarListener(runtimeContext);
-      this.tickListeners.add(strategy);
-      this.tickListeners.add(runtimeContext);
-      return strategy;
+      return CompoundRuntimeContext.of(
+          runtimeContextFactory.createRuntimeContext(),
+          backTestTradingRecord
+      );
     }
 
 
     @Override
     public void onCandle(final CandleReceived event) {
-      this.series.barBuilder()
-          .startTime(event.beginTime())
-          .endTime(event.endTime())
-          .openPrice(event.openPrice())
-          .highPrice(event.highPrice())
-          .lowPrice(event.lowPrice())
-          .closePrice(event.closePrice())
-          .volume(event.volume())
-          .add()
-      ;
-
-      reevaluate(this.series, this.amount);
+      this.multiTimeFrameSeries.onCandle(event);
+      reevaluate(this.amount);
     }
 
 
-    private void reevaluate(final BacktestBarSeries barSeries, final Num amount) {
-      this.strategies.forEach(strategy -> {
-
-        final var tradeExecutionModel = BacktestExecutor.this.configuration.tradeExecutionModel();
-        switch (strategy.shouldOperate()) {
-          case ENTER -> tradeExecutionModel.enter(
-              barSeries.getBar(),
-              strategy.getTradeRecord(),
-              amount
-          );
-          case EXIT -> tradeExecutionModel.exit(
-              barSeries.getBar(),
-              strategy.getTradeRecord(),
-              amount
-          );
-          case NOOP -> {
-          }
+    private void reevaluate(final Num amount) {
+      final var tradeExecutionModel = BacktestExecutor.this.configuration.tradeExecutionModel();
+      switch (this.strategy.shouldOperate()) {
+        case ENTER -> tradeExecutionModel.enter(
+            this.runtimeContext,
+            this.strategy.getTradeRecord(),
+            amount
+        );
+        case EXIT -> tradeExecutionModel.exit(
+            this.runtimeContext,
+            this.strategy.getTradeRecord(),
+            amount
+        );
+        case NOOP -> {
         }
-      });
+      }
     }
 
 
     @Override
     public void onTick(final TickReceived event) {
       this.tickListeners.forEach(listener -> listener.onTick(event));
-      reevaluate(this.series, this.amount);
+      reevaluate(this.amount);
     }
 
 
@@ -208,10 +229,8 @@ public class BacktestExecutor {
     }
 
 
-    public List<TradingStatement> getTradintStatements() {
-      return this.strategies.stream()
-          .map(strategy -> new TradingStatementGenerator().generate(strategy))
-          .toList();
+    public TradingStatement getTradingStatement() {
+      return new TradingStatementGenerator().generate(this.strategy);
     }
   }
 }

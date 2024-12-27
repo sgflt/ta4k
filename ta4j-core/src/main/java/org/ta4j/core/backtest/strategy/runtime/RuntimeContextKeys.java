@@ -22,23 +22,15 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.ta4j.core.backtest.strategy;
+package org.ta4j.core.backtest.strategy.runtime;
 
-import org.ta4j.core.api.strategy.StrategyFactory;
-import org.ta4j.core.backtest.strategy.runtime.RuntimeContextFactory;
+import lombok.experimental.UtilityClass;
 
 /**
- * This class encapsulates classes that are required for backtesting.
+ * @author Lukáš Kvídera
  */
-public interface BacktestRunFactory {
-
-  /**
-   * @return context that holds relevant data for strategy
-   */
-  RuntimeContextFactory getRuntimeContextFactory();
-
-  /**
-   * @return factory that accepts related runtime context
-   */
-  StrategyFactory<BacktestStrategy> getStrategyFactory();
+@UtilityClass
+public class RuntimeContextKeys {
+  public static final String CURRENT_PRICE = "ta4j-currentPrice";
+  public static final String CURRENT_TIME = "ta4j-currentTime";
 }

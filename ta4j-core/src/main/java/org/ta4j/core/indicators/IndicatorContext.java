@@ -45,9 +45,11 @@ public class IndicatorContext implements BarListener {
   private final LinkedHashMap<String, Indicator<?>> indicators;
   private final Set<IndicatorChangeListener> changeListeners = new HashSet<>();
   private final Set<IndicatorContextUpdateListener> updateListeners = new HashSet<>();
+  private final TimeFrame timeFrame;
 
 
-  private IndicatorContext(final Indicator<?>... indicators) {
+  private IndicatorContext(final TimeFrame timeFrame, final Indicator<?>... indicators) {
+    this.timeFrame = timeFrame;
     this.indicators = new LinkedHashMap<>();
     for (final var indicator : indicators) {
       this.indicators.put(generatePlaceholderName(), indicator);
@@ -60,11 +62,6 @@ public class IndicatorContext implements BarListener {
   }
 
 
-  private IndicatorContext() {
-    this.indicators = new LinkedHashMap<>();
-  }
-
-
   /**
    * Creates immutable context with defined indicators.
    *
@@ -72,8 +69,8 @@ public class IndicatorContext implements BarListener {
    *
    * @return instance of {@link IndicatorContext}
    */
-  public static IndicatorContext of(final Indicator<?>... indicators) {
-    return new IndicatorContext(indicators);
+  public static IndicatorContext of(final TimeFrame timeFrame, final Indicator<?>... indicators) {
+    return new IndicatorContext(timeFrame, indicators);
   }
 
 
@@ -82,8 +79,8 @@ public class IndicatorContext implements BarListener {
    *
    * @return mutable instance of {@link IndicatorContext}
    */
-  public static IndicatorContext empty() {
-    return new IndicatorContext();
+  public static IndicatorContext empty(final TimeFrame timeFrame) {
+    return new IndicatorContext(timeFrame);
   }
 
 
@@ -140,6 +137,10 @@ public class IndicatorContext implements BarListener {
         changeListener.accept(bar.beginTime(), indicator);
       }
     }
+
+    for (final var updateListener : this.updateListeners) {
+      updateListener.onContextUpdate(bar.endTime());
+    }
   }
 
 
@@ -169,5 +170,10 @@ public class IndicatorContext implements BarListener {
 
   public boolean contains(final String indicatorName) {
     return this.indicators.containsKey(indicatorName);
+  }
+
+
+  public TimeFrame timeFrame() {
+    return this.timeFrame;
   }
 }

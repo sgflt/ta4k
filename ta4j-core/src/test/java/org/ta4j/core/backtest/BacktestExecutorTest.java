@@ -30,6 +30,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
@@ -44,12 +45,14 @@ import org.ta4j.core.api.strategy.Strategy;
 import org.ta4j.core.api.strategy.StrategyFactory;
 import org.ta4j.core.backtest.strategy.BacktestRunFactory;
 import org.ta4j.core.backtest.strategy.BacktestStrategy;
-import org.ta4j.core.backtest.strategy.NOOPRuntimeContextFactory;
-import org.ta4j.core.backtest.strategy.RuntimeContextFactory;
 import org.ta4j.core.backtest.strategy.StrategyFactoryConverter;
+import org.ta4j.core.backtest.strategy.runtime.NOOPRuntimeContextFactory;
+import org.ta4j.core.backtest.strategy.runtime.RuntimeContextFactory;
 import org.ta4j.core.events.CandleReceived;
 import org.ta4j.core.events.MarketEvent;
 import org.ta4j.core.indicators.IndicatorContext;
+import org.ta4j.core.indicators.IndicatorContexts;
+import org.ta4j.core.indicators.TimeFrame;
 import org.ta4j.core.num.NumFactory;
 
 @Slf4j
@@ -101,6 +104,7 @@ class BacktestExecutorTest {
 
   private CandleReceived generateEvent() {
     return CandleReceived.builder()
+        .timeFrame(TimeFrame.DAY)
         .beginTime(this.time)
         .endTime(this.time.plus(Duration.ofDays(1)))
         .closePrice(100.0)
@@ -110,6 +114,7 @@ class BacktestExecutorTest {
 
   private CandleReceived generateEvent(final CandleReceived previous) {
     return CandleReceived.builder()
+        .timeFrame(previous.timeFrame())
         .beginTime(previous.endTime())
         .endTime(previous.endTime().plus(Duration.ofDays(1)))
         .closePrice(Math.max(0.0, previous.closePrice() + this.random.nextDouble(-1.0, 1.2)))
@@ -123,6 +128,7 @@ class BacktestExecutorTest {
 
 
   private static class TestBacktestRunFactory implements BacktestRunFactory {
+
     @Override
     public RuntimeContextFactory getRuntimeContextFactory() {
       return new NOOPRuntimeContextFactory();
@@ -150,15 +156,17 @@ class BacktestExecutorTest {
     @Override
     public Strategy createStrategy(
         final RuntimeContext runtimeContext,
-        final IndicatorContext indicatorContext
+        final IndicatorContexts indicatorContexts
     ) {
 
       final var closePrice = Indicators.closePrice();
+      final var indicatorContext = indicatorContexts.get(TimeFrame.DAY);
       indicatorContext.add(closePrice.sma(11), SMA_FAST);
       indicatorContext.add(closePrice.sma(200), SMA_SLOW);
 
       return DefaultStrategy.builder()
           .name("test-strategy")
+          .timeFrames(Set.of(TimeFrame.DAY))
           .entryRule(createEntryRule(indicatorContext))
           .exitRule(createExitRule(indicatorContext))
           .indicatorContext(indicatorContext)

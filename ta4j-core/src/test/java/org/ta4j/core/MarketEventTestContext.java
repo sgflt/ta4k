@@ -24,12 +24,14 @@ import org.ta4j.core.backtest.BacktestBarSeriesBuilder;
 import org.ta4j.core.events.CandleReceived;
 import org.ta4j.core.events.MarketEvent;
 import org.ta4j.core.indicators.IndicatorContext;
+import org.ta4j.core.indicators.TimeFrame;
 import org.ta4j.core.indicators.bool.BooleanIndicator;
 import org.ta4j.core.indicators.numeric.NumericIndicator;
 import org.ta4j.core.mocks.MockMarketEventBuilder;
 import org.ta4j.core.num.NaN;
 import org.ta4j.core.num.Num;
 import org.ta4j.core.num.NumFactory;
+import org.ta4j.core.utils.TimeFrameMapping;
 
 /**
  * This class simplifies testing by connecting market events and bar series through indicator context.
@@ -40,11 +42,11 @@ public class MarketEventTestContext {
   private static final Logger log = LoggerFactory.getLogger(MarketEventTestContext.class);
 
   private Queue<MarketEvent> marketEvents;
-  private final IndicatorContext indicatorContext = IndicatorContext.empty();
+  private final IndicatorContext indicatorContext = IndicatorContext.empty(TimeFrame.DAY);
   @Getter
   private BacktestBarSeries barSeries =
       new BacktestBarSeriesBuilder().withIndicatorContext(this.indicatorContext).build();
-  private Duration candleDuration = Duration.ofDays(1);
+  private Duration candleDuration = TimeFrameMapping.getDuration(TimeFrame.DAY);
   private Instant startTime = Instant.EPOCH;
 
 
@@ -108,6 +110,7 @@ public class MarketEventTestContext {
     this.barSeries =
         new BacktestBarSeriesBuilder()
             .withNumFactory(factory)
+            .withTimeFrame(TimeFrame.DAY)
             .withIndicatorContext(this.indicatorContext)
             .build();
     return this;

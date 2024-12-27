@@ -22,23 +22,35 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.ta4j.core.backtest.strategy;
+package org.ta4j.core.rules;
 
-import org.ta4j.core.api.strategy.StrategyFactory;
-import org.ta4j.core.backtest.strategy.runtime.RuntimeContextFactory;
+import java.util.List;
+
+import org.ta4j.core.api.strategy.Rule;
 
 /**
- * This class encapsulates classes that are required for backtesting.
+ * Aggregates smaller rules.
  */
-public interface BacktestRunFactory {
+public class CompoundRule implements Rule {
+
+  private final List<Rule> rules;
+
+
+  private CompoundRule(final List<Rule> rules) {
+    this.rules = rules;
+  }
+
+
+  public static CompoundRule of(final List<Rule> rules) {
+    return new CompoundRule(rules);
+  }
+
 
   /**
-   * @return context that holds relevant data for strategy
+   * @return true only if all rules are satisfied
    */
-  RuntimeContextFactory getRuntimeContextFactory();
-
-  /**
-   * @return factory that accepts related runtime context
-   */
-  StrategyFactory<BacktestStrategy> getStrategyFactory();
+  @Override
+  public boolean isSatisfied() {
+    return this.rules.stream().allMatch(Rule::isSatisfied);
+  }
 }

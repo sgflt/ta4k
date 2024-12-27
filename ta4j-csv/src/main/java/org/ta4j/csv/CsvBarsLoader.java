@@ -27,7 +27,6 @@ import java.io.IOException;
 import java.io.Reader;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.time.Duration;
 import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -40,6 +39,8 @@ import com.opencsv.exceptions.CsvValidationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.ta4j.core.events.CandleReceived;
+import org.ta4j.core.indicators.TimeFrame;
+import org.ta4j.core.utils.TimeFrameMapping;
 
 /**
  * This class build a Ta4j bar series from a CSV file containing bars.
@@ -102,14 +103,14 @@ public final class CsvBarsLoader {
       final double volume
   ) {
     return new CandleReceived(
+        TimeFrame.DAY,
         start,
-        start.plus(Duration.ofDays(1)),
+        start.plus(TimeFrameMapping.getDuration(TimeFrame.DAY)),
         open,
         high,
         low,
         close,
-        volume,
-        0
+        volume
     );
   }
 }

@@ -43,6 +43,7 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.ta4j.core.backtest.TradingRecord;
 import org.ta4j.core.events.CandleReceived;
 import org.ta4j.core.events.MarketEvent;
+import org.ta4j.core.indicators.TimeFrame;
 import org.ta4j.core.mocks.MockIndicator;
 import org.ta4j.core.mocks.MockTradingRecord;
 import org.ta4j.core.num.NaN;
@@ -180,14 +181,14 @@ public class XlsTestsUtils {
       final Instant endDateTime = Instant.ofEpochMilli(endDate.getTime());
       candleEvents.add(
           new CandleReceived(
+              TimeFrame.DAY,
               endDateTime.minus(Duration.ofDays(1)),
               endDateTime,
               cellValues[1].getNumberValue(), // open
               cellValues[2].getNumberValue(), // high
               cellValues[3].getNumberValue(), // low
               cellValues[4].getNumberValue(), // close
-              cellValues[5].getNumberValue(), // volume
-              0.0 // amount
+              cellValues[5].getNumberValue() // volume
           )
       );
     }

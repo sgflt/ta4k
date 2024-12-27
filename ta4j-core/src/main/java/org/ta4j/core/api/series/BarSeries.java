@@ -23,7 +23,9 @@
 package org.ta4j.core.api.series;
 
 import org.ta4j.core.api.Indicator;
+import org.ta4j.core.api.callback.BarListener;
 import org.ta4j.core.events.CandleReceived;
+import org.ta4j.core.indicators.TimeFrame;
 import org.ta4j.core.num.NumFactory;
 
 /**
@@ -41,6 +43,11 @@ public interface BarSeries {
      * @return factory that generates numbers usable in this BarSeries
      */
     NumFactory numFactory();
+
+    /**
+     * @return which timeframe this series accepts
+     */
+    TimeFrame timeFrame();
 
     /**
      * @return builder that generates compatible bars
@@ -67,6 +74,7 @@ public interface BarSeries {
      */
     void addBar(Bar bar);
 
+    void addBarListener(BarListener listener);
 
     void onCandle(CandleReceived event);
 }

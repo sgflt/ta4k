@@ -23,7 +23,7 @@
  */
 package org.ta4j.core.backtest;
 
-import org.ta4j.core.api.series.Bar;
+import org.ta4j.core.api.strategy.RuntimeContext;
 import org.ta4j.core.num.Num;
 
 /**
@@ -37,19 +37,19 @@ public interface TradeExecutionModel {
   /**
    * Executes a trade in the given {@code tradingRecord}.
    *
-   * @param curentBar the current bar that triggered execution
+   * @param runtimeContext with current time and price data
    * @param tradingRecord the trading record to place the trade
    * @param amount the trade amount
    */
-  void enter(Bar curentBar, TradingRecord tradingRecord, Num amount);
+  void enter(RuntimeContext runtimeContext, TradingRecord tradingRecord, Num amount);
 
   /**
    * Executes a trade in the given {@code tradingRecord}.
    *
-   * @param curentBar the current bar that triggered execution
+   * @param runtimeContext with current time and price data
    * @param tradingRecord the trading record to place the trade
    * @param amount the trade amount
    */
-  void exit(Bar curentBar, TradingRecord tradingRecord, Num amount);
+  void exit(RuntimeContext runtimeContext, TradingRecord tradingRecord, Num amount);
 
 }

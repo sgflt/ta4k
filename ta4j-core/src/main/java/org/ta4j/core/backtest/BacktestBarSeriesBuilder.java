@@ -27,6 +27,7 @@ import java.util.List;
 
 import org.ta4j.core.api.series.BarBuilderFactory;
 import org.ta4j.core.indicators.IndicatorContext;
+import org.ta4j.core.indicators.TimeFrame;
 import org.ta4j.core.num.NumFactory;
 import org.ta4j.core.num.NumFactoryProvider;
 
@@ -35,24 +36,11 @@ import org.ta4j.core.num.NumFactoryProvider;
  */
 public class BacktestBarSeriesBuilder {
 
-  /** The {@link #name} for an unnamed bar series. */
-  private static final String UNNAMED_SERIES_NAME = "unnamed_series";
-
-  private String name;
+  private String name = "UNDEFINED";
   private NumFactory numFactory = NumFactoryProvider.getDefaultNumFactory();
   private BarBuilderFactory barBuilderFactory = new BacktestBarBuilderFactory();
-  private IndicatorContext indicatorContext = IndicatorContext.empty();
-
-
-  /** Constructor to build a {@code BacktestBarSeries}. */
-  public BacktestBarSeriesBuilder() {
-    initValues();
-  }
-
-
-  private void initValues() {
-    this.name = "unnamed_series";
-  }
+  private TimeFrame timeFrame = TimeFrame.DAY;
+  private IndicatorContext indicatorContext = IndicatorContext.empty(this.timeFrame);
 
 
   /**
@@ -81,6 +69,16 @@ public class BacktestBarSeriesBuilder {
 
 
   /**
+   * Mutually exclusive with {@link #withIndicatorContext(IndicatorContext)}
+   */
+  public BacktestBarSeriesBuilder withTimeFrame(final TimeFrame timeFrame) {
+    this.timeFrame = timeFrame;
+    this.indicatorContext = IndicatorContext.empty(timeFrame);
+    return this;
+  }
+
+
+  /**
    * @param barBuilderFactory to build bars with the same datatype as series
    *
    * @return {@code this}
@@ -91,25 +89,23 @@ public class BacktestBarSeriesBuilder {
   }
 
 
-  //  FIXME
-  //  public BacktestBarSeriesBuilder withStrategyFactory(final StrategyFactory strategy) {
-  //    this.strategyFactories.add(strategy);
-  //    return this;
-  //  }
-  //
-  //
+  /**
+   * Mutually exclusive with {@link #withTimeFrame(TimeFrame)}
+   */
+  public BacktestBarSeriesBuilder withIndicatorContext(final IndicatorContext indicatorContext) {
+    this.indicatorContext = indicatorContext;
+    this.timeFrame = indicatorContext.timeFrame();
+    return this;
+  }
+
+
   public BacktestBarSeries build() {
     return new BacktestBarSeries(
-        this.name == null ? UNNAMED_SERIES_NAME : this.name,
+        this.name,
+        this.timeFrame,
         this.numFactory,
         this.barBuilderFactory,
         List.of(this.indicatorContext)
     );
-  }
-
-
-  public BacktestBarSeriesBuilder withIndicatorContext(final IndicatorContext indicatorContext) {
-    this.indicatorContext = indicatorContext;
-    return this;
   }
 }

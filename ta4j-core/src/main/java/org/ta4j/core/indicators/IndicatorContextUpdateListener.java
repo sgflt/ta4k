@@ -29,7 +29,9 @@ import java.time.Instant;
 public interface IndicatorContextUpdateListener {
 
   /**
-   * Called after whole context has been update on Bar
+   * Called after timeframe context has been update on Bar.
+   *
+   * If there are multiple timeframes, method may be called multiple times. Call have to be idempotent.
    */
   void onContextUpdate(Instant time);
 }

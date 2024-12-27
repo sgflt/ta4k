@@ -23,7 +23,9 @@
  */
 package org.ta4j.core.backtest;
 
-import org.ta4j.core.api.series.Bar;
+import org.ta4j.core.api.strategy.RuntimeContext;
+import org.ta4j.core.backtest.strategy.runtime.CurrentPriceResolver;
+import org.ta4j.core.backtest.strategy.runtime.CurrentTimeResolver;
 import org.ta4j.core.num.Num;
 
 /**
@@ -37,14 +39,26 @@ import org.ta4j.core.num.Num;
  */
 public class TradeOnCurrentCloseModel implements TradeExecutionModel {
 
+  public static final CurrentTimeResolver CURRENT_TIME_RESOLVER = new CurrentTimeResolver();
+  public static final CurrentPriceResolver CURRENT_PRICE_RESOLVER = new CurrentPriceResolver();
+
+
   @Override
-  public void enter(final Bar currentBar, final TradingRecord tradingRecord, final Num amount) {
-    tradingRecord.enter(currentBar.endTime(), currentBar.closePrice(), amount);
+  public void enter(final RuntimeContext context, final TradingRecord tradingRecord, final Num amount) {
+    tradingRecord.enter(
+        CURRENT_TIME_RESOLVER.resolve(context),
+        CURRENT_PRICE_RESOLVER.resolve(context),
+        amount
+    );
   }
 
 
   @Override
-  public void exit(final Bar currentBar, final TradingRecord tradingRecord, final Num amount) {
-    tradingRecord.exit(currentBar.endTime(), currentBar.closePrice(), amount);
+  public void exit(final RuntimeContext context, final TradingRecord tradingRecord, final Num amount) {
+    tradingRecord.exit(
+        CURRENT_TIME_RESOLVER.resolve(context),
+        CURRENT_PRICE_RESOLVER.resolve(context),
+        amount
+    );
   }
 }

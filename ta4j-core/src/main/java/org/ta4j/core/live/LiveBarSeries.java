@@ -23,11 +23,16 @@
  */
 package org.ta4j.core.live;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.ta4j.core.api.callback.BarListener;
 import org.ta4j.core.api.series.Bar;
 import org.ta4j.core.api.series.BarBuilderFactory;
 import org.ta4j.core.api.series.BarSeries;
 import org.ta4j.core.events.CandleReceived;
 import org.ta4j.core.indicators.IndicatorContext;
+import org.ta4j.core.indicators.TimeFrame;
 import org.ta4j.core.num.NumFactory;
 
 /**
@@ -39,30 +44,39 @@ import org.ta4j.core.num.NumFactory;
  */
 class LiveBarSeries implements BarSeries {
 
+  private final TimeFrame timeFrame;
   private final NumFactory numFactory;
   private final String name;
   private final BarBuilderFactory barBuilderFactory;
-  private final IndicatorContext indicatorContext;
+  private final List<BarListener> barListeners = new ArrayList<>();
 
   private Bar bar;
 
 
   LiveBarSeries(
       final String name,
+      final TimeFrame timeFrame,
       final NumFactory numFactory,
       final BarBuilderFactory barBuilderFactory,
       final IndicatorContext indicatorContext
   ) {
     this.name = name;
+    this.timeFrame = timeFrame;
     this.numFactory = numFactory;
     this.barBuilderFactory = barBuilderFactory;
-    this.indicatorContext = indicatorContext;
+    this.barListeners.add(indicatorContext);
   }
 
 
   @Override
   public NumFactory numFactory() {
     return this.numFactory;
+  }
+
+
+  @Override
+  public TimeFrame timeFrame() {
+    return this.timeFrame;
   }
 
 
@@ -92,9 +106,15 @@ class LiveBarSeries implements BarSeries {
 
     this.bar = bar;
 
-    if (this.indicatorContext != null) {
-      this.indicatorContext.onBar(bar);
+    for (final var barListener : this.barListeners) {
+      barListener.onBar(bar);
     }
+  }
+
+
+  @Override
+  public void addBarListener(final BarListener listener) {
+    this.barListeners.add(listener);
   }
 
 

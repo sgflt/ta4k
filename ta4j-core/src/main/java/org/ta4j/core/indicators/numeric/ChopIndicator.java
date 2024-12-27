@@ -55,7 +55,7 @@
 //public class ChopIndicator extends CachedIndicator<Num> {
 //
 //    private final ATRIndicator atrIndicator;
-//    private final int timeFrame;
+//    private final int timeFrames;
 //    private final Num log10n;
 //    private final HighestValueIndicator hvi;
 //    private final LowestValueIndicator lvi;
@@ -74,7 +74,7 @@
 //        this.atrIndicator = new ATRIndicator(barSeries, 1); // ATR(1) = Average True Range (Period of 1)
 //        this.hvi = new HighestValueIndicator(new HighPriceIndicator(barSeries), ciTimeFrame);
 //        this.lvi = new LowestValueIndicator(new LowPriceIndicator(barSeries), ciTimeFrame);
-//        this.timeFrame = ciTimeFrame;
+//        this.timeFrames = ciTimeFrame;
 //        this.log10n = getBarSeries().numFactory().numOf(Math.log10(ciTimeFrame));
 //        this.scaleUpTo = getBarSeries().numFactory().numOf(scaleTo);
 //    }
@@ -82,7 +82,7 @@
 //    @Override
 //    public Num calculate(int index) {
 //        Num summ = atrIndicator.getValue(index);
-//        for (int i = 1; i < timeFrame; ++i) {
+//        for (int i = 1; i < timeFrames; ++i) {
 //            summ = summ.plus(atrIndicator.getValue(index - i));
 //        }
 //        Num a = summ.dividedBy((hvi.getValue(index).minus(lvi.getValue(index))));
@@ -92,6 +92,6 @@
 //
 //    @Override
 //    public int getUnstableBars() {
-//        return timeFrame;
+//        return timeFrames;
 //    }
 //}

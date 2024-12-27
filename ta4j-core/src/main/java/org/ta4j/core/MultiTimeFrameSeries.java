@@ -22,23 +22,28 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.ta4j.core.backtest.strategy;
+package org.ta4j.core;
 
-import org.ta4j.core.api.strategy.StrategyFactory;
-import org.ta4j.core.backtest.strategy.runtime.RuntimeContextFactory;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.ta4j.core.api.series.BarSeries;
+import org.ta4j.core.events.CandleReceived;
+import org.ta4j.core.indicators.TimeFrame;
 
 /**
- * This class encapsulates classes that are required for backtesting.
+ * @author Lukáš Kvídera
  */
-public interface BacktestRunFactory {
+public class MultiTimeFrameSeries<B extends BarSeries> {
+  private final Map<TimeFrame, B> timeFramedSeries = new HashMap<>();
 
-  /**
-   * @return context that holds relevant data for strategy
-   */
-  RuntimeContextFactory getRuntimeContextFactory();
 
-  /**
-   * @return factory that accepts related runtime context
-   */
-  StrategyFactory<BacktestStrategy> getStrategyFactory();
+  public void add(final B series) {
+    this.timeFramedSeries.put(series.timeFrame(), series);
+  }
+
+
+  public void onCandle(final CandleReceived event) {
+    this.timeFramedSeries.get(event.timeFrame()).onCandle(event);
+  }
 }

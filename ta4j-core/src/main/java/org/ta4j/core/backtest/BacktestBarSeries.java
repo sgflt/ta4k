@@ -35,7 +35,7 @@ import org.ta4j.core.api.series.Bar;
 import org.ta4j.core.api.series.BarBuilderFactory;
 import org.ta4j.core.api.series.BarSeries;
 import org.ta4j.core.events.CandleReceived;
-import org.ta4j.core.indicators.IndicatorContext;
+import org.ta4j.core.indicators.TimeFrame;
 import org.ta4j.core.num.Num;
 import org.ta4j.core.num.NumFactory;
 
@@ -43,8 +43,7 @@ import org.ta4j.core.num.NumFactory;
  * Base implementation of a {@link BarSeries}.
  *
  * <ul>
- *  <li>constrained between beginning and ending indices (e.g. for some backtesting cases)
- *  <li>limited to a fixed number of bars (e.g. for actual trading)
+ *  <li>limited to single timeframe
  * </ul>
  */
 public class BacktestBarSeries implements BarSeries {
@@ -57,6 +56,7 @@ public class BacktestBarSeries implements BarSeries {
   private final BarBuilderFactory barBuilderFactory;
   private final List<BarListener> barListeners = new ArrayList<>(1);
 
+  private final TimeFrame timeFrame;
   private final NumFactory numFactory;
 
   /**
@@ -77,11 +77,13 @@ public class BacktestBarSeries implements BarSeries {
    */
   BacktestBarSeries(
       final String name,
+      final TimeFrame timeFrame,
       final NumFactory numFactory,
       final BarBuilderFactory barBuilderFactory,
-      final List<IndicatorContext> barListeners
+      final List<BarListener> barListeners
   ) {
     this.name = name;
+    this.timeFrame = Objects.requireNonNull(timeFrame);
     this.numFactory = numFactory;
 
     this.barBuilderFactory = Objects.requireNonNull(barBuilderFactory);
@@ -122,6 +124,12 @@ public class BacktestBarSeries implements BarSeries {
 
 
   @Override
+  public TimeFrame timeFrame() {
+    return this.timeFrame;
+  }
+
+
+  @Override
   public BacktestBarBuilder barBuilder() {
     return (BacktestBarBuilder) this.barBuilderFactory.createBarBuilder(this);
   }
@@ -139,17 +147,14 @@ public class BacktestBarSeries implements BarSeries {
   }
 
 
-  public void addBar(final Bar bar) {
-    addBar(bar, false);
-  }
-
-
   public Bar getBar(final int index) {
     return this.bars.get(index);
   }
 
 
   public void onCandle(final CandleReceived candleReceived) {
+    checkTimeFrame(candleReceived);
+
     barBuilder()
         .startTime(candleReceived.beginTime())
         .endTime(candleReceived.beginTime())
@@ -158,8 +163,19 @@ public class BacktestBarSeries implements BarSeries {
         .lowPrice(candleReceived.lowPrice())
         .closePrice(candleReceived.closePrice())
         .volume(candleReceived.volume())
-        .amount(candleReceived.amount())
         .add();
+  }
+
+
+  private void checkTimeFrame(final CandleReceived candleReceived) {
+    if (!candleReceived.timeFrame().equals(this.timeFrame)) {
+      throw new IllegalArgumentException(
+          "candle time frame (%s) does not match time frame (%s)".formatted(
+              candleReceived.timeFrame(),
+              this.timeFrame
+          )
+      );
+    }
   }
 
 
@@ -224,31 +240,16 @@ public class BacktestBarSeries implements BarSeries {
    * Exceeding bars are removed.
    *
    * @param bar the bar to be added
-   * @param replace true to replace the latest bar. Some exchanges continuously
-   *     provide new bar data in the respective period, e.g. 1 second
-   *     in 1 minute duration.
    *
    * @throws NullPointerException if {@code bar} is {@code null}
    */
-  public void addBar(final Bar bar, final boolean replace) {
+  public void addBar(final Bar bar) {
     Objects.requireNonNull(bar, "bar must not be null");
-    if (!this.numFactory.produces(bar.closePrice())) {
-      throw new IllegalArgumentException(
-          String.format(
-              "Cannot onCandle Bar with data type: %s to series with datatype: %s",
-              bar.closePrice().getClass(), this.numFactory.one().getClass()
-          ));
-    }
-
     if (!(bar instanceof BacktestBar)) {
       throw new IllegalArgumentException("Wrong bar type: " + bar.closePrice().getName());
     }
 
     if (!this.bars.isEmpty()) {
-      if (replace) {
-        this.bars.set(this.bars.size() - 1, (BacktestBar) bar);
-        return;
-      }
       final int lastBarIndex = this.bars.size() - 1;
       final Instant seriesEndTime = this.bars.get(lastBarIndex).endTime();
       if (!bar.endTime().isAfter(seriesEndTime)) {

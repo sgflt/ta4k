@@ -23,12 +23,14 @@
  */
 package org.ta4j.core.live;
 
+import org.ta4j.core.MultiTimeFrameSeries;
 import org.ta4j.core.api.series.BarBuilderFactory;
 import org.ta4j.core.api.strategy.RuntimeContext;
 import org.ta4j.core.api.strategy.Strategy;
 import org.ta4j.core.api.strategy.StrategyFactory;
 import org.ta4j.core.backtest.BacktestBarSeries;
-import org.ta4j.core.indicators.IndicatorContext;
+import org.ta4j.core.indicators.IndicatorContexts;
+import org.ta4j.core.indicators.TimeFrame;
 import org.ta4j.core.num.NumFactory;
 import org.ta4j.core.num.NumFactoryProvider;
 
@@ -40,12 +42,12 @@ public class LiveTradingBuilder {
   /** The {@link #name} for an unnamed bar series. */
   private static final String UNNAMED_SERIES_NAME = "unnamed_series";
 
-  private String name;
+  private String name = UNNAMED_SERIES_NAME;
   private NumFactory numFactory = NumFactoryProvider.getDefaultNumFactory();
   private BarBuilderFactory barBuilderFactory = new LiveBarBuilderFactory();
   private StrategyFactory<Strategy> strategyFactory;
   private RuntimeContext runtimeContext;
-  private IndicatorContext indicatorContext = IndicatorContext.empty();
+  private IndicatorContexts indicatorContexts = IndicatorContexts.empty();
 
 
   /**
@@ -93,8 +95,8 @@ public class LiveTradingBuilder {
   }
 
 
-  public LiveTradingBuilder withIndicatorContext(final IndicatorContext indicatorContext) {
-    this.indicatorContext = indicatorContext;
+  public LiveTradingBuilder withIndicatorContext(final IndicatorContexts indicatorContexts) {
+    this.indicatorContexts = indicatorContexts;
     return this;
   }
 
@@ -104,14 +106,25 @@ public class LiveTradingBuilder {
       throw new IllegalArgumentException("Strategy factory not set");
     }
 
-    final var strategy = this.strategyFactory.createStrategy(this.runtimeContext, this.indicatorContext);
-    final var liveBarSeries = new LiveBarSeries(
-        this.name == null ? UNNAMED_SERIES_NAME : this.name,
+    final var strategy = this.strategyFactory.createStrategy(this.runtimeContext, this.indicatorContexts);
+
+    final var series = new MultiTimeFrameSeries<LiveBarSeries>();
+    strategy.timeFrames().stream()
+        .map(this::createSeriesPerTimeFrame)
+        .forEach(series::add);
+
+
+    return new LiveTrading(series, strategy);
+  }
+
+
+  private LiveBarSeries createSeriesPerTimeFrame(final TimeFrame timeFrame) {
+    return new LiveBarSeries(
+        this.name,
+        timeFrame,
         this.numFactory,
         this.barBuilderFactory,
-        this.indicatorContext
+        this.indicatorContexts.get(timeFrame)
     );
-
-    return new LiveTrading(liveBarSeries, strategy);
   }
 }

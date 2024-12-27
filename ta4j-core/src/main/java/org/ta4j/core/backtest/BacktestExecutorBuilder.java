@@ -4,6 +4,7 @@ import org.ta4j.core.backtest.analysis.cost.CostModel;
 import org.ta4j.core.backtest.analysis.cost.ZeroCostModel;
 import org.ta4j.core.num.DoubleNumFactory;
 import org.ta4j.core.num.NumFactory;
+import org.ta4j.core.num.NumFactoryProvider;
 
 /**
  * @author Lukáš Kvídera
@@ -21,6 +22,7 @@ public class BacktestExecutorBuilder {
 
   public BacktestExecutorBuilder numFactory(final NumFactory numFactory) {
     this.numFactory = numFactory;
+    NumFactoryProvider.setDefaultNumFactory(numFactory);
     return this;
   }
 

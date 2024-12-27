@@ -22,23 +22,14 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.ta4j.core.backtest.strategy;
+package org.ta4j.core.backtest.strategy.runtime;
 
-import org.ta4j.core.api.strategy.StrategyFactory;
-import org.ta4j.core.backtest.strategy.runtime.RuntimeContextFactory;
+import org.ta4j.core.api.strategy.RuntimeContext;
 
 /**
- * This class encapsulates classes that are required for backtesting.
+ * Creates RuntimeContext related to some strategy or multiple strategies.
  */
-public interface BacktestRunFactory {
+public interface RuntimeContextFactory {
 
-  /**
-   * @return context that holds relevant data for strategy
-   */
-  RuntimeContextFactory getRuntimeContextFactory();
-
-  /**
-   * @return factory that accepts related runtime context
-   */
-  StrategyFactory<BacktestStrategy> getStrategyFactory();
+  RuntimeContext createRuntimeContext();
 }

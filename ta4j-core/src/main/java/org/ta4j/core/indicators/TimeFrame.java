@@ -1,4 +1,3 @@
-
 /*
  * The MIT License (MIT)
  *
@@ -22,23 +21,20 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.ta4j.core.backtest.strategy;
-
-import org.ta4j.core.api.strategy.StrategyFactory;
-import org.ta4j.core.backtest.strategy.runtime.RuntimeContextFactory;
+package org.ta4j.core.indicators;
 
 /**
- * This class encapsulates classes that are required for backtesting.
+ * @param name name of timeframe. f.e.: 1m, 2m 5m, 1h, 4h, 1d or any custom
  */
-public interface BacktestRunFactory {
-
-  /**
-   * @return context that holds relevant data for strategy
-   */
-  RuntimeContextFactory getRuntimeContextFactory();
-
-  /**
-   * @return factory that accepts related runtime context
-   */
-  StrategyFactory<BacktestStrategy> getStrategyFactory();
+public record TimeFrame(String name) {
+  public static final TimeFrame UNDEFINED = new TimeFrame("UNDEFINED");
+  public static final TimeFrame MINUTES_1 = new TimeFrame("1m");
+  public static final TimeFrame MINUTES_5 = new TimeFrame("5m");
+  public static final TimeFrame MINUTES_15 = new TimeFrame("15m");
+  public static final TimeFrame MINUTES_30 = new TimeFrame("30m");
+  public static final TimeFrame HOURS_1 = new TimeFrame("1h");
+  public static final TimeFrame HOURS_4 = new TimeFrame("4h");
+  public static final TimeFrame DAY = new TimeFrame("1d");
+  public static final TimeFrame WEEK = new TimeFrame("1w");
+  public static final TimeFrame MONTH = new TimeFrame("1M");
 }

@@ -71,10 +71,10 @@
 //     */
 //    public DPOIndicator(Indicator<Num> price, int barCount) {
 //        super(price);
-//        int timeFrame = barCount / 2 + 1;
+//        int timeFrames = barCount / 2 + 1;
 //        final SMAIndicator simpleMovingAverage = new SMAIndicator(price, barCount);
 //        final PreviousValueIndicator previousSimpleMovingAverage = new PreviousValueIndicator(simpleMovingAverage,
-//                timeFrame);
+//                timeFrames);
 //        this.indicatorMinusPreviousSMAIndicator = CombineIndicator.minus(price, previousSimpleMovingAverage);
 //        this.name = String.format("%s barCount: %s", getClass().getSimpleName(), barCount);
 //    }

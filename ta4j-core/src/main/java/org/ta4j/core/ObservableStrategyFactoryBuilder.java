@@ -27,6 +27,7 @@ package org.ta4j.core;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import org.ta4j.core.api.callback.EntrySignalListener;
 import org.ta4j.core.api.callback.ExitSignalListener;
@@ -34,8 +35,9 @@ import org.ta4j.core.api.strategy.Rule;
 import org.ta4j.core.api.strategy.RuntimeContext;
 import org.ta4j.core.api.strategy.Strategy;
 import org.ta4j.core.api.strategy.StrategyFactory;
-import org.ta4j.core.indicators.IndicatorContext;
 import org.ta4j.core.indicators.IndicatorContextUpdateListener;
+import org.ta4j.core.indicators.IndicatorContexts;
+import org.ta4j.core.indicators.TimeFrame;
 
 /**
  * @author Lukáš Kvídera
@@ -44,9 +46,7 @@ public class ObservableStrategyFactoryBuilder {
 
   private final List<EntrySignalListener> entrySignalListeners = new ArrayList<>(1);
   private final List<ExitSignalListener> exitSignalListeners = new ArrayList<>(1);
-  private IndicatorContext indicatorContext = IndicatorContext.empty();
   private StrategyFactory<Strategy> strategyFactory;
-  private RuntimeContext runtimeContext;
 
 
   public ObservableStrategyFactoryBuilder withEntryListener(final EntrySignalListener entrySignalListener) {
@@ -67,39 +67,26 @@ public class ObservableStrategyFactoryBuilder {
   }
 
 
-  public ObservableStrategyFactoryBuilder withIndicatorContext(final IndicatorContext indicatorContext) {
-    this.indicatorContext = indicatorContext;
-    return this;
-  }
-
-
-  public ObservableStrategyFactoryBuilder withRuntimeContext(final RuntimeContext runtimeContext) {
-    this.runtimeContext = runtimeContext;
-    return this;
-  }
-
-
   public StrategyFactory<Strategy> build() {
-    final var observableStrategy = new ObservableStrategy(
-        this.strategyFactory.createStrategy(this.runtimeContext, this.indicatorContext),
-        this.entrySignalListeners,
-        this.exitSignalListeners
-    );
-    this.indicatorContext.register(observableStrategy);
-
     return new StrategyFactory<>() {
 
       @Override
       public TradeType getTradeType() {
-        return null;
+        return ObservableStrategyFactoryBuilder.this.strategyFactory.getTradeType();
       }
 
 
       @Override
       public ObservableStrategy createStrategy(
           final RuntimeContext runtimeContext,
-          final IndicatorContext indicatorContext
+          final IndicatorContexts indicatorContexts
       ) {
+        final var observableStrategy = new ObservableStrategy(
+            ObservableStrategyFactoryBuilder.this.strategyFactory.createStrategy(runtimeContext, indicatorContexts),
+            ObservableStrategyFactoryBuilder.this.entrySignalListeners,
+            ObservableStrategyFactoryBuilder.this.exitSignalListeners
+        );
+        indicatorContexts.register(observableStrategy);
         return observableStrategy;
       }
     };
@@ -111,6 +98,7 @@ public class ObservableStrategyFactoryBuilder {
     private final List<EntrySignalListener> entrySignalListeners;
     private final List<ExitSignalListener> exitSignalListeners;
     private final Strategy strategy;
+    private Instant lastCallTime = Instant.MIN;
 
 
     private ObservableStrategy(
@@ -127,6 +115,12 @@ public class ObservableStrategyFactoryBuilder {
     @Override
     public String name() {
       return this.strategy.name();
+    }
+
+
+    @Override
+    public Set<TimeFrame> timeFrames() {
+      return this.strategy.timeFrames();
     }
 
 
@@ -150,10 +144,14 @@ public class ObservableStrategyFactoryBuilder {
 
     @Override
     public void onContextUpdate(final Instant time) {
-      if (isStable() && entryRule().isSatisfied()) {
-        this.entrySignalListeners.forEach(l -> l.onSignal(new Signal(time, name())));
-      } else if (isStable() && exitRule().isSatisfied()) {
-        this.exitSignalListeners.forEach(l -> l.onSignal(new Signal(time, name())));
+      if (time.isAfter(this.lastCallTime)) {
+        this.lastCallTime = time;
+
+        if (isStable() && entryRule().isSatisfied()) {
+          this.entrySignalListeners.forEach(l -> l.onSignal(new Signal(time, name())));
+        } else if (isStable() && exitRule().isSatisfied()) {
+          this.exitSignalListeners.forEach(l -> l.onSignal(new Signal(time, name())));
+        }
       }
     }
   }

@@ -22,6 +22,10 @@
  */
 package org.ta4j.core.api.strategy;
 
+import java.util.Set;
+
+import org.ta4j.core.indicators.TimeFrame;
+
 /**
  * A {@code Strategy} (also called "trading strategy") is a pair of
  * complementary (entry and exit) {@link Rule rules}. It may recommend to enter
@@ -34,6 +38,18 @@ public interface Strategy {
    * @return the name of the strategy
    */
   String name();
+
+  /**
+   * Which timeframes this strategy accepts.
+   *
+   * Leaf strategy wil return exactly one element.
+   *
+   * Root strategy that aggregates multiple timeframe restricted strategies will return all timeframes of child
+   * strategies.
+   *
+   * @return timeframes that this strategy expects
+   */
+  Set<TimeFrame> timeFrames();
 
   /**
    * @return the entry rule

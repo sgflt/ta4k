@@ -24,7 +24,7 @@
 package org.ta4j.core.api.strategy;
 
 import org.ta4j.core.TradeType;
-import org.ta4j.core.indicators.IndicatorContext;
+import org.ta4j.core.indicators.IndicatorContexts;
 
 public interface StrategyFactory<T extends Strategy> {
 
@@ -37,9 +37,9 @@ public interface StrategyFactory<T extends Strategy> {
 
   /**
    * @param runtimeContext that provides additional data to strategy
-   * @param indicatorContext that performs indicator recalculation on each bar
+   * @param indicatorContexts that performs indicator recalculation on each bar
    *
    * @return strategy that is source for trading signals
    */
-  T createStrategy(RuntimeContext runtimeContext, IndicatorContext indicatorContext);
+  T createStrategy(RuntimeContext runtimeContext, IndicatorContexts indicatorContexts);
 }
