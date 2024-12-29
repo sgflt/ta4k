@@ -22,19 +22,25 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.ta4j.core.backtest.strategy.runtime;
+package org.ta4j.core.strategy;
 
-import java.time.Instant;
+import java.util.Set;
 
-import org.ta4j.core.strategy.RuntimeContext;
-import org.ta4j.core.strategy.RuntimeValueResolver;
+import lombok.Builder;
+import lombok.NonNull;
+import org.ta4j.core.indicators.IndicatorContext;
+import org.ta4j.core.indicators.TimeFrame;
 
-/**
- * @author Lukáš Kvídera
- */
-public final class CurrentTimeResolver implements RuntimeValueResolver<Instant> {
+@Builder
+public record DefaultStrategy(
+    @NonNull String name,
+    @NonNull Set<TimeFrame> timeFrames,
+    @NonNull Rule entryRule,
+    @NonNull Rule exitRule,
+    @NonNull IndicatorContext indicatorContext
+) implements Strategy {
   @Override
-  public Instant resolve(final RuntimeContext context) {
-    return (Instant) context.getValue(RuntimeContextKeys.CURRENT_TIME);
+  public boolean isStable() {
+    return this.indicatorContext.isStable();
   }
 }

@@ -24,8 +24,8 @@
 package org.ta4j.core.live;
 
 import org.ta4j.core.MultiTimeFrameSeries;
-import org.ta4j.core.api.strategy.Strategy;
 import org.ta4j.core.events.CandleReceived;
+import org.ta4j.core.strategy.Strategy;
 
 /**
  * Trading contest that traces bars and respective strategy

@@ -22,19 +22,29 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.ta4j.core.backtest.strategy.runtime;
+package org.ta4j.core.backtest.strategy;
 
-import java.time.Instant;
-
-import org.ta4j.core.strategy.RuntimeContext;
-import org.ta4j.core.strategy.RuntimeValueResolver;
+import org.ta4j.core.backtest.strategy.runtime.RuntimeContextFactory;
+import org.ta4j.core.strategy.StrategyFactory;
+import org.ta4j.core.strategy.configuration.StrategyConfiguration;
 
 /**
- * @author Lukáš Kvídera
+ * This class encapsulates classes that are required for backtesting.
  */
-public final class CurrentTimeResolver implements RuntimeValueResolver<Instant> {
-  @Override
-  public Instant resolve(final RuntimeContext context) {
-    return (Instant) context.getValue(RuntimeContextKeys.CURRENT_TIME);
-  }
+public interface BacktestRun {
+
+  /**
+   * @return context that holds relevant data for strategy
+   */
+  RuntimeContextFactory getRuntimeContextFactory();
+
+  /**
+   * @return factory that accepts related runtime context
+   */
+  StrategyFactory<BacktestStrategy> getStrategyFactory();
+
+  /**
+   * @return configuration that will be used for creation of strategy
+   */
+  StrategyConfiguration getConfiguration();
 }

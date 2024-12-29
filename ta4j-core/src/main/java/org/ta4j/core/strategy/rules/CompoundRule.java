@@ -22,19 +22,35 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.ta4j.core.backtest.strategy.runtime;
+package org.ta4j.core.strategy.rules;
 
-import java.time.Instant;
+import java.util.List;
 
-import org.ta4j.core.strategy.RuntimeContext;
-import org.ta4j.core.strategy.RuntimeValueResolver;
+import org.ta4j.core.strategy.Rule;
 
 /**
- * @author Lukáš Kvídera
+ * Aggregates smaller rules.
  */
-public final class CurrentTimeResolver implements RuntimeValueResolver<Instant> {
+public class CompoundRule implements Rule {
+
+  private final List<Rule> rules;
+
+
+  private CompoundRule(final List<Rule> rules) {
+    this.rules = rules;
+  }
+
+
+  public static CompoundRule of(final List<Rule> rules) {
+    return new CompoundRule(rules);
+  }
+
+
+  /**
+   * @return true only if all rules are satisfied
+   */
   @Override
-  public Instant resolve(final RuntimeContext context) {
-    return (Instant) context.getValue(RuntimeContextKeys.CURRENT_TIME);
+  public boolean isSatisfied() {
+    return this.rules.stream().allMatch(Rule::isSatisfied);
   }
 }

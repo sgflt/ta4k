@@ -24,10 +24,10 @@
 
 package org.ta4j.core.api.callback;
 
-import org.ta4j.core.api.strategy.RuntimeContext;
 import org.ta4j.core.events.CandleReceived;
 import org.ta4j.core.events.NewsReceived;
 import org.ta4j.core.events.TickReceived;
+import org.ta4j.core.strategy.RuntimeContext;
 
 public interface MarketEventHandler {
 

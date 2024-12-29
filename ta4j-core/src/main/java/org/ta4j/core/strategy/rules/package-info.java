@@ -1,4 +1,3 @@
-
 /*
  * The MIT License (MIT)
  *
@@ -21,20 +20,13 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-
-package org.ta4j.core.backtest.strategy.runtime;
-
-import java.time.Instant;
-
-import org.ta4j.core.strategy.RuntimeContext;
-import org.ta4j.core.strategy.RuntimeValueResolver;
-
 /**
- * @author Lukáš Kvídera
+ * Trading rules for trading strategies.
+ *
+ * <p>
+ * A {@link org.ta4j.core.strategy.Rule rule} can be combined and set as entry/exit
+ * signals for a {@link org.ta4j.core.strategy.Strategy trading strategy}. A trading
+ * strategy is designed to achieve a profitable return by going long or short
+ * over a {@link org.ta4j.core.api.series.BarSeries series}.
  */
-public final class CurrentTimeResolver implements RuntimeValueResolver<Instant> {
-  @Override
-  public Instant resolve(final RuntimeContext context) {
-    return (Instant) context.getValue(RuntimeContextKeys.CURRENT_TIME);
-  }
-}
+package org.ta4j.core.strategy.rules;

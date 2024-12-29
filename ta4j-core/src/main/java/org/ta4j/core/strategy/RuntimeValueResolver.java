@@ -1,4 +1,3 @@
-
 /*
  * The MIT License (MIT)
  *
@@ -22,19 +21,21 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.ta4j.core.backtest.strategy.runtime;
-
-import java.time.Instant;
-
-import org.ta4j.core.strategy.RuntimeContext;
-import org.ta4j.core.strategy.RuntimeValueResolver;
+package org.ta4j.core.strategy;
 
 /**
- * @author Lukáš Kvídera
+ * Interface for type-safe runtime value resolution
+ *
+ * @param <T> the type of value to resolve
  */
-public final class CurrentTimeResolver implements RuntimeValueResolver<Instant> {
-  @Override
-  public Instant resolve(final RuntimeContext context) {
-    return (Instant) context.getValue(RuntimeContextKeys.CURRENT_TIME);
-  }
+@FunctionalInterface
+public interface RuntimeValueResolver<T> {
+  /**
+   * Resolves a value from a RuntimeContext
+   *
+   * @param context the context to resolve from
+   *
+   * @return the resolved value, or null if not available
+   */
+  T resolve(RuntimeContext context);
 }

@@ -1,4 +1,3 @@
-
 /*
  * The MIT License (MIT)
  *
@@ -22,37 +21,63 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.ta4j.core.backtest.strategy.runtime;
+package org.ta4j.core.strategy;
 
 import org.ta4j.core.api.series.Bar;
 import org.ta4j.core.events.TickReceived;
-import org.ta4j.core.strategy.RuntimeContext;
-import org.ta4j.core.strategy.RuntimeValueResolver;
 
 /**
- * This context does nothing.
+ * A RuntimeContext that combines multiple other RuntimeContexts.
+ * When querying values, it checks contexts in order until it finds a non-null result.
  */
-class NOOPRuntimeContext implements RuntimeContext {
+public final class CompoundRuntimeContext implements RuntimeContext {
+  private final RuntimeContext primary;
+  private final RuntimeContext secondary;
+
+
+  private CompoundRuntimeContext(final RuntimeContext primary, final RuntimeContext secondary) {
+    this.primary = primary;
+    this.secondary = secondary;
+  }
+
+
+  /**
+   * Creates a new CompoundRuntimeContext by combining two RuntimeContexts.
+   *
+   * @param primary the primary context to check first
+   * @param secondary the secondary context to check if primary returns null
+   *
+   * @return a new CompoundRuntimeContext
+   */
+  public static CompoundRuntimeContext of(final RuntimeContext primary, final RuntimeContext secondary) {
+    return new CompoundRuntimeContext(primary, secondary);
+  }
+
+
   @Override
   public <T> T getValue(final RuntimeValueResolver<T> resolver) {
-    return null;
+    final var primaryValue = resolver.resolve(this.primary);
+    return primaryValue != null ? primaryValue : resolver.resolve(this.secondary);
   }
 
 
   @Override
   public Object getValue(final String key) {
-    return null;
+    final var value = this.primary.getValue(key);
+    return value != null ? value : this.secondary.getValue(key);
   }
 
 
   @Override
   public void onBar(final Bar bar) {
-    // nothing to update
+    this.primary.onBar(bar);
+    this.secondary.onBar(bar);
   }
 
 
   @Override
   public void onTick(final TickReceived tick) {
-    // nothing to update
+    this.primary.onTick(tick);
+    this.secondary.onTick(tick);
   }
 }

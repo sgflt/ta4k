@@ -23,10 +23,10 @@
  */
 package org.ta4j.core.backtest;
 
-import org.ta4j.core.api.strategy.RuntimeContext;
 import org.ta4j.core.backtest.strategy.runtime.CurrentPriceResolver;
 import org.ta4j.core.backtest.strategy.runtime.CurrentTimeResolver;
 import org.ta4j.core.num.Num;
+import org.ta4j.core.strategy.RuntimeContext;
 
 /**
  * An execution model for {@link BacktestExecutor} objects.

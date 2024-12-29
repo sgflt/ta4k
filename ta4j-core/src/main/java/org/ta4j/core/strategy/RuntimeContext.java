@@ -22,19 +22,22 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.ta4j.core.backtest.strategy.runtime;
+package org.ta4j.core.strategy;
 
-import java.time.Instant;
+import org.ta4j.core.api.callback.BarListener;
+import org.ta4j.core.api.callback.TickListener;
 
-import org.ta4j.core.strategy.RuntimeContext;
-import org.ta4j.core.strategy.RuntimeValueResolver;
+public interface RuntimeContext extends BarListener, TickListener {
 
-/**
- * @author Lukáš Kvídera
- */
-public final class CurrentTimeResolver implements RuntimeValueResolver<Instant> {
-  @Override
-  public Instant resolve(final RuntimeContext context) {
-    return (Instant) context.getValue(RuntimeContextKeys.CURRENT_TIME);
-  }
+  /**
+   * Type-safe value resolution using visitor pattern
+   *
+   * @param resolver the value resolver for the specific type
+   * @param <T> the type of value to resolve
+   *
+   * @return resolved value of type T
+   */
+  <T> T getValue(final RuntimeValueResolver<T> resolver);
+
+  Object getValue(String key);
 }

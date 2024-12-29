@@ -24,9 +24,9 @@
 
 package org.ta4j.core.backtest.strategy.runtime;
 
-import org.ta4j.core.api.strategy.RuntimeContext;
-import org.ta4j.core.api.strategy.RuntimeValueResolver;
 import org.ta4j.core.num.Num;
+import org.ta4j.core.strategy.RuntimeContext;
+import org.ta4j.core.strategy.RuntimeValueResolver;
 
 /**
  * @author Lukáš Kvídera

@@ -32,13 +32,13 @@ import org.slf4j.LoggerFactory;
 import org.ta4j.core.api.callback.BarListener;
 import org.ta4j.core.api.callback.TickListener;
 import org.ta4j.core.api.series.Bar;
-import org.ta4j.core.api.strategy.Rule;
-import org.ta4j.core.api.strategy.RuntimeContext;
-import org.ta4j.core.api.strategy.Strategy;
 import org.ta4j.core.backtest.OperationType;
 import org.ta4j.core.backtest.Position;
 import org.ta4j.core.events.TickReceived;
 import org.ta4j.core.indicators.TimeFrame;
+import org.ta4j.core.strategy.Rule;
+import org.ta4j.core.strategy.RuntimeContext;
+import org.ta4j.core.strategy.Strategy;
 
 /**
  * This implementation is designed for backtesting of custom strategy.

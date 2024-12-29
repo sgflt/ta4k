@@ -1,4 +1,3 @@
-
 /*
  * The MIT License (MIT)
  *
@@ -22,19 +21,36 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.ta4j.core.backtest.strategy.runtime;
+package org.ta4j.core.strategy;
 
-import java.time.Instant;
-
-import org.ta4j.core.strategy.RuntimeContext;
-import org.ta4j.core.strategy.RuntimeValueResolver;
+import org.ta4j.core.TradeType;
+import org.ta4j.core.indicators.IndicatorContexts;
+import org.ta4j.core.strategy.configuration.StrategyConfiguration;
 
 /**
- * @author Lukáš Kvídera
+ * Implement this class if you have strategy that works.
+ *
+ * If you want to evolve strategy parameters, implement {@link OptimizableStrategyFactory}
  */
-public final class CurrentTimeResolver implements RuntimeValueResolver<Instant> {
-  @Override
-  public Instant resolve(final RuntimeContext context) {
-    return (Instant) context.getValue(RuntimeContextKeys.CURRENT_TIME);
-  }
+public interface StrategyFactory<T extends Strategy> {
+
+  /**
+   * For what direction is produced Strategy designed
+   *
+   * @return BUY or SELL
+   */
+  TradeType getTradeType();
+
+  /**
+   * @param configuration used for strategy
+   * @param runtimeContext that provides additional data to strategy
+   * @param indicatorContexts that performs indicator recalculation on each bar
+   *
+   * @return strategy that is source for trading signals
+   */
+  T createStrategy(
+      StrategyConfiguration configuration,
+      RuntimeContext runtimeContext,
+      IndicatorContexts indicatorContexts
+  );
 }

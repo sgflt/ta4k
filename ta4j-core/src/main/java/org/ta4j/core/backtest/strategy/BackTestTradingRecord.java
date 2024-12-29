@@ -33,8 +33,6 @@ import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 import org.ta4j.core.TradeType;
 import org.ta4j.core.api.series.Bar;
-import org.ta4j.core.api.strategy.RuntimeContext;
-import org.ta4j.core.api.strategy.RuntimeValueResolver;
 import org.ta4j.core.backtest.Position;
 import org.ta4j.core.backtest.Trade;
 import org.ta4j.core.backtest.TradingRecord;
@@ -44,6 +42,8 @@ import org.ta4j.core.backtest.strategy.runtime.RuntimeContextKeys;
 import org.ta4j.core.events.TickReceived;
 import org.ta4j.core.num.Num;
 import org.ta4j.core.num.NumFactory;
+import org.ta4j.core.strategy.RuntimeContext;
+import org.ta4j.core.strategy.RuntimeValueResolver;
 
 /**
  * Base implementation of a {@link TradingRecord}.

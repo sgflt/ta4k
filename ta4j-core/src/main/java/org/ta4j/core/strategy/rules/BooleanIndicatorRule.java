@@ -1,4 +1,3 @@
-
 /*
  * The MIT License (MIT)
  *
@@ -21,20 +20,40 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
+package org.ta4j.core.strategy.rules;
 
-package org.ta4j.core.backtest.strategy.runtime;
-
-import java.time.Instant;
-
-import org.ta4j.core.strategy.RuntimeContext;
-import org.ta4j.core.strategy.RuntimeValueResolver;
+import org.ta4j.core.api.Indicator;
+import org.ta4j.core.indicators.bool.BooleanIndicator;
 
 /**
- * @author Lukáš Kvídera
+ * Satisfied when the value of the boolean {@link Indicator indicator} is
+ * {@code true}.
  */
-public final class CurrentTimeResolver implements RuntimeValueResolver<Instant> {
+public class BooleanIndicatorRule extends AbstractRule {
+
+  private final BooleanIndicator indicator;
+
+
+  /**
+   * Constructor.
+   *
+   * @param indicator the boolean indicator
+   */
+  public BooleanIndicatorRule(final BooleanIndicator indicator) {
+    this.indicator = indicator;
+  }
+
+
   @Override
-  public Instant resolve(final RuntimeContext context) {
-    return (Instant) context.getValue(RuntimeContextKeys.CURRENT_TIME);
+  public boolean isSatisfied() {
+    final boolean satisfied = this.indicator.getValue();
+    traceIsSatisfied(satisfied);
+    return satisfied;
+  }
+
+
+  @Override
+  public String toString() {
+    return String.format("BoolIndRule[%s] => %s", this.indicator, this.indicator.getValue());
   }
 }

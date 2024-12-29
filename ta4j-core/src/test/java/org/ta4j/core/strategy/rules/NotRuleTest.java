@@ -1,4 +1,3 @@
-
 /*
  * The MIT License (MIT)
  *
@@ -21,20 +20,34 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
+package org.ta4j.core.strategy.rules;
 
-package org.ta4j.core.backtest.strategy.runtime;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
-import java.time.Instant;
+import org.junit.Before;
+import org.junit.Test;
+import org.ta4j.core.strategy.Rule;
 
-import org.ta4j.core.strategy.RuntimeContext;
-import org.ta4j.core.strategy.RuntimeValueResolver;
+public class NotRuleTest {
 
-/**
- * @author Lukáš Kvídera
- */
-public final class CurrentTimeResolver implements RuntimeValueResolver<Instant> {
-  @Override
-  public Instant resolve(final RuntimeContext context) {
-    return (Instant) context.getValue(RuntimeContextKeys.CURRENT_TIME);
+  private Rule satisfiedRule;
+  private Rule unsatisfiedRule;
+
+
+  @Before
+  public void setUp() {
+    this.satisfiedRule = BooleanRule.TRUE;
+    this.unsatisfiedRule = BooleanRule.FALSE;
+  }
+
+
+  @Test
+  public void isSatisfied() {
+    assertFalse(this.satisfiedRule.negation().isSatisfied());
+    assertTrue(this.unsatisfiedRule.negation().isSatisfied());
+
+    assertFalse(this.satisfiedRule.negation().isSatisfied());
+    assertTrue(this.unsatisfiedRule.negation().isSatisfied());
   }
 }

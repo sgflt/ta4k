@@ -1,4 +1,3 @@
-
 /*
  * The MIT License (MIT)
  *
@@ -21,20 +20,42 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-
-package org.ta4j.core.backtest.strategy.runtime;
-
-import java.time.Instant;
-
-import org.ta4j.core.strategy.RuntimeContext;
-import org.ta4j.core.strategy.RuntimeValueResolver;
+package org.ta4j.core.strategy.rules;
 
 /**
- * @author Lukáš Kvídera
+ * Satisfied when the rule has been initialized with {@code true}.
  */
-public final class CurrentTimeResolver implements RuntimeValueResolver<Instant> {
+public class BooleanRule extends AbstractRule {
+
+  /** An always-true rule. */
+  public static final BooleanRule TRUE = new BooleanRule(true);
+
+  /** An always-false rule. */
+  public static final BooleanRule FALSE = new BooleanRule(false);
+
+  private final boolean satisfied;
+
+
+  /**
+   * Constructor.
+   *
+   * @param satisfied true for the rule to be always satisfied, false to be never
+   *     satisfied
+   */
+  private BooleanRule(final boolean satisfied) {
+    this.satisfied = satisfied;
+  }
+
+
   @Override
-  public Instant resolve(final RuntimeContext context) {
-    return (Instant) context.getValue(RuntimeContextKeys.CURRENT_TIME);
+  public boolean isSatisfied() {
+    traceIsSatisfied(this.satisfied);
+    return this.satisfied;
+  }
+
+
+  @Override
+  public String toString() {
+    return String.format("BoolRule[%s] => %s", this.satisfied, isSatisfied());
   }
 }

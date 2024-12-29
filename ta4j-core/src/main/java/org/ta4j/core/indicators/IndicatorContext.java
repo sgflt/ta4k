@@ -42,7 +42,7 @@ import org.ta4j.core.indicators.numeric.NumericIndicator;
  */
 public class IndicatorContext implements BarListener {
   private boolean isStable;
-  private final LinkedHashMap<String, Indicator<?>> indicators;
+  private final LinkedHashMap<IndicatorIdentification, Indicator<?>> indicators;
   private final Set<IndicatorChangeListener> changeListeners = new HashSet<>();
   private final Set<IndicatorContextUpdateListener> updateListeners = new HashSet<>();
   private final TimeFrame timeFrame;
@@ -57,8 +57,8 @@ public class IndicatorContext implements BarListener {
   }
 
 
-  private static String generatePlaceholderName() {
-    return UUID.randomUUID().toString();
+  private static IndicatorIdentification generatePlaceholderName() {
+    return new IndicatorIdentification(UUID.randomUUID().toString());
   }
 
 
@@ -99,7 +99,7 @@ public class IndicatorContext implements BarListener {
   }
 
 
-  public void add(final Indicator<?> indicator, final String name) {
+  public void add(final Indicator<?> indicator, final IndicatorIdentification name) {
     this.indicators.put(name, indicator);
   }
 
@@ -109,18 +109,18 @@ public class IndicatorContext implements BarListener {
   }
 
 
-  private Indicator<?> get(final String name) {
+  private Indicator<?> get(final IndicatorIdentification name) {
     return this.indicators.get(name);
   }
 
 
-  public NumericIndicator getNumericIndicator(final String indicatorName) {
-    return (NumericIndicator) get(indicatorName);
+  public NumericIndicator getNumericIndicator(final IndicatorIdentification indicatorId) {
+    return (NumericIndicator) get(indicatorId);
   }
 
 
-  public BooleanIndicator getBooleanIndicator(final String indicatorName) {
-    return (BooleanIndicator) get(indicatorName);
+  public BooleanIndicator getBooleanIndicator(final IndicatorIdentification indicatorId) {
+    return (BooleanIndicator) get(indicatorId);
   }
 
 
@@ -168,12 +168,17 @@ public class IndicatorContext implements BarListener {
   }
 
 
-  public boolean contains(final String indicatorName) {
-    return this.indicators.containsKey(indicatorName);
+  public boolean contains(final IndicatorIdentification indicatorId) {
+    return this.indicators.containsKey(indicatorId);
   }
 
 
   public TimeFrame timeFrame() {
     return this.timeFrame;
+  }
+
+
+  public record IndicatorIdentification(String name) {
+
   }
 }

@@ -24,7 +24,7 @@
 
 package org.ta4j.core.backtest.strategy.runtime;
 
-import org.ta4j.core.api.strategy.RuntimeContext;
+import org.ta4j.core.strategy.RuntimeContext;
 
 /**
  * Factory for NOOP context

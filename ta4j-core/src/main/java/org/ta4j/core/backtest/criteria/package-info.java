@@ -25,7 +25,7 @@
  *
  * <p>
  * This package contains different criteria which can be used to calculate the
- * performance of a {@link org.ta4j.core.api.strategy.Strategy trading strategy} and to
- * compare two {@link org.ta4j.core.api.strategy.Strategy trading strategies} to each other.
+ * performance of a {@link org.ta4j.core.strategy.Strategy trading strategy} and to
+ * compare two {@link org.ta4j.core.strategy.Strategy trading strategies} to each other.
  */
 package org.ta4j.core.backtest.criteria;

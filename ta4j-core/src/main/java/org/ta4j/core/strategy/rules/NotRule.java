@@ -1,4 +1,3 @@
-
 /*
  * The MIT License (MIT)
  *
@@ -21,20 +20,50 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
+package org.ta4j.core.strategy.rules;
 
-package org.ta4j.core.backtest.strategy.runtime;
-
-import java.time.Instant;
-
-import org.ta4j.core.strategy.RuntimeContext;
-import org.ta4j.core.strategy.RuntimeValueResolver;
+import org.ta4j.core.strategy.Rule;
 
 /**
- * @author Lukáš Kvídera
+ * An opposite (logical operator: NOT) rule (i.e. a rule that is the negation of
+ * another rule).
+ *
+ * <p>
+ * Satisfied when the rule is not satisfied.<br>
+ * Not satisfied when the rule is satisfied.
  */
-public final class CurrentTimeResolver implements RuntimeValueResolver<Instant> {
+public class NotRule extends AbstractRule {
+
+  /** The trading rule to negate. */
+  private final Rule ruleToNegate;
+
+
+  /**
+   * Constructor.
+   *
+   * @param ruleToNegate the trading rule to negate
+   */
+  public NotRule(final Rule ruleToNegate) {
+    this.ruleToNegate = ruleToNegate;
+  }
+
+
   @Override
-  public Instant resolve(final RuntimeContext context) {
-    return (Instant) context.getValue(RuntimeContextKeys.CURRENT_TIME);
+  public boolean isSatisfied() {
+    final boolean satisfied = !this.ruleToNegate.isSatisfied();
+    traceIsSatisfied(satisfied);
+    return satisfied;
+  }
+
+
+  /** @return {@link #ruleToNegate} */
+  public Rule getRuleToNegate() {
+    return this.ruleToNegate;
+  }
+
+
+  @Override
+  public String toString() {
+    return String.format("NotRule[%s] => %s", this.ruleToNegate, isSatisfied());
   }
 }

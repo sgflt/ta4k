@@ -26,9 +26,9 @@ import java.time.Instant;
 import java.util.List;
 
 import org.ta4j.core.TradeType;
-import org.ta4j.core.api.strategy.Rule;
-import org.ta4j.core.api.strategy.Strategy;
 import org.ta4j.core.num.Num;
+import org.ta4j.core.strategy.Rule;
+import org.ta4j.core.strategy.Strategy;
 
 /**
  * A {@code TradingRecord} holds the full history/record of a trading session

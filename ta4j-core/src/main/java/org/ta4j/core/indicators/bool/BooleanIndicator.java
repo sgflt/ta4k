@@ -30,7 +30,7 @@ import org.ta4j.core.indicators.bool.chandelier.ChandelierExitLongIndicator;
 import org.ta4j.core.indicators.bool.chandelier.ChandelierExitShortIndicator;
 import org.ta4j.core.indicators.helpers.previous.PreviousBooleanValueIndicator;
 import org.ta4j.core.num.NumFactoryProvider;
-import org.ta4j.core.rules.BooleanIndicatorRule;
+import org.ta4j.core.strategy.rules.BooleanIndicatorRule;
 
 public abstract class BooleanIndicator implements Indicator<Boolean> {
 

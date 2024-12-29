@@ -22,10 +22,10 @@
  */
 package org.ta4j.core.backtest.criteria;
 
-import org.ta4j.core.api.strategy.Strategy;
 import org.ta4j.core.backtest.Position;
 import org.ta4j.core.backtest.TradingRecord;
 import org.ta4j.core.num.Num;
+import org.ta4j.core.strategy.Strategy;
 
 /**
  * An analysis criterion. It can be used to:

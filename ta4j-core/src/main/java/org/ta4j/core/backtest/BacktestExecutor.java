@@ -27,16 +27,13 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-import org.ta4j.core.CompoundRuntimeContext;
 import org.ta4j.core.MultiTimeFrameSeries;
 import org.ta4j.core.api.callback.MarketEventHandler;
 import org.ta4j.core.api.callback.TickListener;
-import org.ta4j.core.api.strategy.RuntimeContext;
-import org.ta4j.core.api.strategy.StrategyFactory;
 import org.ta4j.core.backtest.reports.TradingStatement;
 import org.ta4j.core.backtest.reports.TradingStatementGenerator;
 import org.ta4j.core.backtest.strategy.BackTestTradingRecord;
-import org.ta4j.core.backtest.strategy.BacktestRunFactory;
+import org.ta4j.core.backtest.strategy.BacktestRun;
 import org.ta4j.core.backtest.strategy.BacktestStrategy;
 import org.ta4j.core.events.CandleReceived;
 import org.ta4j.core.events.MarketEvent;
@@ -44,6 +41,9 @@ import org.ta4j.core.events.NewsReceived;
 import org.ta4j.core.events.TickReceived;
 import org.ta4j.core.indicators.IndicatorContexts;
 import org.ta4j.core.num.Num;
+import org.ta4j.core.strategy.CompoundRuntimeContext;
+import org.ta4j.core.strategy.RuntimeContext;
+import org.ta4j.core.strategy.StrategyFactory;
 
 /**
  * Allows backtesting multiple strategies and comparing them to find out which
@@ -63,46 +63,25 @@ public class BacktestExecutor {
    * Executes given strategies with specified trade type to open the position and
    * return the trading statements.
    *
-   * @param backtestRunFactory that creates strategies to test and their contexts
+   * @param backtestRun that creates strategies to test and their contexts
    * @param amount the amount used to open/close the position
    *
    * @return a list of TradingStatements
    */
   public TradingStatement execute(
-      final BacktestRunFactory backtestRunFactory,
+      final BacktestRun backtestRun,
       final List<MarketEvent> marketEvents,
       final Number amount
   ) {
-    return execute(List.of(backtestRunFactory), marketEvents, amount).getFirst();
-  }
+    final var marketEventHandler =
+        new DefaultMarketEventHandler(backtestRun, this.configuration.numFactory().numOf(amount));
 
+    replay(
+        marketEvents,
+        marketEventHandler
+    );
+    return marketEventHandler.getTradingStatement();
 
-  /**
-   * Executes given strategies with specified trade type to open the position and
-   * return the trading statements.
-   *
-   * @param backtestRunFactories that creates strategies to test and their contexts
-   * @param amount the amount used to open/close the position
-   *
-   * @return a list of TradingStatements
-   */
-  public List<TradingStatement> execute(
-      final List<BacktestRunFactory> backtestRunFactories,
-      final List<MarketEvent> marketEvents,
-      final Number amount
-  ) {
-    return backtestRunFactories.parallelStream()
-        .map(backtestRunFactory -> {
-          final var marketEventHandler =
-              new DefaultMarketEventHandler(backtestRunFactory, this.configuration.numFactory().numOf(amount));
-
-          replay(
-              marketEvents,
-              marketEventHandler
-          );
-          return marketEventHandler.getTradingStatement();
-        })
-        .toList();
   }
 
 
@@ -137,20 +116,21 @@ public class BacktestExecutor {
 
 
     public DefaultMarketEventHandler(
-        final BacktestRunFactory backtestRunFactory,
+        final BacktestRun backtestRun,
         final Num amount
     ) {
-      this.strategy = createStrategy(backtestRunFactory);
+      this.strategy = createStrategy(backtestRun);
       this.amount = amount;
     }
 
 
-    private BacktestStrategy createStrategy(final BacktestRunFactory backtestRunFactory) {
-      final var strategyFactory = backtestRunFactory.getStrategyFactory();
+    private BacktestStrategy createStrategy(final BacktestRun backtestRun) {
+      final var strategyFactory = backtestRun.getStrategyFactory();
 
-      final var runtimeContext = getCompoundRuntimeContext(backtestRunFactory, strategyFactory);
+      final var runtimeContext = getCompoundRuntimeContext(backtestRun, strategyFactory);
       final var indicatorContexts = IndicatorContexts.empty();
-      final var strategy = strategyFactory.createStrategy(runtimeContext, indicatorContexts);
+      final var strategy =
+          strategyFactory.createStrategy(backtestRun.getConfiguration(), runtimeContext, indicatorContexts);
 
       strategy.timeFrames().forEach(
           timeFrame -> {
@@ -172,7 +152,7 @@ public class BacktestExecutor {
 
 
     private CompoundRuntimeContext getCompoundRuntimeContext(
-        final BacktestRunFactory backtestRunFactory,
+        final BacktestRun backtestRun,
         final StrategyFactory<BacktestStrategy> strategyFactory
     ) {
       final var backTestTradingRecord = new BackTestTradingRecord(
@@ -182,7 +162,7 @@ public class BacktestExecutor {
           BacktestExecutor.this.configuration.numFactory()
       );
 
-      final var runtimeContextFactory = backtestRunFactory.getRuntimeContextFactory();
+      final var runtimeContextFactory = backtestRun.getRuntimeContextFactory();
       return CompoundRuntimeContext.of(
           runtimeContextFactory.createRuntimeContext(),
           backTestTradingRecord

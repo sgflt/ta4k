@@ -1,4 +1,3 @@
-
 /*
  * The MIT License (MIT)
  *
@@ -21,20 +20,35 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
+package org.ta4j.core.strategy.rules;
 
-package org.ta4j.core.backtest.strategy.runtime;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.ta4j.core.MarketEventTestContext;
+import org.ta4j.core.indicators.helpers.FixedBooleanIndicator;
 
-import java.time.Instant;
+class BooleanIndicatorRuleTest {
 
-import org.ta4j.core.strategy.RuntimeContext;
-import org.ta4j.core.strategy.RuntimeValueResolver;
+  private MarketEventTestContext context;
 
-/**
- * @author Lukáš Kvídera
- */
-public final class CurrentTimeResolver implements RuntimeValueResolver<Instant> {
-  @Override
-  public Instant resolve(final RuntimeContext context) {
-    return (Instant) context.getValue(RuntimeContextKeys.CURRENT_TIME);
+
+  @BeforeEach
+  void setUp() {
+    this.context = new MarketEventTestContext()
+        .withCandlePrices(1, 2, 3, 4, 5)
+        .withIndicator(new FixedBooleanIndicator(true, true, false, false, true))
+    ;
+  }
+
+
+  @Test
+  void isSatisfied() {
+    this.context
+        .assertNextTrue()
+        .assertNextTrue()
+        .assertNextFalse()
+        .assertNextFalse()
+        .assertNextTrue()
+    ;
   }
 }

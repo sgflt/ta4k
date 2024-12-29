@@ -24,10 +24,11 @@
 package org.ta4j.core.backtest.strategy;
 
 import org.ta4j.core.TradeType;
-import org.ta4j.core.api.strategy.RuntimeContext;
-import org.ta4j.core.api.strategy.Strategy;
-import org.ta4j.core.api.strategy.StrategyFactory;
 import org.ta4j.core.indicators.IndicatorContexts;
+import org.ta4j.core.strategy.RuntimeContext;
+import org.ta4j.core.strategy.Strategy;
+import org.ta4j.core.strategy.StrategyFactory;
+import org.ta4j.core.strategy.configuration.StrategyConfiguration;
 
 /**
  * Converts standard StrategyFactory<Strategy> to StrategyFactory<BacktestStrategy>
@@ -68,17 +69,18 @@ public final class StrategyFactoryConverter {
 
 
     /**
-     * @param runtimeContext that provides additional data to strategy,
-     * @param indicatorContext that performs indicator recalculation on each bar
+     * {@inheritDoc}
      *
      * @return strategy for backtesting
      */
     @Override
     public BacktestStrategy createStrategy(
+        final StrategyConfiguration configuration,
         final RuntimeContext runtimeContext,
         final IndicatorContexts indicatorContext
     ) {
       final var originalStrategy = this.originalFactory.createStrategy(
+          configuration,
           runtimeContext,
           indicatorContext
       );

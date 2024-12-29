@@ -1,4 +1,3 @@
-
 /*
  * The MIT License (MIT)
  *
@@ -21,20 +20,49 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
+package org.ta4j.core.strategy.rules;
 
-package org.ta4j.core.backtest.strategy.runtime;
-
-import java.time.Instant;
-
-import org.ta4j.core.strategy.RuntimeContext;
-import org.ta4j.core.strategy.RuntimeValueResolver;
+import org.ta4j.core.strategy.Rule;
 
 /**
- * @author Lukáš Kvídera
+ * A one-shot rule.
+ *
+ * <p>
+ * Satisfied when the rule is satisfied for the first time, then never again.
  */
-public final class CurrentTimeResolver implements RuntimeValueResolver<Instant> {
+public class JustOnceRule extends AbstractRule {
+
+  private final Rule rule;
+  private boolean satisfied = false;
+
+
+  /**
+   * Satisfied when the given {@code rule} is satisfied the first time, then never
+   * again.
+   */
+  public JustOnceRule() {
+    this(BooleanRule.TRUE);
+  }
+
+
+  /**
+   * Satisfied when the given {@code rule} is satisfied the first time, then never
+   * again.
+   *
+   * @param rule the rule that should be satisfied only the first time
+   */
+  public JustOnceRule(final Rule rule) {
+    this.rule = rule;
+  }
+
+
   @Override
-  public Instant resolve(final RuntimeContext context) {
-    return (Instant) context.getValue(RuntimeContextKeys.CURRENT_TIME);
+  public boolean isSatisfied() {
+    if (this.satisfied) {
+      return false;
+    }
+
+    this.satisfied = this.rule.isSatisfied();
+    return this.satisfied;
   }
 }

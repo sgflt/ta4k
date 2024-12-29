@@ -1,4 +1,3 @@
-
 /*
  * The MIT License (MIT)
  *
@@ -21,20 +20,60 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
+package org.ta4j.core.strategy.rules;
 
-package org.ta4j.core.backtest.strategy.runtime;
-
-import java.time.Instant;
-
-import org.ta4j.core.strategy.RuntimeContext;
-import org.ta4j.core.strategy.RuntimeValueResolver;
+import org.ta4j.core.strategy.Rule;
 
 /**
- * @author Lukáš Kvídera
+ * An AND combination of two {@link Rule rules}.
+ *
+ * <p>
+ * Satisfied when both rules are satisfied.
+ *
+ * <p>
+ * <b>Warning:</b> The second rule is not tested if the first rule is not
+ * satisfied.
  */
-public final class CurrentTimeResolver implements RuntimeValueResolver<Instant> {
+public class AndRule extends AbstractRule {
+
+  private final Rule rule1;
+  private final Rule rule2;
+
+
+  /**
+   * Constructor.
+   *
+   * @param rule1 a trading rule
+   * @param rule2 another trading rule
+   */
+  public AndRule(final Rule rule1, final Rule rule2) {
+    this.rule1 = rule1;
+    this.rule2 = rule2;
+  }
+
+
   @Override
-  public Instant resolve(final RuntimeContext context) {
-    return (Instant) context.getValue(RuntimeContextKeys.CURRENT_TIME);
+  public boolean isSatisfied() {
+    final boolean satisfied = this.rule1.isSatisfied() && this.rule2.isSatisfied();
+    traceIsSatisfied(satisfied);
+    return satisfied;
+  }
+
+
+  /** @return the first rule */
+  public Rule getRule1() {
+    return this.rule1;
+  }
+
+
+  /** @return the second rule */
+  public Rule getRule2() {
+    return this.rule2;
+  }
+
+
+  @Override
+  public String toString() {
+    return String.format("UnderRule[%s, %s] => %s", this.rule1, this.rule2, isSatisfied());
   }
 }

@@ -1,4 +1,3 @@
-
 /*
  * The MIT License (MIT)
  *
@@ -22,19 +21,21 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.ta4j.core.backtest.strategy.runtime;
+package org.ta4j.core.strategy;
 
-import java.time.Instant;
+import java.util.List;
 
-import org.ta4j.core.strategy.RuntimeContext;
-import org.ta4j.core.strategy.RuntimeValueResolver;
+import org.ta4j.core.strategy.optimization.ParameterDescriptor;
 
 /**
- * @author Lukáš Kvídera
+ * Use this interface if you don't know how to set up parameters of chosen strategy.
+ *
+ * This factory provides description of parameters that may be fine-tuned by optimization algorithm.
  */
-public final class CurrentTimeResolver implements RuntimeValueResolver<Instant> {
-  @Override
-  public Instant resolve(final RuntimeContext context) {
-    return (Instant) context.getValue(RuntimeContextKeys.CURRENT_TIME);
-  }
+public interface OptimizableStrategyFactory<T extends Strategy> extends StrategyFactory<T> {
+
+  /**
+   * @return all parameters that may be fine-tuned
+   */
+  List<ParameterDescriptor> getParameterDescriptors();
 }

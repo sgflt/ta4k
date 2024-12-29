@@ -60,8 +60,8 @@ import org.ta4j.core.indicators.numeric.statistics.StandardErrorIndicator;
 import org.ta4j.core.indicators.numeric.statistics.VarianceIndicator;
 import org.ta4j.core.num.Num;
 import org.ta4j.core.num.NumFactory;
-import org.ta4j.core.rules.OverIndicatorRule;
-import org.ta4j.core.rules.UnderIndicatorRule;
+import org.ta4j.core.strategy.rules.OverIndicatorRule;
+import org.ta4j.core.strategy.rules.UnderIndicatorRule;
 
 /**
  * NumericIndicator is a fluent class. It provides

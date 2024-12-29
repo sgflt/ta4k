@@ -1,4 +1,3 @@
-
 /*
  * The MIT License (MIT)
  *
@@ -21,20 +20,29 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
+package org.ta4j.core.strategy.rules;
 
-package org.ta4j.core.backtest.strategy.runtime;
-
-import java.time.Instant;
-
-import org.ta4j.core.strategy.RuntimeContext;
-import org.ta4j.core.strategy.RuntimeValueResolver;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.ta4j.core.strategy.Rule;
 
 /**
- * @author Lukáš Kvídera
+ * An abstract trading {@link Rule rule}.
  */
-public final class CurrentTimeResolver implements RuntimeValueResolver<Instant> {
-  @Override
-  public Instant resolve(final RuntimeContext context) {
-    return (Instant) context.getValue(RuntimeContextKeys.CURRENT_TIME);
+public abstract class AbstractRule implements Rule {
+
+  protected final Logger log = LoggerFactory.getLogger(getClass());
+
+
+  /**
+   * Traces the {@code isSatisfied()} method calls.
+   *
+   * @param isSatisfied true if the rule is satisfied, false otherwise
+   */
+  protected void traceIsSatisfied(final boolean isSatisfied) {
+    if (this.log.isTraceEnabled()) {
+      // TODO
+      this.log.trace("{}", this);
+    }
   }
 }

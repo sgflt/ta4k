@@ -10,7 +10,6 @@ import java.time.temporal.ChronoUnit;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
-import java.util.UUID;
 import java.util.stream.Stream;
 
 import lombok.Getter;
@@ -24,6 +23,7 @@ import org.ta4j.core.backtest.BacktestBarSeriesBuilder;
 import org.ta4j.core.events.CandleReceived;
 import org.ta4j.core.events.MarketEvent;
 import org.ta4j.core.indicators.IndicatorContext;
+import org.ta4j.core.indicators.IndicatorContext.IndicatorIdentification;
 import org.ta4j.core.indicators.TimeFrame;
 import org.ta4j.core.indicators.bool.BooleanIndicator;
 import org.ta4j.core.indicators.numeric.NumericIndicator;
@@ -82,13 +82,13 @@ public class MarketEventTestContext {
 
 
   public MarketEventTestContext withIndicator(final Indicator<?> indicator) {
-    this.indicatorContext.add(indicator, UUID.randomUUID().toString());
+    this.indicatorContext.add(indicator);
     return this;
   }
 
 
   public MarketEventTestContext withIndicator(final Indicator<?> indicator, final String name) {
-    this.indicatorContext.add(indicator, name);
+    this.indicatorContext.add(indicator, new IndicatorIdentification(name));
     return this;
   }
 
@@ -202,7 +202,7 @@ public class MarketEventTestContext {
   }
 
 
-  private NumericIndicator getNumericIndicator(final String indicatorName) {
+  private NumericIndicator getNumericIndicator(final IndicatorIdentification indicatorName) {
     return this.indicatorContext.getNumericIndicator(indicatorName);
   }
 
@@ -276,25 +276,25 @@ public class MarketEventTestContext {
 
 
   public class IndicatorAsserts {
-    private final String indicatorName;
+    private final IndicatorIdentification indicatorId;
 
 
     public IndicatorAsserts(final String indicatorName) {
-      this.indicatorName = indicatorName;
-      if (!MarketEventTestContext.this.indicatorContext.contains(indicatorName)) {
+      this.indicatorId = new IndicatorIdentification(indicatorName);
+      if (!MarketEventTestContext.this.indicatorContext.contains(this.indicatorId)) {
         throw new IllegalStateException("Indicator " + indicatorName + " not found");
       }
     }
 
 
     public IndicatorAsserts assertNext(final double expected) {
-      MarketEventTestContext.this.assertNext(getNumericIndicator(this.indicatorName), expected);
+      MarketEventTestContext.this.assertNext(getNumericIndicator(this.indicatorId), expected);
       return this;
     }
 
 
     public IndicatorAsserts assertCurrent(final double expected) {
-      MarketEventTestContext.this.assertCurrent(getNumericIndicator(this.indicatorName), expected);
+      MarketEventTestContext.this.assertCurrent(getNumericIndicator(this.indicatorId), expected);
       return this;
     }
   }

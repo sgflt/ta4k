@@ -25,14 +25,15 @@ package org.ta4j.core.live;
 
 import org.ta4j.core.MultiTimeFrameSeries;
 import org.ta4j.core.api.series.BarBuilderFactory;
-import org.ta4j.core.api.strategy.RuntimeContext;
-import org.ta4j.core.api.strategy.Strategy;
-import org.ta4j.core.api.strategy.StrategyFactory;
 import org.ta4j.core.backtest.BacktestBarSeries;
 import org.ta4j.core.indicators.IndicatorContexts;
 import org.ta4j.core.indicators.TimeFrame;
 import org.ta4j.core.num.NumFactory;
 import org.ta4j.core.num.NumFactoryProvider;
+import org.ta4j.core.strategy.RuntimeContext;
+import org.ta4j.core.strategy.Strategy;
+import org.ta4j.core.strategy.StrategyFactory;
+import org.ta4j.core.strategy.configuration.StrategyConfiguration;
 
 /**
  * A builder to build a new {@link BacktestBarSeries}.
@@ -48,6 +49,7 @@ public class LiveTradingBuilder {
   private StrategyFactory<Strategy> strategyFactory;
   private RuntimeContext runtimeContext;
   private IndicatorContexts indicatorContexts = IndicatorContexts.empty();
+  private StrategyConfiguration configuration;
 
 
   /**
@@ -101,12 +103,19 @@ public class LiveTradingBuilder {
   }
 
 
+  public LiveTradingBuilder withConfiguration(final StrategyConfiguration configuration) {
+    this.configuration = configuration;
+    return this;
+  }
+
+
   public LiveTrading build() {
     if (this.strategyFactory == null) {
       throw new IllegalArgumentException("Strategy factory not set");
     }
 
-    final var strategy = this.strategyFactory.createStrategy(this.runtimeContext, this.indicatorContexts);
+    final var strategy =
+        this.strategyFactory.createStrategy(this.configuration, this.runtimeContext, this.indicatorContexts);
 
     final var series = new MultiTimeFrameSeries<LiveBarSeries>();
     strategy.timeFrames().stream()

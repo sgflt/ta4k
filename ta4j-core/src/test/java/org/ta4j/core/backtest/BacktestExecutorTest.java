@@ -36,14 +36,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.ta4j.core.DefaultStrategy;
 import org.ta4j.core.TradeType;
 import org.ta4j.core.api.Indicators;
-import org.ta4j.core.api.strategy.Rule;
-import org.ta4j.core.api.strategy.RuntimeContext;
-import org.ta4j.core.api.strategy.Strategy;
-import org.ta4j.core.api.strategy.StrategyFactory;
-import org.ta4j.core.backtest.strategy.BacktestRunFactory;
+import org.ta4j.core.backtest.strategy.BacktestRun;
 import org.ta4j.core.backtest.strategy.BacktestStrategy;
 import org.ta4j.core.backtest.strategy.StrategyFactoryConverter;
 import org.ta4j.core.backtest.strategy.runtime.NOOPRuntimeContextFactory;
@@ -51,9 +46,17 @@ import org.ta4j.core.backtest.strategy.runtime.RuntimeContextFactory;
 import org.ta4j.core.events.CandleReceived;
 import org.ta4j.core.events.MarketEvent;
 import org.ta4j.core.indicators.IndicatorContext;
+import org.ta4j.core.indicators.IndicatorContext.IndicatorIdentification;
 import org.ta4j.core.indicators.IndicatorContexts;
 import org.ta4j.core.indicators.TimeFrame;
 import org.ta4j.core.num.NumFactory;
+import org.ta4j.core.strategy.DefaultStrategy;
+import org.ta4j.core.strategy.Rule;
+import org.ta4j.core.strategy.RuntimeContext;
+import org.ta4j.core.strategy.Strategy;
+import org.ta4j.core.strategy.StrategyFactory;
+import org.ta4j.core.strategy.configuration.ParameterName;
+import org.ta4j.core.strategy.configuration.StrategyConfiguration;
 
 @Slf4j
 class BacktestExecutorTest {
@@ -75,13 +78,12 @@ class BacktestExecutorTest {
         .numFactory(numFactory)
         .build();
 
-    final var tradingStatements = executor.execute(
-        getBacktestRunFactories(),
+    final var statement = executor.execute(
+        getBacktestRunFactory(),
         getMarketEvents(),
         1.0
     );
 
-    final var statement = tradingStatements.getFirst();
     log.info(statement.toString());
     assertNumEquals(-4.75019506722970, statement.performanceReport().totalLoss());
     assertNumEquals(718.71244689979, statement.performanceReport().totalProfit());
@@ -122,12 +124,12 @@ class BacktestExecutorTest {
   }
 
 
-  private static List<BacktestRunFactory> getBacktestRunFactories() {
-    return List.of(new TestBacktestRunFactory());
+  private static TestBacktestRun getBacktestRunFactory() {
+    return new TestBacktestRun();
   }
 
 
-  private static class TestBacktestRunFactory implements BacktestRunFactory {
+  private static class TestBacktestRun implements BacktestRun {
 
     @Override
     public RuntimeContextFactory getRuntimeContextFactory() {
@@ -139,12 +141,21 @@ class BacktestExecutorTest {
     public StrategyFactory<BacktestStrategy> getStrategyFactory() {
       return StrategyFactoryConverter.convert(new TestStrategyFactory());
     }
+
+
+    @Override
+    public StrategyConfiguration getConfiguration() {
+      final var configuration = new StrategyConfiguration();
+      configuration.put(new ParameterName("smaFastBars"), 11);
+      configuration.put(new ParameterName("smaSlowBars"), 200);
+      return configuration;
+    }
   }
 
 
   private static class TestStrategyFactory implements StrategyFactory<Strategy> {
-    private static final String SMA_FAST = "smaFast";
-    private static final String SMA_SLOW = "smaSlow";
+    private static final IndicatorIdentification SMA_FAST = new IndicatorIdentification("smaFast");
+    private static final IndicatorIdentification SMA_SLOW = new IndicatorIdentification("smaSlow");
 
 
     @Override
@@ -155,14 +166,20 @@ class BacktestExecutorTest {
 
     @Override
     public Strategy createStrategy(
+        final StrategyConfiguration configuration,
         final RuntimeContext runtimeContext,
         final IndicatorContexts indicatorContexts
     ) {
-
       final var closePrice = Indicators.closePrice();
       final var indicatorContext = indicatorContexts.get(TimeFrame.DAY);
-      indicatorContext.add(closePrice.sma(11), SMA_FAST);
-      indicatorContext.add(closePrice.sma(200), SMA_SLOW);
+      indicatorContext.add(
+          closePrice.sma(configuration.getInt(new ParameterName("smaFastBars")).orElse(11)),
+          SMA_FAST
+      );
+      indicatorContext.add(
+          closePrice.sma(configuration.getInt(new ParameterName("smaSlowBars")).orElse(200)),
+          SMA_SLOW
+      );
 
       return DefaultStrategy.builder()
           .name("test-strategy")

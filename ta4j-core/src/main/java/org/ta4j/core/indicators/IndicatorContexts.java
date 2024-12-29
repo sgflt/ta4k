@@ -27,7 +27,7 @@ package org.ta4j.core.indicators;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.ta4j.core.ObservableStrategyFactoryBuilder;
+import org.ta4j.core.strategy.ObservableStrategyFactoryBuilder;
 
 /**
  * Aggregation class that stores indicator contexts related to defined timeframes.
