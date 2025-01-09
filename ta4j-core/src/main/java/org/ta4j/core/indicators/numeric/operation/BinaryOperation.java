@@ -22,6 +22,7 @@
  */
 package org.ta4j.core.indicators.numeric.operation;
 
+import java.util.Objects;
 import java.util.function.BinaryOperator;
 
 import org.ta4j.core.api.series.Bar;
@@ -50,8 +51,8 @@ public class BinaryOperation extends NumericIndicator {
   ) {
     super(left.getNumFactory());
     this.operator = operator;
-    this.left = left;
-    this.right = right;
+    this.left = Objects.requireNonNull(left);
+    this.right = Objects.requireNonNull(right);
   }
 
 
