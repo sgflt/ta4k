@@ -23,6 +23,9 @@
  */
 package org.ta4j.core.live;
 
+import java.util.stream.Stream;
+
+import lombok.extern.slf4j.Slf4j;
 import org.ta4j.core.MultiTimeFrameSeries;
 import org.ta4j.core.api.series.BarBuilderFactory;
 import org.ta4j.core.backtest.BacktestBarSeries;
@@ -30,6 +33,7 @@ import org.ta4j.core.indicators.IndicatorContexts;
 import org.ta4j.core.indicators.TimeFrame;
 import org.ta4j.core.num.NumFactory;
 import org.ta4j.core.num.NumFactoryProvider;
+import org.ta4j.core.strategy.NOOPStrategyFactory;
 import org.ta4j.core.strategy.RuntimeContext;
 import org.ta4j.core.strategy.Strategy;
 import org.ta4j.core.strategy.StrategyFactory;
@@ -38,6 +42,7 @@ import org.ta4j.core.strategy.configuration.StrategyConfiguration;
 /**
  * A builder to build a new {@link BacktestBarSeries}.
  */
+@Slf4j
 public class LiveTradingBuilder {
 
   /** The {@link #name} for an unnamed bar series. */
@@ -46,7 +51,7 @@ public class LiveTradingBuilder {
   private String name = UNNAMED_SERIES_NAME;
   private NumFactory numFactory = NumFactoryProvider.getDefaultNumFactory();
   private BarBuilderFactory barBuilderFactory = new LiveBarBuilderFactory();
-  private StrategyFactory<Strategy> strategyFactory;
+  private StrategyFactory<Strategy> strategyFactory = new NOOPStrategyFactory();
   private RuntimeContext runtimeContext;
   private IndicatorContexts indicatorContexts = IndicatorContexts.empty();
   private StrategyConfiguration configuration;
@@ -97,7 +102,7 @@ public class LiveTradingBuilder {
   }
 
 
-  public LiveTradingBuilder withIndicatorContext(final IndicatorContexts indicatorContexts) {
+  public LiveTradingBuilder withIndicatorContexts(final IndicatorContexts indicatorContexts) {
     this.indicatorContexts = indicatorContexts;
     return this;
   }
@@ -109,16 +114,25 @@ public class LiveTradingBuilder {
   }
 
 
+  /**
+   * Have to be called after initialization of indicatorContexts.
+   *
+   * @return instance for live trading or live indicator calculation
+   */
   public LiveTrading build() {
-    if (this.strategyFactory == null) {
-      throw new IllegalArgumentException("Strategy factory not set");
+    if (this.strategyFactory instanceof NOOPStrategyFactory) {
+      log.warn("Using NOOP strategy");
     }
 
     final var strategy =
         this.strategyFactory.createStrategy(this.configuration, this.runtimeContext, this.indicatorContexts);
 
     final var series = new MultiTimeFrameSeries<LiveBarSeries>();
-    strategy.timeFrames().stream()
+    Stream.concat(
+            strategy.timeFrames().stream(),
+            this.indicatorContexts.timeFrames().stream()
+        )
+        .distinct()
         .map(this::createSeriesPerTimeFrame)
         .forEach(series::add);
 

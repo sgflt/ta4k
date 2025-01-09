@@ -43,7 +43,16 @@ public class MultiTimeFrameSeries<B extends BarSeries> {
   }
 
 
+  /**
+   * Passes candle event to series with the same time frame. If strategy does not define given time frame, then this is
+   * NOOP.
+   *
+   * @param event to process
+   */
   public void onCandle(final CandleReceived event) {
-    this.timeFramedSeries.get(event.timeFrame()).onCandle(event);
+    final var series = this.timeFramedSeries.get(event.timeFrame());
+    if (series != null) {
+      series.onCandle(event);
+    }
   }
 }

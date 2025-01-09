@@ -29,7 +29,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
-import java.util.function.Consumer;
 
 import org.ta4j.core.api.Indicator;
 import org.ta4j.core.api.callback.BarListener;
@@ -131,24 +130,15 @@ public class IndicatorContext implements BarListener {
 
   @Override
   public void onBar(final Bar bar) {
-    for (final var indicator : this.indicators.values()) {
-      indicator.onBar(bar);
+    for (final var indicator : this.indicators.entrySet()) {
+      indicator.getValue().onBar(bar);
       for (final var changeListener : this.changeListeners) {
-        changeListener.accept(bar.beginTime(), indicator);
+        changeListener.accept(bar.beginTime(), indicator.getKey(), indicator.getValue());
       }
     }
 
     for (final var updateListener : this.updateListeners) {
       updateListener.onContextUpdate(bar.endTime());
-    }
-  }
-
-
-  public void inspect(final Consumer<NamedIndicator<?>> consumer) {
-    for (final var indicator : this.indicators.values()) {
-      if (indicator instanceof final NamedIndicator<?> namedIndicator) {
-        consumer.accept(namedIndicator);
-      }
     }
   }
 

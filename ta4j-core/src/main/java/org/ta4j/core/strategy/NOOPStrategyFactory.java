@@ -1,3 +1,4 @@
+
 /*
  * The MIT License (MIT)
  *
@@ -20,43 +21,38 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.ta4j.core.api;
 
-import org.ta4j.core.api.series.Bar;
-import org.ta4j.core.api.series.BarSeries;
+package org.ta4j.core.strategy;
+
+import java.util.Set;
+
+import org.ta4j.core.TradeType;
+import org.ta4j.core.indicators.IndicatorContext;
+import org.ta4j.core.indicators.IndicatorContexts;
+import org.ta4j.core.strategy.configuration.StrategyConfiguration;
 
 /**
- * Indicator over a {@link BarSeries bar series}.
- *
- * <p>
- * Returns a value of type <b>T</b> for each index of the bar series.
- *
- * @param <T> the type of the returned value (Double, Boolean, etc.)
+ * @author Lukáš Kvídera
  */
-public interface Indicator<T> {
+public class NOOPStrategyFactory implements StrategyFactory<Strategy> {
+  @Override
+  public TradeType getTradeType() {
+    return TradeType.BUY;
+  }
 
-  /**
-   * @return the value of the indicator
-   */
-  T getValue();
 
-  /**
-   * updates its state based on current bar
-   *
-   * Implementation of indicator should be aware of that it may be called multiple
-   * times for single bar. If there is extensive calculation, implementation may
-   * count on that for each bar there will be discrete time passed that may be
-   * used for caching purposes.
-   *
-   * Backtesting may rewind time to past, this event should invalidate calculated
-   * value.
-   *
-   * @param bar current time
-   */
-  void onBar(Bar bar);
-
-  /**
-   * @return true if indicator is stabilized
-   */
-  boolean isStable();
+  @Override
+  public Strategy createStrategy(
+      final StrategyConfiguration configuration,
+      final RuntimeContext runtimeContext,
+      final IndicatorContexts indicatorContexts
+  ) {
+    return DefaultStrategy.builder()
+        .name("NOOP")
+        .timeFrames(Set.of())
+        .entryRule(Rule.NOOP)
+        .exitRule(Rule.NOOP)
+        .indicatorContext(IndicatorContext.empty(null))
+        .build();
+  }
 }

@@ -26,6 +26,7 @@ package org.ta4j.core.indicators;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import org.ta4j.core.strategy.ObservableStrategyFactoryBuilder;
 
@@ -57,5 +58,15 @@ public class IndicatorContexts {
 
   public void register(final ObservableStrategyFactoryBuilder.ObservableStrategy observableStrategy) {
     this.timeFramedContexts.values().forEach(indicatorContext -> indicatorContext.register(observableStrategy));
+  }
+
+
+  public Set<TimeFrame> timeFrames() {
+    return this.timeFramedContexts.keySet();
+  }
+
+
+  public boolean isEmpty() {
+    return this.timeFramedContexts.isEmpty();
   }
 }

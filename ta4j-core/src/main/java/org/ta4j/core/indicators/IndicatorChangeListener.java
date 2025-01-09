@@ -27,11 +27,12 @@ package org.ta4j.core.indicators;
 import java.time.Instant;
 
 import org.ta4j.core.api.Indicator;
+import org.ta4j.core.indicators.IndicatorContext.IndicatorIdentification;
 
 /**
  * @author Lukáš Kvídera
  */
 public interface IndicatorChangeListener {
 
-  void accept(Instant tick, Indicator<?> indicator);
+  void accept(Instant tick, IndicatorIdentification indicatorId, Indicator<?> indicator);
 }
