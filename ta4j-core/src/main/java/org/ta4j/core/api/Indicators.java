@@ -24,6 +24,7 @@
 package org.ta4j.core.api;
 
 import lombok.experimental.UtilityClass;
+import org.ta4j.core.indicators.numeric.CloseLocationValueIndicator;
 import org.ta4j.core.indicators.numeric.NumericIndicator;
 import org.ta4j.core.indicators.numeric.candles.LowerShadowIndicator;
 import org.ta4j.core.indicators.numeric.candles.RealBodyIndicator;
@@ -82,6 +83,11 @@ public final class Indicators {
 
   public static TypicalPriceIndicator typicalPrice() {
     return extended().typicalPrice();
+  }
+
+
+  public static CloseLocationValueIndicator closeLocationValue() {
+    return extended().closeLocationValue();
   }
 
 
@@ -292,5 +298,9 @@ public final class Indicators {
       return awesomeOscillator(medianPrice(), shortBarCount, longBarCount);
     }
 
+
+    public CloseLocationValueIndicator closeLocationValue() {
+      return new CloseLocationValueIndicator(this.numFactory);
+    }
   }
 }
