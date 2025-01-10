@@ -32,6 +32,7 @@ import java.util.stream.DoubleStream;
 import org.ta4j.core.events.CandleReceived;
 import org.ta4j.core.events.MarketEvent;
 import org.ta4j.core.indicators.TimeFrame;
+import org.ta4j.core.utils.TimeFrameMapping;
 
 /**
  * Generates BacktestBar implementations with mocked time or duration if not set
@@ -43,7 +44,7 @@ public class MockMarketEventBuilder {
   private boolean defaultData;
   private List<CandleReceived> candleEvents = new ArrayList<>();
   private int candlesProduced;
-  private Duration candleDuration;
+  private Duration candleDuration = TimeFrameMapping.getDuration(TimeFrame.DAY);
 
 
   private int createCandleSerialNumber() {
@@ -142,5 +143,69 @@ public class MockMarketEventBuilder {
   public MockMarketEventBuilder withStartTime(final Instant startTime) {
     this.startTime = startTime;
     return this;
+  }
+
+
+  public MockCandleBuilder candle() {
+    return new MockCandleBuilder();
+  }
+
+
+  public class MockCandleBuilder {
+    private final Instant startTime =
+        MockMarketEventBuilder.this.startTime.plus(MockMarketEventBuilder.this.candleDuration.multipliedBy(
+            createCandleSerialNumber()));
+    private final Instant endTime =
+        this.startTime.plus(MockMarketEventBuilder.this.candleDuration.multipliedBy(createCandleSerialNumber()));
+    private double open;
+    private double close;
+    private double high;
+    private double low;
+    private TimeFrame timeFrame = TimeFrame.DAY;
+
+
+    public MockCandleBuilder openPrice(final double open) {
+      this.open = open;
+      return this;
+    }
+
+
+    public MockCandleBuilder closePrice(final double close) {
+      this.close = close;
+      return this;
+    }
+
+
+    public MockCandleBuilder highPrice(final double high) {
+      this.high = high;
+      return this;
+    }
+
+
+    public MockCandleBuilder lowPrice(final double low) {
+      this.low = low;
+      return this;
+    }
+
+
+    public MockCandleBuilder timeFrame(final TimeFrame timeFrame) {
+      this.timeFrame = timeFrame;
+      return this;
+    }
+
+
+    public MockMarketEventBuilder add() {
+      MockMarketEventBuilder.this.candleEvents.add(
+          CandleReceived.builder()
+              .timeFrame(this.timeFrame)
+              .beginTime(this.startTime)
+              .endTime(this.endTime)
+              .openPrice(this.open)
+              .closePrice(this.close)
+              .highPrice(this.high)
+              .lowPrice(this.low)
+              .build());
+      return MockMarketEventBuilder.this;
+    }
   }
 }
