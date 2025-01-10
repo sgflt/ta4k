@@ -812,7 +812,7 @@ public final class DecimalNum implements Num {
     final double xpowb = Math.pow(this.delegate.doubleValue(), bDouble);
     // use PrecisionNum.multiply(PrecisionNum)
     final BigDecimal result = xpowa.multiply(BigDecimal.valueOf(xpowb));
-    return new DecimalNum(result.toString(), this.mathContext);
+    return new DecimalNum(result, this.mathContext);
   }
 
 }
