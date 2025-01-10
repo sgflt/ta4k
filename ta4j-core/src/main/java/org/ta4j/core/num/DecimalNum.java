@@ -103,25 +103,25 @@ public final class DecimalNum implements Num {
 
   private DecimalNum(final long val, final MathContext mathContext) {
     this.mathContext = mathContext;
-    this.delegate = BigDecimal.valueOf(val);
+    this.delegate = BigDecimal.valueOf(val).round(mathContext);
   }
 
 
   private DecimalNum(final float val, final MathContext mathContext) {
     this.mathContext = mathContext;
-    this.delegate = BigDecimal.valueOf(val);
+    this.delegate = BigDecimal.valueOf(val).round(mathContext);
   }
 
 
   private DecimalNum(final double val, final MathContext mathContext) {
     this.mathContext = mathContext;
-    this.delegate = BigDecimal.valueOf(val);
+    this.delegate = BigDecimal.valueOf(val).round(mathContext);
   }
 
 
   private DecimalNum(final BigDecimal val, final MathContext mathContext) {
     this.mathContext = mathContext;
-    this.delegate = Objects.requireNonNull(val);
+    this.delegate = Objects.requireNonNull(val).round(mathContext);
   }
 
 
