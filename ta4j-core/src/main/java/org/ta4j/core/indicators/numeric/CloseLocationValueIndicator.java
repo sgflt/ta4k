@@ -54,7 +54,7 @@ public class CloseLocationValueIndicator extends NumericIndicator {
 
   @Override
   public boolean isStable() {
-    return true;
+    return this.value != null;
   }
 
 
