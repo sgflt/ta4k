@@ -23,6 +23,7 @@
  */
 package org.ta4j.core.live;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,6 +31,8 @@ import org.ta4j.core.api.callback.BarListener;
 import org.ta4j.core.api.series.Bar;
 import org.ta4j.core.api.series.BarBuilderFactory;
 import org.ta4j.core.api.series.BarSeries;
+import org.ta4j.core.api.series.PastCandleParadoxException;
+import org.ta4j.core.api.series.WrongTimeFrameException;
 import org.ta4j.core.events.CandleReceived;
 import org.ta4j.core.indicators.IndicatorContext;
 import org.ta4j.core.indicators.TimeFrame;
@@ -81,6 +84,12 @@ class LiveBarSeries implements BarSeries {
 
 
   @Override
+  public Instant getCurrentTime() {
+    return this.bar == null ? Instant.EPOCH : this.bar.endTime();
+  }
+
+
+  @Override
   public LiveBarBuilder barBuilder() {
     return (LiveBarBuilder) this.barBuilderFactory.createBarBuilder(this);
   }
@@ -101,7 +110,7 @@ class LiveBarSeries implements BarSeries {
   @Override
   public void addBar(final Bar bar) {
     if (this.bar != null && bar.endTime().isBefore(this.bar.endTime())) {
-      throw new IllegalArgumentException("New Bar is before current bar");
+      throw new PastCandleParadoxException(bar.endTime(), getCurrentTime());
     }
 
     this.bar = bar;
@@ -120,6 +129,8 @@ class LiveBarSeries implements BarSeries {
 
   @Override
   public void onCandle(final CandleReceived event) {
+    checkTimeFrame(event);
+
     barBuilder()
         .startTime(event.beginTime())
         .endTime(event.beginTime())
@@ -129,5 +140,15 @@ class LiveBarSeries implements BarSeries {
         .closePrice(event.closePrice())
         .volume(event.volume())
         .add();
+  }
+
+
+  private void checkTimeFrame(final CandleReceived candleReceived) {
+    if (!candleReceived.timeFrame().equals(this.timeFrame)) {
+      throw new WrongTimeFrameException(
+          this.timeFrame,
+          candleReceived.timeFrame()
+      );
+    }
   }
 }

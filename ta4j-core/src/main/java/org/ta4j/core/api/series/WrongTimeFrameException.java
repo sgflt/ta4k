@@ -1,8 +1,7 @@
 /*
  * The MIT License (MIT)
  *
- * Copyright (c) 2017-2024 Ta4j Organization & respective
- * authors (see AUTHORS)
+ * Copyright (c) 2017-2024 Ta4j Organization & respective authors (see AUTHORS)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -21,45 +20,20 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.ta4j.core.live;
 
-import org.ta4j.core.MultiTimeFrameSeries;
-import org.ta4j.core.api.series.BarSeries;
-import org.ta4j.core.events.CandleReceived;
-import org.ta4j.core.strategy.Strategy;
+package org.ta4j.core.api.series;
 
-/**
- * Trading contest that traces bars and respective strategy
- *
- * @author Lukáš Kvídera
- */
-public class LiveTrading {
-  private final MultiTimeFrameSeries<BarSeries> series;
-  private final Strategy strategy;
+import org.ta4j.core.indicators.TimeFrame;
+
+public class WrongTimeFrameException extends IllegalArgumentException {
 
 
-  public LiveTrading(final MultiTimeFrameSeries<BarSeries> series, final Strategy strategy) {
-    this.series = series;
-    this.strategy = strategy;
-  }
-
-
-  public void onCandle(final CandleReceived candle) {
-    this.series.onCandle(candle);
-  }
-
-
-  public MultiTimeFrameSeries.TimeFrameState getLastEventTimes() {
-    return this.series.getLastEventTimes();
-  }
-
-
-  public boolean shouldEnter() {
-    return this.strategy.shouldEnter();
-  }
-
-
-  public boolean shouldExit() {
-    return this.strategy.shouldExit();
+  public WrongTimeFrameException(final TimeFrame seriesTimeFrame, final TimeFrame candleTimeFrame) {
+    super(
+        "candle time frame (%s) does not match time frame (%s)".formatted(
+            candleTimeFrame,
+            seriesTimeFrame
+        )
+    );
   }
 }

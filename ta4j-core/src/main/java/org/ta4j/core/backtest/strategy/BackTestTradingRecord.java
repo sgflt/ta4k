@@ -303,7 +303,7 @@ public class BackTestTradingRecord implements TradingRecord, RuntimeContext {
     log.debug("onTick: {}", event);
 
     this.currentTime = event.beginTime();
-    this.currentPrice = this.numFactory.numOf(event.ask());
+    this.currentPrice = this.numFactory.numOf((event.ask() + event.bid()) / 2.0);
   }
 
 

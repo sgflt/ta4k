@@ -24,16 +24,24 @@
 
 package org.ta4j.core;
 
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 
+import lombok.extern.slf4j.Slf4j;
 import org.ta4j.core.api.series.BarSeries;
 import org.ta4j.core.events.CandleReceived;
 import org.ta4j.core.indicators.TimeFrame;
 
 /**
+ * After initialization thread safe router for multiple timeframes.
+ *
+ * Single thread may update single timeframe.
+ * Each timeframe have corresponding series nad indicator context.
+ *
  * @author Lukáš Kvídera
  */
+@Slf4j
 public class MultiTimeFrameSeries<B extends BarSeries> {
   private final Map<TimeFrame, B> timeFramedSeries = new HashMap<>();
 
@@ -53,6 +61,34 @@ public class MultiTimeFrameSeries<B extends BarSeries> {
     final var series = this.timeFramedSeries.get(event.timeFrame());
     if (series != null) {
       series.onCandle(event);
+    }
+  }
+
+
+  public TimeFrameState getLastEventTimes() {
+    final var timeFrameState = new TimeFrameState();
+    for (final var series : this.timeFramedSeries.values()) {
+      timeFrameState.add(series.timeFrame(), series.getCurrentTime());
+    }
+
+    return timeFrameState;
+  }
+
+
+  /**
+   * Contains information how much stale data are.
+   */
+  public static class TimeFrameState {
+    private final Map<TimeFrame, Instant> state = new HashMap<>();
+
+
+    void add(final TimeFrame timeFrame, final Instant time) {
+      this.state.put(timeFrame, time);
+    }
+
+
+    public Instant getLastEventTime(final TimeFrame timeFrame) {
+      return this.state.getOrDefault(timeFrame, Instant.EPOCH);
     }
   }
 }

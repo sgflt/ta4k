@@ -34,6 +34,8 @@ import org.ta4j.core.api.callback.BarListener;
 import org.ta4j.core.api.series.Bar;
 import org.ta4j.core.api.series.BarBuilderFactory;
 import org.ta4j.core.api.series.BarSeries;
+import org.ta4j.core.api.series.PastCandleParadoxException;
+import org.ta4j.core.api.series.WrongTimeFrameException;
 import org.ta4j.core.events.CandleReceived;
 import org.ta4j.core.indicators.TimeFrame;
 import org.ta4j.core.num.Num;
@@ -130,6 +132,16 @@ public class BacktestBarSeries implements BarSeries {
 
 
   @Override
+  public Instant getCurrentTime() {
+    try {
+      return this.bars.getLast().endTime();
+    } catch (final IndexOutOfBoundsException e) {
+      return Instant.EPOCH;
+    }
+  }
+
+
+  @Override
   public BacktestBarBuilder barBuilder() {
     return (BacktestBarBuilder) this.barBuilderFactory.createBarBuilder(this);
   }
@@ -169,11 +181,9 @@ public class BacktestBarSeries implements BarSeries {
 
   private void checkTimeFrame(final CandleReceived candleReceived) {
     if (!candleReceived.timeFrame().equals(this.timeFrame)) {
-      throw new IllegalArgumentException(
-          "candle time frame (%s) does not match time frame (%s)".formatted(
-              candleReceived.timeFrame(),
-              this.timeFrame
-          )
+      throw new WrongTimeFrameException(
+          timeFrame,
+          candleReceived.timeFrame()
       );
     }
   }
@@ -250,14 +260,9 @@ public class BacktestBarSeries implements BarSeries {
     }
 
     if (!this.bars.isEmpty()) {
-      final int lastBarIndex = this.bars.size() - 1;
-      final Instant seriesEndTime = this.bars.get(lastBarIndex).endTime();
+      final var seriesEndTime = getCurrentTime();
       if (!bar.endTime().isAfter(seriesEndTime)) {
-        throw new IllegalArgumentException(
-            String.format(
-                "Cannot onCandle a bar with end time:%s that is <= to series end time: %s",
-                bar.endTime(), seriesEndTime
-            ));
+        throw new PastCandleParadoxException(bar.endTime(), seriesEndTime);
       }
     }
 
@@ -318,24 +323,6 @@ public class BacktestBarSeries implements BarSeries {
   public int getCurrentIndex() {
     return this.currentBarIndex;
   }
-
-
-  //  public void addStrategy(final BacktestStrategy strategy) {
-  //    this.indicatorContexts.add(strategy);
-  //  }
-  //
-  //
-  //  @Override
-  //  public void replaceStrategy(final Strategy strategy) {
-  //    this.indicatorContexts.clear();
-  //    this.indicatorContexts.add(strategy);
-  //  }
-  //
-  //
-  //  public void replaceStrategies(final List<Strategy> strategies) {
-  //    this.indicatorContexts.clear();
-  //    this.indicatorContexts.addAll(strategies);
-  //  }
 
 
   public void rewind() {

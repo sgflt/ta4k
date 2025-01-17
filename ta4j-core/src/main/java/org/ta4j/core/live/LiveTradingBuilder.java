@@ -127,7 +127,7 @@ public class LiveTradingBuilder {
     final var strategy =
         this.strategyFactory.createStrategy(this.configuration, this.runtimeContext, this.indicatorContexts);
 
-    final var series = new MultiTimeFrameSeries<LiveBarSeries>();
+    final var series = new MultiTimeFrameSeries<>();
     Stream.concat(
             strategy.timeFrames().stream(),
             this.indicatorContexts.timeFrames().stream()

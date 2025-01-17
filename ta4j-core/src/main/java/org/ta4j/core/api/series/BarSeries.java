@@ -22,6 +22,8 @@
  */
 package org.ta4j.core.api.series;
 
+import java.time.Instant;
+
 import org.ta4j.core.api.Indicator;
 import org.ta4j.core.api.callback.BarListener;
 import org.ta4j.core.events.CandleReceived;
@@ -39,42 +41,76 @@ import org.ta4j.core.num.NumFactory;
  * </ul>
  */
 public interface BarSeries {
-    /**
-     * @return factory that generates numbers usable in this BarSeries
-     */
-    NumFactory numFactory();
+  /**
+   * @return factory that generates numbers usable in this BarSeries
+   */
+  NumFactory numFactory();
 
-    /**
-     * @return which timeframe this series accepts
-     */
-    TimeFrame timeFrame();
+  /**
+   * @return which timeframe this series accepts
+   */
+  TimeFrame timeFrame();
 
-    /**
-     * @return builder that generates compatible bars
-     */
-    BarBuilder barBuilder();
+  /**
+   * May be used for loading candles from broker or database.
+   *
+   * Example use case: Daily analysis without realtime updates
+   * <ol>
+   * <li>app wants to analyze symbol</li>
+   * <li>series is not updated from stream, it contains stale data</li>
+   * <li>loader checks last candle for given timeframe</li>
+   * <li>loads required window length to provide stable indicators</li>
+   * <li>pushes data into {@link #onCandle)</li>
+   * <li>now we have up to date indicators usable for analysis</li>
+   * </ol>
+   *
+   * @return end time of last received bar.
+   */
+  Instant getCurrentTime();
 
-    /**
-     * @return the name of the series
-     */
-    String getName();
+  /**
+   * @return builder that generates compatible bars
+   */
+  BarBuilder barBuilder();
 
-    /**
-     * Gets the bar from series.
-     *
-     * @return the bar at the current position
-     */
-    Bar getBar();
+  /**
+   * @return the name of the series
+   */
+  String getName();
+
+  /**
+   * Gets the bar from series.
+   *
+   * @return the bar at the current position
+   */
+  Bar getBar();
 
 
-    /**
-     * Adds the {@code bar} at the end of the series.
-     *
-     * @param bar the bar to be added
-     */
-    void addBar(Bar bar);
+  /**
+   * Adds the {@code bar} at the end of the series.
+   *
+   * @param bar the bar to be added
+   *
+   * @throws PastCandleParadoxException if you try to push old candle into series that is relatively in future to
+   *     that candle.
+   * @throws NullPointerException if bar is null
+   */
+  void addBar(Bar bar);
 
-    void addBarListener(BarListener listener);
+  /**
+   * @param listener that is interested in bars with defined num implementation instead of market events
+   */
+  void addBarListener(BarListener listener);
 
-    void onCandle(CandleReceived event);
+  /**
+   * Event listener for market event in form of candle.
+   *
+   * @param event that holds OHLCV data
+   *
+   * @throws PastCandleParadoxException if you try to push old candle into series that is relatively in future to
+   *     that candle.
+   * @throws WrongTimeFrameException if you try to mix candles from different timeframes than this series expect
+   * @throws NullPointerException if event is null
+   */
+  void onCandle(CandleReceived event);
 }
