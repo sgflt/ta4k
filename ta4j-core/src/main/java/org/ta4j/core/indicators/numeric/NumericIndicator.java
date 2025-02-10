@@ -579,7 +579,7 @@ public abstract class NumericIndicator implements Indicator<Num> {
 
 
   @Override
-  public final void onBar(final Bar bar) {
+  public final synchronized void onBar(final Bar bar) {
     if (bar.beginTime().isAfter(this.currentBeginTime)) {
       updateState(bar);
       this.currentBeginTime = bar.beginTime();
