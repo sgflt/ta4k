@@ -94,13 +94,14 @@ public class StochasticOscillatorKIndicator extends NumericIndicator {
     final Num highestHighPrice = this.highestHigh.getValue();
     final Num lowestLowPrice = this.lowestMin.getValue();
 
-    if (highestHighPrice.minus(lowestLowPrice).isZero()) {
+    final var fullCandleHeight = highestHighPrice.minus(lowestLowPrice);
+    if (fullCandleHeight.isZero()) {
       return getNumFactory().fifty();
     }
 
     return this.indicator.getValue()
         .minus(lowestLowPrice)
-        .dividedBy(highestHighPrice.minus(lowestLowPrice))
+        .dividedBy(fullCandleHeight)
         .multipliedBy(getNumFactory().hundred());
   }
 
