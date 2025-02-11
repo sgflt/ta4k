@@ -51,7 +51,7 @@ public class SMAIndicator extends NumericIndicator {
    */
   public SMAIndicator(final NumericIndicator indicator, final int barCount) {
     super(indicator.getNumFactory());
-    this.sum = new RunningTotalIndicator(indicator, barCount);
+    this.sum = indicator.runningTotal(barCount);
     this.barCount = barCount;
     this.divisor = getNumFactory().numOf(this.barCount);
   }
