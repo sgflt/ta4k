@@ -43,6 +43,8 @@ import org.ta4j.core.indicators.numeric.momentum.adx.MinusDMIndicator;
 import org.ta4j.core.indicators.numeric.momentum.adx.PlusDIIndicator;
 import org.ta4j.core.indicators.numeric.momentum.adx.PlusDMIndicator;
 import org.ta4j.core.indicators.numeric.oscilators.AwesomeOscillatorIndicator;
+import org.ta4j.core.indicators.numeric.oscilators.StochasticOscillatorDIndicator;
+import org.ta4j.core.indicators.numeric.oscilators.StochasticOscillatorKIndicator;
 import org.ta4j.core.indicators.numeric.oscilators.aroon.AroonDownIndicator;
 import org.ta4j.core.indicators.numeric.oscilators.aroon.AroonOscillatorIndicator;
 import org.ta4j.core.indicators.numeric.oscilators.aroon.AroonUpIndicator;
@@ -158,6 +160,16 @@ public final class Indicators {
 
   public static LowerShadowIndicator lowerShadow() {
     return extended().lowerShadow();
+  }
+
+
+  public static StochasticOscillatorKIndicator stochasticKOscillator(final int barCount) {
+    return extended().stochasticKOscillator(barCount);
+  }
+
+
+  public static StochasticOscillatorDIndicator stochasticOscillator(final int barCount) {
+    return extended().stochasticOscillator(barCount);
   }
 
 
@@ -282,6 +294,16 @@ public final class Indicators {
 
     public LowerShadowIndicator lowerShadow() {
       return new LowerShadowIndicator(this.numFactory);
+    }
+
+
+    public StochasticOscillatorDIndicator stochasticOscillator(final int barCount) {
+      return new StochasticOscillatorDIndicator(this.numFactory, stochasticKOscillator(barCount));
+    }
+
+
+    public StochasticOscillatorKIndicator stochasticKOscillator(final int barCount) {
+      return new StochasticOscillatorKIndicator(this.numFactory, barCount);
     }
 
 
