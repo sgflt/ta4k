@@ -20,67 +20,43 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.ta4j.core.indicators.numeric.momentum;
+package org.ta4j.core.indicators.numeric.momentum
 
-import org.ta4j.core.api.series.Bar;
-import org.ta4j.core.indicators.numeric.NumericIndicator;
-import org.ta4j.core.indicators.numeric.average.MMAIndicator;
-import org.ta4j.core.indicators.numeric.candles.TRIndicator;
-import org.ta4j.core.num.Num;
-import org.ta4j.core.num.NumFactory;
+import org.ta4j.core.api.series.Bar
+import org.ta4j.core.indicators.numeric.NumericIndicator
+import org.ta4j.core.indicators.numeric.average.MMAIndicator
+import org.ta4j.core.indicators.numeric.candles.TRIndicator
+import org.ta4j.core.num.Num
+import org.ta4j.core.num.NumFactory
 
 /**
  * Average true range indicator.
  */
-public class ATRIndicator extends NumericIndicator {
-
-  private final MMAIndicator averageTrueRangeIndicator;
-
-
-  /**
-   * Constructor.
-   *
-   * @param numFactory the {@link Num} provider
-   * @param barCount the time frame
-   */
-  public ATRIndicator(final NumFactory numFactory, final int barCount) {
-    this(numFactory, new TRIndicator(numFactory), barCount);
-  }
+class ATRIndicator(numFactory: NumFactory, tr: NumericIndicator, barCount: Int) : NumericIndicator(numFactory) {
+    private val averageTrueRangeIndicator = MMAIndicator(tr, barCount)
 
 
-  /**
-   * Constructor.
-   *
-   * @param numFactory the numFactory
-   * @param tr the {@link TRIndicator}
-   * @param barCount the time frame
-   */
-  public ATRIndicator(final NumFactory numFactory, final NumericIndicator tr, final int barCount) {
-    super(numFactory);
-    this.averageTrueRangeIndicator = new MMAIndicator(tr, barCount);
-  }
+    /**
+     * Constructor.
+     *
+     * @param numFactory the [Num] provider
+     * @param barCount the time frame
+     */
+    constructor(numFactory: NumFactory, barCount: Int) : this(numFactory, TRIndicator(numFactory), barCount)
 
 
-  @Override
-  public void updateState(final Bar bar) {
-    this.averageTrueRangeIndicator.onBar(bar);
-    this.value = calculate();
-  }
+    override fun updateState(bar: Bar) {
+        averageTrueRangeIndicator.onBar(bar)
+        value = calculate()
+    }
 
 
-  private Num calculate() {
-    return this.averageTrueRangeIndicator.getValue();
-  }
+    private fun calculate() = averageTrueRangeIndicator.value
 
 
-  @Override
-  public boolean isStable() {
-    return this.averageTrueRangeIndicator.isStable();
-  }
+    override val isStable: Boolean
+        get() = averageTrueRangeIndicator.isStable
 
 
-  @Override
-  public String toString() {
-    return getClass().getSimpleName() + " " + this.averageTrueRangeIndicator;
-  }
+    override fun toString() = "${javaClass.simpleName} $averageTrueRangeIndicator"
 }

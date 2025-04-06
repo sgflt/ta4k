@@ -55,7 +55,7 @@ class FixedTransactionCostModelTest {
     final var feePerTrade = RANDOM.nextDouble();
     final var model = new FixedTransactionCostModel(feePerTrade);
 
-    final var position = new Position(TradeType.BUY, new ZeroCostModel(), model, numFactory);
+    final var position = new Position(TradeType.BUY, ZeroCostModel.INSTANCE, model, numFactory);
     position.operate(Instant.now(), PRICE, AMOUNT);
     final var cost = model.calculate(position);
 

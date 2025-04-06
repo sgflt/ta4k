@@ -272,7 +272,7 @@ public class XlsTestsUtils {
       }
       final String s = evaluator.evaluate(row.getCell(column)).formatAsString();
       if (s.equals("#DIV/0!")) {
-        values.add(NaN.NaN);
+        values.add(NaN.INSTANCE);
       } else {
         values.add(numFactory.numOf(new BigDecimal(s)));
       }

@@ -21,78 +21,37 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.ta4j.core.indicators.bool.chandelier;
+package org.ta4j.core.indicators.bool.chandelier
 
-import org.ta4j.core.api.Indicators;
-import org.ta4j.core.api.series.Bar;
-import org.ta4j.core.indicators.bool.BooleanIndicator;
-import org.ta4j.core.indicators.numeric.candles.price.ClosePriceIndicator;
-import org.ta4j.core.indicators.numeric.helpers.HighestValueIndicator;
-import org.ta4j.core.indicators.numeric.momentum.ATRIndicator;
-import org.ta4j.core.num.Num;
-import org.ta4j.core.num.NumFactory;
+import org.ta4j.core.api.Indicators
+import org.ta4j.core.api.series.Bar
+import org.ta4j.core.indicators.bool.BooleanIndicator
+import org.ta4j.core.num.NumFactory
 
 /**
  * The Chandelier Exit (long) Indicator.
  *
- * @see <a href=
- *     "http://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:chandelier_exit">
- *     http://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:chandelier_exit</a>
+ * @see [
+ * http://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:chandelier_exit](http://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:chandelier_exit)
  */
-public class ChandelierExitLongIndicator extends BooleanIndicator {
+class ChandelierExitLongIndicator @JvmOverloads constructor(
+    numFactory: NumFactory,
+    barCount: Int = 22,
+    k: Double = 3.0,
+) : BooleanIndicator() {
+    private val high = Indicators.highPrice().highest(barCount)
+    private val atr = Indicators.atr(barCount)
+    private val k = numFactory.numOf(k)
+    private val close = Indicators.closePrice()
 
-  private final HighestValueIndicator high;
-  private final ATRIndicator atr;
-  private final Num k;
-  private final ClosePriceIndicator close;
+    private fun calculate(): Boolean = close.isLessThan(high.value.minus(atr.value.multipliedBy(k)).doubleValue())
 
+    override fun updateState(bar: Bar) {
+        close.onBar(bar)
+        high.onBar(bar)
+        atr.onBar(bar)
+        value = calculate()
+    }
 
-  /**
-   * Constructor with:
-   *
-   * <ul>
-   * <li>{@code barCount} = 22
-   * <li>{@code k} = 3
-   * </ul>
-   *
-   * @param numFactory the bar series
-   */
-  public ChandelierExitLongIndicator(final NumFactory numFactory) {
-    this(numFactory, 22, 3);
-  }
-
-
-  /**
-   * Constructor.
-   *
-   * @param numFactory the num factory
-   * @param barCount the time frame (usually 22)
-   * @param k the K multiplier for ATR (usually 3.0)
-   */
-  public ChandelierExitLongIndicator(final NumFactory numFactory, final int barCount, final double k) {
-    this.close = Indicators.closePrice();
-    this.high = Indicators.highPrice().highest(barCount);
-    this.atr = Indicators.atr(barCount);
-    this.k = numFactory.numOf(k);
-  }
-
-
-  private boolean calculate() {
-    return this.close.isLessThan(this.high.getValue().minus(this.atr.getValue().multipliedBy(this.k)).doubleValue());
-  }
-
-
-  @Override
-  public void updateState(final Bar bar) {
-    this.close.onBar(bar);
-    this.high.onBar(bar);
-    this.atr.onBar(bar);
-    this.value = calculate();
-  }
-
-
-  @Override
-  public boolean isStable() {
-    return this.close.isStable() && this.high.isStable() && this.atr.isStable();
-  }
+    override val isStable get() = close.isStable && high.isStable && atr.isStable
 }

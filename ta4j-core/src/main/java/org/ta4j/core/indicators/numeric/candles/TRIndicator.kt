@@ -20,58 +20,46 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.ta4j.core.indicators.numeric.candles;
+package org.ta4j.core.indicators.numeric.candles
 
-import org.ta4j.core.api.series.Bar;
-import org.ta4j.core.indicators.numeric.NumericIndicator;
-import org.ta4j.core.num.Num;
-import org.ta4j.core.num.NumFactory;
+import org.ta4j.core.api.series.Bar
+import org.ta4j.core.indicators.numeric.NumericIndicator
+import org.ta4j.core.num.Num
+import org.ta4j.core.num.NumFactory
 
 /**
  * True range indicator.
  *
  * <pre>
  * TrueRange = MAX(high - low, high - previousClose, previousClose - low)
- * </pre>
+</pre> *
  */
-public class TRIndicator extends NumericIndicator {
-
-  private Bar previousBar;
-  private boolean stable;
-
-
-  public TRIndicator(final NumFactory numFactory) {
-    super(numFactory);
-  }
+class TRIndicator(numFactory: NumFactory) : NumericIndicator(numFactory) {
+    private var previousBar: Bar? = null
+    override var isStable = false
+        private set
 
 
-  protected Num calculate(final Bar bar) {
-    final Num high = bar.highPrice();
-    final Num low = bar.lowPrice();
-    final Num hl = high.minus(low);
+    private fun calculate(bar: Bar): Num {
+        val high = bar.highPrice
+        val low = bar.lowPrice
+        val hl = high.minus(low)
 
-    if (this.previousBar == null) {
-      this.previousBar = bar;
-      return hl.abs();
+        if (previousBar == null) {
+            previousBar = bar
+            return hl.abs()
+        }
+
+        isStable = true
+        val previousClose = previousBar!!.closePrice
+        val hc = high.minus(previousClose)
+        val cl = previousClose.minus(low)
+        previousBar = bar
+        return hl.abs().max(hc.abs()).max(cl.abs())
     }
 
-    this.stable = true;
-    final Num previousClose = this.previousBar.closePrice();
-    final Num hc = high.minus(previousClose);
-    final Num cl = previousClose.minus(low);
-    this.previousBar = bar;
-    return hl.abs().max(hc.abs()).max(cl.abs());
-  }
 
-
-  @Override
-  public void updateState(final Bar bar) {
-    this.value = calculate(bar);
-  }
-
-
-  @Override
-  public boolean isStable() {
-    return this.stable;
-  }
+    override fun updateState(bar: Bar) {
+        value = calculate(bar)
+    }
 }

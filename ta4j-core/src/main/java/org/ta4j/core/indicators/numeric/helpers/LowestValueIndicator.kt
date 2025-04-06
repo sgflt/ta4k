@@ -20,93 +20,82 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.ta4j.core.indicators.numeric.helpers;
+package org.ta4j.core.indicators.numeric.helpers
 
-import java.util.Deque;
-import java.util.LinkedList;
-
-import org.ta4j.core.api.Indicator;
-import org.ta4j.core.api.series.Bar;
-import org.ta4j.core.indicators.numeric.NumericIndicator;
-import org.ta4j.core.num.Num;
+import org.ta4j.core.api.series.Bar
+import org.ta4j.core.indicators.numeric.NumericIndicator
+import org.ta4j.core.num.Num
+import java.util.*
 
 /**
  * Lowest value indicator.
  *
- * <p>
+ *
+ *
  * Returns the lowest indicator value from the bar series within the bar count.
  */
-public class LowestValueIndicator extends NumericIndicator {
-
-  private final NumericIndicator indicator;
-  private final int barCount;
-
-  /** circular array */
-  private final Num[] window; // TODO CircularNumArray
-  private final Deque<Integer> deque = new LinkedList<>();
-  private int barsPassed;
+class LowestValueIndicator(private val indicator: NumericIndicator, private val barCount: Int) : NumericIndicator(
+    indicator.numFactory
+) {
+    /** circular array  */
+    private val window: Array<Num?> // TODO CircularNumArray
+    private val deque: Deque<Int> = LinkedList<Int>()
+    private var barsPassed = 0
 
 
-  /**
-   * Constructor.
-   *
-   * @param indicator the {@link Indicator}
-   * @param barCount the time frame
-   */
-  public LowestValueIndicator(final NumericIndicator indicator, final int barCount) {
-    super(indicator.getNumFactory());
-    this.indicator = indicator;
-    this.barCount = barCount;
-    this.window = new Num[barCount];
-  }
-
-
-  protected Num calculate() {
-    final int actualIndex = this.barsPassed % this.barCount;
-
-    if (this.barsPassed >= this.barCount) {
-      final int outgoingIndex = (this.barsPassed - this.barCount) % this.barCount;
-      if (!this.deque.isEmpty() && this.deque.peekFirst() == outgoingIndex) {
-        this.deque.pollFirst();
-      }
+    /**
+     * Constructor.
+     *
+     * @param indicator the [Indicator]
+     * @param barCount the time frame
+     */
+    init {
+        window = arrayOfNulls<Num>(barCount)
     }
 
-    final var currentValue = this.indicator.getValue();
-    if (currentValue.isNaN()) {
-      return currentValue;
+
+    private fun calculate(): Num {
+        val actualIndex = barsPassed % barCount
+
+        if (barsPassed >= barCount) {
+            val outgoingIndex = (barsPassed - barCount) % barCount
+            if (deque.isNotEmpty() && deque.peekFirst() == outgoingIndex) {
+                deque.pollFirst()
+            }
+        }
+
+        val currentValue = indicator.value
+        if (currentValue.isNaN) {
+            return currentValue
+        }
+
+        window[actualIndex] = currentValue
+
+        while (
+            deque.isNotEmpty()
+            && (window[deque.peekLast()]!!.isGreaterThan(currentValue)
+                    || window[deque.peekLast()]!!.isNaN
+                    )
+        ) {
+            deque.pollLast()
+        }
+
+        deque.offerLast(actualIndex)
+        barsPassed++
+
+        return window[deque.peekFirst()!!]!!
     }
 
-    this.window[actualIndex] = currentValue;
 
-    while (!this.deque.isEmpty() && (
-        this.window[this.deque.peekLast()].isGreaterThan(currentValue)
-        || this.window[this.deque.peekLast()].isNaN()
-    )) {
-      this.deque.pollLast();
+    override fun updateState(bar: Bar) {
+        indicator.onBar(bar)
+        value = calculate()
     }
 
-    this.deque.offerLast(actualIndex);
-    this.barsPassed++;
 
-    return this.window[this.deque.peekFirst()];
-  }
+    override val isStable: Boolean
+        get() = barsPassed >= barCount && indicator.isStable
 
 
-  @Override
-  public void updateState(final Bar bar) {
-    this.indicator.onBar(bar);
-    this.value = calculate();
-  }
-
-
-  @Override
-  public boolean isStable() {
-    return this.barsPassed >= this.barCount && this.indicator.isStable();
-  }
-
-
-  @Override
-  public String toString() {
-    return String.format("LoVa(%s, %s) => %s", this.indicator, this.barCount, getValue());
-  }
+    override fun toString() = "LoVa($indicator, $barCount) => $value"
 }

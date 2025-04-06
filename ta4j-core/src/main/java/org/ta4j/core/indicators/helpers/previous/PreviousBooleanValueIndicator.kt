@@ -21,40 +21,28 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  *  CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.ta4j.core.indicators.helpers.previous;
+package org.ta4j.core.indicators.helpers.previous
 
-import org.ta4j.core.api.series.Bar;
-import org.ta4j.core.indicators.bool.BooleanIndicator;
+import org.ta4j.core.api.Indicator
+import org.ta4j.core.api.series.Bar
+import org.ta4j.core.indicators.bool.BooleanIndicator
 
 /**
  * @author Lukáš Kvídera
  */
-public class PreviousBooleanValueIndicator extends BooleanIndicator {
+class PreviousBooleanValueIndicator(indicator: BooleanIndicator, n: Int) : BooleanIndicator() {
+    private val previousValueHelper: PreviousValueHelper<Boolean?> =
+        PreviousValueHelper<Boolean?>(indicator as Indicator<Boolean?>, n)
 
 
-  private final PreviousValueHelper<Boolean> previousValueHelper;
+    private fun calculate() = previousValueHelper.value == true
+
+    public override fun updateState(bar: Bar) {
+        previousValueHelper.onBar(bar)
+        value = calculate()
+    }
 
 
-  public PreviousBooleanValueIndicator(final BooleanIndicator indicator, final int n) {
-    this.previousValueHelper = new PreviousValueHelper<>(indicator, n);
-  }
-
-
-  private Boolean calculate() {
-    final var value = this.previousValueHelper.getValue();
-    return value != null && value;
-  }
-
-
-  @Override
-  public void updateState(final Bar bar) {
-    this.previousValueHelper.onBar(bar);
-    this.value = calculate();
-  }
-
-
-  @Override
-  public boolean isStable() {
-    return this.previousValueHelper.isStable();
-  }
+    override val isStable
+        get() = previousValueHelper.isStable
 }

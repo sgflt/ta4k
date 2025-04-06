@@ -38,52 +38,55 @@ import ta4jexamples.loaders.jsonhelper.GsonBarSeries;
 
 public class JsonBarsSerializer {
 
-    private static final Logger LOG = Logger.getLogger(JsonBarsSerializer.class.getName());
+  private static final Logger LOG = Logger.getLogger(JsonBarsSerializer.class.getName());
 
-    public static void persistSeries(final BacktestBarSeries series, final String filename) {
-        final var exportableSeries = GsonBarSeries.from(series);
-        final var gson = new GsonBuilder().setPrettyPrinting().create();
-        FileWriter writer = null;
+
+  public static void persistSeries(final BacktestBarSeries series, final String filename) {
+    final var exportableSeries = GsonBarSeries.from(series);
+    final var gson = new GsonBuilder().setPrettyPrinting().create();
+    FileWriter writer = null;
+    try {
+      writer = new FileWriter(filename);
+      gson.toJson(exportableSeries, writer);
+      LOG.info("Bar series '" + series.getName() + "' successfully saved to '" + filename + "'");
+    } catch (final IOException e) {
+      e.printStackTrace();
+      LOG.log(Level.SEVERE, "Unable to store bars in JSON", e);
+    } finally {
+      if (writer != null) {
         try {
-            writer = new FileWriter(filename);
-            gson.toJson(exportableSeries, writer);
-            LOG.info("Bar series '" + series.getName() + "' successfully saved to '" + filename + "'");
+          writer.flush();
+          writer.close();
         } catch (final IOException e) {
-            e.printStackTrace();
-            LOG.log(Level.SEVERE, "Unable to store bars in JSON", e);
-        } finally {
-            if (writer != null) {
-                try {
-                    writer.flush();
-                    writer.close();
-                } catch (final IOException e) {
-                    e.printStackTrace();
-                }
-            }
+          e.printStackTrace();
         }
+      }
     }
+  }
 
-    public static BarSeries loadSeries(final String filename) {
-        final Gson gson = new Gson();
-        FileReader reader = null;
-        BacktestBarSeries result = null;
-        try {
-            reader = new FileReader(filename);
-            final GsonBarSeries loadedSeries = gson.fromJson(reader, GsonBarSeries.class);
 
-            result = loadedSeries.toBarSeries();
-            LOG.info("Bar series '" + result.getName() + "' successfully loaded. #Entries: " + result.getBarCount());
-        } catch (final FileNotFoundException e) {
-            e.printStackTrace();
-            LOG.log(Level.SEVERE, "Unable to load bars from JSON", e);
-        } finally {
-            try {
-                if (reader != null)
-                    reader.close();
-            } catch (final IOException e) {
-                e.printStackTrace();
-            }
+  public static BarSeries loadSeries(final String filename) {
+    final Gson gson = new Gson();
+    FileReader reader = null;
+    BacktestBarSeries result = null;
+    try {
+      reader = new FileReader(filename);
+      final GsonBarSeries loadedSeries = gson.fromJson(reader, GsonBarSeries.class);
+
+      result = loadedSeries.toBarSeries();
+      LOG.info("Bar series '" + result.getName() + "' successfully loaded. #Entries: " + result.getBarCount());
+    } catch (final FileNotFoundException e) {
+      e.printStackTrace();
+      LOG.log(Level.SEVERE, "Unable to load bars from JSON", e);
+    } finally {
+      try {
+        if (reader != null) {
+          reader.close();
         }
-        return result;
+      } catch (final IOException e) {
+        e.printStackTrace();
+      }
     }
+    return result;
+  }
 }

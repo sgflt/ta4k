@@ -21,65 +21,42 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.ta4j.core.indicators.numeric.channels.keltner;
+package org.ta4j.core.indicators.numeric.channels.keltner
 
-import org.ta4j.core.api.Indicator;
-import org.ta4j.core.api.Indicators;
-import org.ta4j.core.api.series.Bar;
-import org.ta4j.core.api.series.BarSeries;
-import org.ta4j.core.indicators.numeric.NumericIndicator;
-import org.ta4j.core.indicators.numeric.average.EMAIndicator;
-import org.ta4j.core.num.Num;
+import org.ta4j.core.api.Indicators.typicalPrice
+import org.ta4j.core.api.series.Bar
+import org.ta4j.core.api.series.BarSeries
+import org.ta4j.core.indicators.numeric.NumericIndicator
+import org.ta4j.core.indicators.numeric.average.EMAIndicator
 
 /**
  * Keltner Channel (middle line) indicator.
  *
- * @see <a href=
- *     "http://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:keltner_channels">
- *     http://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:keltner_channels</a>
+ * @see [
+ * http://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:keltner_channels](http://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:keltner_channels)
  */
-public class KeltnerChannelMiddleIndicator extends NumericIndicator {
-
-  private final EMAIndicator emaIndicator;
-
-
-  /**
-   * Constructor.
-   *
-   * @param series the bar series
-   * @param barCountEMA the bar count for the {@link EMAIndicator}
-   */
-  public KeltnerChannelMiddleIndicator(final BarSeries series, final int barCountEMA) {
-    this(Indicators.typicalPrice(), barCountEMA);
-  }
+class KeltnerChannelMiddleIndicator(indicator: NumericIndicator, barCountEMA: Int) :
+    NumericIndicator(indicator.numFactory) {
+    private val emaIndicator = EMAIndicator(indicator, barCountEMA)
 
 
-  /**
-   * Constructor.
-   *
-   * @param indicator the {@link Indicator}
-   * @param barCountEMA the bar count for the {@link EMAIndicator}
-   */
-  public KeltnerChannelMiddleIndicator(final NumericIndicator indicator, final int barCountEMA) {
-    super(indicator.getNumFactory());
-    this.emaIndicator = new EMAIndicator(indicator, barCountEMA);
-  }
+    /**
+     * Constructor.
+     *
+     * @param series the bar series
+     * @param barCountEMA the bar count for the [EMAIndicator]
+     */
+    constructor(series: BarSeries?, barCountEMA: Int) : this(typicalPrice(), barCountEMA)
 
 
-  private Num calculate() {
-    return this.emaIndicator.getValue();
-  }
+    private fun calculate() = emaIndicator.value
+
+    public override fun updateState(bar: Bar) {
+        emaIndicator.onBar(bar)
+        value = calculate()
+    }
 
 
-  @Override
-  public void updateState(final Bar bar) {
-    this.emaIndicator.onBar(bar);
-    this.value = calculate();
-  }
-
-
-  @Override
-  public boolean isStable() {
-    return this.emaIndicator.isStable();
-  }
+    override val isStable: Boolean
+        get() = emaIndicator.isStable
 }

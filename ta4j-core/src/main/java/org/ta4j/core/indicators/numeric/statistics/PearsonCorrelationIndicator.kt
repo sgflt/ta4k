@@ -21,119 +21,84 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.ta4j.core.indicators.numeric.statistics;
+package org.ta4j.core.indicators.numeric.statistics
 
-import static org.ta4j.core.num.NaN.NaN;
-
-import java.util.ArrayDeque;
-import java.util.Deque;
-
-import org.ta4j.core.api.series.Bar;
-import org.ta4j.core.indicators.numeric.NumericIndicator;
-import org.ta4j.core.num.Num;
+import org.ta4j.core.api.series.Bar
+import org.ta4j.core.indicators.numeric.NumericIndicator
+import org.ta4j.core.num.NaN
+import org.ta4j.core.num.Num
+import java.util.*
 
 /**
  * Indicator-Pearson-Correlation
  *
- * @see <a href=
- *     "http://www.statisticshowto.com/probability-and-statistics/correlation-coefficient-formula/">
- *     http://www.statisticshowto.com/probability-and-statistics/correlation-coefficient-formula/</a>
+ * @see [
+ * http://www.statisticshowto.com/probability-and-statistics/correlation-coefficient-formula/](http://www.statisticshowto.com/probability-and-statistics/correlation-coefficient-formula/)
  */
-public class PearsonCorrelationIndicator extends NumericIndicator {
+class PearsonCorrelationIndicator(
+    private val indicator1: NumericIndicator,
+    private val indicator2: NumericIndicator,
+    private val barCount: Int,
+) : NumericIndicator(indicator1.numFactory) {
+    private val window = ArrayDeque<XY>(barCount)
+    private var sx = numFactory.zero()
+    private var sy = numFactory.zero()
+    private var sxx = numFactory.zero()
+    private var syy = numFactory.zero()
+    private var sxy = numFactory.zero()
+    private val n = numFactory.numOf(barCount)
 
-  private final NumericIndicator indicator1;
-  private final NumericIndicator indicator2;
-  private final int barCount;
-  private final Deque<XY> window;
-  private Num sx;
-  private Num sy;
-  private Num sxx;
-  private Num syy;
-  private Num sxy;
-  private final Num n;
+    private fun calculate(): Num {
+        val x = indicator1.value
+        val y = indicator2.value
+        window.offer(XY(x, y))
 
-
-  /**
-   * Constructor.
-   *
-   * @param indicator1 the first indicator
-   * @param indicator2 the second indicator
-   * @param barCount the time frame
-   */
-  public PearsonCorrelationIndicator(
-      final NumericIndicator indicator1,
-      final NumericIndicator indicator2,
-      final int barCount
-  ) {
-    super(indicator1.getNumFactory());
-    this.indicator1 = indicator1;
-    this.indicator2 = indicator2;
-    this.barCount = barCount;
-    this.window = new ArrayDeque<>(barCount);
-    this.sx = getNumFactory().zero();
-    this.sy = getNumFactory().zero();
-    this.sxx = getNumFactory().zero();
-    this.sxy = getNumFactory().zero();
-    this.syy = getNumFactory().zero();
-    this.n = getNumFactory().numOf(this.barCount);
-  }
+        if (window.size > barCount) {
+            val polled = window.poll()
+            removeOldValue(polled)
+        }
 
 
-  protected Num calculate() {
+        sx = sx.plus(x)
+        sy = sy.plus(y)
+        sxy = sxy.plus(x.multipliedBy(y))
+        sxx = sxx.plus(x.multipliedBy(x))
+        syy = syy.plus(y.multipliedBy(y))
 
-    final var x = this.indicator1.getValue();
-    final var y = this.indicator2.getValue();
-    this.window.offer(new XY(x, y));
+        // (n * Sxx - Sx * Sx) * (n * Syy - Sy * Sy)
+        val toSqrt = (n.multipliedBy(sxx).minus(sx.multipliedBy(sx)))
+            .multipliedBy(n.multipliedBy(syy).minus(sy.multipliedBy(sy)))
 
-    if (this.window.size() > this.barCount) {
-      final var polled = this.window.poll();
-      removeOldValue(polled);
+        if (toSqrt.isGreaterThan(numFactory.zero())) {
+            // pearson = (n * Sxy - Sx * Sy) / sqrt((n * Sxx - Sx * Sx) * (n * Syy - Sy *
+            // Sy))
+            return (n.multipliedBy(sxy).minus(sx.multipliedBy(sy))).dividedBy(toSqrt.sqrt())
+        }
+
+        return NaN
     }
 
 
-    this.sx = this.sx.plus(x);
-    this.sy = this.sy.plus(y);
-    this.sxy = this.sxy.plus(x.multipliedBy(y));
-    this.sxx = this.sxx.plus(x.multipliedBy(x));
-    this.syy = this.syy.plus(y.multipliedBy(y));
-
-    // (n * Sxx - Sx * Sx) * (n * Syy - Sy * Sy)
-    final var toSqrt = (this.n.multipliedBy(this.sxx).minus(this.sx.multipliedBy(this.sx)))
-        .multipliedBy(this.n.multipliedBy(this.syy).minus(this.sy.multipliedBy(this.sy)));
-
-    if (toSqrt.isGreaterThan(getNumFactory().zero())) {
-      // pearson = (n * Sxy - Sx * Sy) / sqrt((n * Sxx - Sx * Sx) * (n * Syy - Sy *
-      // Sy))
-      return (this.n.multipliedBy(this.sxy).minus(this.sx.multipliedBy(this.sy))).dividedBy(toSqrt.sqrt());
+    private fun removeOldValue(polled: XY) {
+        sx = sx.minus(polled.x)
+        sy = sy.minus(polled.y)
+        sxy = sxy.minus(polled.x.multipliedBy(polled.y))
+        sxx = sxx.minus(polled.x.multipliedBy(polled.x))
+        syy = syy.minus(polled.y.multipliedBy(polled.y))
     }
 
-    return NaN;
-  }
+
+    public override fun updateState(bar: Bar) {
+        indicator1.onBar(bar)
+        indicator2.onBar(bar)
+        value = calculate()
+    }
 
 
-  private void removeOldValue(final XY polled) {
-    this.sx = this.sx.minus(polled.x());
-    this.sy = this.sy.minus(polled.y());
-    this.sxy = this.sxy.minus(polled.x().multipliedBy(polled.y()));
-    this.sxx = this.sxx.minus(polled.x().multipliedBy(polled.x()));
-    this.syy = this.syy.minus(polled.y().multipliedBy(polled.y()));
-  }
+    override val isStable: Boolean
+        get() = indicator1.isStable && indicator2.isStable
 
 
-  @Override
-  public void updateState(final Bar bar) {
-    this.indicator1.onBar(bar);
-    this.indicator2.onBar(bar);
-    this.value = calculate();
-  }
-
-
-  @Override
-  public boolean isStable() {
-    return this.indicator1.isStable() && this.indicator2.isStable();
-  }
-
-
-  private record XY(Num x, Num y) {
-  }
+    @JvmRecord
+    private data class XY(val x: Num, val y: Num)
 }

@@ -21,45 +21,28 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.ta4j.core.indicators.numeric;
+package org.ta4j.core.indicators.numeric
 
-import org.ta4j.core.api.series.Bar;
-import org.ta4j.core.num.Num;
-import org.ta4j.core.num.NumFactory;
+import org.ta4j.core.api.series.Bar
+import org.ta4j.core.num.NumFactory
 
 /**
  * Close Location Value (CLV) indicator.
  *
- * @see <a href="https://www.investopedia.com/terms/c/close_location_value.asp">Close Location Value</a>
+ * @see [Close Location Value](https://www.investopedia.com/terms/c/close_location_value.asp)
  */
-public class CloseLocationValueIndicator extends NumericIndicator {
+class CloseLocationValueIndicator(numFactory: NumFactory) : NumericIndicator(numFactory) {
+    private fun calculate(bar: Bar) = with(bar) {
+        val diffHighLow = highPrice.minus(lowPrice)
 
-  public CloseLocationValueIndicator(final NumFactory numFactory) {
-    super(numFactory);
-  }
+        if (diffHighLow.isNaN || diffHighLow.isZero) numFactory.zero()
+        else closePrice.minus(lowPrice).minus(highPrice.minus(closePrice)).dividedBy(diffHighLow)
+    }
 
+    override fun updateState(bar: Bar) {
+        value = calculate(bar)
+    }
 
-  private Num calculate(final Bar bar) {
-    final Num low = bar.lowPrice();
-    final Num high = bar.highPrice();
-    final Num close = bar.closePrice();
-
-    final Num diffHighLow = high.minus(low);
-
-    return diffHighLow.isNaN() || diffHighLow.isZero()
-           ? getNumFactory().zero()
-           : ((close.minus(low)).minus(high.minus(close))).dividedBy(diffHighLow);
-  }
-
-
-  @Override
-  public boolean isStable() {
-    return this.value != null;
-  }
-
-
-  @Override
-  protected void updateState(final Bar bar) {
-    this.value = calculate(bar);
-  }
+    override val isStable
+        get() = !value.isNaN
 }

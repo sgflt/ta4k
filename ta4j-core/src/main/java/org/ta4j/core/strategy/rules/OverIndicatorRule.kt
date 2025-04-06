@@ -20,73 +20,54 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.ta4j.core.strategy.rules;
+package org.ta4j.core.strategy.rules
 
-import org.ta4j.core.api.Indicator;
-import org.ta4j.core.indicators.numeric.ConstantNumericIndicator;
-import org.ta4j.core.indicators.numeric.NumericIndicator;
-import org.ta4j.core.num.Num;
+import org.ta4j.core.indicators.numeric.ConstantNumericIndicator
+import org.ta4j.core.indicators.numeric.NumericIndicator
+import org.ta4j.core.num.Num
 
 /**
- * A rule that monitors when one {@link Indicator indicator} is over another.
+ * A rule that monitors when one [indicator][Indicator] is over another.
  *
- * <p>
- * Satisfied when the value of the first {@link Indicator indicator} is strictly
+ *
+ *
+ * Satisfied when the value of the first [indicator][Indicator] is strictly
  * greater than the value of the second one.
  */
-public class OverIndicatorRule extends AbstractRule {
-
-  /** The first indicator. */
-  private final NumericIndicator first;
-
-  /** The second indicator. */
-  private final NumericIndicator second;
-
-
-  /**
-   * Constructor.
-   *
-   * @param indicator the indicator
-   * @param threshold the threshold
-   */
-  public OverIndicatorRule(final NumericIndicator indicator, final Number threshold) {
-    this(indicator, indicator.getNumFactory().numOf(threshold));
-  }
+class OverIndicatorRule(
+    /** The first indicator.  */
+    private val first: NumericIndicator,
+    /** The second indicator.  */
+    private val second: NumericIndicator,
+) : AbstractRule() {
+    /**
+     * Constructor.
+     *
+     * @param indicator the indicator
+     * @param threshold the threshold
+     */
+    constructor(indicator: NumericIndicator, threshold: Number) : this(
+        indicator,
+        indicator.numFactory.numOf(threshold)
+    )
 
 
-  /**
-   * Constructor.
-   *
-   * @param indicator the indicator
-   * @param threshold the threshold
-   */
-  public OverIndicatorRule(final NumericIndicator indicator, final Num threshold) {
-    this(indicator, new ConstantNumericIndicator(threshold));
-  }
+    /**
+     * Constructor.
+     *
+     * @param indicator the indicator
+     * @param threshold the threshold
+     */
+    constructor(indicator: NumericIndicator, threshold: Num) : this(indicator, ConstantNumericIndicator(threshold))
 
 
-  /**
-   * Constructor.
-   *
-   * @param first the first indicator
-   * @param second the second indicator
-   */
-  public OverIndicatorRule(final NumericIndicator first, final NumericIndicator second) {
-    this.first = first;
-    this.second = second;
-  }
+    override val isSatisfied: Boolean
+        get() {
+            val satisfied = first.isGreaterThan(second)
+            traceIsSatisfied(satisfied)
+            return satisfied
+        }
 
 
-  @Override
-  public boolean isSatisfied() {
-    final boolean satisfied = this.first.isGreaterThan(this.second);
-    traceIsSatisfied(satisfied);
-    return satisfied;
-  }
-
-
-  @Override
-  public String toString() {
-    return String.format("OverRule[%s, %s] => %s", this.first, this.second, isSatisfied());
-  }
+    override fun toString() = "OverRule[$first, $second] => ${isSatisfied}"
 }

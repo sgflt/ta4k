@@ -21,71 +21,44 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.ta4j.core.indicators.numeric.channels.bollinger;
+package org.ta4j.core.indicators.numeric.channels.bollinger
 
-import org.ta4j.core.api.series.Bar;
-import org.ta4j.core.indicators.numeric.NumericIndicator;
-import org.ta4j.core.num.Num;
+import org.ta4j.core.api.series.Bar
+import org.ta4j.core.indicators.numeric.NumericIndicator
 
 /**
  * Bollinger BandWidth indicator.
  *
- * @see <a href=
- *     "http://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:bollinger_band_width">
- *     http://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:bollinger_band_width</a>
+ * @see [
+ * http://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:bollinger_band_width](http://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:bollinger_band_width)
  */
-public class BollingerBandWidthIndicator extends NumericIndicator {
+class BollingerBandWidthIndicator
+/**
+ * Constructor.
+ *
+ * @param bbu the upper band Indicator.
+ * @param bbm the middle band Indicator. Typically an `SMAIndicator` is
+ * used.
+ * @param bbl the lower band Indicator.
+ */(
+    private val bbu: BollingerBandsUpperIndicator,
+    private val bbm: BollingerBandsMiddleIndicator,
+    private val bbl: BollingerBandsLowerIndicator,
+) : NumericIndicator(bbm.numFactory) {
+    private fun calculate() = bbu.value
+        .minus(bbl.value)
+        .dividedBy(bbm.value)
+        .multipliedBy(numFactory.hundred())
 
-  private final BollingerBandsUpperIndicator bbu;
-  private final BollingerBandsMiddleIndicator bbm;
-  private final BollingerBandsLowerIndicator bbl;
+    override fun updateState(bar: Bar) {
+        bbl.onBar(bar)
+        bbm.onBar(bar)
+        bbu.onBar(bar)
+        value = calculate()
+    }
 
+    override val isStable
+        get() = bbl.isStable && bbu.isStable && bbm.isStable
 
-  /**
-   * Constructor.
-   *
-   * @param bbu the upper band Indicator.
-   * @param bbm the middle band Indicator. Typically an {@code SMAIndicator} is
-   *     used.
-   * @param bbl the lower band Indicator.
-   */
-  public BollingerBandWidthIndicator(
-      final BollingerBandsUpperIndicator bbu,
-      final BollingerBandsMiddleIndicator bbm,
-      final BollingerBandsLowerIndicator bbl
-  ) {
-    super(bbm.getNumFactory());
-    this.bbu = bbu;
-    this.bbm = bbm;
-    this.bbl = bbl;
-  }
-
-
-  protected Num calculate() {
-    return this.bbu.getValue()
-        .minus(this.bbl.getValue())
-        .dividedBy(this.bbm.getValue())
-        .multipliedBy(getNumFactory().hundred());
-  }
-
-
-  @Override
-  public void updateState(final Bar bar) {
-    this.bbl.onBar(bar);
-    this.bbm.onBar(bar);
-    this.bbu.onBar(bar);
-    this.value = calculate();
-  }
-
-
-  @Override
-  public boolean isStable() {
-    return this.bbl.isStable() && this.bbu.isStable() && this.bbm.isStable();
-  }
-
-
-  @Override
-  public String toString() {
-    return String.format("BolBaWidth(%s, %s, %s) => %s", this.bbu, this.bbm, this.bbl, getValue());
-  }
+    override fun toString() = "BolBaWidth(${bbu}, ${bbm}, ${bbl}) => $value"
 }

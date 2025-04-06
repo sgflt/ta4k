@@ -21,63 +21,53 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.ta4j.core.indicators.helpers;
+package org.ta4j.core.indicators.helpers
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.ta4j.core.api.Indicator;
-import org.ta4j.core.api.series.Bar;
+import org.ta4j.core.api.Indicator
+import org.ta4j.core.api.series.Bar
 
 /**
  * A fixed indicator.
  *
- * <p>
+ *
+ *
  * Returns constant values for a bar.
  *
  * @param <T> the type of returned constant values (Double, Boolean, etc.)
- */
-class FixedIndicator<T> implements Indicator<T> {
-
-  private final List<T> values = new ArrayList<>();
-  private int index = -1;
-
-
-  /**
-   * Constructor.
-   *
-   * @param values the values to be returned by this indicator
-   */
-  @SafeVarargs
-  protected FixedIndicator(final T... values) {
-    this.values.addAll(List.of(values));
-  }
+</T> */
+internal class FixedIndicator<T> @SafeVarargs constructor(vararg values: T) : Indicator<T> {
+    private val values = ArrayList<T>()
+    private var index = -1
 
 
-  /**
-   * Adds the {@code value} to {@link #values}.
-   *
-   * @param value the value to onCandle
-   */
-  public void addValue(final T value) {
-    this.values.add(value);
-  }
+    /**
+     * Constructor.
+     *
+     * @param values the values to be returned by this indicator
+     */
+    init {
+        this.values.addAll(listOf<T>(*values))
+    }
 
 
-  @Override
-  public T getValue() {
-    return this.values.get(this.index);
-  }
+    /**
+     * Adds the `value` to [.values].
+     *
+     * @param value the value to onCandle
+     */
+    fun addValue(value: T) {
+        this.values.add(value)
+    }
 
 
-  @Override
-  public void onBar(final Bar bar) {
-    ++this.index;
-  }
+    override val value: T
+        get() = this.values[this.index]
 
 
-  @Override
-  public boolean isStable() {
-    return true;
-  }
+    override fun onBar(bar: Bar) {
+        ++this.index
+    }
+
+
+    override val isStable = true
 }

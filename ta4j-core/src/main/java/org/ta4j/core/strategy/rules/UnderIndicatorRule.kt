@@ -20,73 +20,60 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.ta4j.core.strategy.rules;
+package org.ta4j.core.strategy.rules
 
-import org.ta4j.core.api.Indicator;
-import org.ta4j.core.indicators.numeric.ConstantNumericIndicator;
-import org.ta4j.core.indicators.numeric.NumericIndicator;
-import org.ta4j.core.num.Num;
+import org.ta4j.core.indicators.numeric.ConstantNumericIndicator
+import org.ta4j.core.indicators.numeric.NumericIndicator
+import org.ta4j.core.num.Num
 
 /**
- * A rule that monitors when one {@link Indicator indicator} is below another.
+ * A rule that monitors when one [indicator][Indicator] is below another.
  *
- * <p>
- * Satisfied when the value of the first {@link Indicator indicator} is strictly
+ *
+ *
+ * Satisfied when the value of the first [indicator][Indicator] is strictly
  * less than the value of the second one.
  */
-public class UnderIndicatorRule extends AbstractRule {
-
-  /** The first indicator. */
-  private final NumericIndicator first;
-
-  /** The second indicator. */
-  private final NumericIndicator second;
-
-
-  /**
-   * Constructor.
-   *
-   * @param indicator the indicator
-   * @param threshold the threshold
-   */
-  public UnderIndicatorRule(final NumericIndicator indicator, final Number threshold) {
-    this(indicator, new ConstantNumericIndicator(indicator.getNumFactory().numOf(threshold)));
-  }
-
-
-  /**
-   * Constructor.
-   *
-   * @param indicator the indicator
-   * @param threshold the threshold
-   */
-  public UnderIndicatorRule(final NumericIndicator indicator, final Num threshold) {
-    this(indicator, new ConstantNumericIndicator(threshold));
-  }
+class UnderIndicatorRule
+/**
+ * Constructor.
+ *
+ * @param first the first indicator
+ * @param second the second indicator
+ */(
+    /** The first indicator.  */
+    private val first: NumericIndicator,
+    /** The second indicator.  */
+    private val second: NumericIndicator,
+) : AbstractRule() {
+    /**
+     * Constructor.
+     *
+     * @param indicator the indicator
+     * @param threshold the threshold
+     */
+    constructor(indicator: NumericIndicator, threshold: Number) : this(
+        indicator,
+        ConstantNumericIndicator(indicator.numFactory.numOf(threshold))
+    )
 
 
-  /**
-   * Constructor.
-   *
-   * @param first the first indicator
-   * @param second the second indicator
-   */
-  public UnderIndicatorRule(final NumericIndicator first, final NumericIndicator second) {
-    this.first = first;
-    this.second = second;
-  }
+    /**
+     * Constructor.
+     *
+     * @param indicator the indicator
+     * @param threshold the threshold
+     */
+    constructor(indicator: NumericIndicator, threshold: Num) : this(indicator, ConstantNumericIndicator(threshold))
 
 
-  @Override
-  public boolean isSatisfied() {
-    final boolean satisfied = this.first.isLessThan(this.second);
-    traceIsSatisfied(satisfied);
-    return satisfied;
-  }
+    override val isSatisfied: Boolean
+        get() {
+            val satisfied = first.isLessThan(second)
+            traceIsSatisfied(satisfied)
+            return satisfied
+        }
 
 
-  @Override
-  public String toString() {
-    return String.format("UnderRule[%s, %s] => %s", this.first, this.second, isSatisfied());
-  }
+    override fun toString() = "UnderRule[$first, $second] => ${isSatisfied}"
 }

@@ -21,48 +21,28 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.ta4j.core.indicators.numeric.statistics;
+package org.ta4j.core.indicators.numeric.statistics
 
-import org.ta4j.core.api.series.Bar;
-import org.ta4j.core.indicators.numeric.NumericIndicator;
-import org.ta4j.core.num.Num;
+import org.ta4j.core.api.series.Bar
+import org.ta4j.core.indicators.numeric.NumericIndicator
 
 /**
  * Standard error indicator.
  */
-public class StandardErrorIndicator extends NumericIndicator {
-
-  private final Num divisor;
-  private final StandardDeviationIndicator sdev;
-
-
-  /**
-   * Constructor.
-   *
-   * @param indicator the indicator
-   * @param barCount the time frame
-   */
-  public StandardErrorIndicator(final NumericIndicator indicator, final int barCount) {
-    super(indicator.getNumFactory());
-    this.sdev = indicator.stddev(barCount);
-    this.divisor = getNumFactory().numOf(barCount).sqrt();
-  }
+class StandardErrorIndicator(indicator: NumericIndicator, barCount: Int) : NumericIndicator(indicator.numFactory) {
+    private val divisor = numFactory.numOf(barCount).sqrt()
+    private val sdev = indicator.stddev(barCount)
 
 
-  protected Num calculate() {
-    return this.sdev.getValue().dividedBy(this.divisor);
-  }
+    private fun calculate() = sdev.value.dividedBy(divisor)
 
 
-  @Override
-  public void updateState(final Bar bar) {
-    this.sdev.onBar(bar);
-    this.value = calculate();
-  }
+    override fun updateState(bar: Bar) {
+        sdev.onBar(bar)
+        value = calculate()
+    }
 
 
-  @Override
-  public boolean isStable() {
-    return this.sdev.isStable();
-  }
+    override val isStable: Boolean
+        get() = sdev.isStable
 }

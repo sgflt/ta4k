@@ -50,8 +50,8 @@ class CashFlowTest {
 
     final var cashFlow = new CashFlow(tradingContext.getTradingRecord());
 
-    assertNumEquals(numFactory.one(), cashFlow.getValue(tradingContext.getBarSeries().getBar(0).endTime()));
-    assertNumEquals(numFactory.numOf(2), cashFlow.getValue(tradingContext.getBarSeries().getBar(1).endTime()));
+    assertNumEquals(numFactory.one(), cashFlow.getValue(tradingContext.getBarSeries().getBar(0).getEndTime()));
+    assertNumEquals(numFactory.numOf(2), cashFlow.getValue(tradingContext.getBarSeries().getBar(1).getEndTime()));
   }
 
 
@@ -69,9 +69,9 @@ class CashFlowTest {
     final var cashFlow = new CashFlow(tradingContext.getTradingRecord());
     final var bars = tradingContext.getBarSeries();
 
-    assertNumEquals(numFactory.one(), cashFlow.getValue(bars.getBar(0).endTime()));
-    assertNumEquals(numFactory.numOf(1.1), cashFlow.getValue(bars.getBar(1).endTime()));
-    assertNumEquals(numFactory.numOf(1.2), cashFlow.getValue(bars.getBar(2).endTime()));
+    assertNumEquals(numFactory.one(), cashFlow.getValue(bars.getBar(0).getEndTime()));
+    assertNumEquals(numFactory.numOf(1.1), cashFlow.getValue(bars.getBar(1).getEndTime()));
+    assertNumEquals(numFactory.numOf(1.2), cashFlow.getValue(bars.getBar(2).getEndTime()));
   }
 
 
@@ -92,14 +92,14 @@ class CashFlowTest {
 
     // Check values at each step (price increases by 10 each bar)
     for (int i = 0; i <= 10; i++) {
-      log.debug("{}: {}@{}", i, bars.getBar(i).endTime(), bars.getBar(i).closePrice());
+      log.debug("{}: {}@{}", i, bars.getBar(i).getEndTime(), bars.getBar(i).getClosePrice());
       final var expectedValue = i < 1 ?
                                 numFactory.one() :
                                 numFactory.one().minus(
                                     numFactory.numOf(0.05).multipliedBy(numFactory.numOf(i))
                                 );
       log.debug("expected {}", expectedValue);
-      assertNumEquals(expectedValue, cashFlow.getValue(bars.getBar(i).endTime()));
+      assertNumEquals(expectedValue, cashFlow.getValue(bars.getBar(i).getEndTime()));
     }
   }
 
@@ -121,14 +121,14 @@ class CashFlowTest {
 
     // Check values at each step (price increases by 10 each bar)
     for (int i = 0; i <= 10; i++) {
-      log.debug("{}: {}@{}", i, bars.getBar(i).endTime(), bars.getBar(i).closePrice());
+      log.debug("{}: {}@{}", i, bars.getBar(i).getEndTime(), bars.getBar(i).getClosePrice());
       final var expectedValue = i < 1 ?
                                 numFactory.one() :
                                 numFactory.one().minus(
                                     numFactory.numOf(0.1).multipliedBy(numFactory.numOf(i))
                                 );
       log.debug("expected {}", expectedValue);
-      assertNumEquals(expectedValue, cashFlow.getValue(bars.getBar(i).endTime()));
+      assertNumEquals(expectedValue, cashFlow.getValue(bars.getBar(i).getEndTime()));
     }
   }
 
@@ -163,22 +163,22 @@ class CashFlowTest {
     final var bars = tradingContext.getBarSeries();
 
     // Initial value
-    assertNumEquals(numFactory.one(), cashFlow.getValue(bars.getBar(0).endTime()));
+    assertNumEquals(numFactory.one(), cashFlow.getValue(bars.getBar(0).getEndTime()));
 
     // After Position 1 close: 120/100 = 1.20
-    assertNumEquals(numFactory.numOf(1.20), cashFlow.getValue(bars.getBar(1).endTime()));
+    assertNumEquals(numFactory.numOf(1.20), cashFlow.getValue(bars.getBar(1).getEndTime()));
 
     // After Position 2 close: 135/100 = 0.9
-    assertNumEquals(numFactory.numOf(1.35), cashFlow.getValue(bars.getBar(3).endTime()));
+    assertNumEquals(numFactory.numOf(1.35), cashFlow.getValue(bars.getBar(3).getEndTime()));
 
     // After Position 3 close: 100/100
-    assertNumEquals(numFactory.numOf(1.0), cashFlow.getValue(bars.getBar(5).endTime()));
+    assertNumEquals(numFactory.numOf(1.0), cashFlow.getValue(bars.getBar(5).getEndTime()));
 
     // After Position 4 close: 200/100 = 2.0
-    assertNumEquals(numFactory.numOf(2.0), cashFlow.getValue(bars.getBar(7).endTime()));
+    assertNumEquals(numFactory.numOf(2.0), cashFlow.getValue(bars.getBar(7).getEndTime()));
 
     // After Position 5 close: 160 / 100 = 1.6
-    assertNumEquals(numFactory.numOf(1.6), cashFlow.getValue(bars.getBar(9).endTime()));
+    assertNumEquals(numFactory.numOf(1.6), cashFlow.getValue(bars.getBar(9).getEndTime()));
   }
 
 
@@ -216,21 +216,21 @@ class CashFlowTest {
     final var bars = tradingContext.getBarSeries();
 
     // Initial value
-    assertNumEquals(numFactory.one(), cashFlow.getValue(bars.getBar(0).endTime()));
+    assertNumEquals(numFactory.one(), cashFlow.getValue(bars.getBar(0).getEndTime()));
 
     // After Position 1 close: 120/100 = 1.20
-    assertNumEquals(numFactory.numOf(1.20), cashFlow.getValue(bars.getBar(1).endTime()));
+    assertNumEquals(numFactory.numOf(1.20), cashFlow.getValue(bars.getBar(1).getEndTime()));
 
     // After Position 2 close: 135/150 = 0.9
-    assertNumEquals(numFactory.numOf(0.9), cashFlow.getValue(bars.getBar(3).endTime()));
+    assertNumEquals(numFactory.numOf(0.9), cashFlow.getValue(bars.getBar(3).getEndTime()));
 
     // After Position 3 close: 100/100
-    assertNumEquals(numFactory.numOf(1.0), cashFlow.getValue(bars.getBar(5).endTime()));
+    assertNumEquals(numFactory.numOf(1.0), cashFlow.getValue(bars.getBar(5).getEndTime()));
 
     // After Position 4 close: 200/100 = 2.0
-    assertNumEquals(numFactory.numOf(2.0), cashFlow.getValue(bars.getBar(7).endTime()));
+    assertNumEquals(numFactory.numOf(2.0), cashFlow.getValue(bars.getBar(7).getEndTime()));
 
     // After Position 5 close: 160 / 200 = 0.8
-    assertNumEquals(numFactory.numOf(0.8), cashFlow.getValue(bars.getBar(9).endTime()));
+    assertNumEquals(numFactory.numOf(0.8), cashFlow.getValue(bars.getBar(9).getEndTime()));
   }
 }

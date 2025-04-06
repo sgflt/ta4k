@@ -21,114 +21,97 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.ta4j.core.indicators.numeric.oscilators.aroon;
+package org.ta4j.core.indicators.numeric.oscilators.aroon
 
-import java.util.ArrayList;
-
-import org.ta4j.core.api.Indicator;
-import org.ta4j.core.api.Indicators;
-import org.ta4j.core.api.series.Bar;
-import org.ta4j.core.indicators.numeric.NumericIndicator;
-import org.ta4j.core.indicators.numeric.candles.price.LowPriceIndicator;
-import org.ta4j.core.indicators.numeric.helpers.LowestValueIndicator;
-import org.ta4j.core.num.NaN;
-import org.ta4j.core.num.Num;
-import org.ta4j.core.num.NumFactory;
+import org.ta4j.core.api.Indicators.lowPrice
+import org.ta4j.core.api.series.Bar
+import org.ta4j.core.indicators.numeric.NumericIndicator
+import org.ta4j.core.indicators.numeric.helpers.LowestValueIndicator
+import org.ta4j.core.num.NaN
+import org.ta4j.core.num.Num
+import org.ta4j.core.num.NumFactory
 
 /**
  * Aroon down indicator.
  *
- * @see <a href=
- *     "http://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:aroon">chart_school:technical_indicators:aroon</a>
+ * @see [chart_school:technical_indicators:aroon](http://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:aroon)
  */
-public class AroonDownIndicator extends NumericIndicator {
+class AroonDownIndicator(
+    numFactory: NumFactory,
+    private val lowIndicator: NumericIndicator,
+    private val barCount: Int,
+) :
+    NumericIndicator(numFactory) {
+    private val lowestLowValueIndicator: LowestValueIndicator
 
-  private final int barCount;
-  private final LowestValueIndicator lowestLowValueIndicator;
-  private final Indicator<Num> lowIndicator;
-
-  private int index;
-  private final ArrayList<Num> previousValues; // TODO CircularNumArray
-
-
-  /**
-   * Constructor.
-   *
-   * @param lowIndicator the indicator for the low price (default
-   *     {@link LowPriceIndicator})
-   * @param barCount the time frame
-   */
-  public AroonDownIndicator(final NumFactory numFactory, final NumericIndicator lowIndicator, final int barCount) {
-    super(numFactory);
-    this.barCount = barCount;
-    this.previousValues = new ArrayList<>(barCount);
-    for (int i = 0; i < barCount; i++) {
-      this.previousValues.add(NaN.NaN);
-    }
-    this.lowIndicator = lowIndicator;
-    this.lowestLowValueIndicator = lowIndicator.lowest(barCount + 1);
-  }
+    private var index = 0
+    private val previousValues: ArrayList<Num> // TODO CircularNumArray
 
 
-  /**
-   * Default Constructor with {@code lowPriceIndicator} =
-   * {@link LowPriceIndicator}.
-   *
-   * @param numFactory the bar numFactory
-   * @param barCount the time frame
-   */
-  public AroonDownIndicator(final NumFactory numFactory, final int barCount) {
-    this(numFactory, Indicators.lowPrice(), barCount);
-  }
+    /**
+     * Constructor.
+     *
+     * @param lowIndicator the indicator for the low price (default
+     * [LowPriceIndicator])
+     * @param barCount the time frame
+     */
+    init {
+        previousValues = ArrayList<Num>(barCount).apply {
+            repeat(barCount) { add(NaN) }
+        }
 
-
-  protected Num calculate() {
-    final var currentLow = this.lowIndicator.getValue();
-    this.previousValues.set(getIndex(this.index), currentLow);
-
-    if (currentLow.isNaN()) {
-      return NaN.NaN;
+        lowestLowValueIndicator = lowIndicator.lowest(barCount + 1)
     }
 
-    final var lowestValue = this.lowestLowValueIndicator.getValue();
+    /**
+     * Default Constructor with `lowPriceIndicator` =
+     * [LowPriceIndicator].
+     *
+     * @param numFactory the bar numFactory
+     * @param barCount the time frame
+     */
+    constructor(numFactory: NumFactory, barCount: Int) : this(numFactory, lowPrice(), barCount)
 
-    final var barCountFromLastMinimum = countBarsBetweenLows(lowestValue);
-    return getNumFactory().numOf((double) (this.barCount - barCountFromLastMinimum) / this.barCount * 100.0);
-  }
+    private fun calculate(): Num {
+        val currentLow = lowIndicator.value
+        previousValues[getIndex(index)] = currentLow
 
+        if (currentLow.isNaN) {
+            return NaN
+        }
 
-  private int countBarsBetweenLows(final Num lowestValue) {
-    for (int i = getIndex(this.index), barDistance = 0; barDistance < this.barCount; barDistance++, i--) {
-      if (this.previousValues.get(getIndex(this.barCount + i)).equals(lowestValue)) {
-        return barDistance;
-      }
+        val lowestValue = lowestLowValueIndicator.value
+
+        val barCountFromLastMinimum = countBarsBetweenLows(lowestValue)
+        return numFactory.numOf((barCount - barCountFromLastMinimum).toDouble() / barCount * 100.0)
     }
-    return this.barCount;
-  }
 
+    private fun countBarsBetweenLows(lowestValue: Num?): Int {
+        var i = getIndex(index)
+        var barDistance = 0
+        while (barDistance < barCount) {
+            if (previousValues[getIndex(barCount + i)] == lowestValue) {
+                return barDistance
+            }
+            barDistance++
+            i--
+        }
+        return barCount
+    }
 
-  private int getIndex(final int i) {
-    return i % this.barCount;
-  }
+    private fun getIndex(i: Int): Int {
+        return i % barCount
+    }
 
+    public override fun updateState(bar: Bar) {
+        ++index
+        lowIndicator.onBar(bar)
+        lowestLowValueIndicator.onBar(bar)
+        value = calculate()
+    }
 
-  @Override
-  public void updateState(final Bar bar) {
-    ++this.index;
-    this.lowIndicator.onBar(bar);
-    this.lowestLowValueIndicator.onBar(bar);
-    this.value = calculate();
-  }
+    override val isStable: Boolean
+        get() = index >= barCount && lowIndicator.isStable && lowestLowValueIndicator.isStable
 
-
-  @Override
-  public boolean isStable() {
-    return this.index >= this.barCount && this.lowIndicator.isStable() && this.lowestLowValueIndicator.isStable();
-  }
-
-
-  @Override
-  public String toString() {
-    return String.format("AroonDown(%s) => %s", this.lowIndicator, getValue());
-  }
+    override fun toString() = "AroonDown($lowIndicator) => $value"
 }

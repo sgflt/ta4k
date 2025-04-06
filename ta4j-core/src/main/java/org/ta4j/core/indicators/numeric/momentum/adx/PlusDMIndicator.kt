@@ -20,66 +20,44 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.ta4j.core.indicators.numeric.momentum.adx;
+package org.ta4j.core.indicators.numeric.momentum.adx
 
-import org.ta4j.core.api.series.Bar;
-import org.ta4j.core.indicators.numeric.NumericIndicator;
-import org.ta4j.core.num.Num;
-import org.ta4j.core.num.NumFactory;
+import org.ta4j.core.api.series.Bar
+import org.ta4j.core.indicators.numeric.NumericIndicator
+import org.ta4j.core.num.NumFactory
 
 /**
  * +DM indicator.
  *
- * <p>
  * Part of the Directional Movement System.
  */
-public class PlusDMIndicator extends NumericIndicator {
+class PlusDMIndicator(numFactory: NumFactory) : NumericIndicator(numFactory) {
+    private var previousBar: Bar? = null
+    override var isStable = false
+        private set
 
-  private Bar previousBar;
-  private boolean stable;
+    private fun calculate(bar: Bar) = when {
+        previousBar == null -> {
+            previousBar = bar
+            numFactory.zero()
+        }
 
+        else -> {
+            isStable = true
+            val prevBar = previousBar!!
+            val upMove = bar.highPrice.minus(prevBar.highPrice)
+            val downMove = prevBar.lowPrice.minus(bar.lowPrice)
+            previousBar = bar
 
-  /**
-   * Constructor.
-   *
-   * @param numFactory the bar numFactory
-   */
-  public PlusDMIndicator(final NumFactory numFactory) {
-    super(numFactory);
-  }
-
-
-  protected Num calculate(final Bar bar) {
-    final var numFactory = getNumFactory();
-
-    if (this.previousBar == null) {
-      this.previousBar = bar;
-      return numFactory.zero();
+            if (upMove.isGreaterThan(downMove) && upMove.isGreaterThan(numFactory.zero())) {
+                upMove
+            } else {
+                numFactory.zero()
+            }
+        }
     }
 
-    this.stable = true;
-    final Bar prevBar = this.previousBar;
-
-    final Num upMove = bar.highPrice().minus(prevBar.highPrice());
-    final Num downMove = prevBar.lowPrice().minus(bar.lowPrice());
-
-    this.previousBar = bar;
-    if (upMove.isGreaterThan(downMove) && upMove.isGreaterThan(numFactory.zero())) {
-      return upMove;
+    override fun updateState(bar: Bar) {
+        value = calculate(bar)
     }
-
-    return numFactory.zero();
-  }
-
-
-  @Override
-  public void updateState(final Bar bar) {
-    this.value = calculate(bar);
-  }
-
-
-  @Override
-  public boolean isStable() {
-    return this.stable;
-  }
 }

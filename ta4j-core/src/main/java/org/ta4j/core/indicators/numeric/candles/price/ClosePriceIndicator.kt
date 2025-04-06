@@ -21,39 +21,23 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.ta4j.core.indicators.numeric.candles.price;
+package org.ta4j.core.indicators.numeric.candles.price
 
-import org.ta4j.core.api.series.Bar;
-import org.ta4j.core.indicators.SeriesRelatedNumericIndicator;
-import org.ta4j.core.num.NumFactory;
+import org.ta4j.core.api.series.Bar
+import org.ta4j.core.indicators.SeriesRelatedNumericIndicator
+import org.ta4j.core.num.NumFactory
 
 /**
  * Close price indicator.
  *
- * <p>
+ *
+ *
  * Returns the close price of a bar.
  */
-public class ClosePriceIndicator extends SeriesRelatedNumericIndicator {
+class ClosePriceIndicator(numFactory: NumFactory) : SeriesRelatedNumericIndicator(numFactory) {
+    override fun updateState(bar: Bar) {
+        value = bar.closePrice
+    }
 
-  /**
-   * Constructor.
-   *
-   * @param numFactory the bar series
-   */
-  public ClosePriceIndicator(final NumFactory numFactory) {
-    super(numFactory);
-  }
-
-
-  @Override
-  public void updateState(final Bar bar) {
-    this.value = bar.closePrice();
-  }
-
-
-  @Override
-  public String toString() {
-    return String.format("Close() => %s", getValue());
-  }
-
+    override fun toString() = "Close() => $value"
 }

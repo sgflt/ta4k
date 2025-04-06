@@ -143,7 +143,7 @@ class PositionTest {
   @DisplayName("Should throw exception when starting type is null")
   void shouldThrowExceptionOnNullStartingType() {
     assertThrows(
-        IllegalArgumentException.class,
+        NullPointerException.class,
         () -> new Position(null, DecimalNumFactory.getInstance())
     );
   }

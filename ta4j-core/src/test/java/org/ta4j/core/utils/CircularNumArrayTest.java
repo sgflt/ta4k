@@ -1,11 +1,11 @@
 package org.ta4j.core.utils;
 
 import static org.junit.Assert.assertEquals;
-import static org.ta4j.core.num.NaN.NaN;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.ta4j.core.num.DecimalNumFactory;
+import org.ta4j.core.num.NaN;
 import org.ta4j.core.num.Num;
 
 public class CircularNumArrayTest {
@@ -27,9 +27,9 @@ public class CircularNumArrayTest {
 
   @Test
   public void get() {
-    assertEquals(NaN, this.array.get(0));
-    assertEquals(NaN, this.array.get(1));
-    assertEquals(NaN, this.array.get(3));
+    assertEquals(NaN.INSTANCE, this.array.get(0));
+    assertEquals(NaN.INSTANCE, this.array.get(1));
+    assertEquals(NaN.INSTANCE, this.array.get(3));
   }
 
 

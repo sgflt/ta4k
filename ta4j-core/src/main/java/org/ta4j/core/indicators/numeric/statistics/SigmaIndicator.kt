@@ -20,59 +20,38 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.ta4j.core.indicators.numeric.statistics;
+package org.ta4j.core.indicators.numeric.statistics
 
-import org.ta4j.core.api.series.Bar;
-import org.ta4j.core.indicators.numeric.NumericIndicator;
-import org.ta4j.core.indicators.numeric.average.SMAIndicator;
-import org.ta4j.core.num.Num;
+import org.ta4j.core.api.series.Bar
+import org.ta4j.core.indicators.numeric.NumericIndicator
+import org.ta4j.core.num.Num
 
 /**
  * Sigma-Indicator (also called, "z-score" or "standard score").
  */
-public class SigmaIndicator extends NumericIndicator {
-
-  private final NumericIndicator ref;
-
-  private final SMAIndicator mean;
-  private final StandardDeviationIndicator sd;
+class SigmaIndicator(private val ref: NumericIndicator, barCount: Int) : NumericIndicator(ref.numFactory) {
+    private val mean = ref.sma(barCount)
+    private val sd = ref.stddev(barCount)
 
 
-  /**
-   * Constructor.
-   *
-   * @param ref the indicator
-   * @param barCount the time frame
-   */
-  public SigmaIndicator(final NumericIndicator ref, final int barCount) {
-    super(ref.getNumFactory());
-    this.ref = ref;
-    this.mean = ref.sma(barCount);
-    this.sd = ref.stddev(barCount);
-  }
+    private fun calculate(): Num {
+        if (sd.value.isZero) {
+            return numFactory.one()
+        }
 
-
-  protected Num calculate() {
-    if (this.sd.getValue().isZero()) {
-      return getNumFactory().one();
+        // z-score = (ref - mean) / sd
+        return ref.value.minus(mean.value).dividedBy(sd.value)
     }
 
-    // z-score = (ref - mean) / sd
-    return this.ref.getValue().minus(this.mean.getValue()).dividedBy(this.sd.getValue());
-  }
+
+    public override fun updateState(bar: Bar) {
+        ref.onBar(bar)
+        mean.onBar(bar)
+        sd.onBar(bar)
+        value = calculate()
+    }
 
 
-  @Override
-  public void updateState(final Bar bar) {
-    this.ref.onBar(bar);
-    this.mean.onBar(bar);
-    this.sd.onBar(bar);
-    this.value = calculate();
-  }
-
-
-  @Override
-  public boolean isStable() {
-    return this.ref.isStable() && this.mean.isStable() && this.sd.isStable();
-  }
+    override val isStable: Boolean
+        get() = ref.isStable && mean.isStable && sd.isStable
 }

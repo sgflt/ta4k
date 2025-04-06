@@ -46,9 +46,10 @@ class BollingerBandWidthIndicatorTest {
   @ParameterizedTest(name = "Bollinger bands width [{index}] {0}")
   @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
   void bollingerBandWidthUsingSMAAndStandardDeviation(final NumFactory numFactory) {
+    this.testContext.withNumFactory(numFactory);
 
     final var bbf = Indicators.bollingerBands(5, 2);
-    final var bandwidth = bbf.bandwidth();
+    final var bandwidth = bbf.getBandwidth();
 
     this.testContext.withIndicators(bandwidth)
         .fastForwardUntilStable()

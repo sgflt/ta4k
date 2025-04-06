@@ -21,90 +21,38 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.ta4j.core.indicators.numeric.oscilators;
+package org.ta4j.core.indicators.numeric.oscilators
 
-import org.ta4j.core.api.Indicators;
-import org.ta4j.core.api.series.Bar;
-import org.ta4j.core.indicators.numeric.NumericIndicator;
-import org.ta4j.core.indicators.numeric.average.SMAIndicator;
-import org.ta4j.core.indicators.numeric.candles.price.MedianPriceIndicator;
-import org.ta4j.core.num.Num;
-import org.ta4j.core.num.NumFactory;
+import org.ta4j.core.api.Indicators.medianPrice
+import org.ta4j.core.api.series.Bar
+import org.ta4j.core.indicators.numeric.NumericIndicator
+import org.ta4j.core.num.NumFactory
 
 /**
  * Awesome oscillator (AO) indicator.
  *
- * @see <a href="https://www.tradingview.com/wiki/Awesome_Oscillator_(AO)">Awesome Oscillator</a>
- */
-public class AwesomeOscillatorIndicator extends NumericIndicator {
-
-  private final SMAIndicator shortSma;
-  private final SMAIndicator longSma;
-
-
-  /**
-   * Constructor.
-   *
-   * @param indicator (normally {@link MedianPriceIndicator})
-   * @param shortBarCount (normally 5)
-   * @param longBarCOunt (normally 34)
-   */
-  public AwesomeOscillatorIndicator(
-      final NumFactory numFactory,
-      final NumericIndicator indicator,
-      final int shortBarCount,
-      final int longBarCOunt
-  ) {
-    super(numFactory);
-    this.shortSma = indicator.sma(shortBarCount);
-    this.longSma = indicator.sma(longBarCOunt);
-  }
+ * @see [](https://www.tradingview.com/wiki/Awesome_Oscillator_
+) */
+class AwesomeOscillatorIndicator @JvmOverloads constructor(
+    numFactory: NumFactory,
+    indicator: NumericIndicator = medianPrice(),
+    shortBarCount: Int = 5,
+    longBarCOunt: Int = 34,
+) : NumericIndicator(numFactory) {
+    private val shortSma = indicator.sma(shortBarCount)
+    private val longSma = indicator.sma(longBarCOunt)
 
 
-  /**
-   * Constructor with:
-   *
-   * <ul>
-   * <li>{@code barCountSma1} = 5
-   * <li>{@code barCountSma2} = 34
-   * </ul>
-   *
-   * @param indicator (normally {@link MedianPriceIndicator})
-   */
-  public AwesomeOscillatorIndicator(final NumFactory numFactory, final NumericIndicator indicator) {
-    this(numFactory, indicator, 5, 34);
-  }
+    private fun calculate() = shortSma.value.minus(longSma.value)
 
 
-  /**
-   * Constructor with:
-   *
-   * <ul>
-   * <li>{@code indicator} = {@link MedianPriceIndicator}
-   * <li>{@code barCountSma1} = 5
-   * <li>{@code barCountSma2} = 34
-   * </ul>
-   */
-  public AwesomeOscillatorIndicator(final NumFactory numFactory) {
-    this(numFactory, Indicators.medianPrice(), 5, 34);
-  }
+    public override fun updateState(bar: Bar) {
+        shortSma.onBar(bar)
+        longSma.onBar(bar)
+        value = calculate()
+    }
 
 
-  protected Num calculate() {
-    return this.shortSma.getValue().minus(this.longSma.getValue());
-  }
-
-
-  @Override
-  public void updateState(final Bar bar) {
-    this.shortSma.onBar(bar);
-    this.longSma.onBar(bar);
-    this.value = calculate();
-  }
-
-
-  @Override
-  public boolean isStable() {
-    return this.shortSma.isStable() && this.longSma.isStable();
-  }
+    override val isStable
+        get() = shortSma.isStable && longSma.isStable
 }

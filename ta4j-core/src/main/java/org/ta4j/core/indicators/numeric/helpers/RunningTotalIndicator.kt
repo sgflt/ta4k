@@ -20,66 +20,52 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.ta4j.core.indicators.numeric.helpers;
+package org.ta4j.core.indicators.numeric.helpers
 
-import org.ta4j.core.api.series.Bar;
-import org.ta4j.core.indicators.helpers.previous.PreviousNumericValueIndicator;
-import org.ta4j.core.indicators.numeric.NumericIndicator;
-import org.ta4j.core.num.Num;
+import org.ta4j.core.api.series.Bar
+import org.ta4j.core.indicators.helpers.previous.PreviousNumericValueIndicator
+import org.ta4j.core.indicators.numeric.NumericIndicator
+import org.ta4j.core.num.Num
 
 /**
  * Running Total aka Cumulative Sum indicator
  *
- * @see <a href=
- *     "https://en.wikipedia.org/wiki/Running_total">https://en.wikipedia.org/wiki/Running_total</a>
+ * @see [https://en.wikipedia.org/wiki/Running_total](https://en.wikipedia.org/wiki/Running_total)
  */
-public class RunningTotalIndicator extends NumericIndicator {
-  private final NumericIndicator indicator;
-  private final int barCount;
-  private final PreviousNumericValueIndicator previousValue;
-  private Num previousSum;
-  private int processedBars;
+class RunningTotalIndicator(private val indicator: NumericIndicator, private val barCount: Int) : NumericIndicator(
+    indicator.numFactory
+) {
+    private val previousValue = PreviousNumericValueIndicator(indicator, barCount)
+    private var previousSum = numFactory.zero()
+    private var processedBars = 0
 
 
-  public RunningTotalIndicator(final NumericIndicator indicator, final int barCount) {
-    super(indicator.getNumFactory());
-    this.indicator = indicator;
-    this.barCount = barCount;
-    this.previousSum = getNumFactory().zero();
-    this.previousValue = new PreviousNumericValueIndicator(indicator, barCount);
-  }
+    private fun calculate(): Num {
+        val indicatorValue = indicator.value
 
+        var sum = previousSum.plus(indicatorValue)
 
-  protected Num calculate() {
-    final var indicatorValue = this.indicator.getValue();
+        if (previousValue.isStable) {
+            sum = sum.minus(previousValue.value)
+        }
 
-    var sum = this.previousSum.plus(indicatorValue);
-
-    if (this.previousValue.isStable()) {
-      sum = sum.minus(this.previousValue.getValue());
+        previousSum = sum
+        return sum
     }
 
-    this.previousSum = sum;
-    return sum;
-  }
+
+    override fun toString(): String {
+        return javaClass.getSimpleName() + " barCount: " + barCount
+    }
 
 
-  @Override
-  public String toString() {
-    return getClass().getSimpleName() + " barCount: " + this.barCount;
-  }
+    public override fun updateState(bar: Bar) {
+        ++processedBars
+        previousValue.onBar(bar)
+        value = calculate()
+    }
 
 
-  @Override
-  public void updateState(final Bar bar) {
-    ++this.processedBars;
-    this.previousValue.onBar(bar);
-    this.value = calculate();
-  }
-
-
-  @Override
-  public boolean isStable() {
-    return this.processedBars >= this.barCount && this.indicator.isStable();
-  }
+    override val isStable: Boolean
+        get() = processedBars >= barCount && indicator.isStable
 }

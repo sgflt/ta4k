@@ -177,7 +177,7 @@ class RealizedCashFlowTest {
   @ParameterizedTest
   @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
   void cashFlowWithNoTrades(final NumFactory numFactory) {
-    final var tradingRecord = new BackTestTradingRecord(numFactory);
+    final var tradingRecord = new BackTestTradingRecord(TradeType.BUY, numFactory);
     final var cashFlow = new RealizedCashFlow(numFactory, tradingRecord);
     final var now = Instant.now(this.clock);
 

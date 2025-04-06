@@ -21,31 +21,16 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.ta4j.core.indicators.numeric.average;
+package org.ta4j.core.indicators.numeric.average
 
-import org.ta4j.core.indicators.numeric.NumericIndicator;
+import org.ta4j.core.indicators.numeric.NumericIndicator
 
 /**
  * Exponential moving average indicator.
  *
- * @see <a href=
- *     "https://www.investopedia.com/terms/e/ema.asp">https://www.investopedia.com/terms/e/ema.asp</a>
+ * @see [https://www.investopedia.com/terms/e/ema.asp](https://www.investopedia.com/terms/e/ema.asp)
  */
-public class EMAIndicator extends AbstractEMAIndicator {
-
-  /**
-   * Constructor.
-   *
-   * @param indicator an indicator
-   * @param barCount the EMA time frame
-   */
-  public EMAIndicator(final NumericIndicator indicator, final int barCount) {
-    super(indicator, barCount, (2.0 / (barCount + 1)));
-  }
-
-
-  @Override
-  public String toString() {
-    return String.format("EMA(%d) => %s", getBarCount(), getValue());
-  }
+class EMAIndicator(indicator: NumericIndicator, barCount: Int) :
+    AbstractEMAIndicator(indicator, barCount, (2.0 / (barCount + 1))) {
+    override fun toString() = "EMA(${barCount}) => $value"
 }

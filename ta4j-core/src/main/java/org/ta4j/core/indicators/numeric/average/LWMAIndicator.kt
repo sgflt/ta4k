@@ -21,87 +21,68 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.ta4j.core.indicators.numeric.average;
+package org.ta4j.core.indicators.numeric.average
 
-import java.util.ArrayList;
-
-import org.ta4j.core.api.Indicator;
-import org.ta4j.core.api.series.Bar;
-import org.ta4j.core.indicators.numeric.NumericIndicator;
-import org.ta4j.core.num.Num;
-import org.ta4j.core.utils.CircularNumArray;
+import org.ta4j.core.api.series.Bar
+import org.ta4j.core.indicators.numeric.NumericIndicator
+import org.ta4j.core.num.Num
+import org.ta4j.core.utils.CircularNumArray
 
 /**
  * Linearly Weighted Moving Average (LWMA) indicator.
  *
- * @see <a href=
- *     "https://www.investopedia.com/terms/l/linearlyweightedmovingaverage.asp">
- *     https://www.investopedia.com/terms/l/linearlyweightedmovingaverage.asp</a>
+ * @see [
+ * https://www.investopedia.com/terms/l/linearlyweightedmovingaverage.asp](https://www.investopedia.com/terms/l/linearlyweightedmovingaverage.asp)
  */
-public class LWMAIndicator extends NumericIndicator {
-
-  private final NumericIndicator indicator;
-  private final int barCount;
-  private final CircularNumArray values;
-  private final ArrayList<Num> weights;
-  private final Num denominator;
+class LWMAIndicator(private val indicator: NumericIndicator, private val barCount: Int) :
+    NumericIndicator(indicator.numFactory) {
+    private val values = CircularNumArray(barCount)
+    private val weights = ArrayList<Num>(barCount)
+    private val denominator: Num
 
 
-  /**
-   * Constructor.
-   *
-   * @param indicator the {@link Indicator}
-   * @param barCount the time frame
-   */
-  public LWMAIndicator(final NumericIndicator indicator, final int barCount) {
-    super(indicator.getNumFactory());
-    this.indicator = indicator;
-    this.barCount = barCount;
-    this.values = new CircularNumArray(barCount);
-    this.weights = new ArrayList<>(barCount);
-    final var numFactory = getNumFactory();
-    for (int i = 1; i < barCount + 1; i++) {
-      this.weights.add(numFactory.numOf(i));
-    }
-    this.denominator = numFactory.numOf(this.weights.stream().mapToInt(Num::intValue).sum());
-  }
-
-
-  protected Num calculate() {
-    final var numFactory = getNumFactory();
-    Num sum = numFactory.zero();
-
-    this.values.addLast(this.indicator.getValue());
-
-    if (this.values.isNotFull()) {
-      return numFactory.zero();
+    /**
+     * Constructor.
+     *
+     * @param indicator the [Indicator]
+     * @param barCount the time frame
+     */
+    init {
+        for (i in 1..<barCount + 1) {
+            weights.add(numFactory.numOf(i))
+        }
+        denominator = numFactory.numOf(weights.sumOf { it.intValue() })
     }
 
-    int count = 0;
-    for (final var val : this.values) {
-      final var weight = this.weights.get(count++);
-      sum = sum.plus(val.multipliedBy(weight));
+
+    private fun calculate(): Num {
+        var sum = numFactory.zero()
+
+        values.addLast(indicator.value)
+
+        if (values.isNotFull) {
+            return numFactory.zero()
+        }
+
+        var count = 0
+        for (`val` in values) {
+            val weight = weights[count++]
+            sum = sum.plus(`val`.multipliedBy(weight))
+        }
+
+        return sum.dividedBy(denominator)
     }
 
-    return sum.dividedBy(this.denominator);
-  }
+
+    public override fun updateState(bar: Bar) {
+        indicator.onBar(bar)
+        value = calculate()
+    }
 
 
-  @Override
-  public void updateState(final Bar bar) {
-    this.indicator.onBar(bar);
-    this.value = calculate();
-  }
+    override val isStable: Boolean
+        get() = !values.isNotFull && indicator.isStable
 
 
-  @Override
-  public boolean isStable() {
-    return false;
-  }
-
-
-  @Override
-  public String toString() {
-    return String.format("LWMA(%d) => %s", this.barCount, getValue());
-  }
+    override fun toString() = "LWMA($barCount) => $value"
 }

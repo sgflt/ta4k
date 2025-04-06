@@ -21,117 +21,100 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.ta4j.core.indicators.numeric.oscilators.aroon;
+package org.ta4j.core.indicators.numeric.oscilators.aroon
 
-import static org.ta4j.core.num.NaN.NaN;
-
-import java.util.ArrayList;
-
-import org.ta4j.core.api.Indicator;
-import org.ta4j.core.api.Indicators;
-import org.ta4j.core.api.series.Bar;
-import org.ta4j.core.indicators.numeric.NumericIndicator;
-import org.ta4j.core.indicators.numeric.candles.price.HighPriceIndicator;
-import org.ta4j.core.indicators.numeric.helpers.HighestValueIndicator;
-import org.ta4j.core.num.Num;
-import org.ta4j.core.num.NumFactory;
+import org.ta4j.core.api.Indicators.highPrice
+import org.ta4j.core.api.series.Bar
+import org.ta4j.core.indicators.numeric.NumericIndicator
+import org.ta4j.core.indicators.numeric.helpers.HighestValueIndicator
+import org.ta4j.core.num.NaN
+import org.ta4j.core.num.Num
+import org.ta4j.core.num.NumFactory
 
 /**
  * Aroon up indicator.
  *
- * @see <a href=
- *     "http://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:aroon">chart_school:technical_indicators:aroon</a>
+ * @see [chart_school:technical_indicators:aroon](http://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:aroon)
  */
-public class AroonUpIndicator extends NumericIndicator {
+class AroonUpIndicator(numFactory: NumFactory, private val highIndicator: NumericIndicator, private val barCount: Int) :
+    NumericIndicator(numFactory) {
+    private val highestHighValueIndicator: HighestValueIndicator
 
-  private final int barCount;
-  private final HighestValueIndicator highestHighValueIndicator;
-  private final Indicator<Num> highIndicator;
-
-  private int index;
-  private final ArrayList<Num> previousValues;
+    private var index = 0
+    private val previousValues: ArrayList<Num> = ArrayList<Num>(barCount)
 
 
-  /**
-   * Constructor.
-   *
-   * @param highIndicator the indicator for the high price (default
-   *     {@link HighPriceIndicator})
-   * @param barCount the time frame
-   */
-  public AroonUpIndicator(final NumFactory numFactory, final NumericIndicator highIndicator, final int barCount) {
-    super(numFactory);
-    this.barCount = barCount;
-    this.highIndicator = highIndicator;
-    this.previousValues = new ArrayList<>(barCount);
-    for (int i = 0; i < barCount; i++) {
-      this.previousValues.add(NaN);
-    }
-    // + 1 needed for last possible iteration in loop
-    this.highestHighValueIndicator = new HighestValueIndicator(highIndicator, barCount + 1);
-  }
-
-
-  /**
-   * Default Constructor with {@code highPriceIndicator} =
-   * {@link HighPriceIndicator}.
-   *
-   * @param numFactory the bar numFactory
-   * @param barCount the time frame
-   */
-  public AroonUpIndicator(final NumFactory numFactory, final int barCount) {
-    this(numFactory, Indicators.highPrice(), barCount);
-  }
-
-
-  protected Num calculate() {
-    final var currentLow = this.highIndicator.getValue();
-    this.previousValues.set(getIndex(this.index), currentLow);
-
-    if (currentLow.isNaN()) {
-      return NaN;
+    /**
+     * Constructor.
+     *
+     * @param highIndicator the indicator for the high price (default
+     * [HighPriceIndicator])
+     * @param barCount the time frame
+     */
+    init {
+        for (i in 0..<barCount) {
+            previousValues.add(NaN)
+        }
+        // + 1 needed for last possible iteration in loop
+        highestHighValueIndicator = HighestValueIndicator(highIndicator, barCount + 1)
     }
 
-    final var lowestValue = this.highestHighValueIndicator.getValue();
 
-    final var barCountFromLastMaximum = countBarsBetweenHighs(lowestValue);
-    return getNumFactory().numOf((double) (this.barCount - barCountFromLastMaximum) / this.barCount * 100.0);
-  }
+    /**
+     * Default Constructor with `highPriceIndicator` =
+     * [HighPriceIndicator].
+     *
+     * @param numFactory the bar numFactory
+     * @param barCount the time frame
+     */
+    constructor(numFactory: NumFactory, barCount: Int) : this(numFactory, highPrice(), barCount)
 
 
-  private int countBarsBetweenHighs(final Num lowestValue) {
-    for (int i = getIndex(this.index), barDistance = 0; barDistance < this.barCount; barDistance++, i--) {
-      if (this.previousValues.get(getIndex(this.barCount + i)).equals(lowestValue)) {
-        return barDistance;
-      }
+    private fun calculate(): Num {
+        val currentLow = highIndicator.value
+        previousValues[getIndex(index)] = currentLow
+
+        if (currentLow.isNaN) {
+            return NaN
+        }
+
+        val lowestValue = highestHighValueIndicator.value
+
+        val barCountFromLastMaximum = countBarsBetweenHighs(lowestValue)
+        return numFactory.numOf((barCount - barCountFromLastMaximum).toDouble() / barCount * 100.0)
     }
-    return this.barCount;
-  }
 
 
-  private int getIndex(final int i) {
-    return i % this.barCount;
-  }
+    private fun countBarsBetweenHighs(lowestValue: Num?): Int {
+        var i = getIndex(index)
+        var barDistance = 0
+        while (barDistance < barCount) {
+            if (previousValues[getIndex(barCount + i)] == lowestValue) {
+                return barDistance
+            }
+            barDistance++
+            i--
+        }
+        return barCount
+    }
 
 
-  @Override
-  public void updateState(final Bar bar) {
-    ++this.index;
-    this.highIndicator.onBar(bar);
-    this.highestHighValueIndicator.onBar(bar);
-    this.value = calculate();
-  }
+    private fun getIndex(i: Int): Int {
+        return i % barCount
+    }
 
 
-  @Override
-  public boolean isStable() {
-    return this.index > this.barCount && this.highIndicator.isStable() && this.highestHighValueIndicator.isStable();
-  }
+    public override fun updateState(bar: Bar) {
+        ++index
+        highIndicator.onBar(bar)
+        highestHighValueIndicator.onBar(bar)
+        value = calculate()
+    }
 
 
-  @Override
-  public String toString() {
-    return String.format("AroonUp(%s) => %s", this.highIndicator, getValue());
-  }
+    override val isStable: Boolean
+        get() = index > barCount && highIndicator.isStable && highestHighValueIndicator.isStable
 
+
+    override fun toString() = "AroonUp($highIndicator) => $value"
 }

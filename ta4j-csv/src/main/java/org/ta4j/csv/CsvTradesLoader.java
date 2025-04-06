@@ -114,8 +114,8 @@ public class CsvTradesLoader {
         // if the trade happened during the bar
         if (bar.inPeriod(tradeTimeStamp)) {
           // onCandle the trade to the bar
-          final Num tradePrice = series.numFactory().numOf(Double.parseDouble(tradeLine[1]));
-          final Num tradeVolume = series.numFactory().numOf(Double.parseDouble(tradeLine[2]));
+          final Num tradePrice = series.getNumFactory().numOf(Double.parseDouble(tradeLine[1]));
+          final Num tradeVolume = series.getNumFactory().numOf(Double.parseDouble(tradeLine[2]));
           bar.addTrade(tradeVolume, tradePrice);
         } else {
           // the trade happened after the end of the bar

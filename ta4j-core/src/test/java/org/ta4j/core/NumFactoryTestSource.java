@@ -33,6 +33,6 @@ import org.ta4j.core.num.NumFactory;
  */
 public class NumFactoryTestSource {
   public static Stream<NumFactory> numFactories() {
-    return Stream.of(DoubleNumFactory.getInstance(), DecimalNumFactory.getInstance());
+    return Stream.of(DoubleNumFactory.INSTANCE, DecimalNumFactory.getInstance());
   }
 }

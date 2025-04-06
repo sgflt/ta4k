@@ -21,165 +21,125 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.ta4j.core.indicators.numeric.statistics;
+package org.ta4j.core.indicators.numeric.statistics
 
-import java.util.ArrayDeque;
-import java.util.Deque;
-
-import org.ta4j.core.api.series.Bar;
-import org.ta4j.core.indicators.numeric.NumericIndicator;
-import org.ta4j.core.num.Num;
+import org.ta4j.core.api.series.Bar
+import org.ta4j.core.indicators.numeric.NumericIndicator
+import org.ta4j.core.num.Num
+import java.util.*
 
 /**
  * Simple linear regression indicator.
  *
- * <p>
+ *
+ *
  * A moving (i.e. over the time frame) simple linear regression (least squares).
  *
  * <pre>
  * y = slope * x + intercept
- * </pre>
+</pre> *
  *
- * see <a href=
- * "https://introcs.cs.princeton.edu/java/97data/LinearRegression.java.html">LinearRegression</a>
+ * see [LinearRegression](https://introcs.cs.princeton.edu/java/97data/LinearRegression.java.html)
  */
-public class SimpleLinearRegressionIndicator extends NumericIndicator {
+class SimpleLinearRegressionIndicator @JvmOverloads constructor(
+    private val indicator: NumericIndicator,
+    private val barCount: Int,
+    private val type: SimpleLinearRegressionType? = SimpleLinearRegressionType.Y,
+) : NumericIndicator(indicator.numFactory) {
+    private val window = ArrayDeque<XY>(barCount)
+    private var sumX = numFactory.zero()
+    private var sumY = numFactory.zero()
+    private var sumXY = numFactory.zero()
+    private var sumXX = numFactory.zero()
+    private var barsPassed = 0
 
+    private fun calculate(): Num {
+        calculateRegressionLine()
 
-  private final NumericIndicator indicator;
-  private final int barCount;
-  private final Deque<XY> window;
-  private Num sumX;
-  private Num sumY;
-  private Num sumXY;
-  private Num sumXX;
-  private final SimpleLinearRegressionType type;
-  private int barsPassed;
+        if (type == SimpleLinearRegressionType.SLOPE) {
+            return slope
+        }
 
+        if (type == SimpleLinearRegressionType.INTERCEPT) {
+            return intercept
+        }
 
-  /**
-   * Constructor for the y-values of the formula (y = slope * x + intercept).
-   *
-   * @param indicator the indicator for the x-values of the formula.
-   * @param barCount the time frame
-   */
-  public SimpleLinearRegressionIndicator(final NumericIndicator indicator, final int barCount) {
-    this(indicator, barCount, SimpleLinearRegressionType.Y);
-  }
-
-
-  /**
-   * Constructor.
-   *
-   * @param indicator the indicator for the x-values of the formula.
-   * @param barCount the time frame
-   * @param type the type of the outcome value (y, slope, intercept)
-   */
-  public SimpleLinearRegressionIndicator(
-      final NumericIndicator indicator,
-      final int barCount,
-      final SimpleLinearRegressionType type
-  ) {
-    super(indicator.getNumFactory());
-    this.indicator = indicator;
-    this.barCount = barCount;
-    this.type = type;
-    this.window = new ArrayDeque<>(barCount);
-    this.sumX = getNumFactory().zero();
-    this.sumY = getNumFactory().zero();
-    this.sumXX = getNumFactory().zero();
-    this.sumXY = getNumFactory().zero();
-  }
-
-
-  protected Num calculate() {
-    calculateRegressionLine();
-
-    if (this.type == SimpleLinearRegressionType.SLOPE) {
-      return getSlope();
+        return slope.multipliedBy(numFactory.numOf(barCount)).plus(intercept)
     }
 
-    if (this.type == SimpleLinearRegressionType.INTERCEPT) {
-      return getIntercept();
+
+    /**
+     * Calculates the regression line.
+     */
+    private fun calculateRegressionLine() {
+        if (window.size == barCount) {
+            val old = window.remove()
+            sumX = sumX.minus(old.x)
+            sumY = sumY.minus(old.y)
+            sumXX = sumXX.minus(old.x.multipliedBy(old.x))
+            sumXY = sumXY.minus(old.x.multipliedBy(old.y))
+        }
+
+        val x = numFactory.numOf(barsPassed)
+        val y = indicator.value
+        window.offer(XY(x, y))
+
+        sumX = sumX.plus(x)
+        sumY = sumY.plus(y)
+        sumXX = sumXX.plus(x.multipliedBy(x))
+        sumXY = sumXY.plus(x.multipliedBy(y))
     }
 
-    return getSlope().multipliedBy(getNumFactory().numOf(this.barCount)).plus(getIntercept());
-  }
+
+    private val slope: Num
+        get() {
+            val n = window.size
+            if (n < 2) {
+                return numFactory.zero() // Not enough points for regression
+            }
+
+            val nNum = numFactory.numOf(n)
+            val numerator = nNum.multipliedBy(sumXY).minus(sumX.multipliedBy(sumY))
+            val denominator = nNum.multipliedBy(sumXX).minus(sumX.multipliedBy(sumX))
+            return numerator.dividedBy(denominator)
+        }
 
 
-  /**
-   * Calculates the regression line.
-   */
-  private void calculateRegressionLine() {
-    if (this.window.size() == this.barCount) {
-      final var old = this.window.remove();
-      this.sumX = this.sumX.minus(old.x());
-      this.sumY = this.sumY.minus(old.y());
-      this.sumXX = this.sumXX.minus(old.x().multipliedBy(old.x()));
-      this.sumXY = this.sumXY.minus(old.x().multipliedBy(old.y()));
+    private val intercept: Num
+        get() {
+            val n = window.size
+            if (n < 2) {
+                return numFactory.zero() // Not enough points for regression
+            }
+
+            val nNum = numFactory.numOf(n)
+            val xMean = sumX.dividedBy(nNum)
+            val yMean = sumY.dividedBy(nNum)
+
+            return yMean.minus(slope.multipliedBy(xMean))
+        }
+
+
+    public override fun updateState(bar: Bar) {
+        ++barsPassed
+        indicator.onBar(bar)
+        value = calculate()
     }
 
-    final var x = getNumFactory().numOf(this.barsPassed);
-    final var y = this.indicator.getValue();
-    this.window.offer(new XY(x, y));
 
-    this.sumX = this.sumX.plus(x);
-    this.sumY = this.sumY.plus(y);
-    this.sumXX = this.sumXX.plus(x.multipliedBy(x));
-    this.sumXY = this.sumXY.plus(x.multipliedBy(y));
-  }
+    override val isStable
+        get() = indicator.isStable
 
 
-  private Num getSlope() {
-    final int n = this.window.size();
-    if (n < 2) {
-      return getNumFactory().zero(); // Not enough points for regression
+    /**
+     * The type for the outcome of the [SimpleLinearRegressionIndicator].
+     */
+    enum class SimpleLinearRegressionType {
+        Y,
+        SLOPE,
+        INTERCEPT
     }
 
-    final var nNum = getNumFactory().numOf(n);
-    final var numerator = nNum.multipliedBy(this.sumXY).minus(this.sumX.multipliedBy(this.sumY));
-    final var denominator = nNum.multipliedBy(this.sumXX).minus(this.sumX.multipliedBy(this.sumX));
-    return numerator.dividedBy(denominator);
-  }
-
-
-  private Num getIntercept() {
-    final int n = this.window.size();
-    if (n < 2) {
-      return getNumFactory().zero(); // Not enough points for regression
-    }
-
-    final var nNum = getNumFactory().numOf(n);
-    final var xMean = this.sumX.dividedBy(nNum);
-    final var yMean = this.sumY.dividedBy(nNum);
-
-    return yMean.minus(getSlope().multipliedBy(xMean));
-  }
-
-
-  @Override
-  public void updateState(final Bar bar) {
-    ++this.barsPassed;
-    this.indicator.onBar(bar);
-    this.value = calculate();
-  }
-
-
-  @Override
-  public boolean isStable() {
-    return this.indicator.isStable();
-  }
-
-
-  /**
-   * The type for the outcome of the {@link SimpleLinearRegressionIndicator}.
-   */
-  public enum SimpleLinearRegressionType {
-    Y,
-    SLOPE,
-    INTERCEPT
-  }
-
-  private record XY(Num x, Num y) {
-  }
+    @JvmRecord
+    private data class XY(val x: Num, val y: Num)
 }

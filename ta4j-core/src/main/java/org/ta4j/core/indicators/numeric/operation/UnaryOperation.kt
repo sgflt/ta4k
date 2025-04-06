@@ -20,82 +20,67 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.ta4j.core.indicators.numeric.operation;
+package org.ta4j.core.indicators.numeric.operation
 
-import java.util.function.UnaryOperator;
-
-import org.ta4j.core.api.series.Bar;
-import org.ta4j.core.indicators.numeric.NumericIndicator;
-import org.ta4j.core.num.Num;
+import org.ta4j.core.api.series.Bar
+import org.ta4j.core.indicators.numeric.NumericIndicator
+import org.ta4j.core.num.Num
+import java.util.function.UnaryOperator
 
 /**
  * Objects of this class defer the evaluation of a unary operator, like sqrt().
  *
  * There may be other unary operations on Num that could be added here.
  */
-public class UnaryOperation extends NumericIndicator {
-
-  /**
-   * Returns an {@code Indicator} whose value is {@code √(operand)}.
-   *
-   * @param operand
-   *
-   * @return {@code √(operand)}
-   *
-   * @see Num#sqrt
-   */
-  public static UnaryOperation sqrt(final NumericIndicator operand) {
-    return new UnaryOperation(Num::sqrt, operand);
-  }
+class UnaryOperation private constructor(
+    private val operator: UnaryOperator<Num>,
+    private val operand: NumericIndicator,
+) : NumericIndicator(
+    operand.numFactory
+) {
+    private fun calculate(): Num {
+        val n = operand.value
+        return operator.apply(n)
+    }
 
 
-  /**
-   * Returns an {@code Indicator} whose value is the absolute value of
-   * {@code operand}.
-   *
-   * @param operand
-   *
-   * @return {@code abs(operand)}
-   *
-   * @see Num#abs
-   */
-  public static UnaryOperation abs(final NumericIndicator operand) {
-    return new UnaryOperation(Num::abs, operand);
-  }
+    public override fun updateState(bar: Bar) {
+        operand.onBar(bar)
+        value = calculate()
+    }
 
 
-  private final UnaryOperator<Num> operator;
-  private final NumericIndicator operand;
+    override val isStable
+        get() = operand.isStable
 
 
-  private UnaryOperation(final UnaryOperator<Num> operator, final NumericIndicator operand) {
-    super(operand.getNumFactory());
-    this.operator = operator;
-    this.operand = operand;
-  }
+    override fun toString() = "UI<$operand> => $value"
+
+    companion object {
+        /**
+         * Returns an `Indicator` whose value is `√(operand)`.
+         *
+         * @param operand
+         *
+         * @return `√(operand)`
+         *
+         * @see Num.sqrt
+         */
+        @JvmStatic
+        fun sqrt(operand: NumericIndicator) = UnaryOperation(UnaryOperator { it.sqrt() }, operand)
 
 
-  private Num calculate() {
-    final var n = this.operand.getValue();
-    return this.operator.apply(n);
-  }
-
-
-  @Override
-  public void updateState(final Bar bar) {
-    this.operand.onBar(bar);
-    this.value = calculate();
-  }
-
-
-  @Override
-  public boolean isStable() {
-    return this.operand.isStable();
-  }
-
-
-  @Override
-  public String toString() {
-    return String.format("UI<%s> => %s", this.operand, getValue());
-  }
+        /**
+         * Returns an `Indicator` whose value is the absolute value of
+         * `operand`.
+         *
+         * @param operand
+         *
+         * @return `abs(operand)`
+         *
+         * @see Num.abs
+         */
+        @JvmStatic
+        fun abs(operand: NumericIndicator) = UnaryOperation(UnaryOperator { it.abs() }, operand)
+    }
 }

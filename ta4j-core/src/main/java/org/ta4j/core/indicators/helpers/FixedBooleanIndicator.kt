@@ -21,42 +21,28 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.ta4j.core.indicators.helpers;
+package org.ta4j.core.indicators.helpers
 
-import org.ta4j.core.api.series.Bar;
-import org.ta4j.core.indicators.bool.BooleanIndicator;
+import org.ta4j.core.api.series.Bar
+import org.ta4j.core.indicators.bool.BooleanIndicator
 
 /**
  * A fixed boolean indicator.
  *
- * <p>
- * Returns constant {@link Boolean} values for a bar.
+ *
+ *
+ * Returns constant [Boolean] values for a bar.
  */
-public class FixedBooleanIndicator extends BooleanIndicator {
+class FixedBooleanIndicator(vararg values: Boolean?) : BooleanIndicator() {
+    private val indicator: FixedIndicator<Boolean?> = FixedIndicator<Boolean?>(*values)
 
 
-  private final FixedIndicator<Boolean> indicator;
+    override fun updateState(bar: Bar) {
+        indicator.onBar(bar)
+        value = indicator.value!!
+    }
 
 
-  /**
-   * Constructor.
-   *
-   * @param values the values to be returned by this indicator
-   */
-  public FixedBooleanIndicator(final Boolean... values) {
-    this.indicator = new FixedIndicator<>(values);
-  }
-
-
-  @Override
-  public void updateState(final Bar bar) {
-    this.indicator.onBar(bar);
-    this.value = this.indicator.getValue();
-  }
-
-
-  @Override
-  public boolean isStable() {
-    return this.indicator.isStable();
-  }
+    override val isStable
+        get() = indicator.isStable
 }

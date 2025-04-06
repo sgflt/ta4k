@@ -5,6 +5,7 @@ import static org.ta4j.core.TestUtils.assertNumEquals;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.ta4j.core.TradeType;
 import org.ta4j.core.TradingRecordTestContext;
 import org.ta4j.core.backtest.criteria.AnalysisCriterion.PositionFilter;
 import org.ta4j.core.backtest.criteria.NumberOfConsecutivePositionsCriterion;
@@ -17,7 +18,7 @@ class NumberOfConsecutivePositionsCriterionTest {
   @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
   @DisplayName("Should calculate zero for no positions")
   void calculateWithNoPositions(final NumFactory numFactory) {
-    final var tradingRecord = new BackTestTradingRecord(numFactory);
+    final var tradingRecord = new BackTestTradingRecord(TradeType.BUY, numFactory);
 
     assertNumEquals(0, new NumberOfConsecutivePositionsCriterion(PositionFilter.LOSS).calculate(tradingRecord));
     assertNumEquals(0, new NumberOfConsecutivePositionsCriterion(PositionFilter.PROFIT).calculate(tradingRecord));

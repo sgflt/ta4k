@@ -21,56 +21,21 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.ta4j.core.indicators.numeric.channels.bollinger;
+package org.ta4j.core.indicators.numeric.channels.bollinger
 
-import org.ta4j.core.api.series.Bar;
-import org.ta4j.core.indicators.numeric.NumericIndicator;
-import org.ta4j.core.num.Num;
+import org.ta4j.core.api.series.Bar
+import org.ta4j.core.indicators.numeric.NumericIndicator
 
-/**
- * Buy - Occurs when the price line crosses from below to above the Lower
- * Bollinger Band.
- *
- * <p>
- * Sell - Occurs when the price line crosses from above to below the Upper
- * Bollinger Band.
- */
-public class BollingerBandsMiddleIndicator extends NumericIndicator {
+class BollingerBandsMiddleIndicator(private val indicator: NumericIndicator) : NumericIndicator(indicator.numFactory) {
+    private fun calculate() = indicator.value
 
-  private final NumericIndicator indicator;
+    public override fun updateState(bar: Bar) {
+        indicator.onBar(bar)
+        value = calculate()
+    }
 
+    override val isStable
+        get() = indicator.isStable
 
-  /**
-   * Constructor.
-   *
-   * @param indicator the indicator that gives the values of the middle band
-   */
-  public BollingerBandsMiddleIndicator(final NumericIndicator indicator) {
-    super(indicator.getNumFactory());
-    this.indicator = indicator;
-  }
-
-
-  protected Num calculate() {
-    return this.indicator.getValue();
-  }
-
-
-  @Override
-  public void updateState(final Bar bar) {
-    this.indicator.onBar(bar);
-    this.value = calculate();
-  }
-
-
-  @Override
-  public boolean isStable() {
-    return this.indicator.isStable();
-  }
-
-
-  @Override
-  public String toString() {
-    return String.format("BolBaMid(%s) => %s", this.indicator, getValue());
-  }
+    override fun toString() = "BolBaMid(${indicator}) => $value"
 }

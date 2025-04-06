@@ -50,7 +50,7 @@ class ReturnsTest {
 
       // When
       final var returns = new Returns(
-          ReturnsTest.this.context.getBarSeries().numFactory(),
+          ReturnsTest.this.context.getBarSeries().getNumFactory(),
           ReturnsTest.this.tradingContext.getTradingRecord(), Returns.ReturnType.ARITHMETIC
       );
 
@@ -74,7 +74,7 @@ class ReturnsTest {
 
       // When
       final var returns = new Returns(
-          ReturnsTest.this.context.getBarSeries().numFactory(),
+          ReturnsTest.this.context.getBarSeries().getNumFactory(),
           ReturnsTest.this.tradingContext.getTradingRecord(), Returns.ReturnType.ARITHMETIC
       );
 
@@ -101,7 +101,7 @@ class ReturnsTest {
 
       // When
       final var returns = new Returns(
-          ReturnsTest.this.context.getBarSeries().numFactory(),
+          ReturnsTest.this.context.getBarSeries().getNumFactory(),
           ReturnsTest.this.tradingContext.getTradingRecord(), Returns.ReturnType.LOG
       );
 
@@ -125,7 +125,7 @@ class ReturnsTest {
 
       // When
       final var returns = new Returns(
-          ReturnsTest.this.context.getBarSeries().numFactory(),
+          ReturnsTest.this.context.getBarSeries().getNumFactory(),
           ReturnsTest.this.tradingContext.getTradingRecord(), Returns.ReturnType.LOG
       );
 
@@ -163,7 +163,7 @@ class ReturnsTest {
 
       // When
       final var returns = new Returns(
-          testContext.getBarSeries().numFactory(),
+          testContext.getBarSeries().getNumFactory(),
           testContext.getTradingRecord(), Returns.ReturnType.ARITHMETIC
       );
 
@@ -199,7 +199,7 @@ class ReturnsTest {
 
       // When
       final var returns = new Returns(
-          ReturnsTest.this.context.getBarSeries().numFactory(),
+          ReturnsTest.this.context.getBarSeries().getNumFactory(),
           ReturnsTest.this.tradingContext.getTradingRecord(), Returns.ReturnType.ARITHMETIC
       );
 

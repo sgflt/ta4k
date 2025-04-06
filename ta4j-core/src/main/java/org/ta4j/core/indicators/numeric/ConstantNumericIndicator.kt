@@ -20,44 +20,25 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.ta4j.core.indicators.numeric;
+package org.ta4j.core.indicators.numeric
 
-import org.ta4j.core.api.series.Bar;
-import org.ta4j.core.num.Num;
+import org.ta4j.core.api.series.Bar
+import org.ta4j.core.num.Num
 
 /**
- * Constant indicator.
- *
- * <p>
- * Returns a constant value for a bar.
+ * Constant indicator that returns a constant value for a bar.
  */
-public class ConstantNumericIndicator extends NumericIndicator {
-
-  /**
-   * Constructor.
-   *
-   * @param t the constant value
-   */
-  public ConstantNumericIndicator(final Num t) {
-    super(t.getNumFactory());
-    this.value = t;
-  }
+class ConstantNumericIndicator(t: Num) : NumericIndicator(t.numFactory) {
+    init {
+        value = t
+    }
 
 
-  @Override
-  public void updateState(final Bar bar) {
-    // NOOP
-  }
+    override fun updateState(bar: Bar) {
+        // NOOP
+    }
 
+    override val isStable = true
 
-  @Override
-  public boolean isStable() {
-    return true;
-  }
-
-
-  @Override
-  public String toString() {
-    return "C => %s".formatted(getValue());
-  }
+    override fun toString() = "C => $value"
 }

@@ -24,8 +24,8 @@ public class TradingRecordTestContext {
   private TradeType tradeType = TradeType.BUY;
   private BackTestTradingRecord tradingRecord;
   private AnalysisCriterion criterion;
-  private CostModel transactionCostModel = new ZeroCostModel();
-  private CostModel holdingCostModel = new ZeroCostModel();
+  private CostModel transactionCostModel = ZeroCostModel.INSTANCE;
+  private CostModel holdingCostModel = ZeroCostModel.INSTANCE;
   private MarketEventTestContext marketEvenTestContext;
   private NumFactory numFactory = NumFactoryProvider.getDefaultNumFactory();
   private ChronoUnit resolution = ChronoUnit.DAYS;
@@ -38,7 +38,7 @@ public class TradingRecordTestContext {
 
   public TradingRecordTestContext(final MarketEventTestContext marketEventTestContext) {
     this.marketEvenTestContext = marketEventTestContext;
-    withNumFactory(marketEventTestContext.getBarSeries().numFactory());
+    withNumFactory(marketEventTestContext.getBarSeries().getNumFactory());
     reinitalizeTradingRecord();
   }
 
@@ -61,6 +61,7 @@ public class TradingRecordTestContext {
   private void reinitalizeTradingRecord() {
     this.tradingRecord = new BackTestTradingRecord(
         this.tradeType,
+        "",
         this.transactionCostModel,
         this.holdingCostModel,
         this.numFactory
@@ -194,8 +195,8 @@ public class TradingRecordTestContext {
 
       final var bar = TradingRecordTestContext.this.marketEvenTestContext.getBarSeries().getBar();
       TradingRecordTestContext.this.tradingRecord.enter(
-          bar.endTime(),
-          bar.closePrice(),
+          bar.getEndTime(),
+          bar.getClosePrice(),
           getNumFactory().numOf(this.amount)
       );
 
@@ -232,8 +233,8 @@ public class TradingRecordTestContext {
 
       final var bar = TradingRecordTestContext.this.marketEvenTestContext.getBarSeries().getBar();
       TradingRecordTestContext.this.tradingRecord.exit(
-          bar.endTime(),
-          bar.closePrice(),
+          bar.getEndTime(),
+          bar.getClosePrice(),
           getNumFactory().numOf(this.amount)
       );
 

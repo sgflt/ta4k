@@ -21,56 +21,33 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.ta4j.core.indicators.numeric.statistics;
+package org.ta4j.core.indicators.numeric.statistics
 
-import org.ta4j.core.api.series.Bar;
-import org.ta4j.core.indicators.numeric.NumericIndicator;
-import org.ta4j.core.num.Num;
+import org.ta4j.core.api.series.Bar
+import org.ta4j.core.indicators.numeric.NumericIndicator
 
 /**
  * Standard deviation indicator.
  *
- * @see <a href=
- *     "http://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:standard_deviation_volatility">
- *     http://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:standard_deviation_volatility</a>
+ * @see [
+ * http://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:standard_deviation_volatility](http://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:standard_deviation_volatility)
  */
-public class StandardDeviationIndicator extends NumericIndicator {
-
-  private final VarianceIndicator variance;
-
-
-  /**
-   * Constructor.
-   *
-   * @param indicator the indicator
-   * @param barCount the time frame
-   */
-  public StandardDeviationIndicator(final NumericIndicator indicator, final int barCount) {
-    super(indicator.getNumFactory());
-    this.variance = new VarianceIndicator(indicator, barCount);
-  }
+class StandardDeviationIndicator(indicator: NumericIndicator, barCount: Int) : NumericIndicator(indicator.numFactory) {
+    private val variance = VarianceIndicator(indicator, barCount)
 
 
-  protected Num calculate() {
-    return this.variance.getValue().sqrt();
-  }
+    private fun calculate() = variance.value.sqrt()
 
 
-  @Override
-  public void updateState(final Bar bar) {
-    this.variance.onBar(bar);
-    this.value = calculate();
-  }
+    public override fun updateState(bar: Bar) {
+        variance.onBar(bar)
+        value = calculate()
+    }
 
 
-  @Override
-  public boolean isStable() {
-    return this.variance.isStable();
-  }
+    override val isStable
+        get() = variance.isStable
 
 
-  @Override
-  public String toString() {
-    return String.format("STDDEV(%s) => %s", this.variance, getValue());
-  }
+    override fun toString() = "STDDEV($variance) => $value"
 }

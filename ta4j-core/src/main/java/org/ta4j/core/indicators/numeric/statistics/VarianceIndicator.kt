@@ -21,106 +21,74 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.ta4j.core.indicators.numeric.statistics;
+package org.ta4j.core.indicators.numeric.statistics
 
-import org.ta4j.core.api.series.Bar;
-import org.ta4j.core.indicators.helpers.previous.PreviousNumericValueIndicator;
-import org.ta4j.core.indicators.numeric.NumericIndicator;
-import org.ta4j.core.num.Num;
+import org.ta4j.core.api.series.Bar
+import org.ta4j.core.indicators.numeric.NumericIndicator
+import org.ta4j.core.num.Num
 
 /**
  * Variance indicator.
  */
-public class VarianceIndicator extends NumericIndicator {
+class VarianceIndicator(private val indicator: NumericIndicator, private val barCount: Int) :
+    NumericIndicator(indicator.numFactory) {
+    private val divisor: Num = numFactory.numOf(barCount - 1)
+    private val oldestValue = indicator.previous(barCount)
+    private var mean = numFactory.zero()
+    private var currentIndex = 0
+    private var _value = numFactory.zero()
 
-  private final NumericIndicator indicator;
-  private final int barCount;
-  private final Num divisor;
-  private final PreviousNumericValueIndicator oldestValue;
-  private Num mean;
-  private int currentIndex;
-
-
-  /**
-   * Constructor.
-   *
-   * @param indicator the indicator
-   * @param barCount the time frame
-   */
-  public VarianceIndicator(final NumericIndicator indicator, final int barCount) {
-    super(indicator.getNumFactory());
-    if (barCount <= 1) {
-      throw new IllegalArgumentException("barCount must be greater than 1");
+    init {
+        require(barCount > 1) { "barCount must be greater than 1" }
     }
 
-    this.barCount = barCount;
-    this.indicator = indicator;
-    this.divisor = getNumFactory().numOf(barCount - 1);
-    this.mean = getNumFactory().zero();
-    this.oldestValue = indicator.previous(barCount);
-    this.value = getNumFactory().zero();
-  }
+    private fun calculate(): Num {
+        if (currentIndex < barCount) {
+            return add(indicator.value)
+        }
 
-
-  protected Num calculate() {
-    if (this.currentIndex < this.barCount) {
-      return add(this.indicator.getValue());
+        val oldValue = oldestValue.value
+        return dropOldestAndAddNew(oldValue, indicator.value)
     }
 
-    final var oldValue = this.oldestValue.getValue();
-    return dropOldestAndAddNew(oldValue, this.indicator.getValue());
-  }
+    fun add(x: Num): Num {
+        currentIndex++
+        val delta = x.minus(mean)
+        mean = mean.plus(delta.dividedBy(numFactory.numOf(currentIndex)))
+        return _value.plus(delta.multipliedBy(x.minus(mean)))
+    }
 
-
-  public Num add(final Num x) {
-    this.currentIndex++;
-    final var delta = x.minus(this.mean);
-    this.mean = this.mean.plus(delta.dividedBy(getNumFactory().numOf(this.currentIndex)));
-    return this.value.plus(delta.multipliedBy(x.minus(this.mean)));
-  }
-
-
-  private Num dropOldestAndAddNew(final Num x, final Num y) {
-    final var deltaYX = y.minus(x);
-    final var deltaX = x.minus(this.mean);
-    final var deltaY = y.minus(this.mean);
-    this.mean = this.mean.plus(deltaYX.dividedBy(getNumFactory().numOf(this.barCount)));
-    final var deltaYp = y.minus(this.mean);
-    return this.value.minus(
-            getNumFactory().numOf(this.barCount)
+    private fun dropOldestAndAddNew(x: Num, y: Num): Num {
+        val deltaYX = y.minus(x)
+        val deltaX = x.minus(mean)
+        val deltaY = y.minus(mean)
+        mean = mean.plus(deltaYX.dividedBy(numFactory.numOf(barCount)))
+        val deltaYp = y.minus(mean)
+        return _value.minus(
+            numFactory.numOf(barCount)
                 .multipliedBy(
                     deltaX.multipliedBy(deltaX)
                         .minus(deltaY.multipliedBy(deltaYp))
-                        .dividedBy(this.divisor)
+                        .dividedBy(divisor)
                 )
         )
-        .minus(deltaYX.multipliedBy(deltaYp).dividedBy(this.divisor))
-        ;
-  }
+            .minus(deltaYX.multipliedBy(deltaYp).dividedBy(divisor))
+    }
 
+    override var value: Num
+        get() = _value.dividedBy(divisor)
+        protected set(value) {
+            _value = value
+        }
 
-  @Override
-  public Num getValue() {
-    return this.value.dividedBy(this.divisor);
-  }
+    public override fun updateState(bar: Bar) {
+        indicator.onBar(bar)
+        oldestValue.onBar(bar)
+        value = calculate()
+    }
 
+    override val isStable: Boolean
+        get() = currentIndex >= barCount && indicator.isStable
 
-  @Override
-  public void updateState(final Bar bar) {
-    this.indicator.onBar(bar);
-    this.oldestValue.onBar(bar);
-    this.value = calculate();
-  }
-
-
-  @Override
-  public boolean isStable() {
-    return this.currentIndex >= this.barCount && this.indicator.isStable();
-  }
-
-
-  @Override
-  public String toString() {
-    return String.format("VAR(%s, %s) => %s", this.indicator, this.barCount, getValue());
-  }
+    override fun toString() = "VAR($indicator, $barCount) => $value"
 }

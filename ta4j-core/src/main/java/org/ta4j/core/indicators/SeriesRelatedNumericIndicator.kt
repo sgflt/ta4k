@@ -21,29 +21,20 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.ta4j.core.indicators;
+package org.ta4j.core.indicators
 
-import org.ta4j.core.indicators.numeric.NumericIndicator;
-import org.ta4j.core.num.NumFactory;
+import org.ta4j.core.indicators.numeric.NumericIndicator
+import org.ta4j.core.num.NumFactory
 
 /**
  * Indicator that fetches data from series directly
  */
-public abstract class SeriesRelatedNumericIndicator extends NumericIndicator {
-
-
-  /**
-   * Constructor.
-   *
-   * @param numFactory the bar numFactory
-   */
-  protected SeriesRelatedNumericIndicator(final NumFactory numFactory) {
-    super(numFactory);
-  }
-
-
-  @Override
-  public final boolean isStable() {
-    return this.value != null;
-  }
+abstract class SeriesRelatedNumericIndicator
+/**
+ * Constructor.
+ *
+ * @param numFactory the bar numFactory
+ */
+protected constructor(numFactory: NumFactory) : NumericIndicator(numFactory) {
+    override val isStable get() = !value.isNaN
 }

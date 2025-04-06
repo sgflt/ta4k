@@ -20,69 +20,50 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.ta4j.core.indicators.numeric.momentum.adx;
+package org.ta4j.core.indicators.numeric.momentum.adx
 
-import org.ta4j.core.api.Indicators;
-import org.ta4j.core.api.series.Bar;
-import org.ta4j.core.indicators.numeric.NumericIndicator;
-import org.ta4j.core.num.Num;
-import org.ta4j.core.num.NumFactory;
+import org.ta4j.core.api.Indicators.minusDII
+import org.ta4j.core.api.Indicators.plusDII
+import org.ta4j.core.api.series.Bar
+import org.ta4j.core.indicators.numeric.NumericIndicator
+import org.ta4j.core.num.Num
+import org.ta4j.core.num.NumFactory
 
 /**
  * DX indicator.
  *
- * <p>
+ *
+ *
  * Part of the Directional Movement System.
  */
-public class DXIndicator extends NumericIndicator {
-
-  private final PlusDIIndicator plusDIIndicator;
-  private final MinusDIIndicator minusDIIndicator;
-
-
-  /**
-   * Constructor.
-   *
-   * @param numFactory the numFactory
-   * @param barCount the bar count for {@link #plusDIIndicator} and
-   *     {@link #minusDIIndicator}
-   */
-  public DXIndicator(final NumFactory numFactory, final int barCount) {
-    super(numFactory);
-    this.plusDIIndicator = Indicators.plusDII(barCount);
-    this.minusDIIndicator = Indicators.minusDII(barCount);
-  }
+class DXIndicator(numFactory: NumFactory, barCount: Int) : NumericIndicator(numFactory) {
+    private val plusDIIndicator = plusDII(barCount)
+    private val minusDIIndicator = minusDII(barCount)
 
 
-  protected Num calculate() {
-    final Num pdiValue = this.plusDIIndicator.getValue();
-    final Num mdiValue = this.minusDIIndicator.getValue();
-    if (pdiValue.plus(mdiValue).equals(getNumFactory().zero())) {
-      return getNumFactory().zero();
+    private fun calculate(): Num {
+        val pdiValue = plusDIIndicator.value
+        val mdiValue = minusDIIndicator.value
+        if (pdiValue.plus(mdiValue) == numFactory.zero()) {
+            return numFactory.zero()
+        }
+        return pdiValue.minus(mdiValue)
+            .abs()
+            .dividedBy(pdiValue.plus(mdiValue))
+            .multipliedBy(numFactory.hundred())
     }
-    return pdiValue.minus(mdiValue)
-        .abs()
-        .dividedBy(pdiValue.plus(mdiValue))
-        .multipliedBy(getNumFactory().hundred());
-  }
 
 
-  @Override
-  public void updateState(final Bar bar) {
-    this.plusDIIndicator.onBar(bar);
-    this.minusDIIndicator.onBar(bar);
-    this.value = calculate();
-  }
+    override fun updateState(bar: Bar) {
+        plusDIIndicator.onBar(bar)
+        minusDIIndicator.onBar(bar)
+        value = calculate()
+    }
 
 
-  @Override
-  public boolean isStable() {
-    return this.plusDIIndicator.isStable() && this.minusDIIndicator.isStable();
-  }
+    override val isStable
+        get() = plusDIIndicator.isStable && minusDIIndicator.isStable
 
 
-  @Override
-  public String toString() {
-    return getClass().getSimpleName() + " " + this.plusDIIndicator + " " + this.minusDIIndicator;
-  }
+    override fun toString() = "${javaClass.simpleName} $plusDIIndicator $minusDIIndicator"
 }

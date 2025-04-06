@@ -28,7 +28,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.ta4j.core.TestUtils.assertNumEquals;
 import static org.ta4j.core.TestUtils.assertNumNotEquals;
-import static org.ta4j.core.num.NaN.NaN;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -48,11 +47,11 @@ class NumTest {
   @ParameterizedTest
   @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
   void testZero(final NumFactory numFactory) {
-    final var anyNaNNum = NaN;
+    final var anyNaNNum = org.ta4j.core.num.NaN.INSTANCE;
     final var anyDecimalNum = DecimalNum.valueOf(3);
     final var anyDoubleNum = DoubleNum.valueOf(3);
 
-    assertNumEquals(NaN, anyNaNNum.getNumFactory().zero());
+    assertNumEquals(org.ta4j.core.num.NaN.INSTANCE, anyNaNNum.getNumFactory().zero());
     assertNumEquals(0, numFactory.numOf(3).getNumFactory().zero());
     assertNumEquals(0, anyDecimalNum.getNumFactory().zero());
     assertNumEquals(0, anyDoubleNum.getNumFactory().zero());
@@ -62,11 +61,11 @@ class NumTest {
   @ParameterizedTest
   @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
   void testOne(final NumFactory numFactory) {
-    final var anyNaNNum = NaN;
+    final var anyNaNNum = org.ta4j.core.num.NaN.INSTANCE;
     final var anyDecimalNum = DecimalNum.valueOf(3);
     final var anyDoubleNum = DoubleNum.valueOf(3);
 
-    assertNumEquals(NaN, anyNaNNum.getNumFactory().one());
+    assertNumEquals(org.ta4j.core.num.NaN.INSTANCE, anyNaNNum.getNumFactory().one());
     assertNumEquals(1, numFactory.numOf(3).getNumFactory().one());
     assertNumEquals(1, anyDecimalNum.getNumFactory().one());
     assertNumEquals(1, anyDoubleNum.getNumFactory().one());
@@ -76,11 +75,11 @@ class NumTest {
   @ParameterizedTest
   @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
   void testHundred(final NumFactory numFactory) {
-    final var anyNaNNum = NaN;
+    final var anyNaNNum = org.ta4j.core.num.NaN.INSTANCE;
     final var anyDecimalNum = DecimalNum.valueOf(3);
     final var anyDoubleNum = DoubleNum.valueOf(3);
 
-    assertNumEquals(NaN, anyNaNNum.getNumFactory().hundred());
+    assertNumEquals(org.ta4j.core.num.NaN.INSTANCE, anyNaNNum.getNumFactory().hundred());
     assertNumEquals(100, numFactory.numOf(3).getNumFactory().hundred());
     assertNumEquals(100, anyDecimalNum.getNumFactory().hundred());
     assertNumEquals(100, anyDoubleNum.getNumFactory().hundred());
@@ -172,50 +171,50 @@ class NumTest {
 
   @Test
   void testFailNaNtoInt() {
-    assertThatThrownBy(() -> NaN.intValue())
+    assertThatThrownBy(() -> org.ta4j.core.num.NaN.INSTANCE.intValue())
         .isInstanceOf(UnsupportedOperationException.class);
   }
 
 
   @Test
   void testFailNaNtoLong() {
-    assertThatThrownBy(() -> NaN.longValue())
+    assertThatThrownBy(() -> org.ta4j.core.num.NaN.INSTANCE.longValue())
         .isInstanceOf(UnsupportedOperationException.class);
   }
 
 
   @Test
   void testNaN() {
-    final var a = NaN;
+    final var a = org.ta4j.core.num.NaN.INSTANCE;
     final var eleven = DecimalNum.valueOf(11);
 
     var mustBeNaN = a.plus(eleven);
-    assertNumEquals(mustBeNaN, NaN);
+    assertNumEquals(mustBeNaN, org.ta4j.core.num.NaN.INSTANCE);
 
     mustBeNaN = a.minus(eleven);
-    assertNumEquals(mustBeNaN, NaN);
+    assertNumEquals(mustBeNaN, org.ta4j.core.num.NaN.INSTANCE);
 
     mustBeNaN = a.dividedBy(a);
-    assertNumEquals(mustBeNaN, NaN);
+    assertNumEquals(mustBeNaN, org.ta4j.core.num.NaN.INSTANCE);
 
-    mustBeNaN = a.multipliedBy(NaN);
-    assertNumEquals(mustBeNaN, NaN);
+    mustBeNaN = a.multipliedBy(org.ta4j.core.num.NaN.INSTANCE);
+    assertNumEquals(mustBeNaN, org.ta4j.core.num.NaN.INSTANCE);
 
     mustBeNaN = a.max(eleven);
-    assertNumEquals(mustBeNaN, NaN);
+    assertNumEquals(mustBeNaN, org.ta4j.core.num.NaN.INSTANCE);
 
     mustBeNaN = eleven.min(a);
-    assertNumEquals(mustBeNaN, NaN);
+    assertNumEquals(mustBeNaN, org.ta4j.core.num.NaN.INSTANCE);
 
     mustBeNaN = a.pow(12);
-    assertNumEquals(mustBeNaN, NaN);
+    assertNumEquals(mustBeNaN, org.ta4j.core.num.NaN.INSTANCE);
 
     mustBeNaN = a.pow(a);
-    assertNumEquals(mustBeNaN, NaN);
+    assertNumEquals(mustBeNaN, org.ta4j.core.num.NaN.INSTANCE);
 
     assertThat(a.doubleValue()).isNaN();
     assertThat(a.floatValue()).isNaN();
-    assertThat(a).isEqualTo(NaN);
+    assertThat(a).isEqualTo(org.ta4j.core.num.NaN.INSTANCE);
   }
 
 

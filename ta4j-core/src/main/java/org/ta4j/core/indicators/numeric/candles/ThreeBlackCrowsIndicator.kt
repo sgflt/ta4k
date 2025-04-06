@@ -21,135 +21,122 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.ta4j.core.indicators.numeric.candles;
+package org.ta4j.core.indicators.numeric.candles
 
-import org.ta4j.core.api.Indicators;
-import org.ta4j.core.api.series.Bar;
-import org.ta4j.core.indicators.bool.BooleanIndicator;
-import org.ta4j.core.indicators.helpers.previous.PreviousNumericValueIndicator;
-import org.ta4j.core.num.Num;
-import org.ta4j.core.num.NumFactory;
-import org.ta4j.core.utils.CircularBarArray;
-import org.ta4j.core.utils.CircularIndicatorArray;
+import org.ta4j.core.api.Indicators.lowerShadow
+import org.ta4j.core.api.series.Bar
+import org.ta4j.core.indicators.bool.BooleanIndicator
+import org.ta4j.core.indicators.helpers.previous.PreviousNumericValueIndicator
+import org.ta4j.core.indicators.numeric.NumericIndicator
+import org.ta4j.core.num.NumFactory
+import org.ta4j.core.utils.CircularBarArray
 
 /**
  * Three black crows indicator.
  *
- * @see <a href="http://www.investopedia.com/terms/t/three_black_crows.asp">
- *     http://www.investopedia.com/terms/t/three_black_crows.asp</a>
+ * @see [
+ * http://www.investopedia.com/terms/t/three_black_crows.asp](http://www.investopedia.com/terms/t/three_black_crows.asp)
  */
-public class ThreeBlackCrowsIndicator extends BooleanIndicator {
+class ThreeBlackCrowsIndicator(numFactory: NumFactory, barCount: Int, factor: Double) : BooleanIndicator() {
+    /** Lower shadow.  */
+    private val lowerShadows = ArrayList<NumericIndicator>(3)
 
-  /** Lower shadow. */
-  private final CircularIndicatorArray lowerShadows = new CircularIndicatorArray(3);
+    /** Average lower shadow.  */
+    private val averageLowerShadowInd: PreviousNumericValueIndicator
 
-  /** Average lower shadow. */
-  private final PreviousNumericValueIndicator averageLowerShadowInd;
+    /** Factor used when checking if a candle has a very short lower shadow.  */
+    private val factor = numFactory.numOf(factor)
 
-  /** Factor used when checking if a candle has a very short lower shadow. */
-  private final Num factor;
-
-  private final CircularBarArray bars = new CircularBarArray(4);
-
-
-  /**
-   * Constructor.
-   *
-   * @param numFactory the bar numFactory
-   * @param barCount the number of bars used to calculate the average lower shadow
-   * @param factor the factor used when checking if a candle has a very short
-   *     lower shadow
-   */
-  public ThreeBlackCrowsIndicator(final NumFactory numFactory, final int barCount, final double factor) {
-    final var lowerShadowIndicator = Indicators.lowerShadow();
-    this.lowerShadows.addLast(lowerShadowIndicator.previous(3));
-    this.lowerShadows.addLast(lowerShadowIndicator.previous(2));
-    this.lowerShadows.addLast(lowerShadowIndicator.previous());
-    this.averageLowerShadowInd = lowerShadowIndicator.sma(barCount).previous(4);
-    this.factor = numFactory.numOf(factor);
-  }
+    private val bars = CircularBarArray(4)
 
 
-  protected Boolean calculate(final Bar bar) {
-    this.bars.addLast(bar);
-
-    if (this.bars.isNotFull()) {
-      // We need 4 candles: 1 white, 3 black
-      return false;
+    /**
+     * Constructor.
+     *
+     * @param numFactory the bar numFactory
+     * @param barCount the number of bars used to calculate the average lower shadow
+     * @param factor the factor used when checking if a candle has a very short
+     * lower shadow
+     */
+    init {
+        val lowerShadowIndicator = lowerShadow()
+        lowerShadows.addLast(lowerShadowIndicator.previous(3))
+        lowerShadows.addLast(lowerShadowIndicator.previous(2))
+        lowerShadows.addLast(lowerShadowIndicator.previous())
+        averageLowerShadowInd = lowerShadowIndicator.sma(barCount).previous(4)
     }
 
-    final var index = this.bars.getCurrentIndex();
-    final int whiteCandleIndex = index - 3;
-    return this.bars.get(whiteCandleIndex).isBullish()
-           && isBlackCrow(index - 2)
-           && isBlackCrow(index - 1)
-           && isBlackCrow(index);
-  }
 
+    protected fun calculate(bar: Bar?): Boolean {
+        bars.addLast(bar)
 
-  /**
-   * @return true if the bar/candle has a very short lower shadow, false otherwise
-   */
-  private boolean hasVeryShortLowerShadow(final int index) {
-    final Num currentLowerShadow = this.lowerShadows.get(index).getValue();
-    // We use the white candle index to remove to bias of the previous crows
-    final Num averageLowerShadow = this.averageLowerShadowInd.getValue();
+        if (bars.isNotFull) {
+            // We need 4 candles: 1 white, 3 black
+            return false
+        }
 
-    return currentLowerShadow.isLessThan(averageLowerShadow.multipliedBy(this.factor));
-  }
-
-
-  /**
-   * @param index the current bar/candle index
-   *
-   * @return true if the current bar/candle is declining, false otherwise
-   */
-  private boolean isDeclining(final int index) {
-    final Bar prevBar = this.bars.get(index - 1);
-    final Bar currBar = this.bars.get(index);
-    final Num prevOpenPrice = prevBar.openPrice();
-    final Num prevClosePrice = prevBar.closePrice();
-    final Num currOpenPrice = currBar.openPrice();
-    final Num currClosePrice = currBar.closePrice();
-
-    // Opens within the body of the previous candle
-    return currOpenPrice.isLessThan(prevOpenPrice) && currOpenPrice.isGreaterThan(prevClosePrice)
-           // Closes below the previous close price
-           && currClosePrice.isLessThan(prevClosePrice);
-  }
-
-
-  /**
-   * @param index the current bar/candle index
-   *
-   * @return true if the current bar/candle is a black crow, false otherwise
-   */
-  private boolean isBlackCrow(final int index) {
-    final Bar prevBar = this.bars.get(index - 1);
-    final Bar currBar = this.bars.get(index);
-    if (currBar.isBearish()) {
-      if (prevBar.isBullish()) {
-        // First crow case
-        return hasVeryShortLowerShadow(index)
-               && currBar.openPrice().isLessThan(prevBar.highPrice());
-      } else {
-        return hasVeryShortLowerShadow(index) && isDeclining(index);
-      }
+        val index = bars.currentIndex
+        val whiteCandleIndex = index - 3
+        return bars[whiteCandleIndex]?.isBullish == true
+                && isBlackCrow(index - 2)
+                && isBlackCrow(index - 1)
+                && isBlackCrow(index)
     }
-    return false;
-  }
 
 
-  @Override
-  public void updateState(final Bar bar) {
-    this.averageLowerShadowInd.onBar(bar);
-    this.lowerShadows.refresh(bar);
-    this.value = calculate(bar);
-  }
+    /**
+     * @return true if the bar/candle has a very short lower shadow, false otherwise
+     */
+    private fun hasVeryShortLowerShadow(index: Int): Boolean {
+        val currentLowerShadow = lowerShadows[index].value
+        // We use the white candle index to remove to bias of the previous crows
+        val averageLowerShadow = averageLowerShadowInd.value
+
+        return currentLowerShadow.isLessThan(averageLowerShadow.multipliedBy(factor))
+    }
 
 
-  @Override
-  public boolean isStable() {
-    return this.averageLowerShadowInd.isStable();
-  }
+    /**
+     * @param index the current bar/candle index
+     *
+     * @return true if the current bar/candle is declining, false otherwise
+     */
+    private fun isDeclining(index: Int): Boolean {
+        val (prevOpenPrice, prevClosePrice) = bars[index - 1]?.let { it.openPrice to it.closePrice } ?: return false
+        val (currOpenPrice, currClosePrice) = bars[index]?.let { it.openPrice to it.closePrice } ?: return false
+
+        return currOpenPrice.isLessThan(prevOpenPrice) &&
+                currOpenPrice.isGreaterThan(prevClosePrice) &&
+                currClosePrice.isLessThan(prevClosePrice)
+    }
+
+
+    /**
+     * @param index the current bar/candle index
+     *
+     * @return true if the current bar/candle is a black crow, false otherwise
+     */
+    private fun isBlackCrow(index: Int): Boolean {
+        val prevBar = bars[index - 1]
+        val currBar = bars[index]
+        if (currBar?.isBearish != true) {
+            return false
+        }
+
+        return if (prevBar?.isBullish == true) {
+            hasVeryShortLowerShadow(index) && currBar.openPrice.isLessThan(prevBar.highPrice)
+        } else {
+            hasVeryShortLowerShadow(index) && isDeclining(index)
+        }
+    }
+
+    override fun updateState(bar: Bar) {
+        averageLowerShadowInd.onBar(bar)
+        lowerShadows.forEach { it.onBar(bar) }
+        value = calculate(bar)
+    }
+
+
+    override val isStable
+        get() = averageLowerShadowInd.isStable
 }

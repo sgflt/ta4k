@@ -161,7 +161,7 @@ class ExpectedShortfallCriterionTest {
   @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
   void calculateWithNoBarsShouldReturnZero(final NumFactory numFactory) {
     final var criterion = new ExpectedShortfallCriterion(numFactory, 0.95);
-    final var tradingRecord = new BackTestTradingRecord(numFactory);
+    final var tradingRecord = new BackTestTradingRecord(TradeType.BUY, numFactory);
     assertNumEquals(numFactory.numOf(0), criterion.calculate(tradingRecord));
   }
 

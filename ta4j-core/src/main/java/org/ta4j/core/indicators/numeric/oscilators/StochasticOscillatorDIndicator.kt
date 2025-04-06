@@ -21,55 +21,35 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.ta4j.core.indicators.numeric.oscilators;
+package org.ta4j.core.indicators.numeric.oscilators
 
-import org.ta4j.core.api.series.Bar;
-import org.ta4j.core.indicators.numeric.NumericIndicator;
-import org.ta4j.core.num.NaN;
-import org.ta4j.core.num.Num;
-import org.ta4j.core.num.NumFactory;
+import org.ta4j.core.api.series.Bar
+import org.ta4j.core.indicators.numeric.NumericIndicator
+import org.ta4j.core.num.NaN
+import org.ta4j.core.num.Num
+import org.ta4j.core.num.NumFactory
 
 /**
  * Stochastic oscillator D.
  */
-public class StochasticOscillatorDIndicator extends NumericIndicator {
+class StochasticOscillatorDIndicator private constructor(
+    numFactory: NumFactory,
+    private val indicator: NumericIndicator,
+) : NumericIndicator(numFactory) {
+    private var barsPassed = 0
 
-  private final NumericIndicator indicator;
-  private int barsPassed = 0;
+    constructor(numFactory: NumFactory, k: StochasticOscillatorKIndicator) : this(numFactory, k.sma(3))
 
+    private fun calculate(): Num = indicator.value
 
-  public StochasticOscillatorDIndicator(final NumFactory numFactory, final StochasticOscillatorKIndicator k) {
-    this(numFactory, k.sma(3));
-  }
+    override fun toString() = "StochD() => ${if (isStable) value else NaN}"
 
+    override fun updateState(bar: Bar) {
+        indicator.onBar(bar)
+        ++barsPassed
+        value = calculate()
+    }
 
-  private StochasticOscillatorDIndicator(final NumFactory numFactory, final NumericIndicator indicator) {
-    super(numFactory);
-    this.indicator = indicator;
-  }
-
-
-  private Num calculate() {
-    return this.indicator.getValue();
-  }
-
-
-  @Override
-  public String toString() {
-    return "StochD() => %s".formatted(isStable() ? getValue() : NaN.NaN);
-  }
-
-
-  @Override
-  protected void updateState(final Bar bar) {
-    this.indicator.onBar(bar);
-    ++this.barsPassed;
-    this.value = calculate();
-  }
-
-
-  @Override
-  public boolean isStable() {
-    return this.indicator.isStable() && this.barsPassed >= 3;
-  }
+    override val isStable
+        get() = indicator.isStable && barsPassed >= 3
 }

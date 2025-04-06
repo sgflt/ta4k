@@ -21,59 +21,35 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.ta4j.core.indicators.numeric.average;
+package org.ta4j.core.indicators.numeric.average
 
-import org.ta4j.core.api.series.Bar;
-import org.ta4j.core.indicators.numeric.NumericIndicator;
-import org.ta4j.core.num.Num;
+import org.ta4j.core.api.series.Bar
+import org.ta4j.core.indicators.numeric.NumericIndicator
 
 /**
  * Double exponential moving average indicator.
  *
- * @see <a href=
- *     "https://en.wikipedia.org/wiki/Double_exponential_moving_average">
- *     https://en.wikipedia.org/wiki/Double_exponential_moving_average</a>
+ * @see [
+ * https://en.wikipedia.org/wiki/Double_exponential_moving_average](https://en.wikipedia.org/wiki/Double_exponential_moving_average)
  */
-public class DoubleEMAIndicator extends NumericIndicator {
-
-  private final EMAIndicator ema;
-  private final EMAIndicator emaEma;
-
-
-  /**
-   * Constructor.
-   *
-   * @param indicator the indicator
-   * @param barCount the time frame
-   */
-  public DoubleEMAIndicator(final NumericIndicator indicator, final int barCount) {
-    super(indicator.getNumFactory());
-    this.ema = indicator.ema(barCount);
-    this.emaEma = this.ema.ema(barCount);
-  }
+class DoubleEMAIndicator(indicator: NumericIndicator, private val barCount: Int) :
+    NumericIndicator(indicator.numFactory) {
+    private val ema = indicator.ema(barCount)
+    private val emaEma = ema.ema(barCount)
 
 
-  @Override
-  public void updateState(final Bar bar) {
-    this.ema.onBar(bar);
-    this.emaEma.onBar(bar);
-    this.value = calculate();
-  }
+    public override fun updateState(bar: Bar) {
+        ema.onBar(bar)
+        emaEma.onBar(bar)
+        value = calculate()
+    }
 
 
-  @Override
-  public boolean isStable() {
-    return this.ema.isStable() && this.emaEma.isStable();
-  }
+    override val isStable
+        get() = ema.isStable && emaEma.isStable
 
 
-  protected Num calculate() {
-    return this.ema.getValue().multipliedBy(getNumFactory().two()).minus(this.emaEma.getValue());
-  }
+    private fun calculate() = ema.value.multipliedBy(numFactory.two()).minus(emaEma.value)
 
-
-  @Override
-  public String toString() {
-    return String.format("DoEMA(%d) => %s", this.ema.getBarCount(), getValue());
-  }
+    override fun toString() = "DoEMA(${barCount}) => $value"
 }

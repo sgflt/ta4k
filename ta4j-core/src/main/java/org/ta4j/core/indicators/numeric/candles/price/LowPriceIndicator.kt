@@ -21,38 +21,22 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.ta4j.core.indicators.numeric.candles.price;
+package org.ta4j.core.indicators.numeric.candles.price
 
-import org.ta4j.core.api.series.Bar;
-import org.ta4j.core.indicators.SeriesRelatedNumericIndicator;
-import org.ta4j.core.num.NumFactory;
+import org.ta4j.core.api.series.Bar
+import org.ta4j.core.indicators.SeriesRelatedNumericIndicator
+import org.ta4j.core.num.NumFactory
 
 /**
  * Low price indicator.
  *
- * <p>
  * Returns the low price of a bar.
  */
-public class LowPriceIndicator extends SeriesRelatedNumericIndicator {
-
-  /**
-   * Constructor.
-   *
-   * @param series the bar series
-   */
-  public LowPriceIndicator(final NumFactory series) {
-    super(series);
-  }
+class LowPriceIndicator(series: NumFactory) : SeriesRelatedNumericIndicator(series) {
+    override fun updateState(bar: Bar) {
+        value = bar.lowPrice
+    }
 
 
-  @Override
-  public void updateState(final Bar bar) {
-    this.value = bar.lowPrice();
-  }
-
-
-  @Override
-  public String toString() {
-    return String.format("Low() => %s", getValue());
-  }
+    override fun toString() = "Low() => $value"
 }

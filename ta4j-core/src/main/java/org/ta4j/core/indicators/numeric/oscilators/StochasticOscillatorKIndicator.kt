@@ -21,102 +21,77 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.ta4j.core.indicators.numeric.oscilators;
+package org.ta4j.core.indicators.numeric.oscilators
 
-import org.ta4j.core.api.Indicator;
-import org.ta4j.core.api.Indicators;
-import org.ta4j.core.api.series.Bar;
-import org.ta4j.core.indicators.numeric.NumericIndicator;
-import org.ta4j.core.indicators.numeric.candles.price.ClosePriceIndicator;
-import org.ta4j.core.indicators.numeric.candles.price.HighPriceIndicator;
-import org.ta4j.core.indicators.numeric.candles.price.LowPriceIndicator;
-import org.ta4j.core.indicators.numeric.helpers.HighestValueIndicator;
-import org.ta4j.core.indicators.numeric.helpers.LowestValueIndicator;
-import org.ta4j.core.num.Num;
-import org.ta4j.core.num.NumFactory;
+import org.ta4j.core.api.Indicators.closePrice
+import org.ta4j.core.api.Indicators.highPrice
+import org.ta4j.core.api.Indicators.lowPrice
+import org.ta4j.core.api.series.Bar
+import org.ta4j.core.indicators.numeric.NumericIndicator
+import org.ta4j.core.indicators.numeric.candles.price.HighPriceIndicator
+import org.ta4j.core.indicators.numeric.candles.price.LowPriceIndicator
+import org.ta4j.core.num.Num
+import org.ta4j.core.num.NumFactory
 
 /**
  * Stochastic oscillator K.
  */
-public class StochasticOscillatorKIndicator extends NumericIndicator {
+class StochasticOscillatorKIndicator(
+    numFactory: NumFactory,
+    private val indicator: NumericIndicator,
+    barCount: Int,
+    highPriceIndicator: HighPriceIndicator,
+    lowPriceIndicator: LowPriceIndicator,
+) : NumericIndicator(numFactory) {
+    private val highestHigh = highPriceIndicator.highest(barCount)
+    private val lowestMin = lowPriceIndicator.lowest(barCount)
 
-  private final Indicator<Num> indicator;
-  private final HighestValueIndicator highestHigh;
-  private final LowestValueIndicator lowestMin;
 
-
-  /**
-   * Constructor with:
-   *
-   * <ul>
-   * <li>{@code indicator} = {@link ClosePriceIndicator}
-   * <li>{@code highPriceIndicator} = {@link HighPriceIndicator}
-   * <li>{@code lowPriceIndicator} = {@link LowPriceIndicator}
-   * </ul>
-   *
-   * @param numFactory the bar series
-   * @param barCount the time frame
-   */
-  public StochasticOscillatorKIndicator(final NumFactory numFactory, final int barCount) {
-    this(
+    /**
+     * Constructor with:
+     *
+     *
+     *  * `indicator` = [ClosePriceIndicator]
+     *  * `highPriceIndicator` = [HighPriceIndicator]
+     *  * `lowPriceIndicator` = [LowPriceIndicator]
+     *
+     *
+     * @param numFactory the bar series
+     * @param barCount the time frame
+     */
+    constructor(numFactory: NumFactory, barCount: Int) : this(
         numFactory,
-        Indicators.closePrice(),
+        closePrice(),
         barCount,
-        Indicators.highPrice(),
-        Indicators.lowPrice()
-    );
-  }
+        highPrice(),
+        lowPrice()
+    )
 
 
-  /**
-   * Constructor.
-   *
-   * @param indicator the {@link Indicator}
-   * @param barCount the time frame
-   * @param highPriceIndicator the {@link HighPriceIndicator}
-   * @param lowPriceIndicator the {@link LowPriceIndicator}
-   */
-  public StochasticOscillatorKIndicator(
-      final NumFactory numFactory,
-      final Indicator<Num> indicator,
-      final int barCount,
-      final HighPriceIndicator highPriceIndicator,
-      final LowPriceIndicator lowPriceIndicator
-  ) {
-    super(numFactory);
-    this.indicator = indicator;
-    this.highestHigh = highPriceIndicator.highest(barCount);
-    this.lowestMin = lowPriceIndicator.lowest(barCount);
-  }
+    private fun calculate(): Num {
+        val highestHighPrice = highestHigh.value
+        val lowestLowPrice = lowestMin.value
 
+        val fullCandleHeight = highestHighPrice.minus(lowestLowPrice)
+        if (fullCandleHeight.isZero) {
+            return numFactory.fifty()
+        }
 
-  private Num calculate() {
-    final Num highestHighPrice = this.highestHigh.getValue();
-    final Num lowestLowPrice = this.lowestMin.getValue();
-
-    final var fullCandleHeight = highestHighPrice.minus(lowestLowPrice);
-    if (fullCandleHeight.isZero()) {
-      return getNumFactory().fifty();
+        return indicator.value
+            .minus(lowestLowPrice)
+            .dividedBy(fullCandleHeight)
+            .multipliedBy(numFactory.hundred())
     }
 
-    return this.indicator.getValue()
-        .minus(lowestLowPrice)
-        .dividedBy(fullCandleHeight)
-        .multipliedBy(getNumFactory().hundred());
-  }
+
+    override fun updateState(bar: Bar) {
+        indicator.onBar(bar)
+        highestHigh.onBar(bar)
+        lowestMin.onBar(bar)
+        value = calculate()
+    }
 
 
-  @Override
-  protected void updateState(final Bar bar) {
-    this.indicator.onBar(bar);
-    this.highestHigh.onBar(bar);
-    this.lowestMin.onBar(bar);
-    this.value = calculate();
-  }
-
-
-  @Override
-  public boolean isStable() {
-    return this.indicator.isStable() && this.highestHigh.isStable() && this.lowestMin.isStable();
-  }
+    override val isStable: Boolean
+        get() = indicator.isStable && highestHigh.isStable && lowestMin.isStable
 }

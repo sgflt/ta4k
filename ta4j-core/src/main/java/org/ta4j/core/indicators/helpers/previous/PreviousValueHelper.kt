@@ -21,81 +21,56 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.ta4j.core.indicators.helpers.previous;
+package org.ta4j.core.indicators.helpers.previous
 
-import java.util.LinkedList;
-
-import org.ta4j.core.api.Indicator;
-import org.ta4j.core.api.series.Bar;
+import org.ta4j.core.api.Indicator
+import org.ta4j.core.api.series.Bar
+import java.util.*
 
 /**
  * Returns the (n-th) previous value of an indicator.
  */
-class PreviousValueHelper<T> implements Indicator<T> {
+internal class PreviousValueHelper<T>(private val indicator: Indicator<T>, private val n: Int) : Indicator<T?> {
+    private val previousValues = LinkedList<T>()
+    override var value: T? = null
+        private set
+    private var currentBar: Bar? = null
 
-  private final int n;
-  private final Indicator<T> indicator;
-  private final LinkedList<T> previousValues = new LinkedList<>();
-  private T value;
-  private Bar currentBar;
-
-
-  /**
-   * Constructor.
-   *
-   * @param indicator the indicator from which to calculate the previous value
-   * @param n parameter defines the previous n-th value
-   */
-  public PreviousValueHelper(final Indicator<T> indicator, final int n) {
-    if (n < 1) {
-      throw new IllegalArgumentException("n must be positive number, but was: " + n);
-    }
-    this.n = n;
-    this.indicator = indicator;
-  }
-
-
-  protected T calculate() {
-    final var currentValue = this.indicator.getValue();
-    this.previousValues.addLast(currentValue);
-
-    if (this.previousValues.size() > this.n) {
-      return this.previousValues.removeFirst();
+    /**
+     * Constructor.
+     *
+     * @param indicator the indicator from which to calculate the previous value
+     * @param n parameter defines the previous n-th value
+     */
+    init {
+        require(n >= 1) { "n must be positive number, but was: " + n }
     }
 
-    return null;
-  }
+    private fun calculate(): T? {
+        val currentValue = indicator.value
+        previousValues.addLast(currentValue)
 
+        if (previousValues.size > n) {
+            return previousValues.removeFirst()
+        }
 
-  @Override
-  public String toString() {
-    return String.format("PREV(%d, %s) => %s", this.n, this.indicator, getValue());
-  }
-
-
-  @Override
-  public T getValue() {
-    return this.value;
-  }
-
-
-  @Override
-  public void onBar(final Bar bar) {
-    if (bar != this.currentBar) {
-      updateState(bar);
-      this.currentBar = bar;
+        return null
     }
-  }
 
+    override fun toString() = "PREV($n, $indicator) => $value"
 
-  public void updateState(final Bar bar) {
-    this.indicator.onBar(bar);
-    this.value = calculate();
-  }
+    override fun onBar(bar: Bar) {
+        if (bar !== currentBar) {
+            updateState(bar)
+            currentBar = bar
+        }
+    }
 
+    fun updateState(bar: Bar) {
+        indicator.onBar(bar)
+        value = calculate()
+    }
 
-  @Override
-  public boolean isStable() {
-    return this.previousValues.size() == this.n && this.value != null;
-  }
+    override val isStable
+        get() = previousValues.size == n && value != null
 }

@@ -21,65 +21,45 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.ta4j.core.indicators.numeric.statistics;
+package org.ta4j.core.indicators.numeric.statistics
 
-import org.ta4j.core.api.series.Bar;
-import org.ta4j.core.indicators.numeric.NumericIndicator;
-import org.ta4j.core.num.Num;
+import org.ta4j.core.api.series.Bar
+import org.ta4j.core.indicators.numeric.NumericIndicator
+import org.ta4j.core.num.Num
 
 /**
  * Correlation coefficient indicator.
  *
- * @see <a href=
- *     "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/correlation-coefficient">
- *     https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/correlation-coefficient</a>
+ * @see [
+ * https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/correlation-coefficient](https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/correlation-coefficient)
  */
-public class CorrelationCoefficientIndicator extends NumericIndicator {
-
-  private final VarianceIndicator variance1;
-  private final VarianceIndicator variance2;
-  private final CovarianceIndicator covariance;
-
-
-  /**
-   * Constructor.
-   *
-   * @param indicator1 the first indicator
-   * @param indicator2 the second indicator
-   * @param barCount the time frame
-   */
-  public CorrelationCoefficientIndicator(
-      final NumericIndicator indicator1,
-      final NumericIndicator indicator2,
-      final int barCount
-  ) {
-    super(indicator1.getNumFactory());
-    this.variance1 = indicator1.variance(barCount);
-    this.variance2 = indicator2.variance(barCount);
-    this.covariance = indicator1.covariance(indicator2, barCount);
-  }
+class CorrelationCoefficientIndicator(
+    indicator1: NumericIndicator,
+    indicator2: NumericIndicator,
+    barCount: Int,
+) : NumericIndicator(indicator1.numFactory) {
+    private val variance1 = indicator1.variance(barCount)
+    private val variance2 = indicator2.variance(barCount)
+    private val covariance = indicator1.covariance(indicator2, barCount)
 
 
-  protected Num calculate() {
-    final var cov = this.covariance.getValue();
-    final var var1 = this.variance1.getValue();
-    final var var2 = this.variance2.getValue();
-    final var multipliedSqrt = var1.multipliedBy(var2).sqrt();
-    return cov.dividedBy(multipliedSqrt);
-  }
+    private fun calculate(): Num {
+        val cov = covariance.value
+        val var1 = variance1.value
+        val var2 = variance2.value
+        val multipliedSqrt = var1.multipliedBy(var2).sqrt()
+        return cov.dividedBy(multipliedSqrt)
+    }
 
 
-  @Override
-  public void updateState(final Bar bar) {
-    this.variance1.onBar(bar);
-    this.variance2.onBar(bar);
-    this.covariance.onBar(bar);
-    this.value = calculate();
-  }
+    public override fun updateState(bar: Bar) {
+        variance1.onBar(bar)
+        variance2.onBar(bar)
+        covariance.onBar(bar)
+        value = calculate()
+    }
 
 
-  @Override
-  public boolean isStable() {
-    return this.variance1.isStable() && this.variance2.isStable() && this.covariance.isStable();
-  }
+    override val isStable
+        get() = variance1.isStable && variance2.isStable && covariance.isStable
 }

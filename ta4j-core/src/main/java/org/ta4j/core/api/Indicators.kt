@@ -20,309 +20,164 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
+package org.ta4j.core.api
 
-package org.ta4j.core.api;
-
-import lombok.experimental.UtilityClass;
-import org.ta4j.core.indicators.numeric.CloseLocationValueIndicator;
-import org.ta4j.core.indicators.numeric.NumericIndicator;
-import org.ta4j.core.indicators.numeric.candles.LowerShadowIndicator;
-import org.ta4j.core.indicators.numeric.candles.RealBodyIndicator;
-import org.ta4j.core.indicators.numeric.candles.VolumeIndicator;
-import org.ta4j.core.indicators.numeric.candles.price.ClosePriceIndicator;
-import org.ta4j.core.indicators.numeric.candles.price.HighPriceIndicator;
-import org.ta4j.core.indicators.numeric.candles.price.LowPriceIndicator;
-import org.ta4j.core.indicators.numeric.candles.price.MedianPriceIndicator;
-import org.ta4j.core.indicators.numeric.candles.price.OpenPriceIndicator;
-import org.ta4j.core.indicators.numeric.candles.price.TypicalPriceIndicator;
-import org.ta4j.core.indicators.numeric.channels.bollinger.BollingerBandFacade;
-import org.ta4j.core.indicators.numeric.momentum.ATRIndicator;
-import org.ta4j.core.indicators.numeric.momentum.adx.ADXIndicator;
-import org.ta4j.core.indicators.numeric.momentum.adx.MinusDIIndicator;
-import org.ta4j.core.indicators.numeric.momentum.adx.MinusDMIndicator;
-import org.ta4j.core.indicators.numeric.momentum.adx.PlusDIIndicator;
-import org.ta4j.core.indicators.numeric.momentum.adx.PlusDMIndicator;
-import org.ta4j.core.indicators.numeric.oscilators.AwesomeOscillatorIndicator;
-import org.ta4j.core.indicators.numeric.oscilators.StochasticOscillatorDIndicator;
-import org.ta4j.core.indicators.numeric.oscilators.StochasticOscillatorKIndicator;
-import org.ta4j.core.indicators.numeric.oscilators.aroon.AroonDownIndicator;
-import org.ta4j.core.indicators.numeric.oscilators.aroon.AroonOscillatorIndicator;
-import org.ta4j.core.indicators.numeric.oscilators.aroon.AroonUpIndicator;
-import org.ta4j.core.num.NumFactory;
-import org.ta4j.core.num.NumFactoryProvider;
+import org.ta4j.core.indicators.numeric.CloseLocationValueIndicator
+import org.ta4j.core.indicators.numeric.NumericIndicator
+import org.ta4j.core.indicators.numeric.candles.LowerShadowIndicator
+import org.ta4j.core.indicators.numeric.candles.RealBodyIndicator
+import org.ta4j.core.indicators.numeric.candles.VolumeIndicator
+import org.ta4j.core.indicators.numeric.candles.price.*
+import org.ta4j.core.indicators.numeric.channels.bollinger.BollingerBandFacade
+import org.ta4j.core.indicators.numeric.momentum.ATRIndicator
+import org.ta4j.core.indicators.numeric.momentum.adx.*
+import org.ta4j.core.indicators.numeric.oscilators.AwesomeOscillatorIndicator
+import org.ta4j.core.indicators.numeric.oscilators.StochasticOscillatorDIndicator
+import org.ta4j.core.indicators.numeric.oscilators.StochasticOscillatorKIndicator
+import org.ta4j.core.indicators.numeric.oscilators.aroon.AroonDownIndicator
+import org.ta4j.core.indicators.numeric.oscilators.aroon.AroonOscillatorIndicator
+import org.ta4j.core.indicators.numeric.oscilators.aroon.AroonUpIndicator
+import org.ta4j.core.num.NumFactory
+import org.ta4j.core.num.NumFactoryProvider
 
 /**
  * @author Lukáš Kvídera
  */
-@UtilityClass
-public final class Indicators {
+object Indicators {
+    @JvmStatic
+    fun medianPrice() = extended().medianPrice()
 
+    @JvmStatic
+    fun closePrice() = extended().closePrice()
 
-  public static MedianPriceIndicator medianPrice() {
-    return extended().medianPrice();
-  }
+    @JvmStatic
+    fun openPrice() = extended().openPrice()
 
+    @JvmStatic
+    fun lowPrice() = extended().lowPrice()
 
-  public static ClosePriceIndicator closePrice() {
-    return extended().closePrice();
-  }
+    @JvmStatic
+    fun highPrice() = extended().highPrice()
 
+    @JvmStatic
+    fun typicalPrice() = extended().typicalPrice()
 
-  public static OpenPriceIndicator openPrice() {
-    return extended().openPrice();
-  }
+    @JvmStatic
+    fun closeLocationValue() = extended().closeLocationValue()
 
+    @JvmStatic
+    fun volume() = extended().volume()
 
-  public static LowPriceIndicator lowPrice() {
-    return extended().lowPrice();
-  }
+    @JvmStatic
+    fun bollingerBands(barCount: Int, k: Number) = extended().bollingerBands(barCount, k)
 
+    @JvmStatic
+    fun realBody() = extended().realBody()
 
-  public static HighPriceIndicator highPrice() {
-    return extended().highPrice();
-  }
+    @JvmStatic
+    fun aroonOscillator(barCount: Int) = extended().aroonOscillator(barCount)
 
+    @JvmStatic
+    fun aroonUp(barCount: Int) = extended().aroonUp(barCount)
 
-  public static TypicalPriceIndicator typicalPrice() {
-    return extended().typicalPrice();
-  }
+    @JvmStatic
+    fun aroonDown(barCount: Int) = extended().aroonDown(barCount)
 
+    @JvmStatic
+    fun atr(barCount: Int) = extended().atr(barCount)
 
-  public static CloseLocationValueIndicator closeLocationValue() {
-    return extended().closeLocationValue();
-  }
+    @JvmStatic
+    fun adx(diBarCount: Int, adxBarCount: Int) = extended().adx(diBarCount, adxBarCount)
 
+    @JvmStatic
+    fun adx(barCount: Int) = adx(barCount, barCount)
 
-  public static VolumeIndicator volume() {
-    return extended().volume();
-  }
+    @JvmStatic
+    fun plusDMI() = extended().plusDMI()
 
+    @JvmStatic
+    fun plusDII(barCount: Int) = extended().plusDII(barCount)
 
-  public static BollingerBandFacade bollingerBands(final int barCount, final Number k) {
-    return extended().bollingerBands(barCount, k);
-  }
+    @JvmStatic
+    fun minusDMI() = extended().minusDMI()
 
+    @JvmStatic
+    fun minusDII(barCount: Int) = extended().minusDII(barCount)
 
-  public static RealBodyIndicator realBody() {
-    return extended().realBody();
-  }
+    @JvmStatic
+    fun lowerShadow() = extended().lowerShadow()
 
+    @JvmStatic
+    fun stochasticKOscillator(barCount: Int) = extended().stochasticKOscillator(barCount)
 
-  public static AroonOscillatorIndicator aroonOscillator(final int barCount) {
-    return extended().aroonOscillator(barCount);
-  }
+    @JvmStatic
+    fun stochasticOscillator(barCount: Int) = extended().stochasticOscillator(barCount)
 
+    @JvmStatic
+    fun awesomeOscillator(shortBarCount: Int, longBarCount: Int) =
+        extended().awesomeOscillator(shortBarCount, longBarCount)
 
-  public static AroonUpIndicator aroonUp(final int barCount) {
-    return extended().aroonUp(barCount);
-  }
+    @JvmStatic
+    private fun extended() = extended(NumFactoryProvider.defaultNumFactory)
 
+    @JvmStatic
+    fun extended(numFactory: NumFactory) = ExtendedIndicatorFactory(numFactory)
 
-  public static AroonDownIndicator aroonDown(final int barCount) {
-    return extended().aroonDown(barCount);
-  }
+    class ExtendedIndicatorFactory(private val numFactory: NumFactory) {
+        fun medianPrice() = MedianPriceIndicator(numFactory)
 
+        fun closePrice() = ClosePriceIndicator(numFactory)
 
-  public static ATRIndicator atr(final int barCount) {
-    return extended().atr(barCount);
-  }
+        fun openPrice() = OpenPriceIndicator(numFactory)
 
+        fun lowPrice() = LowPriceIndicator(numFactory)
 
-  public static ADXIndicator adx(final int diBarCount, final int adxBarCount) {
-    return extended().adx(diBarCount, adxBarCount);
-  }
+        fun highPrice() = HighPriceIndicator(numFactory)
 
+        fun typicalPrice() = TypicalPriceIndicator(numFactory)
 
-  public static ADXIndicator adx(final int barCount) {
-    return adx(barCount, barCount);
-  }
+        fun volume() = VolumeIndicator(numFactory)
 
+        fun bollingerBands(barCount: Int, k: Number) = BollingerBandFacade(closePrice(), barCount, k)
 
-  public static PlusDMIndicator plusDMI() {
-    return extended().plusDMI();
-  }
+        fun realBody() = RealBodyIndicator(numFactory)
 
+        fun aroonOscillator(barCount: Int) = AroonOscillatorIndicator(numFactory, barCount)
 
-  public static PlusDIIndicator plusDII(final int barCount) {
-    return extended().plusDII(barCount);
-  }
+        fun aroonUp(barCount: Int) = AroonUpIndicator(numFactory, barCount)
 
+        fun aroonDown(barCount: Int) = AroonDownIndicator(numFactory, barCount)
 
-  public static MinusDMIndicator minusDMI() {
-    return extended().minusDMI();
-  }
+        fun atr(barCount: Int) = ATRIndicator(numFactory, barCount)
 
+        fun adx(diBarCount: Int, adxBarCount: Int) = ADXIndicator(numFactory, diBarCount, adxBarCount)
 
-  public static MinusDIIndicator minusDII(final int barCount) {
-    return extended().minusDII(barCount);
-  }
+        fun adx(barCount: Int) = adx(barCount, barCount)
 
+        fun plusDMI() = PlusDMIndicator(numFactory)
 
-  public static LowerShadowIndicator lowerShadow() {
-    return extended().lowerShadow();
-  }
+        fun plusDII(barCount: Int) = PlusDIIndicator(numFactory, barCount)
 
+        fun minusDMI() = MinusDMIndicator(numFactory)
 
-  public static StochasticOscillatorKIndicator stochasticKOscillator(final int barCount) {
-    return extended().stochasticKOscillator(barCount);
-  }
+        fun minusDII(barCount: Int) = MinusDIIndicator(numFactory, barCount)
 
+        fun lowerShadow() = LowerShadowIndicator(numFactory)
 
-  public static StochasticOscillatorDIndicator stochasticOscillator(final int barCount) {
-    return extended().stochasticOscillator(barCount);
-  }
+        fun stochasticOscillator(barCount: Int) =
+            StochasticOscillatorDIndicator(numFactory, stochasticKOscillator(barCount))
 
+        fun stochasticKOscillator(barCount: Int) = StochasticOscillatorKIndicator(numFactory, barCount)
 
-  public static AwesomeOscillatorIndicator awesomeOscillator(final int shortBarCount, final int longBarCount) {
-    return extended().awesomeOscillator(shortBarCount, longBarCount);
-  }
+        fun awesomeOscillator(
+            indicator: NumericIndicator,
+            shortBarCount: Int,
+            longBarCount: Int,
+        ) = AwesomeOscillatorIndicator(numFactory, indicator, shortBarCount, longBarCount)
 
+        fun awesomeOscillator(shortBarCount: Int, longBarCount: Int) =
+            awesomeOscillator(medianPrice(), shortBarCount, longBarCount)
 
-  private static ExtendedIndicatorFactory extended() {
-    return extended(NumFactoryProvider.getDefaultNumFactory());
-  }
-
-
-  public static ExtendedIndicatorFactory extended(final NumFactory numFactory) {
-    return new ExtendedIndicatorFactory(numFactory);
-  }
-
-
-  public static class ExtendedIndicatorFactory {
-    private final NumFactory numFactory;
-
-
-    public ExtendedIndicatorFactory(final NumFactory numFactory) {
-      this.numFactory = numFactory;
+        fun closeLocationValue() = CloseLocationValueIndicator(numFactory)
     }
-
-
-    public MedianPriceIndicator medianPrice() {
-      return new MedianPriceIndicator(this.numFactory);
-    }
-
-
-    public ClosePriceIndicator closePrice() {
-      return new ClosePriceIndicator(this.numFactory);
-    }
-
-
-    public OpenPriceIndicator openPrice() {
-      return new OpenPriceIndicator(this.numFactory);
-    }
-
-
-    public LowPriceIndicator lowPrice() {
-      return new LowPriceIndicator(this.numFactory);
-    }
-
-
-    public HighPriceIndicator highPrice() {
-      return new HighPriceIndicator(this.numFactory);
-    }
-
-
-    public TypicalPriceIndicator typicalPrice() {
-      return new TypicalPriceIndicator(this.numFactory);
-    }
-
-
-    public VolumeIndicator volume() {
-      return new VolumeIndicator(this.numFactory);
-    }
-
-
-    public BollingerBandFacade bollingerBands(final int barCount, final Number k) {
-      return new BollingerBandFacade(closePrice(), barCount, k);
-    }
-
-
-    public RealBodyIndicator realBody() {
-      return new RealBodyIndicator(this.numFactory);
-    }
-
-
-    public AroonOscillatorIndicator aroonOscillator(final int barCount) {
-      return new AroonOscillatorIndicator(this.numFactory, barCount);
-    }
-
-
-    public AroonUpIndicator aroonUp(final int barCount) {
-      return new AroonUpIndicator(this.numFactory, barCount);
-    }
-
-
-    public AroonDownIndicator aroonDown(final int barCount) {
-      return new AroonDownIndicator(this.numFactory, barCount);
-    }
-
-
-    public ATRIndicator atr(final int barCount) {
-      return new ATRIndicator(this.numFactory, barCount);
-    }
-
-
-    public ADXIndicator adx(final int diBarCount, final int adxBarCount) {
-      return new ADXIndicator(this.numFactory, diBarCount, adxBarCount);
-    }
-
-
-    public ADXIndicator adx(final int barCount) {
-      return adx(barCount, barCount);
-    }
-
-
-    public PlusDMIndicator plusDMI() {
-      return new PlusDMIndicator(this.numFactory);
-    }
-
-
-    public PlusDIIndicator plusDII(final int barCount) {
-      return new PlusDIIndicator(this.numFactory, barCount);
-    }
-
-
-    public MinusDMIndicator minusDMI() {
-      return new MinusDMIndicator(this.numFactory);
-    }
-
-
-    public MinusDIIndicator minusDII(final int barCount) {
-      return new MinusDIIndicator(this.numFactory, barCount);
-    }
-
-
-    public LowerShadowIndicator lowerShadow() {
-      return new LowerShadowIndicator(this.numFactory);
-    }
-
-
-    public StochasticOscillatorDIndicator stochasticOscillator(final int barCount) {
-      return new StochasticOscillatorDIndicator(this.numFactory, stochasticKOscillator(barCount));
-    }
-
-
-    public StochasticOscillatorKIndicator stochasticKOscillator(final int barCount) {
-      return new StochasticOscillatorKIndicator(this.numFactory, barCount);
-    }
-
-
-    public AwesomeOscillatorIndicator awesomeOscillator(
-        final NumericIndicator indicator,
-        final int shortBarCount,
-        final int longBarCount
-    ) {
-      return new AwesomeOscillatorIndicator(this.numFactory, indicator, shortBarCount, longBarCount);
-    }
-
-
-    public AwesomeOscillatorIndicator awesomeOscillator(final int shortBarCount, final int longBarCount) {
-      return awesomeOscillator(medianPrice(), shortBarCount, longBarCount);
-    }
-
-
-    public CloseLocationValueIndicator closeLocationValue() {
-      return new CloseLocationValueIndicator(this.numFactory);
-    }
-  }
 }

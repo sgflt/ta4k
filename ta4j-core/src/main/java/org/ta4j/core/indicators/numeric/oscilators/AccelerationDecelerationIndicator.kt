@@ -20,67 +20,36 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.ta4j.core.indicators.numeric.oscilators;
+package org.ta4j.core.indicators.numeric.oscilators
 
-import org.ta4j.core.api.Indicators;
-import org.ta4j.core.api.series.Bar;
-import org.ta4j.core.indicators.numeric.NumericIndicator;
-import org.ta4j.core.indicators.numeric.average.SMAIndicator;
-import org.ta4j.core.num.Num;
-import org.ta4j.core.num.NumFactory;
+import org.ta4j.core.api.Indicators.awesomeOscillator
+import org.ta4j.core.api.series.Bar
+import org.ta4j.core.indicators.numeric.NumericIndicator
+import org.ta4j.core.num.Num
+import org.ta4j.core.num.NumFactory
 
 /**
  * Acceleration-deceleration indicator.
  */
-public class AccelerationDecelerationIndicator extends NumericIndicator {
-
-  private final AwesomeOscillatorIndicator awesome;
-  private final SMAIndicator sma;
-
-
-  /**
-   * Constructor.
-   *
-   * @param numFactory the numFactory
-   * @param shortBarCount the bar count for {@link #awesome}
-   * @param longBarCount the bar count for {@link #sma}
-   */
-  public AccelerationDecelerationIndicator(
-      final NumFactory numFactory,
-      final int shortBarCount,
-      final int longBarCount
-  ) {
-    super(numFactory);
-    this.awesome = Indicators.awesomeOscillator(shortBarCount, longBarCount);
-    this.sma = this.awesome.sma(shortBarCount);
-  }
+class AccelerationDecelerationIndicator @JvmOverloads constructor(
+    numFactory: NumFactory,
+    shortBarCount: Int = 5,
+    longBarCount: Int = 34,
+) : NumericIndicator(numFactory) {
+    private val awesome = awesomeOscillator(shortBarCount, longBarCount)
+    private val sma = this.awesome.sma(shortBarCount)
 
 
-  /**
-   * Constructor with {@code barCountSma1} = 5 and {@code barCountSma2} = 34.
-   *
-   * @param numFactory the numFactory
-   */
-  public AccelerationDecelerationIndicator(final NumFactory numFactory) {
-    this(numFactory, 5, 34);
-  }
+    private fun calculate(): Num = awesome.value.minus(sma.value)
 
 
-  protected Num calculate() {
-    return this.awesome.getValue().minus(this.sma.getValue());
-  }
+    public override fun updateState(bar: Bar) {
+        awesome.onBar(bar)
+        sma.onBar(bar)
+        value = calculate()
+    }
 
 
-  @Override
-  public void updateState(final Bar bar) {
-    this.awesome.onBar(bar);
-    this.sma.onBar(bar);
-    this.value = calculate();
-  }
-
-
-  @Override
-  public boolean isStable() {
-    return this.awesome.isStable() && this.sma.isStable();
-  }
+    override val isStable: Boolean
+        get() = awesome.isStable && sma.isStable
 }

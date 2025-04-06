@@ -21,81 +21,54 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.ta4j.core.indicators.numeric.channels.keltner;
+package org.ta4j.core.indicators.numeric.channels.keltner
 
-import org.ta4j.core.api.series.Bar;
-import org.ta4j.core.indicators.numeric.NumericIndicator;
-import org.ta4j.core.indicators.numeric.momentum.ATRIndicator;
-import org.ta4j.core.num.Num;
-import org.ta4j.core.num.NumFactory;
+import org.ta4j.core.api.series.Bar
+import org.ta4j.core.indicators.numeric.NumericIndicator
+import org.ta4j.core.indicators.numeric.momentum.ATRIndicator
+import org.ta4j.core.num.NumFactory
 
 /**
  * Keltner Channel (upper line) indicator.
  *
- * @see <a href=
- *     "http://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:keltner_channels">
- *     http://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:keltner_channels</a>
+ * @see [
+ * http://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:keltner_channels](http://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:keltner_channels)
  */
-public class KeltnerChannelUpperIndicator extends NumericIndicator {
-
-  private final ATRIndicator averageTrueRangeIndicator;
-  private final KeltnerChannelMiddleIndicator keltnerMiddleIndicator;
-  private final Num ratio;
-
-
-  /**
-   * Constructor.
-   *
-   * @param middle the {@link #keltnerMiddleIndicator}
-   * @param ratio the {@link #ratio}
-   * @param barCountATR the bar count for the {@link ATRIndicator}
-   */
-  public KeltnerChannelUpperIndicator(
-      final NumFactory numFactory,
-      final KeltnerChannelMiddleIndicator middle,
-      final double ratio,
-      final int barCountATR
-  ) {
-    this(numFactory, middle, new ATRIndicator(numFactory, barCountATR), ratio);
-  }
+class KeltnerChannelUpperIndicator(
+    numFactory: NumFactory,
+    private val keltnerMiddleIndicator: KeltnerChannelMiddleIndicator,
+    private val averageTrueRangeIndicator: ATRIndicator,
+    ratio: Double,
+) : NumericIndicator(numFactory) {
+    private val ratio = numFactory.numOf(ratio)
 
 
-  /**
-   * Constructor.
-   *
-   * @param middle the {@link #keltnerMiddleIndicator}
-   * @param atr the {@link ATRIndicator}
-   * @param ratio the {@link #ratio}
-   */
-  public KeltnerChannelUpperIndicator(
-      final NumFactory numFactory,
-      final KeltnerChannelMiddleIndicator middle,
-      final ATRIndicator atr,
-      final double ratio
-  ) {
-    super(numFactory);
-    this.keltnerMiddleIndicator = middle;
-    this.averageTrueRangeIndicator = atr;
-    this.ratio = getNumFactory().numOf(ratio);
-  }
+    /**
+     * Constructor.
+     *
+     * @param middle the [.keltnerMiddleIndicator]
+     * @param ratio the [.ratio]
+     * @param barCountATR the bar count for the [ATRIndicator]
+     */
+    constructor(
+        numFactory: NumFactory,
+        middle: KeltnerChannelMiddleIndicator,
+        ratio: Double,
+        barCountATR: Int,
+    ) : this(numFactory, middle, ATRIndicator(numFactory, barCountATR), ratio)
 
 
-  protected Num calculate() {
-    return this.keltnerMiddleIndicator.getValue()
-        .plus(this.ratio.multipliedBy(this.averageTrueRangeIndicator.getValue()));
-  }
+    private fun calculate() = keltnerMiddleIndicator.value
+        .plus(ratio.multipliedBy(averageTrueRangeIndicator.value))
 
 
-  @Override
-  public void updateState(final Bar bar) {
-    this.keltnerMiddleIndicator.onBar(bar);
-    this.averageTrueRangeIndicator.onBar(bar);
-    this.value = calculate();
-  }
+    public override fun updateState(bar: Bar) {
+        keltnerMiddleIndicator.onBar(bar)
+        averageTrueRangeIndicator.onBar(bar)
+        value = calculate()
+    }
 
 
-  @Override
-  public boolean isStable() {
-    return this.keltnerMiddleIndicator.isStable() && this.averageTrueRangeIndicator.isStable();
-  }
+    override val isStable: Boolean
+        get() = keltnerMiddleIndicator.isStable && averageTrueRangeIndicator.isStable
 }

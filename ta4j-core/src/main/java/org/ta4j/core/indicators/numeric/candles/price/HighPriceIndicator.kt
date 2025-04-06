@@ -21,38 +21,23 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.ta4j.core.indicators.numeric.candles.price;
+package org.ta4j.core.indicators.numeric.candles.price
 
-import org.ta4j.core.api.series.Bar;
-import org.ta4j.core.indicators.SeriesRelatedNumericIndicator;
-import org.ta4j.core.num.NumFactory;
+import org.ta4j.core.api.series.Bar
+import org.ta4j.core.indicators.SeriesRelatedNumericIndicator
+import org.ta4j.core.num.NumFactory
 
 /**
  * The high price indicator.
  *
- * <p>
+ *
+ *
  * Returns the high price of a bar.
  */
-public class HighPriceIndicator extends SeriesRelatedNumericIndicator {
+class HighPriceIndicator(numFactory: NumFactory) : SeriesRelatedNumericIndicator(numFactory) {
+    override fun updateState(bar: Bar) {
+        value = bar.highPrice
+    }
 
-  /**
-   * Constructor.
-   *
-   * @param numFactory the bar numFactory
-   */
-  public HighPriceIndicator(final NumFactory numFactory) {
-    super(numFactory);
-  }
-
-
-  @Override
-  public void updateState(final Bar bar) {
-    this.value = bar.highPrice();
-  }
-
-
-  @Override
-  public String toString() {
-    return "High() => %s".formatted(getValue());
-  }
+    override fun toString() = "High() => $value"
 }

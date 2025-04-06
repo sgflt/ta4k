@@ -21,71 +21,57 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.ta4j.core.indicators.numeric.channels.bollinger;
+package org.ta4j.core.indicators.numeric.channels.bollinger
 
-import org.ta4j.core.api.Indicator;
-import org.ta4j.core.api.series.Bar;
-import org.ta4j.core.indicators.numeric.NumericIndicator;
-import org.ta4j.core.indicators.numeric.average.SMAIndicator;
-import org.ta4j.core.indicators.numeric.statistics.StandardDeviationIndicator;
-import org.ta4j.core.num.Num;
+import org.ta4j.core.api.Indicator
+import org.ta4j.core.api.series.Bar
+import org.ta4j.core.indicators.numeric.NumericIndicator
+import org.ta4j.core.indicators.numeric.average.SMAIndicator
+import org.ta4j.core.indicators.numeric.statistics.StandardDeviationIndicator
+import org.ta4j.core.num.Num
 
 /**
  * %B indicator.
  *
- * @see <a href=
- *     "http://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:bollinger_band_perce">
- *     http://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:bollinger_band_perce</a>
+ * @see [
+ * http://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:bollinger_band_perce](http://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:bollinger_band_perce)
  */
-public class PercentBIndicator extends NumericIndicator {
-
-  private final Indicator<Num> indicator;
-  private final BollingerBandsUpperIndicator bbu;
-  private final BollingerBandsLowerIndicator bbl;
-
-
-  /**
-   * Constructor.
-   *
-   * @param indicator the {@link Indicator} (usually {@code ClosePriceIndicator})
-   * @param barCount the time frame
-   * @param k the K multiplier (usually 2.0)
-   */
-  public PercentBIndicator(final NumericIndicator indicator, final int barCount, final double k) {
-    super(indicator.getNumFactory());
-    this.indicator = indicator;
-    final var bbm = new BollingerBandsMiddleIndicator(new SMAIndicator(indicator, barCount));
-    final var sd = new StandardDeviationIndicator(indicator, barCount);
-    this.bbu = new BollingerBandsUpperIndicator(bbm, sd, getNumFactory().numOf(k));
-    this.bbl = new BollingerBandsLowerIndicator(bbm, sd, getNumFactory().numOf(k));
-  }
+class PercentBIndicator(private val indicator: NumericIndicator, barCount: Int, k: Double) :
+    NumericIndicator(indicator.numFactory) {
+    private val bbu: BollingerBandsUpperIndicator
+    private val bbl: BollingerBandsLowerIndicator
 
 
-  protected Num calculate() {
-    final Num value = this.indicator.getValue();
-    final Num upValue = this.bbu.getValue();
-    final Num lowValue = this.bbl.getValue();
-    return value.minus(lowValue).dividedBy(upValue.minus(lowValue));
-  }
+    /**
+     * Constructor.
+     *
+     * @param indicator the [Indicator] (usually `ClosePriceIndicator`)
+     * @param barCount the time frame
+     * @param k the K multiplier (usually 2.0)
+     */
+    init {
+        val bbm = BollingerBandsMiddleIndicator(SMAIndicator(indicator, barCount))
+        val sd = StandardDeviationIndicator(indicator, barCount)
+        bbu = BollingerBandsUpperIndicator(bbm, sd, numFactory.numOf(k))
+        bbl = BollingerBandsLowerIndicator(bbm, sd, numFactory.numOf(k))
+    }
 
+    private fun calculate(): Num {
+        val value = indicator.value
+        val upValue = bbu.value
+        val lowValue = bbl.value
+        return value.minus(lowValue).dividedBy(upValue.minus(lowValue))
+    }
 
-  @Override
-  public void updateState(final Bar bar) {
-    this.indicator.onBar(bar);
-    this.bbl.onBar(bar);
-    this.bbu.onBar(bar);
-    this.value = calculate();
-  }
+    public override fun updateState(bar: Bar) {
+        indicator.onBar(bar)
+        bbl.onBar(bar)
+        bbu.onBar(bar)
+        value = calculate()
+    }
 
+    override val isStable
+        get() = indicator.isStable && bbl.isStable && bbu.isStable
 
-  @Override
-  public boolean isStable() {
-    return this.indicator.isStable() && this.bbl.isStable() && this.bbu.isStable();
-  }
-
-
-  @Override
-  public String toString() {
-    return String.format("%%Bi(%s) => %s", this.indicator, getValue());
-  }
+    override fun toString() = "%%Bi(${indicator}) => $value"
 }

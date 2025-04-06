@@ -41,12 +41,12 @@ public class GsonBarData {
 
   public static GsonBarData from(final BacktestBar bar) {
     final var result = new GsonBarData();
-    result.startTime = bar.endTime().toEpochMilli();
-    result.openPrice = bar.openPrice().getDelegate();
-    result.highPrice = bar.highPrice().getDelegate();
-    result.lowPrice = bar.lowPrice().getDelegate();
-    result.closePrice = bar.closePrice().getDelegate();
-    result.volume = bar.volume().getDelegate();
+    result.startTime = bar.getEndTime().toEpochMilli();
+    result.openPrice = bar.getOpenPrice().getDelegate();
+    result.highPrice = bar.getHighPrice().getDelegate();
+    result.lowPrice = bar.getLowPrice().getDelegate();
+    result.closePrice = bar.getClosePrice().getDelegate();
+    result.volume = bar.getVolume().getDelegate();
     result.amount = bar.getAmount().getDelegate();
     return result;
   }

@@ -20,45 +20,34 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.ta4j.core.indicators.numeric.candles.price;
+package org.ta4j.core.indicators.numeric.candles.price
 
-import org.ta4j.core.api.series.Bar;
-import org.ta4j.core.indicators.SeriesRelatedNumericIndicator;
-import org.ta4j.core.num.Num;
-import org.ta4j.core.num.NumFactory;
+import org.ta4j.core.api.series.Bar
+import org.ta4j.core.indicators.SeriesRelatedNumericIndicator
+import org.ta4j.core.num.Num
+import org.ta4j.core.num.NumFactory
 
 /**
  * Typical price indicator.
  *
- * <p>
+ *
+ *
  * Returns the typical price of a bar using the following formula:
  *
  * <pre>
  * TypicalPrice = (highPrice + lowPrice + closePrice) / 3
- * </pre>
+</pre> *
  */
-public class TypicalPriceIndicator extends SeriesRelatedNumericIndicator {
-
-  /**
-   * Constructor.
-   *
-   * @param numFactory the bar numFactory
-   */
-  public TypicalPriceIndicator(final NumFactory numFactory) {
-    super(numFactory);
-  }
+class TypicalPriceIndicator(numFactory: NumFactory) : SeriesRelatedNumericIndicator(numFactory) {
+    private fun calculate(bar: Bar): Num {
+        val highPrice = bar.highPrice
+        val lowPrice = bar.lowPrice
+        val closePrice = bar.closePrice
+        return highPrice.plus(lowPrice).plus(closePrice).dividedBy(numFactory.three())
+    }
 
 
-  protected Num calculate(final Bar bar) {
-    final Num highPrice = bar.highPrice();
-    final Num lowPrice = bar.lowPrice();
-    final Num closePrice = bar.closePrice();
-    return highPrice.plus(lowPrice).plus(closePrice).dividedBy(getNumFactory().three());
-  }
-
-
-  @Override
-  public void updateState(final Bar bar) {
-    this.value = calculate(bar);
-  }
+    override fun updateState(bar: Bar) {
+        value = calculate(bar)
+    }
 }

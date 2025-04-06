@@ -88,8 +88,8 @@ class DecimalNumAdvancedTest {
     assertThat(num1.max(num3)).isEqualTo(num3);
 
     // Min/Max with NaN should return NaN
-    assertThat(num1.min(NaN.NaN).isNaN()).isTrue();
-    assertThat(num1.max(NaN.NaN).isNaN()).isTrue();
+    assertThat(num1.min(NaN.INSTANCE).isNaN()).isTrue();
+    assertThat(num1.max(NaN.INSTANCE).isNaN()).isTrue();
   }
 
 
@@ -122,7 +122,7 @@ class DecimalNumAdvancedTest {
     assertThat(num1.remainder(num2)).isEqualTo(expectedRemainder);
 
     // Remainder with NaN should return NaN
-    assertThat(num1.remainder(NaN.NaN).isNaN()).isTrue();
+    assertThat(num1.remainder(NaN.INSTANCE).isNaN()).isTrue();
   }
 
 

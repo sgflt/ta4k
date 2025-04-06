@@ -20,77 +20,51 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.ta4j.core.indicators.numeric.momentum.adx;
+package org.ta4j.core.indicators.numeric.momentum.adx
 
-import org.ta4j.core.api.series.Bar;
-import org.ta4j.core.indicators.numeric.NumericIndicator;
-import org.ta4j.core.indicators.numeric.average.MMAIndicator;
-import org.ta4j.core.num.Num;
-import org.ta4j.core.num.NumFactory;
+import org.ta4j.core.api.series.Bar
+import org.ta4j.core.indicators.numeric.NumericIndicator
+import org.ta4j.core.indicators.numeric.average.MMAIndicator
+import org.ta4j.core.num.NumFactory
 
 /**
  * ADX indicator.
  *
- * <p>
+ *
+ *
  * Part of the Directional Movement System.
  *
- * @see <a href=
- *     "https://www.investopedia.com/terms/a/adx.asp">https://www.investopedia.com/terms/a/adx.asp</a>
+ * @see [https://www.investopedia.com/terms/a/adx.asp](https://www.investopedia.com/terms/a/adx.asp)
  */
-public class ADXIndicator extends NumericIndicator {
-
-  private final int diBarCount;
-  private final int adxBarCount;
-  private final MMAIndicator averageDXIndicator;
+class ADXIndicator(numFactory: NumFactory, private val diBarCount: Int, private val adxBarCount: Int) :
+    NumericIndicator(numFactory) {
+    private val averageDXIndicator = MMAIndicator(DXIndicator(numFactory, diBarCount), adxBarCount)
 
 
-  /**
-   * Constructor.
-   *
-   * @param numFactory the bar numFactory
-   * @param diBarCount the bar count for {@link DXIndicator}
-   * @param adxBarCount the bar count for {@link #averageDXIndicator}
-   */
-  public ADXIndicator(final NumFactory numFactory, final int diBarCount, final int adxBarCount) {
-    super(numFactory);
-    this.diBarCount = diBarCount;
-    this.adxBarCount = adxBarCount;
-    this.averageDXIndicator = new MMAIndicator(new DXIndicator(numFactory, diBarCount), adxBarCount);
-  }
+    /**
+     * Constructor.
+     *
+     * @param numFactory the bar numFactory
+     * @param barCount the bar count for [DXIndicator] and
+     * [.averageDXIndicator]
+     */
+    constructor(numFactory: NumFactory, barCount: Int) : this(numFactory, barCount, barCount)
 
 
-  /**
-   * Constructor.
-   *
-   * @param numFactory the bar numFactory
-   * @param barCount the bar count for {@link DXIndicator} and
-   *     {@link #averageDXIndicator}
-   */
-  public ADXIndicator(final NumFactory numFactory, final int barCount) {
-    this(numFactory, barCount, barCount);
-  }
+    override fun toString(): String {
+        return javaClass.getSimpleName() + " diBarCount: " + this.diBarCount + " adxBarCount: " + this.adxBarCount
+    }
 
 
-  @Override
-  public String toString() {
-    return getClass().getSimpleName() + " diBarCount: " + this.diBarCount + " adxBarCount: " + this.adxBarCount;
-  }
+    private fun calculate() = averageDXIndicator.value
 
 
-  private Num calculate() {
-    return this.averageDXIndicator.getValue();
-  }
+    override fun updateState(bar: Bar) {
+        averageDXIndicator.onBar(bar)
+        value = calculate()
+    }
 
 
-  @Override
-  public void updateState(final Bar bar) {
-    this.averageDXIndicator.onBar(bar);
-    this.value = calculate();
-  }
-
-
-  @Override
-  public boolean isStable() {
-    return this.averageDXIndicator.isStable();
-  }
+    override val isStable
+        get() = averageDXIndicator.isStable
 }

@@ -21,37 +21,32 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.ta4j.core.indicators.aroon;
+package org.ta4j.core.indicators.aroon
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.MethodSource
+import org.ta4j.core.MarketEventTestContext
+import org.ta4j.core.api.Indicators.aroonOscillator
+import org.ta4j.core.events.CandleReceived
+import org.ta4j.core.indicators.TimeFrame
+import org.ta4j.core.num.NumFactory
+import java.time.Duration
+import java.time.LocalDate
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
+import java.util.*
 
-import java.time.Duration;
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
-import java.util.Comparator;
-import java.util.Locale;
-import java.util.stream.Collectors;
-
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.MethodSource;
-import org.ta4j.core.MarketEventTestContext;
-import org.ta4j.core.api.Indicators;
-import org.ta4j.core.events.CandleReceived;
-import org.ta4j.core.indicators.TimeFrame;
-import org.ta4j.core.num.NumFactory;
-
-class AroonOscillatorIndicatorTest {
-
-  private MarketEventTestContext context;
+internal class AroonOscillatorIndicatorTest {
+    private var context: MarketEventTestContext? = null
 
 
-  @BeforeEach
-  void init() {
-    final String rawData = // fb_daily, 2017/01/03 - 2017/08/18
-        // date, close, volume, open, high, low
-        """
+    @BeforeEach
+    fun init() {
+        val rawData =  // fb_daily, 2017/01/03 - 2017/08/18
+            // date, close, volume, open, high, low
+            """
             2017/08/18,167.4100,15065590.0000,166.8400,168.6700,166.2100
             2017/08/17,166.9100,17009420.0000,169.3400,169.8600,166.8500
             2017/08/16,170.0000,15732840.0000,171.2500,171.3800,169.2400
@@ -211,51 +206,50 @@ class AroonOscillatorIndicatorTest {
             2017/01/05,120.6700,19459380.0000,118.8600,120.9500,118.3209
             2017/01/04,118.6900,19594560.0000,117.5500,119.6600,117.2900
             2017/01/03,116.8600,20635600.0000,116.0300,117.8400,115.5100
-            """;
-    this.context = new MarketEventTestContext();
-    final var dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd", Locale.getDefault());
+            """.trimIndent()
+        this.context = MarketEventTestContext()
+        val dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd", Locale.getDefault())
 
-    this.context.withMarketEvents(
-        rawData.lines().map(dataLine -> {
-              final var tickData = dataLine.split(",");
-              final var date = LocalDate.parse(tickData[0], dtf).atStartOfDay(ZoneId.systemDefault()).toInstant();
-              return CandleReceived.builder()
-                  .endTime(date.plus(Duration.ofDays(1)))
-                  .beginTime(date)
-                  .timeFrame(TimeFrame.DAY)
-                  .openPrice(Double.parseDouble(tickData[3]))
-                  .highPrice(Double.parseDouble(tickData[4]))
-                  .lowPrice(Double.parseDouble(tickData[5]))
-                  .closePrice(Double.parseDouble(tickData[1]))
-                  .volume(Double.parseDouble(tickData[2])
-                  ).build();
-            })
-            .sorted(Comparator.comparing(CandleReceived::beginTime))
-            .collect(Collectors.toUnmodifiableList())
-    );
-  }
+        this.context!!.withMarketEvents(
+            rawData.lineSequence().map { dataLine ->
+                val tickData = dataLine.split(",".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+                val date = LocalDate.parse(tickData[0], dtf).atStartOfDay(ZoneId.systemDefault()).toInstant()
+                CandleReceived(
+                    endTime = date.plus(Duration.ofDays(1)),
+                    beginTime = date,
+                    timeFrame = TimeFrame.DAY,
+                    openPrice = tickData[3].toDouble(),
+                    highPrice = tickData[4].toDouble(),
+                    lowPrice = tickData[5].toDouble(),
+                    closePrice = tickData[1].toDouble(),
+                    volume = tickData[2].toDouble()
+                )
+            }
+                .sortedBy { it.beginTime }
+                .toList()
+        )
+    }
 
 
-  @ParameterizedTest(name = "External data with bar count 25 [{index}] {0}")
-  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
-  void test(final NumFactory numFactory) {
-    final var aroonOscillator = Indicators.aroonOscillator(25);
-    assertNotNull(aroonOscillator.getAroonUpIndicator());
-    assertNotNull(aroonOscillator.getAroonDownIndicator());
+    @ParameterizedTest(name = "External data with bar count 25 [{index}] {0}")
+    @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
+    fun test(numFactory: NumFactory) {
+        val aroonOscillator = aroonOscillator(25)
+        Assertions.assertNotNull(aroonOscillator.aroonUpIndicator)
+        Assertions.assertNotNull(aroonOscillator.aroonDownIndicator)
 
-    this.context.withIndicator(aroonOscillator)
-        .withNumFactory(numFactory)
-        .fastForwardUntilStable()
-        .assertCurrent(84)
-        .assertNext(80)
-        .assertNext(76)
-        .fastForward(126) // forward to last 5 values
-        .assertCurrent(56)
-        .assertNext(52)
-        .assertNext(48)
-        .assertNext(44)
-        .assertNext(40)
-        .assertNext(32)
-    ;
-  }
+        this.context!!.withIndicator(aroonOscillator)
+            .withNumFactory(numFactory)
+            .fastForwardUntilStable()
+            .assertCurrent(84.0)
+            .assertNext(80.0)
+            .assertNext(76.0)
+            .fastForward(126) // forward to last 5 values
+            .assertCurrent(56.0)
+            .assertNext(52.0)
+            .assertNext(48.0)
+            .assertNext(44.0)
+            .assertNext(40.0)
+            .assertNext(32.0)
+    }
 }

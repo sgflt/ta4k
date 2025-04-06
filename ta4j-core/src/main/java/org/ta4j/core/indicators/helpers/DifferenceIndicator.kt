@@ -21,68 +21,50 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.ta4j.core.indicators.helpers;
+package org.ta4j.core.indicators.helpers
 
-import org.ta4j.core.api.series.Bar;
-import org.ta4j.core.indicators.numeric.NumericIndicator;
-import org.ta4j.core.num.Num;
+import org.ta4j.core.api.series.Bar
+import org.ta4j.core.indicators.numeric.NumericIndicator
+import org.ta4j.core.num.Num
 
 /**
  * Calculates the difference between the current and the previous indicator value.
  *
  * <pre>
  * difference = current indicator value - previous indicator value
- * </pre>
+</pre> *
  */
-public class DifferenceIndicator extends NumericIndicator {
-  private final NumericIndicator indicator;
-  private Num previousValue;
+class DifferenceIndicator(private val indicator: NumericIndicator) : NumericIndicator(indicator.numFactory) {
+    private var previousValue: Num? = null
 
 
-  /**
-   * Constructor.
-   *
-   * @param indicator the bar indicator
-   */
-  public DifferenceIndicator(final NumericIndicator indicator) {
-    super(indicator.getNumFactory());
-    this.indicator = indicator;
-  }
-
-
-  @Override
-  public void updateState(final Bar bar) {
-    this.indicator.onBar(bar);
-    this.value = calculate();
-  }
-
-
-  @Override
-  public boolean isStable() {
-    return this.previousValue != null;
-  }
-
-
-  /**
-   * Calculates the difference between indicator values of the current bar and the
-   * previous bar.
-   *
-   * @return the difference between the close prices
-   */
-  protected Num calculate() {
-    return diff();
-  }
-
-
-  private Num diff() {
-    if (this.previousValue == null) {
-      this.previousValue = this.indicator.getValue();
-      return this.previousValue;
+    public override fun updateState(bar: Bar) {
+        indicator.onBar(bar)
+        value = calculate()
     }
 
-    final var indicatorValue = this.indicator.getValue();
-    final var diff = indicatorValue.minus(this.previousValue);
-    this.previousValue = indicatorValue;
-    return diff;
-  }
+
+    override val isStable
+        get() = previousValue != null
+
+
+    /**
+     * Calculates the difference between indicator values of the current bar and the
+     * previous bar.
+     *
+     * @return the difference between the close prices
+     */
+    private fun calculate() = diff()
+
+    private fun diff(): Num {
+        if (previousValue == null) {
+            previousValue = indicator.value
+            return previousValue!!
+        }
+
+        val indicatorValue = indicator.value
+        val diff = indicatorValue.minus(previousValue!!)
+        previousValue = indicatorValue
+        return diff
+    }
 }

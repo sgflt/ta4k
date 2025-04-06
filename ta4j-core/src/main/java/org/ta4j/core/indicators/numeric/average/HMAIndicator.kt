@@ -21,66 +21,49 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.ta4j.core.indicators.numeric.average;
+package org.ta4j.core.indicators.numeric.average
 
-import org.ta4j.core.api.Indicator;
-import org.ta4j.core.api.series.Bar;
-import org.ta4j.core.indicators.numeric.NumericIndicator;
-import org.ta4j.core.indicators.numeric.helpers.TransformIndicator;
-import org.ta4j.core.indicators.numeric.operation.CombineIndicator;
-import org.ta4j.core.num.Num;
+import org.ta4j.core.api.series.Bar
+import org.ta4j.core.indicators.numeric.NumericIndicator
+import org.ta4j.core.indicators.numeric.helpers.TransformIndicator.Companion.multiply
+import org.ta4j.core.indicators.numeric.operation.CombineIndicator
+import org.ta4j.core.num.Num
 
 /**
  * Hull moving average (HMA) indicator.
  *
- * @see <a href="http://alanhull.com/hull-moving-average">
- *     http://alanhull.com/hull-moving-average</a>
+ * @see [
+ * http://alanhull.com/hull-moving-average](http://alanhull.com/hull-moving-average)
  */
-public class HMAIndicator extends NumericIndicator {
-
-  private final int barCount;
-  private final WMAIndicator sqrtWma;
+class HMAIndicator(indicator: NumericIndicator, private val barCount: Int) : NumericIndicator(indicator.numFactory) {
+    private val sqrtWma: WMAIndicator
 
 
-  /**
-   * Constructor.
-   *
-   * @param indicator the {@link Indicator}
-   * @param barCount the time frame
-   */
-  public HMAIndicator(final NumericIndicator indicator, final int barCount) {
-    super(indicator.getNumFactory());
-    this.barCount = barCount;
+    /**
+     * Constructor.
+     *
+     * @param indicator the [Indicator]
+     * @param barCount the time frame
+     */
+    init {
+        val halfWma = indicator.wma(barCount / 2)
+        val origWma = indicator.wma(barCount)
 
-    final var halfWma = indicator.wma(barCount / 2);
-    final var origWma = indicator.wma(barCount);
+        val indicatorForSqrtWma = CombineIndicator.minus(multiply(halfWma, 2), origWma)
+        sqrtWma = indicatorForSqrtWma.wma(numFactory.numOf(barCount).sqrt().intValue())
+    }
 
-    final var indicatorForSqrtWma = CombineIndicator.minus(TransformIndicator.multiply(halfWma, 2), origWma);
-    this.sqrtWma = indicatorForSqrtWma.wma(getNumFactory().numOf(barCount).sqrt().intValue());
-  }
+    private fun calculate(): Num {
+        return sqrtWma.value
+    }
 
+    public override fun updateState(bar: Bar) {
+        sqrtWma.onBar(bar)
+        value = calculate()
+    }
 
-  protected Num calculate() {
-    return this.sqrtWma.getValue();
-  }
+    override val isStable
+        get() = sqrtWma.isStable
 
-
-  @Override
-  public void updateState(final Bar bar) {
-    this.sqrtWma.onBar(bar);
-    this.value = calculate();
-  }
-
-
-  @Override
-  public boolean isStable() {
-    return this.sqrtWma.isStable();
-  }
-
-
-  @Override
-  public String toString() {
-    return String.format("HMA(%d) => %s", this.barCount, getValue());
-  }
-
+    override fun toString() = "HMA($barCount) => $value"
 }

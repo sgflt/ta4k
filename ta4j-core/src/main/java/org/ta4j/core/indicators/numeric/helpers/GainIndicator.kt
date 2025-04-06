@@ -20,69 +20,49 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.ta4j.core.indicators.numeric.helpers;
+package org.ta4j.core.indicators.numeric.helpers
 
-import org.ta4j.core.api.Indicator;
-import org.ta4j.core.api.series.Bar;
-import org.ta4j.core.indicators.helpers.previous.PreviousNumericValueIndicator;
-import org.ta4j.core.indicators.numeric.NumericIndicator;
-import org.ta4j.core.num.Num;
-import org.ta4j.core.num.NumFactory;
+import org.ta4j.core.api.series.Bar
+import org.ta4j.core.indicators.numeric.NumericIndicator
+import org.ta4j.core.num.Num
 
 /**
  * Gain indicator.
  *
- * <p>
+ *
+ *
  * Returns the difference of the indicator value of a bar and its previous bar
  * if the indicator value of the current bar is greater than the indicator value
- * of the previous bar (otherwise, {@link NumFactory#zero()} is returned).
+ * of the previous bar (otherwise, [NumFactory.zero] is returned).
  */
-public class GainIndicator extends NumericIndicator {
-
-  private final NumericIndicator indicator;
-  private final PreviousNumericValueIndicator previousValueIndicator;
+class GainIndicator(private val indicator: NumericIndicator) : NumericIndicator(indicator.numFactory) {
+    private val previousValueIndicator = indicator.previous()
 
 
-  /**
-   * Constructor.
-   *
-   * @param indicator the {@link Indicator}
-   */
-  public GainIndicator(final NumericIndicator indicator) {
-    super(indicator.getNumFactory());
-    this.indicator = indicator;
-    this.previousValueIndicator = indicator.previous();
-  }
+    private fun calculate(): Num {
+        if (!previousValueIndicator.isStable) {
+            return numFactory.zero()
+        }
 
-
-  protected Num calculate() {
-    if (!this.previousValueIndicator.isStable()) {
-      return getNumFactory().zero();
+        val actualValue = indicator.value
+        val previousValue = previousValueIndicator.value
+        return if (actualValue.isGreaterThan(previousValue))
+            actualValue.minus(previousValue)
+        else
+            numFactory.zero()
     }
 
-    final Num actualValue = this.indicator.getValue();
-    final Num previousValue = this.previousValueIndicator.getValue();
-    return actualValue.isGreaterThan(previousValue) ? actualValue.minus(previousValue)
-                                                    : getNumFactory().zero();
-  }
+
+    public override fun updateState(bar: Bar) {
+        indicator.onBar(bar)
+        previousValueIndicator.onBar(bar)
+        value = calculate()
+    }
 
 
-  @Override
-  public void updateState(final Bar bar) {
-    this.indicator.onBar(bar);
-    this.previousValueIndicator.onBar(bar);
-    this.value = calculate();
-  }
+    override val isStable: Boolean
+        get() = indicator.isStable && previousValueIndicator.isStable
 
 
-  @Override
-  public boolean isStable() {
-    return this.indicator.isStable() && this.previousValueIndicator.isStable();
-  }
-
-
-  @Override
-  public String toString() {
-    return String.format("GAIN => %s", getValue());
-  }
+    override fun toString() = "GAIN => $value"
 }

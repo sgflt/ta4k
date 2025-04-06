@@ -21,69 +21,60 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.ta4j.core.indicators.helpers;
+package org.ta4j.core.indicators.helpers
 
-import org.ta4j.core.api.series.Bar;
-import org.ta4j.core.api.series.BarSeries;
-import org.ta4j.core.indicators.numeric.NumericIndicator;
-import org.ta4j.core.num.Num;
+import org.ta4j.core.api.series.Bar
+import org.ta4j.core.api.series.BarSeries
+import org.ta4j.core.indicators.numeric.NumericIndicator
+import org.ta4j.core.num.Num
 
 /**
- * A fixed {@code Num} indicator.
+ * A fixed `Num` indicator.
  *
- * <p>
- * Returns constant {@link Num} values for a bar.
+ *
+ *
+ * Returns constant [Num] values for a bar.
  */
-public class FixedDecimalIndicator extends NumericIndicator {
+class FixedDecimalIndicator : NumericIndicator {
+    private val fixedIndicator: FixedIndicator<Num>
 
 
-  private final FixedIndicator<Num> fixedIndicator;
-
-
-  /**
-   * Constructor.
-   *
-   * @param series the bar series
-   * @param values the values to be returned by this indicator
-   */
-  public FixedDecimalIndicator(final BarSeries series, final double... values) {
-    super(series.numFactory());
-    this.fixedIndicator = new FixedIndicator<>();
-    for (final var value : values) {
-      this.fixedIndicator.addValue(series.numFactory().numOf(value));
+    /**
+     * Constructor.
+     *
+     * @param series the bar series
+     * @param values the values to be returned by this indicator
+     */
+    constructor(series: BarSeries, vararg values: Double) : super(series.numFactory) {
+        fixedIndicator = FixedIndicator<Num>()
+        for (value in values) {
+            fixedIndicator.addValue(series.numFactory.numOf(value))
+        }
     }
-  }
 
 
-  /**
-   * Constructor.
-   *
-   * @param series the bar series
-   * @param values the values to be returned by this indicator
-   */
-  public FixedDecimalIndicator(final BarSeries series, final String... values) {
-    super(series.numFactory());
-    this.fixedIndicator = new FixedIndicator<>();
-    for (final var value : values) {
-      this.fixedIndicator.addValue(series.numFactory().numOf(value));
+    /**
+     * Constructor.
+     *
+     * @param series the bar series
+     * @param values the values to be returned by this indicator
+     */
+    constructor(series: BarSeries, vararg values: String) : super(series.numFactory) {
+        fixedIndicator = FixedIndicator<Num>()
+        for (value in values) {
+            fixedIndicator.addValue(series.numFactory.numOf(value))
+        }
     }
-  }
 
 
-  private Num calculate() {
-    return this.fixedIndicator.getValue();
-  }
+    private fun calculate() = fixedIndicator.value
+
+    override fun updateState(bar: Bar) {
+        fixedIndicator.onBar(bar)
+        value = calculate()
+    }
 
 
-  @Override
-  public void updateState(final Bar bar) {
-    this.fixedIndicator.onBar(bar);
-    this.value = calculate();
-  }
-
-
-  @Override
-  public boolean isStable() {
-    return this.fixedIndicator.isStable();
-  }
+    override val isStable
+        get() = fixedIndicator.isStable
 }

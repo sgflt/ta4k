@@ -23,4 +23,6 @@
 /**
  * Indicators for the realization of the 'Bollinger Bands'
  */
-package org.ta4j.core.indicators.numeric.channels.bollinger;
+package org.ta4j.core.indicators.numeric.channels.bollinger
+
+

@@ -20,73 +20,46 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.ta4j.core.indicators.numeric.momentum.adx;
+package org.ta4j.core.indicators.numeric.momentum.adx
 
-import org.ta4j.core.api.Indicators;
-import org.ta4j.core.api.series.Bar;
-import org.ta4j.core.indicators.numeric.NumericIndicator;
-import org.ta4j.core.indicators.numeric.average.MMAIndicator;
-import org.ta4j.core.indicators.numeric.momentum.ATRIndicator;
-import org.ta4j.core.num.Num;
-import org.ta4j.core.num.NumFactory;
+import org.ta4j.core.api.Indicators.atr
+import org.ta4j.core.api.Indicators.minusDMI
+import org.ta4j.core.api.series.Bar
+import org.ta4j.core.indicators.numeric.NumericIndicator
+import org.ta4j.core.num.NumFactory
 
 /**
  * -DI indicator.
  *
- * <p>
+ *
+ *
  * Part of the Directional Movement System.
  *
- * @see <a href=
- *     "http://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:average_directional_index_adx">
- *     http://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:average_directional_index_adx</a>
- * @see <a href=
- *     "https://www.investopedia.com/terms/a/adx.asp">https://www.investopedia.com/terms/a/adx.asp</a>
+ * @see [
+ * http://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:average_directional_index_adx](http://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:average_directional_index_adx)
+ *
+ * @see [https://www.investopedia.com/terms/a/adx.asp](https://www.investopedia.com/terms/a/adx.asp)
  */
-public class MinusDIIndicator extends NumericIndicator {
-
-  private final int barCount;
-  private final ATRIndicator atrIndicator;
-  private final MMAIndicator avgMinusDMIndicator;
+class MinusDIIndicator(numFactory: NumFactory, private val barCount: Int) : NumericIndicator(numFactory) {
+    private val atrIndicator = atr(barCount)
+    private val avgMinusDMIndicator = minusDMI().mma(barCount)
 
 
-  /**
-   * Constructor.
-   *
-   * @param numFactory the bar numFactory
-   * @param barCount the bar count for {@link #atrIndicator} and
-   *     {@link #avgMinusDMIndicator}
-   */
-  public MinusDIIndicator(final NumFactory numFactory, final int barCount) {
-    super(numFactory);
-    this.barCount = barCount;
-    this.atrIndicator = Indicators.atr(barCount);
-    this.avgMinusDMIndicator = Indicators.minusDMI().mma(barCount);
-  }
+    private fun calculate() =
+        avgMinusDMIndicator.value
+            .dividedBy(atrIndicator.value)
+            .multipliedBy(numFactory.hundred())
 
 
-  protected Num calculate() {
-    return this.avgMinusDMIndicator.getValue()
-        .dividedBy(this.atrIndicator.getValue())
-        .multipliedBy(getNumFactory().hundred());
-  }
+    override fun updateState(bar: Bar) {
+        atrIndicator.onBar(bar)
+        avgMinusDMIndicator.onBar(bar)
+        value = calculate()
+    }
 
 
-  @Override
-  public void updateState(final Bar bar) {
-    this.atrIndicator.onBar(bar);
-    this.avgMinusDMIndicator.onBar(bar);
-    this.value = calculate();
-  }
+    override val isStable
+        get() = atrIndicator.isStable && avgMinusDMIndicator.isStable
 
-
-  @Override
-  public boolean isStable() {
-    return this.atrIndicator.isStable() && this.avgMinusDMIndicator.isStable();
-  }
-
-
-  @Override
-  public String toString() {
-    return getClass().getSimpleName() + " barCount: " + this.barCount;
-  }
+    override fun toString() = "MDII($barCount) => $value"
 }

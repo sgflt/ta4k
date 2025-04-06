@@ -21,120 +21,93 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.ta4j.core.indicators.numeric.statistics;
+package org.ta4j.core.indicators.numeric.statistics
 
-import java.util.LinkedList;
-import java.util.Queue;
-
-import org.ta4j.core.api.series.Bar;
-import org.ta4j.core.indicators.numeric.NumericIndicator;
-import org.ta4j.core.num.Num;
+import org.ta4j.core.api.series.Bar
+import org.ta4j.core.indicators.numeric.NumericIndicator
+import org.ta4j.core.num.Num
+import java.util.*
 
 /**
  * Mean deviation indicator.
  *
- * @see <a href=
- *     "http://en.wikipedia.org/wiki/Mean_absolute_deviation#Average_absolute_deviation">
- *     http://en.wikipedia.org/wiki/Mean_absolute_deviation#Average_absolute_deviation</a>
+ * @see [
+ * http://en.wikipedia.org/wiki/Mean_absolute_deviation.Average_absolute_deviation](http://en.wikipedia.org/wiki/Mean_absolute_deviation.Average_absolute_deviation)
  */
-public class MeanDeviationIndicator extends NumericIndicator {
-
-  private final NumericIndicator indicator;
-  private final int barCount;
-  private final Queue<Num> window = new LinkedList<>();
-  private final Num numBarCount;
-  private final Num divisor;
-  private int currentBar;
-  private Num sum;
-  private Num deviationSum;
-
-
-  /**
-   * Constructor.
-   *
-   * @param indicator the indicator
-   * @param barCount the time frame
-   */
-  public MeanDeviationIndicator(final NumericIndicator indicator, final int barCount) {
-    super(indicator.getNumFactory());
-    this.indicator = indicator;
-    this.barCount = barCount;
-    this.sum = getNumFactory().zero();
-    this.deviationSum = getNumFactory().zero();
-    this.numBarCount = getNumFactory().numOf(barCount);
-    this.divisor = getNumFactory().numOf(this.barCount);
-  }
+class MeanDeviationIndicator(private val indicator: NumericIndicator, private val barCount: Int) : NumericIndicator(
+    indicator.numFactory
+) {
+    private val window = LinkedList<Num>()
+    private val numBarCount = numFactory.numOf(barCount)
+    private val divisor = numFactory.numOf(barCount)
+    private var currentBar = 0
+    private var sum = numFactory.zero()
+    private var deviationSum = numFactory.zero()
 
 
-  protected Num calculate() {
-    if (this.window.size() == this.barCount) {
-      stablePath();
+    private fun calculate(): Num {
+        if (window.size == barCount) {
+            stablePath()
+        }
+
+        return unstablePath()
     }
 
-    return unstablePath();
-  }
 
+    private fun unstablePath(): Num {
+        // Add new value
+        val newValue = indicator.value
+        window.offer(newValue)
+        val oldMean =
+            if (window.size == 1) newValue else sum.dividedBy(numFactory.numOf(window.size - 1))
+        sum = sum.plus(newValue)
+        val newMean = sum.dividedBy(numFactory.numOf(window.size))
 
-  private Num unstablePath() {
-    // Add new value
-    final var newValue = this.indicator.getValue();
-    this.window.offer(newValue);
-    final Num oldMean =
-        this.window.size() == 1 ? newValue : this.sum.dividedBy(getNumFactory().numOf(this.window.size() - 1));
-    this.sum = this.sum.plus(newValue);
-    final Num newMean = this.sum.dividedBy(getNumFactory().numOf(this.window.size()));
+        // Update deviationSum
+        deviationSum = deviationSum.plus(newValue.minus(newMean).abs())
 
-    // Update deviationSum
-    this.deviationSum = this.deviationSum.plus(newValue.minus(newMean).abs());
+        // Adjust other values in the window for the new mean
+        for (value in window) {
+            if (value != newValue) {
+                deviationSum = deviationSum.plus(
+                    value.minus(newMean).abs().minus(value.minus(oldMean).abs())
+                )
+            }
+        }
 
-    // Adjust other values in the window for the new mean
-    for (final var value : this.window) {
-      if (!value.equals(newValue)) {
-        this.deviationSum = this.deviationSum.plus(
-            value.minus(newMean).abs().minus(value.minus(oldMean).abs())
-        );
-      }
+        // Calculate and return the mean deviation
+        return deviationSum.dividedBy(numFactory.numOf(window.size))
     }
 
-    // Calculate and return the mean deviation
-    return this.deviationSum.dividedBy(getNumFactory().numOf(this.window.size()));
-  }
 
+    private fun stablePath() {
+        val oldestValue = window.poll()
+        val oldMean = sum.dividedBy(divisor)
 
-  private void stablePath() {
-    final Num oldestValue = this.window.poll();
-    final Num oldMean = this.sum.dividedBy(this.divisor);
+        // Remove contribution of oldest value
+        sum = sum.minus(oldestValue)
+        deviationSum = deviationSum.minus(oldestValue.minus(oldMean).abs())
 
-    // Remove contribution of oldest value
-    this.sum = this.sum.minus(oldestValue);
-    this.deviationSum = this.deviationSum.minus(oldestValue.minus(oldMean).abs());
-
-    // Adjust deviationSum for the change in mean
-    for (final var value : this.window) {
-      this.deviationSum = this.deviationSum.plus(
-          value.minus(this.sum.dividedBy(getNumFactory().numOf(this.barCount - 1))).abs()
-              .minus(value.minus(oldMean).abs())
-      );
+        // Adjust deviationSum for the change in mean
+        for (value in window) {
+            deviationSum = deviationSum.plus(
+                value.minus(sum.dividedBy(numFactory.numOf(barCount - 1))).abs()
+                    .minus(value.minus(oldMean).abs())
+            )
+        }
     }
-  }
 
 
-  @Override
-  public String toString() {
-    return String.format("MDI(%d) => %s", this.numBarCount, getValue());
-  }
+    override fun toString() = "MDI($numBarCount) => $value"
 
 
-  @Override
-  public void updateState(final Bar bar) {
-    ++this.currentBar;
-    this.indicator.onBar(bar);
-    this.value = calculate();
-  }
+    public override fun updateState(bar: Bar) {
+        ++currentBar
+        indicator.onBar(bar)
+        value = calculate()
+    }
 
 
-  @Override
-  public boolean isStable() {
-    return this.currentBar >= this.barCount;
-  }
+    override val isStable
+        get() = currentBar >= barCount
 }

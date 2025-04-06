@@ -20,43 +20,42 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.ta4j.core.api;
+package org.ta4j.core.api
 
-import org.ta4j.core.api.series.Bar;
-import org.ta4j.core.api.series.BarSeries;
+import org.ta4j.core.api.series.Bar
 
 /**
- * Indicator over a {@link BarSeries bar series}.
+ * Indicator over a [bar series][BarSeries].
  *
- * <p>
- * Returns a value of type <b>T</b> for each index of the bar series.
+ *
+ *
+ * Returns a value of type **T** for each index of the bar series.
  *
  * @param <T> the type of the returned value (Double, Boolean, etc.)
- */
-public interface Indicator<T> {
+</T> */
+interface Indicator<out T> {
+    /**
+     * @return the value of the indicator
+     */
+    val value: T
 
-  /**
-   * @return the value of the indicator
-   */
-  T getValue();
+    /**
+     * updates its state based on current bar
+     *
+     * Implementation of indicator should be aware of that it may be called multiple
+     * times for single bar. If there is extensive calculation, implementation may
+     * count on that for each bar there will be discrete time passed that may be
+     * used for caching purposes.
+     *
+     * Backtesting may rewind time to past, this event should invalidate calculated
+     * value.
+     *
+     * @param bar current time
+     */
+    fun onBar(bar: Bar)
 
-  /**
-   * updates its state based on current bar
-   *
-   * Implementation of indicator should be aware of that it may be called multiple
-   * times for single bar. If there is extensive calculation, implementation may
-   * count on that for each bar there will be discrete time passed that may be
-   * used for caching purposes.
-   *
-   * Backtesting may rewind time to past, this event should invalidate calculated
-   * value.
-   *
-   * @param bar current time
-   */
-  void onBar(Bar bar);
-
-  /**
-   * @return true if indicator is stabilized
-   */
-  boolean isStable();
+    /**
+     * @return true if indicator is stabilized
+     */
+    val isStable: Boolean
 }

@@ -20,152 +20,78 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.ta4j.core.indicators.numeric.helpers;
+package org.ta4j.core.indicators.numeric.helpers
 
-import java.util.function.Function;
-import java.util.function.UnaryOperator;
-
-import org.ta4j.core.api.Indicator;
-import org.ta4j.core.api.series.Bar;
-import org.ta4j.core.indicators.numeric.NumericIndicator;
-import org.ta4j.core.num.DecimalNumFactory;
-import org.ta4j.core.num.Num;
+import org.ta4j.core.api.series.Bar
+import org.ta4j.core.indicators.numeric.NumericIndicator
+import org.ta4j.core.num.DecimalNumFactory
+import org.ta4j.core.num.Num
+import java.util.function.UnaryOperator
+import kotlin.math.ln
 
 /**
  * Transform indicator.
  *
- * <p>
- * Transforms the {@link Num} of any indicator by using common math operations.
+ *
+ *
+ * Transforms the [Num] of any indicator by using common math operations.
  */
-public class TransformIndicator extends NumericIndicator {
+class TransformIndicator(
+    private val indicator: NumericIndicator,
+    private val transformationFunction: UnaryOperator<Num>,
+) : NumericIndicator(indicator.numFactory) {
 
-  private final NumericIndicator indicator;
-  private final UnaryOperator<Num> transformationFunction;
+    protected fun calculate() = transformationFunction.apply(indicator.value)
 
+    override fun updateState(bar: Bar) {
+        indicator.onBar(bar)
+        value = calculate()
+    }
 
-  /**
-   * Constructor.
-   *
-   * @param indicator the {@link Indicator}
-   * @param transformation a {@link Function} describing the transformation
-   */
-  public TransformIndicator(final NumericIndicator indicator, final UnaryOperator<Num> transformation) {
-    super(indicator.getNumFactory());
-    this.indicator = indicator;
-    this.transformationFunction = transformation;
-  }
+    override val isStable
+        get() = indicator.isStable
 
+    override fun toString() = "Transform $indicator WITH $transformationFunction"
 
-  protected Num calculate() {
-    return this.transformationFunction.apply(this.indicator.getValue());
-  }
+    companion object {
+        @JvmStatic
+        fun plus(indicator: NumericIndicator, coefficient: Number) =
+            TransformIndicator(indicator) { it.plus(indicator.numFactory.numOf(coefficient)) }
 
+        @JvmStatic
+        fun minus(indicator: NumericIndicator, coefficient: Number) =
+            TransformIndicator(indicator) { it.minus(indicator.numFactory.numOf(coefficient)) }
 
-  @Override
-  public void updateState(final Bar bar) {
-    this.indicator.onBar(bar);
-    this.value = calculate();
-  }
+        @JvmStatic
+        fun divide(indicator: NumericIndicator, coefficient: Number) =
+            TransformIndicator(indicator) { it.dividedBy(indicator.numFactory.numOf(coefficient)) }
 
+        @JvmStatic
+        fun multiply(indicator: NumericIndicator, coefficient: Number) =
+            TransformIndicator(indicator) { it.multipliedBy(indicator.numFactory.numOf(coefficient)) }
 
-  @Override
-  public boolean isStable() {
-    return this.indicator.isStable();
-  }
+        @JvmStatic
+        fun max(indicator: NumericIndicator, coefficient: Number) =
+            TransformIndicator(indicator) { it.max(indicator.numFactory.numOf(coefficient)) }
 
+        @JvmStatic
+        fun min(indicator: NumericIndicator, coefficient: Number) =
+            TransformIndicator(indicator) { it.min(indicator.numFactory.numOf(coefficient)) }
 
-  /**
-   * Transforms the input indicator by indicator.plus(coefficient).
-   */
-  public static TransformIndicator plus(final NumericIndicator indicator, final Number coefficient) {
-    final Num numCoefficient = indicator.getNumFactory().numOf(coefficient);
-    return new TransformIndicator(indicator, val -> val.plus(numCoefficient));
-  }
+        @JvmStatic
+        fun abs(indicator: NumericIndicator) =
+            TransformIndicator(indicator) { it.abs() }
 
+        @JvmStatic
+        fun pow(indicator: NumericIndicator, coefficient: Number) =
+            TransformIndicator(indicator) { it.pow(indicator.numFactory.numOf(coefficient)) }
 
-  /**
-   * Transforms the input indicator by indicator.minus(coefficient).
-   */
-  public static TransformIndicator minus(final NumericIndicator indicator, final Number coefficient) {
-    final Num numCoefficient = indicator.getNumFactory().numOf(coefficient);
-    return new TransformIndicator(indicator, val -> val.minus(numCoefficient));
-  }
+        @JvmStatic
+        fun sqrt(indicator: NumericIndicator) =
+            TransformIndicator(indicator) { it.sqrt() }
 
-
-  /**
-   * Transforms the input indicator by indicator.dividedBy(coefficient).
-   */
-  public static TransformIndicator divide(final NumericIndicator indicator, final Number coefficient) {
-    final Num numCoefficient = indicator.getNumFactory().numOf(coefficient);
-    return new TransformIndicator(indicator, val -> val.dividedBy(numCoefficient));
-  }
-
-
-  /**
-   * Transforms the input indicator by indicator.multipliedBy(coefficient).
-   */
-  public static TransformIndicator multiply(final NumericIndicator indicator, final Number coefficient) {
-    final Num numCoefficient = indicator.getNumFactory().numOf(coefficient);
-    return new TransformIndicator(indicator, val -> val.multipliedBy(numCoefficient));
-  }
-
-
-  /**
-   * Transforms the input indicator by indicator.max(coefficient).
-   */
-  public static TransformIndicator max(final NumericIndicator indicator, final Number coefficient) {
-    final Num numCoefficient = indicator.getNumFactory().numOf(coefficient);
-    return new TransformIndicator(indicator, val -> val.max(numCoefficient));
-  }
-
-
-  /**
-   * Transforms the input indicator by indicator.min(coefficient).
-   */
-  public static TransformIndicator min(final NumericIndicator indicator, final Number coefficient) {
-    final Num numCoefficient = indicator.getNumFactory().numOf(coefficient);
-    return new TransformIndicator(indicator, val -> val.min(numCoefficient));
-  }
-
-
-  /**
-   * Transforms the input indicator by indicator.abs().
-   */
-  public static TransformIndicator abs(final NumericIndicator indicator) {
-    return new TransformIndicator(indicator, Num::abs);
-  }
-
-
-  /**
-   * Transforms the input indicator by indicator.pow(coefficient).
-   */
-  public static TransformIndicator pow(final NumericIndicator indicator, final Number coefficient) {
-    final Num numCoefficient = indicator.getNumFactory().numOf(coefficient);
-    return new TransformIndicator(indicator, val -> val.pow(numCoefficient));
-  }
-
-
-  /**
-   * Transforms the input indicator by indicator.sqrt().
-   */
-  public static TransformIndicator sqrt(final NumericIndicator indicator) {
-    return new TransformIndicator(indicator, Num::sqrt);
-  }
-
-
-  /**
-   * Transforms the input indicator by indicator.log().
-   */
-  public static TransformIndicator log(final NumericIndicator indicator) {
-    return new TransformIndicator(
-        indicator,
-        val -> DecimalNumFactory.getInstance().numOf(Math.log(val.doubleValue()))
-    );
-  }
-
-
-  @Override
-  public String toString() {
-    return "Transform %s WITH %s".formatted(this.indicator, this.transformationFunction);
-  }
+        @JvmStatic
+        fun log(indicator: NumericIndicator) =
+            TransformIndicator(indicator) { DecimalNumFactory.instance.numOf(ln(it.doubleValue())) }
+    }
 }

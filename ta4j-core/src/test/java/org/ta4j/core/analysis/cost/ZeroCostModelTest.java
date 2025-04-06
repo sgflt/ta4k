@@ -38,8 +38,8 @@ class ZeroCostModelTest {
   void calculatePerPosition(final NumFactory numFactory) {
     final var context = new TradingRecordTestContext()
         .withNumFactory(numFactory)
-        .withTransactionCostModel(new ZeroCostModel())
-        .withHoldingCostModel(new ZeroCostModel());
+        .withTransactionCostModel(ZeroCostModel.INSTANCE)
+        .withHoldingCostModel(ZeroCostModel.INSTANCE);
 
     context
         .enter(1).at(100)
@@ -55,7 +55,7 @@ class ZeroCostModelTest {
   @ParameterizedTest
   @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
   void calculatePerPrice(final NumFactory numFactory) {
-    final var model = new ZeroCostModel();
+    final var model = ZeroCostModel.INSTANCE;
     final var cost = model.calculate(numFactory.numOf(100), numFactory.numOf(1));
     assertNumEquals(numFactory.zero(), cost);
   }

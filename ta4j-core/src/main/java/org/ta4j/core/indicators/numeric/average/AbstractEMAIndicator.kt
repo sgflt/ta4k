@@ -21,81 +21,53 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.ta4j.core.indicators.numeric.average;
+package org.ta4j.core.indicators.numeric.average
 
-import org.ta4j.core.api.Indicator;
-import org.ta4j.core.api.series.Bar;
-import org.ta4j.core.indicators.numeric.NumericIndicator;
-import org.ta4j.core.num.Num;
+import org.ta4j.core.api.series.Bar
+import org.ta4j.core.indicators.numeric.NumericIndicator
+import org.ta4j.core.num.Num
 
 /**
  * Base class for Exponential Moving Average implementations.
  */
-public abstract class AbstractEMAIndicator extends NumericIndicator {
+abstract class AbstractEMAIndicator(
+    private val indicator: NumericIndicator,
+    protected val barCount: Int,
+    multiplier: Double,
+) : NumericIndicator(indicator.numFactory) {
+    private val multiplier = numFactory.numOf(multiplier)
 
-  private final NumericIndicator indicator;
-  private final int barCount;
-  private final Num multiplier;
-
-  private Num previousValue;
-  private int barsPassed;
-
-
-  /**
-   * Constructor.
-   *
-   * @param indicator the {@link Indicator}
-   * @param barCount the time frame
-   * @param multiplier the multiplier
-   */
-  protected AbstractEMAIndicator(
-      final NumericIndicator indicator,
-      final int barCount,
-      final double multiplier
-  ) {
-    super(indicator.getNumFactory());
-    this.indicator = indicator;
-    this.barCount = barCount;
-    this.multiplier = getNumFactory().numOf(multiplier);
-  }
+    private var previousValue: Num? = null
+    private var barsPassed = 0
 
 
-  protected int getBarCount() {
-    return this.barCount;
-  }
+    private fun calculate(): Num {
+        if (previousValue == null) {
+            previousValue = indicator.value
+            return previousValue!!
+        }
 
-
-  protected Num calculate() {
-    if (this.previousValue == null) {
-      this.previousValue = this.indicator.getValue();
-      return this.previousValue;
+        val newValue = indicator.value
+            .minus(previousValue!!)
+            .multipliedBy(multiplier)
+            .plus(previousValue!!)
+        previousValue = newValue
+        return newValue
     }
 
-    final var newValue = this.indicator.getValue()
-        .minus(this.previousValue)
-        .multipliedBy(this.multiplier)
-        .plus(this.previousValue);
-    this.previousValue = newValue;
-    return newValue;
-  }
+
+    override fun toString(): String {
+        return javaClass.simpleName + " barCount: " + barCount
+    }
 
 
-  @Override
-  public String toString() {
-    return getClass().getSimpleName() + " barCount: " + this.barCount;
-  }
+    override val isStable: Boolean
+        get() = barsPassed >= barCount && indicator.isStable
 
 
-  @Override
-  public boolean isStable() {
-    return this.barsPassed >= this.barCount && this.indicator.isStable();
-  }
-
-
-  @Override
-  protected void updateState(final Bar bar) {
-    ++this.barsPassed;
-    this.indicator.onBar(bar);
-    this.value = calculate();
-  }
+    override fun updateState(bar: Bar) {
+        ++barsPassed
+        indicator.onBar(bar)
+        value = calculate()
+    }
 }

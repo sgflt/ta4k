@@ -4,13 +4,13 @@
  * Copyright (c) 2017-2024 Ta4j Organization & respective authors (see AUTHORS)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
- * this software and associated documentation files (the "Software"), to deal in
+ *  software and associated documentation files (the "Software"), to deal in
  * the Software without restriction, including without limitation the rights to
  * use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
  * the Software, and to permit persons to whom the Software is furnished to do so,
  * subject to the following conditions:
  *
- * The above copyright notice and this permission notice shall be included in all
+ * The above copyright notice and  permission notice shall be included in all
  * copies or substantial portions of the Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
@@ -20,42 +20,27 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.ta4j.core.indicators.numeric.candles.price;
+package org.ta4j.core.indicators.numeric.candles.price
 
-import org.ta4j.core.api.series.Bar;
-import org.ta4j.core.indicators.SeriesRelatedNumericIndicator;
-import org.ta4j.core.num.Num;
-import org.ta4j.core.num.NumFactory;
+import org.ta4j.core.api.series.Bar
+import org.ta4j.core.indicators.SeriesRelatedNumericIndicator
+import org.ta4j.core.num.NumFactory
 
 /**
  * Average high-low indicator.
  *
- * <p>
+ *
+ *
  * Returns the median price of a bar using the following formula:
  *
  * <pre>
  * MedianPrice = (highPrice + lowPrice) / 2
- * </pre>
+</pre> *
  */
-public class MedianPriceIndicator extends SeriesRelatedNumericIndicator {
+class MedianPriceIndicator(numFactory: NumFactory) : SeriesRelatedNumericIndicator(numFactory) {
+    private fun calculate(bar: Bar) = bar.highPrice.plus(bar.lowPrice).dividedBy(numFactory.two())
 
-  /**
-   * Constructor.
-   *
-   * @param numFactory the bar numFactory
-   */
-  public MedianPriceIndicator(final NumFactory numFactory) {
-    super(numFactory);
-  }
-
-
-  protected Num calculate(final Bar bar) {
-    return bar.highPrice().plus(bar.lowPrice()).dividedBy(getNumFactory().two());
-  }
-
-
-  @Override
-  public void updateState(final Bar bar) {
-    this.value = calculate(bar);
-  }
+    public override fun updateState(bar: Bar) {
+        value = calculate(bar)
+    }
 }

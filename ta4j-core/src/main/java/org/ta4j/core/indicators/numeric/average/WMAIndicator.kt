@@ -21,76 +21,52 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.ta4j.core.indicators.numeric.average;
+package org.ta4j.core.indicators.numeric.average
 
-import org.ta4j.core.api.Indicator;
-import org.ta4j.core.api.series.Bar;
-import org.ta4j.core.indicators.numeric.NumericIndicator;
-import org.ta4j.core.num.Num;
-import org.ta4j.core.utils.CircularNumArray;
+import org.ta4j.core.api.series.Bar
+import org.ta4j.core.indicators.numeric.NumericIndicator
+import org.ta4j.core.num.Num
+import org.ta4j.core.utils.CircularNumArray
 
 /**
  * WMA indicator.
  */
-public class WMAIndicator extends NumericIndicator {
-
-  private final int barCount;
-  private final NumericIndicator indicator;
-  private final CircularNumArray values;
-  private int barsPassed;
+class WMAIndicator(private val indicator: NumericIndicator, private val barCount: Int) :
+    NumericIndicator(indicator.numFactory) {
+    private val values = CircularNumArray(barCount)
+    private var barsPassed = 0
 
 
-  /**
-   * Constructor.
-   *
-   * @param indicator the {@link Indicator}
-   * @param barCount the time frame
-   */
-  public WMAIndicator(final NumericIndicator indicator, final int barCount) {
-    super(indicator.getNumFactory());
-    this.indicator = indicator;
-    this.barCount = barCount;
-    this.values = new CircularNumArray(barCount);
-  }
+    private fun calculate(): Num {
+        if (values.isEmpty) {
+            val indicatorValue = indicator.value
+            values.addLast(indicatorValue)
+            return indicatorValue
+        }
+
+        values.addLast(indicator.value)
+
+        var wmaSum = numFactory.zero()
+        var i = barCount
+        for (v in values.reversed()) {
+            wmaSum = wmaSum.plus(v.multipliedBy(numFactory.numOf(i--)))
+        }
 
 
-  protected Num calculate() {
-    if (this.values.isEmpty()) {
-      final var indicatorValue = this.indicator.getValue();
-      this.values.addLast(indicatorValue);
-      return indicatorValue;
-    }
-
-    this.values.addLast(this.indicator.getValue());
-
-    final var numFactory = getNumFactory();
-    Num wmaSum = numFactory.zero();
-    int i = this.barCount;
-    for (final var v : this.values.reversed()) {
-      wmaSum = wmaSum.plus(v.multipliedBy(numFactory.numOf(i--)));
+        return wmaSum.dividedBy(numFactory.numOf((barCount * (barCount + 1)) / 2))
     }
 
 
-    return wmaSum.dividedBy(numFactory.numOf((this.barCount * (this.barCount + 1)) / 2));
-  }
+    public override fun updateState(bar: Bar) {
+        ++barsPassed
+        indicator.onBar(bar)
+        value = calculate()
+    }
 
 
-  @Override
-  public void updateState(final Bar bar) {
-    ++this.barsPassed;
-    this.indicator.onBar(bar);
-    this.value = calculate();
-  }
+    override val isStable: Boolean
+        get() = barsPassed >= barCount && indicator.isStable
 
 
-  @Override
-  public boolean isStable() {
-    return this.barsPassed >= this.barCount && this.indicator.isStable();
-  }
-
-
-  @Override
-  public String toString() {
-    return String.format("WMA(%d) => %s", this.barCount, getValue());
-  }
+    override fun toString() = "WMA($barCount) => $value"
 }

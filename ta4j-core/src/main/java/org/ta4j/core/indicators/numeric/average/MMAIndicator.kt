@@ -21,33 +21,19 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.ta4j.core.indicators.numeric.average;
+package org.ta4j.core.indicators.numeric.average
 
-import org.ta4j.core.api.Indicator;
-import org.ta4j.core.indicators.numeric.NumericIndicator;
+import org.ta4j.core.indicators.numeric.NumericIndicator
 
 /**
  * Modified moving average indicator.
  *
- * <p>
+ *
+ *
  * It is similar to exponential moving average but smooths more slowly. Used in
  * Welles Wilder's indicators like ADX, RSI.
  */
-public class MMAIndicator extends AbstractEMAIndicator {
-
-  /**
-   * Constructor.
-   *
-   * @param indicator the {@link Indicator}
-   * @param barCount the MMA time frame
-   */
-  public MMAIndicator(final NumericIndicator indicator, final int barCount) {
-    super(indicator, barCount, 1.0 / barCount);
-  }
-
-
-  @Override
-  public String toString() {
-    return String.format("MMA(%d) => %s", getBarCount(), getValue());
-  }
+class MMAIndicator(indicator: NumericIndicator, barCount: Int) :
+    AbstractEMAIndicator(indicator, barCount, 1.0 / barCount) {
+    override fun toString() = "MMA($barCount) => $value"
 }

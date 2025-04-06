@@ -21,70 +21,37 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.ta4j.core.indicators.numeric.average;
+package org.ta4j.core.indicators.numeric.average
 
-import org.ta4j.core.api.Indicator;
-import org.ta4j.core.api.series.Bar;
-import org.ta4j.core.indicators.numeric.NumericIndicator;
-import org.ta4j.core.indicators.numeric.helpers.RunningTotalIndicator;
-import org.ta4j.core.num.Num;
+import org.ta4j.core.api.series.Bar
+import org.ta4j.core.indicators.numeric.NumericIndicator
+import org.ta4j.core.num.Num
 
 /**
  * Simple moving average (SMA) indicator.
  *
- * @see <a href=
- *     "https://www.investopedia.com/terms/s/sma.asp">https://www.investopedia.com/terms/s/sma.asp</a>
+ * @see [https://www.investopedia.com/terms/s/sma.asp](https://www.investopedia.com/terms/s/sma.asp)
  */
-public class SMAIndicator extends NumericIndicator {
+class SMAIndicator(indicator: NumericIndicator, private val barCount: Int) : NumericIndicator(indicator.numFactory) {
+    private val sum = indicator.runningTotal(barCount)
+    private var processedBars = 0
+    private val divisor = numFactory.numOf(barCount)
 
-  private final int barCount;
-  private final RunningTotalIndicator sum;
-  private int processedBars;
-  private final Num divisor;
+    private fun calculate(): Num {
+        val sum = partialSum()
+        return sum.dividedBy(divisor)
+    }
 
+    private fun partialSum() = sum.value
 
-  /**
-   * Constructor.
-   *
-   * @param indicator the {@link Indicator}
-   * @param barCount the time frame
-   */
-  public SMAIndicator(final NumericIndicator indicator, final int barCount) {
-    super(indicator.getNumFactory());
-    this.sum = indicator.runningTotal(barCount);
-    this.barCount = barCount;
-    this.divisor = getNumFactory().numOf(this.barCount);
-  }
+    override val isStable
+        get() = processedBars >= barCount && sum.isStable
 
+    public override fun updateState(bar: Bar) {
+        ++processedBars
+        sum.onBar(bar)
+        value = calculate()
+    }
 
-  protected Num calculate() {
-    final var sum = partialSum();
-    return sum.dividedBy(this.divisor);
-  }
-
-
-  private Num partialSum() {
-    return this.sum.getValue();
-  }
-
-
-  @Override
-  public boolean isStable() {
-    return this.processedBars >= this.barCount && this.sum.isStable();
-  }
-
-
-  @Override
-  public void updateState(final Bar bar) {
-    ++this.processedBars;
-    this.sum.onBar(bar);
-    this.value = calculate();
-  }
-
-
-  @Override
-  public String toString() {
-    return String.format("SMA(%d) => %s", this.barCount, getValue());
-  }
-
+    override fun toString() = "SMA($barCount) => $value"
 }

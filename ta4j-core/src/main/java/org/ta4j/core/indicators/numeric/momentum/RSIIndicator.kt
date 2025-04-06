@@ -20,65 +20,49 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.ta4j.core.indicators.numeric.momentum;
+package org.ta4j.core.indicators.numeric.momentum
 
-import org.ta4j.core.api.Indicator;
-import org.ta4j.core.api.series.Bar;
-import org.ta4j.core.indicators.numeric.NumericIndicator;
-import org.ta4j.core.indicators.numeric.average.MMAIndicator;
-import org.ta4j.core.num.Num;
+import org.ta4j.core.api.series.Bar
+import org.ta4j.core.indicators.numeric.NumericIndicator
+import org.ta4j.core.indicators.numeric.average.MMAIndicator
+import org.ta4j.core.num.Num
 
 /**
  * Relative strength index indicator.
  *
- * <p>
+ *
+ *
  * Computed using original Welles Wilder formula.
  */
-public class RSIIndicator extends NumericIndicator {
+class RSIIndicator(indicator: NumericIndicator, barCount: Int) : NumericIndicator(indicator.numFactory) {
+    private val averageGainIndicator: MMAIndicator = indicator.gain().mma(barCount)
+    private val averageLossIndicator: MMAIndicator = indicator.loss().mma(barCount)
 
-  private final MMAIndicator averageGainIndicator;
-  private final MMAIndicator averageLossIndicator;
-
-
-  /**
-   * Constructor.
-   *
-   * @param indicator the {@link Indicator}
-   * @param barCount the time frame
-   */
-  public RSIIndicator(final NumericIndicator indicator, final int barCount) {
-    super(indicator.getNumFactory());
-    this.averageGainIndicator = indicator.gain().mma(barCount);
-    this.averageLossIndicator = indicator.loss().mma(barCount);
-    this.value = getNumFactory().zero();
-  }
-
-
-  protected Num calculate() {
-    // compute relative strength
-    final var averageGain = this.averageGainIndicator.getValue();
-    final var averageLoss = this.averageLossIndicator.getValue();
-    final var numFactory = getNumFactory();
-    if (averageLoss.isZero()) {
-      return averageGain.isZero() ? numFactory.fifty() : numFactory.hundred();
+    init {
+        value = numFactory.zero()
     }
 
-    final var relativeStrength = averageGain.dividedBy(averageLoss);
-    // compute relative strength index
-    return numFactory.hundred().minus(numFactory.hundred().dividedBy(numFactory.one().plus(relativeStrength)));
-  }
+    private fun calculate(): Num {
+        // compute relative strength
+        val averageGain = averageGainIndicator.value
+        val averageLoss = averageLossIndicator.value
+        if (averageLoss.isZero) {
+            return if (averageGain.isZero) numFactory.fifty() else numFactory.hundred()
+        }
+
+        val relativeStrength = averageGain.dividedBy(averageLoss)
+        // compute relative strength index
+        return numFactory.hundred().minus(numFactory.hundred().dividedBy(numFactory.one().plus(relativeStrength)))
+    }
 
 
-  @Override
-  public void updateState(final Bar bar) {
-    this.averageGainIndicator.onBar(bar);
-    this.averageLossIndicator.onBar(bar);
-    this.value = calculate();
-  }
+    public override fun updateState(bar: Bar) {
+        averageGainIndicator.onBar(bar)
+        averageLossIndicator.onBar(bar)
+        value = calculate()
+    }
 
 
-  @Override
-  public boolean isStable() {
-    return this.averageGainIndicator.isStable() && this.averageLossIndicator.isStable();
-  }
+    override val isStable
+        get() = averageGainIndicator.isStable && averageLossIndicator.isStable
 }

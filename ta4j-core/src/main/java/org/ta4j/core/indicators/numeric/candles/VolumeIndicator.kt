@@ -20,32 +20,19 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.ta4j.core.indicators.numeric.candles;
+package org.ta4j.core.indicators.numeric.candles
 
-import org.ta4j.core.api.series.Bar;
-import org.ta4j.core.indicators.SeriesRelatedNumericIndicator;
-import org.ta4j.core.num.NumFactory;
+import org.ta4j.core.api.series.Bar
+import org.ta4j.core.indicators.SeriesRelatedNumericIndicator
+import org.ta4j.core.num.NumFactory
 
 /**
  * Volume indicator.
  *
- * <p>
  * Returns the open price of a bar.
  */
-public class VolumeIndicator extends SeriesRelatedNumericIndicator {
-
-  /**
-   * Constructor.
-   *
-   * @param numFactory the numFactory
-   */
-  public VolumeIndicator(final NumFactory numFactory) {
-    super(numFactory);
-  }
-
-
-  @Override
-  public void updateState(final Bar bar) {
-    this.value = bar.volume();
-  }
+class VolumeIndicator(numFactory: NumFactory) : SeriesRelatedNumericIndicator(numFactory) {
+    override fun updateState(bar: Bar) {
+        value = bar.volume
+    }
 }

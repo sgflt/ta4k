@@ -33,10 +33,10 @@ class ValueAtRiskCriterionTest {
   @Test
   void calculateOnlyWithGainPositions() {
     new MarketEventTestContext()
-        .withNumFactory(DoubleNumFactory.getInstance())
+        .withNumFactory(DoubleNumFactory.INSTANCE)
         .withCandlePrices(100d, 105d, 106d, 107d, 108d, 115d)
         .toTradingRecordContext()
-        .withSeriesRelatedCriterion(series -> new ValueAtRiskCriterion(series.numFactory(), 0.95))
+        .withSeriesRelatedCriterion(series -> new ValueAtRiskCriterion(series.getNumFactory(), 0.95))
         .enter(1).after(1)
         .exit(1).after(2)
         .enter(1).after(1)
@@ -48,10 +48,10 @@ class ValueAtRiskCriterionTest {
   @Test
   void calculateWithASimplePosition() {
     new MarketEventTestContext()
-        .withNumFactory(DoubleNumFactory.getInstance())
+        .withNumFactory(DoubleNumFactory.INSTANCE)
         .withCandlePrices(100d, 104d, 90d, 100d, 95d, 105d)
         .toTradingRecordContext()
-        .withSeriesRelatedCriterion(series -> new ValueAtRiskCriterion(series.numFactory(), 0.95))
+        .withSeriesRelatedCriterion(series -> new ValueAtRiskCriterion(series.getNumFactory(), 0.95))
         .enter(1).after(2)
         .exit(1).after(1)
         .assertResults(90. / 104. - 1.);
@@ -61,10 +61,10 @@ class ValueAtRiskCriterionTest {
   @Test
   void calculateOnlyWithLossPositions() {
     new MarketEventTestContext()
-        .withNumFactory(DoubleNumFactory.getInstance())
+        .withNumFactory(DoubleNumFactory.INSTANCE)
         .withCandlePrices(0, 100d, 95d, 100d, 80d, 85d, 70d)
         .toTradingRecordContext()
-        .withSeriesRelatedCriterion(series -> new ValueAtRiskCriterion(series.numFactory(), 0.95))
+        .withSeriesRelatedCriterion(series -> new ValueAtRiskCriterion(series.getNumFactory(), 0.95))
         .enter(1).after(2)
         .exit(1).after(1)
         .enter(1).after(1)
@@ -76,10 +76,10 @@ class ValueAtRiskCriterionTest {
   @Test
   void calculateWithNoTrades() {
     final var context = new MarketEventTestContext()
-        .withNumFactory(DoubleNumFactory.getInstance())
+        .withNumFactory(DoubleNumFactory.INSTANCE)
         .withCandlePrices(0, 100d, 95d, 100d, 80d, 85d, 70d)
         .toTradingRecordContext()
-        .withSeriesRelatedCriterion(series -> new ValueAtRiskCriterion(series.numFactory(), 0.95));
+        .withSeriesRelatedCriterion(series -> new ValueAtRiskCriterion(series.getNumFactory(), 0.95));
 
     context.assertResults(0);
   }

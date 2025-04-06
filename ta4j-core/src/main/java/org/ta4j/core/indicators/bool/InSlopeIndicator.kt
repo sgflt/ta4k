@@ -20,109 +20,80 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.ta4j.core.indicators.bool;
+package org.ta4j.core.indicators.bool
 
-import static org.ta4j.core.num.NaN.NaN;
-
-import org.ta4j.core.api.Indicator;
-import org.ta4j.core.api.series.Bar;
-import org.ta4j.core.indicators.helpers.previous.PreviousNumericValueIndicator;
-import org.ta4j.core.indicators.numeric.NumericIndicator;
-import org.ta4j.core.indicators.numeric.operation.CombineIndicator;
-import org.ta4j.core.num.Num;
+import org.ta4j.core.api.Indicator
+import org.ta4j.core.api.series.Bar
+import org.ta4j.core.indicators.helpers.previous.PreviousNumericValueIndicator
+import org.ta4j.core.indicators.numeric.NumericIndicator
+import org.ta4j.core.indicators.numeric.operation.CombineIndicator
+import org.ta4j.core.num.NaN
+import org.ta4j.core.num.Num
 
 /**
- * A rule that monitors when an {@link Indicator} shows a specified slope.
+ * A rule that monitors when an [Indicator] shows a specified slope.
  *
- * <p>
- * Satisfied when the difference of the value of the {@link Indicator indicator}
- * and its previous (n-th) value is between the values of {@code maxSlope}
- * or/and {@code minSlope}. It can test both, positive and negative slope.
+ *
+ *
+ * Satisfied when the difference of the value of the [indicator][Indicator]
+ * and its previous (n-th) value is between the values of `maxSlope`
+ * or/and `minSlope`. It can test both, positive and negative slope.
  */
-public class InSlopeIndicator extends BooleanIndicator {
-
-  /** The minimum slope between ref and prev. */
-  private final Num minSlope;
-
-  /** The maximum slope between ref and prev. */
-  private final Num maxSlope;
-  private final CombineIndicator diff;
-
-
-  /**
-   * Constructor.
-   *
-   * @param ref the reference indicator
-   * @param minSlope minumum slope between reference and previous indicator
-   */
-  public InSlopeIndicator(final NumericIndicator ref, final Num minSlope) {
-    this(ref, 1, minSlope, NaN);
-  }
+class InSlopeIndicator(
+    ref: NumericIndicator,
+    nthPrevious: Int,
+    /** The minimum slope between ref and prev.  */
+    private val minSlope: Num,
+    /** The maximum slope between ref and prev.  */
+    private val maxSlope: Num,
+) : BooleanIndicator() {
+    private val diff = CombineIndicator.minus(ref, PreviousNumericValueIndicator(ref, nthPrevious))
 
 
-  /**
-   * Constructor.
-   *
-   * @param ref the reference indicator
-   * @param minSlope minumum slope between value of reference and previous
-   *     indicator
-   * @param maxSlope maximum slope between value of reference and previous
-   *     indicator
-   */
-  public InSlopeIndicator(final NumericIndicator ref, final Num minSlope, final Num maxSlope) {
-    this(ref, 1, minSlope, maxSlope);
-  }
+    /**
+     * Constructor.
+     *
+     * @param ref the reference indicator
+     * @param minSlope minumum slope between reference and previous indicator
+     */
+    constructor(ref: NumericIndicator, minSlope: Num) : this(ref, 1, minSlope, NaN)
 
 
-  /**
-   * Constructor.
-   *
-   * @param ref the reference indicator
-   * @param nthPrevious defines the previous n-th indicator
-   * @param maxSlope maximum slope between value of reference and previous
-   *     indicator
-   */
-  public InSlopeIndicator(final NumericIndicator ref, final int nthPrevious, final Num maxSlope) {
-    this(ref, nthPrevious, NaN, maxSlope);
-  }
+    /**
+     * Constructor.
+     *
+     * @param ref the reference indicator
+     * @param minSlope minumum slope between value of reference and previous
+     * indicator
+     * @param maxSlope maximum slope between value of reference and previous
+     * indicator
+     */
+    constructor(ref: NumericIndicator, minSlope: Num, maxSlope: Num) : this(ref, 1, minSlope, maxSlope)
 
 
-  /**
-   * Constructor.
-   *
-   * @param ref the reference indicator
-   * @param nthPrevious defines the previous n-th indicator
-   * @param minSlope minumum slope between value of reference and previous
-   *     indicator
-   * @param maxSlope maximum slope between value of reference and previous
-   *     indicator
-   */
-  public InSlopeIndicator(final NumericIndicator ref, final int nthPrevious, final Num minSlope, final Num maxSlope) {
-    this.diff = CombineIndicator.minus(ref, new PreviousNumericValueIndicator(ref, nthPrevious));
-    this.minSlope = minSlope;
-    this.maxSlope = maxSlope;
-  }
+    /**
+     * Constructor.
+     *
+     * @param ref the reference indicator
+     * @param nthPrevious defines the previous n-th indicator
+     * @param maxSlope maximum slope between value of reference and previous
+     * indicator
+     */
+    constructor(ref: NumericIndicator, nthPrevious: Int, maxSlope: Num) : this(ref, nthPrevious, NaN, maxSlope)
 
+    private fun calculate(): Boolean {
+        val difference = diff.value
+        val minSlopeSatisfied = minSlope.isNaN || difference.isGreaterThanOrEqual(minSlope)
+        val maxSlopeSatisfied = maxSlope.isNaN || difference.isLessThanOrEqual(maxSlope)
+        val isNaN = minSlope.isNaN && maxSlope.isNaN
 
-  public boolean calculate() {
-    final var val = this.diff.getValue();
-    final var minSlopeSatisfied = this.minSlope.isNaN() || val.isGreaterThanOrEqual(this.minSlope);
-    final var maxSlopeSatisfied = this.maxSlope.isNaN() || val.isLessThanOrEqual(this.maxSlope);
-    final var isNaN = this.minSlope.isNaN() && this.maxSlope.isNaN();
+        return minSlopeSatisfied && maxSlopeSatisfied && !isNaN
+    }
 
-    return minSlopeSatisfied && maxSlopeSatisfied && !isNaN;
-  }
+    override fun updateState(bar: Bar) {
+        diff.onBar(bar)
+        value = calculate()
+    }
 
-
-  @Override
-  public void updateState(final Bar bar) {
-      this.diff.onBar(bar);
-      this.value = calculate();
-  }
-
-
-  @Override
-  public boolean isStable() {
-    return this.diff.isStable();
-  }
+    override val isStable get() = diff.isStable
 }

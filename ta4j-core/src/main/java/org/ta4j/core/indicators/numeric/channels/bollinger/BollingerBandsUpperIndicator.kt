@@ -21,83 +21,47 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.ta4j.core.indicators.numeric.channels.bollinger;
+package org.ta4j.core.indicators.numeric.channels.bollinger
 
-import org.ta4j.core.api.series.Bar;
-import org.ta4j.core.indicators.numeric.NumericIndicator;
-import org.ta4j.core.num.Num;
+import org.ta4j.core.api.series.Bar
+import org.ta4j.core.indicators.numeric.NumericIndicator
+import org.ta4j.core.num.Num
 
 /**
  * Buy - Occurs when the price line crosses from below to above the Lower
  * Bollinger Band.
  *
- * <p>
+ *
+ *
  * Sell - Occurs when the price line crosses from above to below the Upper
  * Bollinger Band.
  */
-public class BollingerBandsUpperIndicator extends NumericIndicator {
+class BollingerBandsUpperIndicator
+/**
+ * Constructor with `k` = 2.
+ *
+ * @param bbm the middle band Indicator. Typically an `SMAIndicator`
+ * is used.
+ * @param deviation the deviation above and below the middle, factored by k.
+ * Typically a `StandardDeviationIndicator` is used.
+ */
+@JvmOverloads constructor(
+    private val bbm: BollingerBandsMiddleIndicator,
+    private val deviation: NumericIndicator,
+    private val k: Num = deviation.numFactory.two(),
+) : NumericIndicator(deviation.numFactory) {
 
-  private final BollingerBandsMiddleIndicator bbm;
-  private final NumericIndicator deviation;
-  private final Num k;
+    private fun calculate() = bbm.value.plus(deviation.value.multipliedBy(k))
 
-
-  /**
-   * Constructor with {@code k} = 2.
-   *
-   * @param bbm the middle band Indicator. Typically an {@code SMAIndicator}
-   *     is used.
-   * @param deviation the deviation above and below the middle, factored by k.
-   *     Typically a {@code StandardDeviationIndicator} is used.
-   */
-  public BollingerBandsUpperIndicator(final BollingerBandsMiddleIndicator bbm, final NumericIndicator deviation) {
-    this(bbm, deviation, deviation.getNumFactory().two());
-  }
-
-
-  /**
-   * Constructor.
-   *
-   * @param bbm the middle band Indicator. Typically an {@code SMAIndicator}
-   *     is used.
-   * @param deviation the deviation above and below the middle, factored by k.
-   *     Typically a {@code StandardDeviationIndicator} is used.
-   * @param k the scaling factor to multiply the deviation by. Typically
-   *     2.
-   */
-  public BollingerBandsUpperIndicator(
-      final BollingerBandsMiddleIndicator bbm,
-      final NumericIndicator deviation,
-      final Num k
-  ) {
-    super(deviation.getNumFactory());
-    this.bbm = bbm;
-    this.deviation = deviation;
-    this.k = k;
-  }
+    override fun updateState(bar: Bar) {
+        bbm.onBar(bar)
+        deviation.onBar(bar)
+        value = calculate()
+    }
 
 
-  protected Num calculate() {
-    return this.bbm.getValue().plus(this.deviation.getValue().multipliedBy(this.k));
-  }
+    override val isStable
+        get() = bbm.isStable && deviation.isStable
 
-
-  @Override
-  public void updateState(final Bar bar) {
-    this.bbm.onBar(bar);
-    this.deviation.onBar(bar);
-    this.value = calculate();
-  }
-
-
-  @Override
-  public boolean isStable() {
-    return this.bbm.isStable() && this.deviation.isStable();
-  }
-
-
-  @Override
-  public String toString() {
-    return String.format("BolBaUp(%s, %s) => %s", this.bbm, this.k, getValue());
-  }
+    override fun toString() = "BolBaUp(${bbm}, ${k}) => $value"
 }

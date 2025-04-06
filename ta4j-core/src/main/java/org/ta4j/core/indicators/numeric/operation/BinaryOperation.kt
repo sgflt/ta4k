@@ -20,159 +20,124 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.ta4j.core.indicators.numeric.operation;
+package org.ta4j.core.indicators.numeric.operation
 
-import java.util.Objects;
-import java.util.function.BinaryOperator;
-
-import org.ta4j.core.api.series.Bar;
-import org.ta4j.core.indicators.numeric.NumericIndicator;
-import org.ta4j.core.num.Num;
+import org.ta4j.core.api.series.Bar
+import org.ta4j.core.indicators.numeric.NumericIndicator
+import org.ta4j.core.num.Num
+import java.util.function.BinaryOperator
 
 /**
  * Objects of this class defer evaluation of an arithmetic operation.
  *
- * <p>
+ *
+ *
  * This is a lightweight version of the
- * {@link CombineIndicator CombineIndicator};
+ * [CombineIndicator];
  * it doesn't cache.
  */
-public class BinaryOperation extends NumericIndicator {
+class BinaryOperation private constructor(
+    private val operator: BinaryOperator<Num>,
+    private val left: NumericIndicator,
+    private val right: NumericIndicator,
+) : NumericIndicator(left.numFactory) {
 
-  private final BinaryOperator<Num> operator;
-  private final NumericIndicator left;
-  private final NumericIndicator right;
+    private fun calculate() = operator.apply(left.value, right.value)
 
+    override fun updateState(bar: Bar) {
+        left.onBar(bar)
+        right.onBar(bar)
+        value = calculate()
+    }
 
-  private BinaryOperation(
-      final BinaryOperator<Num> operator,
-      final NumericIndicator left,
-      final NumericIndicator right
-  ) {
-    super(left.getNumFactory());
-    this.operator = operator;
-    this.left = Objects.requireNonNull(left);
-    this.right = Objects.requireNonNull(right);
-  }
+    override val isStable
+        get() = left.isStable && right.isStable
 
+    override fun toString() = "BI<$left, $right> => $value"
 
-  /**
-   * Returns an {@code Indicator} whose value is {@code (left + right)}.
-   *
-   * @param left
-   * @param right
-   *
-   * @return {@code left + right}, rounded as necessary
-   *
-   * @see Num#plus
-   */
-  public static BinaryOperation sum(final NumericIndicator left, final NumericIndicator right) {
-    return new BinaryOperation(Num::plus, left, right);
-  }
-
-
-  /**
-   * Returns an {@code Indicator} whose value is {@code (left - right)}.
-   *
-   * @param left
-   * @param right
-   *
-   * @return {@code left - right}, rounded as necessary
-   *
-   * @see Num#minus
-   */
-  public static BinaryOperation difference(final NumericIndicator left, final NumericIndicator right) {
-    return new BinaryOperation(Num::minus, left, right);
-  }
+    companion object {
+        /**
+         * Returns an `Indicator` whose value is `(left + right)`.
+         *
+         * @param left
+         * @param right
+         *
+         * @return `left + right`, rounded as necessary
+         *
+         * @see Num.plus
+         */
+        fun sum(left: NumericIndicator, right: NumericIndicator) = BinaryOperation({ a, b -> a.plus(b) }, left, right)
 
 
-  /**
-   * Returns an {@code Indicator} whose value is {@code (left * right)}.
-   *
-   * @param left
-   * @param right
-   *
-   * @return {@code left * right}, rounded as necessary
-   *
-   * @see Num#multipliedBy
-   */
-  public static BinaryOperation product(final NumericIndicator left, final NumericIndicator right) {
-    return new BinaryOperation(Num::multipliedBy, left, right);
-  }
+        /**
+         * Returns an `Indicator` whose value is `(left - right)`.
+         *
+         * @param left
+         * @param right
+         *
+         * @return `left - right`, rounded as necessary
+         *
+         * @see Num.minus
+         */
+        fun difference(left: NumericIndicator, right: NumericIndicator) =
+            BinaryOperation({ a, b -> a.minus(b) }, left, right)
 
 
-  /**
-   * Returns an {@code Indicator} whose value is {@code (left / right)}.
-   *
-   * @param left
-   * @param right
-   *
-   * @return {@code left / right}, rounded as necessary
-   *
-   * @see Num#dividedBy
-   */
-  public static BinaryOperation quotient(final NumericIndicator left, final NumericIndicator right) {
-    return new BinaryOperation(Num::dividedBy, left, right);
-  }
+        /**
+         * Returns an `Indicator` whose value is `(left * right)`.
+         *
+         * @param left
+         * @param right
+         *
+         * @return `left * right`, rounded as necessary
+         *
+         * @see Num.multipliedBy
+         */
+        fun product(left: NumericIndicator, right: NumericIndicator) =
+            BinaryOperation({ a, b -> a.multipliedBy(b) }, left, right)
 
 
-  /**
-   * Returns the minimum of {@code left} and {@code right} as an
-   * {@code Indicator}.
-   *
-   * @param left
-   * @param right
-   *
-   * @return the {@code Indicator} whose value is the smaller of {@code left} and
-   *     {@code right}. If they are equal, {@code left} is returned.
-   *
-   * @see Num#min
-   */
-  public static BinaryOperation min(final NumericIndicator left, final NumericIndicator right) {
-    return new BinaryOperation(Num::min, left, right);
-  }
+        /**
+         * Returns an `Indicator` whose value is `(left / right)`.
+         *
+         * @param left
+         * @param right
+         *
+         * @return `left / right`, rounded as necessary
+         *
+         * @see Num.dividedBy
+         */
+        fun quotient(left: NumericIndicator, right: NumericIndicator) =
+            BinaryOperation({ a, b -> a.dividedBy(b) }, left, right)
 
 
-  /**
-   * Returns the maximum of {@code left} and {@code right} as an
-   * {@code Indicator}.
-   *
-   * @param left
-   * @param right
-   *
-   * @return the {@code Indicator} whose value is the greater of {@code left} and
-   *     {@code right}. If they are equal, {@code left} is returned.
-   *
-   * @see Num#max
-   */
-  public static BinaryOperation max(final NumericIndicator left, final NumericIndicator right) {
-    return new BinaryOperation(Num::max, left, right);
-  }
+        /**
+         * Returns the minimum of `left` and `right` as an
+         * `Indicator`.
+         *
+         * @param left
+         * @param right
+         *
+         * @return the `Indicator` whose value is the smaller of `left` and
+         * `right`. If they are equal, `left` is returned.
+         *
+         * @see Num.min
+         */
+        fun min(left: NumericIndicator, right: NumericIndicator) = BinaryOperation({ a, b -> a.min(b) }, left, right)
 
 
-  private Num calculate() {
-    final Num n1 = this.left.getValue();
-    final Num n2 = this.right.getValue();
-    return this.operator.apply(n1, n2);
-  }
-
-
-  @Override
-  public void updateState(final Bar bar) {
-    this.left.onBar(bar);
-    this.right.onBar(bar);
-    this.value = calculate();
-  }
-
-
-  @Override
-  public boolean isStable() {
-    return this.left.isStable() && this.right.isStable();
-  }
-
-
-  @Override
-  public String toString() {
-    return String.format("BI<%s, %s> => %s", this.left, this.right, getValue());
-  }
+        /**
+         * Returns the maximum of `left` and `right` as an
+         * `Indicator`.
+         *
+         * @param left
+         * @param right
+         *
+         * @return the `Indicator` whose value is the greater of `left` and
+         * `right`. If they are equal, `left` is returned.
+         *
+         * @see Num.max
+         */
+        fun max(left: NumericIndicator, right: NumericIndicator) = BinaryOperation({ a, b -> a.max(b) }, left, right)
+    }
 }

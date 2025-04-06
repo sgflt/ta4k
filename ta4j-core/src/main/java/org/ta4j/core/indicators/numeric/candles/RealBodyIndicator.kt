@@ -21,44 +21,27 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.ta4j.core.indicators.numeric.candles;
+package org.ta4j.core.indicators.numeric.candles
 
-import org.ta4j.core.api.series.Bar;
-import org.ta4j.core.indicators.SeriesRelatedNumericIndicator;
-import org.ta4j.core.num.Num;
-import org.ta4j.core.num.NumFactory;
+import org.ta4j.core.api.series.Bar
+import org.ta4j.core.indicators.SeriesRelatedNumericIndicator
+import org.ta4j.core.num.NumFactory
 
 /**
  * Real (candle) body height indicator.
  *
- * <p>
+ *
+ *
  * Provides the (relative) difference between the open price and the close price
  * of a bar. I.e.: close price - open price
  *
- * @see <a href=
- *     "http://stockcharts.com/school/doku.php?id=chart_school:chart_analysis:introduction_to_candlesticks#formation">
- *     http://stockcharts.com/school/doku.php?id=chart_school:chart_analysis:introduction_to_candlesticks#formation</a>
+ * @see [
+ * http://stockcharts.com/school/doku.php?id=chart_school:chart_analysis:introduction_to_candlesticks.formation](http://stockcharts.com/school/doku.php?id=chart_school:chart_analysis:introduction_to_candlesticks.formation)
  */
-public class RealBodyIndicator extends SeriesRelatedNumericIndicator {
+class RealBodyIndicator(numFactory: NumFactory) : SeriesRelatedNumericIndicator(numFactory) {
+    private fun calculate(bar: Bar) = bar.closePrice.minus(bar.openPrice)
 
-
-  /**
-   * Constructor.
-   *
-   * @param numFactory the bar numFactory
-   */
-  public RealBodyIndicator(final NumFactory numFactory) {
-    super(numFactory);
-  }
-
-
-  protected Num calculate(final Bar bar) {
-    return bar.closePrice().minus(bar.openPrice());
-  }
-
-
-  @Override
-  public void updateState(final Bar bar) {
-    this.value = calculate(bar);
-  }
+    public override fun updateState(bar: Bar) {
+        value = calculate(bar)
+    }
 }

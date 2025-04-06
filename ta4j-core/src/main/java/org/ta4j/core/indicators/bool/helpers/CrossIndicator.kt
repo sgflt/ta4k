@@ -20,87 +20,41 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.ta4j.core.indicators.bool.helpers;
+package org.ta4j.core.indicators.bool.helpers
 
-import org.ta4j.core.api.series.Bar;
-import org.ta4j.core.indicators.bool.BooleanIndicator;
-import org.ta4j.core.indicators.helpers.previous.PreviousNumericValueIndicator;
-import org.ta4j.core.indicators.numeric.NumericIndicator;
+import org.ta4j.core.api.series.Bar
+import org.ta4j.core.indicators.bool.BooleanIndicator
+import org.ta4j.core.indicators.helpers.previous.PreviousNumericValueIndicator
+import org.ta4j.core.indicators.numeric.NumericIndicator
 
 /**
  * Cross indicator.
  *
- * <p>
  * Boolean indicator that monitors the crossing of two indicators.
  */
-public class CrossIndicator extends BooleanIndicator {
+class CrossIndicator(
+    val up: NumericIndicator,
+    val low: NumericIndicator,
+    barCount: Int,
+) : BooleanIndicator() {
 
-  /** Upper indicator */
-  private final NumericIndicator up;
+    private val previousUp: PreviousNumericValueIndicator = up.previous(barCount)
+    private val previousLow: PreviousNumericValueIndicator = low.previous(barCount)
 
-  /** Lower indicator */
-  private final NumericIndicator low;
-  private final PreviousNumericValueIndicator previousUp;
-  private final PreviousNumericValueIndicator previousLow;
+    private fun calculate() = up.value.isGreaterThan(low.value) && previousUp.value.isLessThanOrEqual(previousLow.value)
 
+    override fun updateState(bar: Bar) {
+        low.onBar(bar)
+        up.onBar(bar)
+        previousUp.onBar(bar)
+        previousLow.onBar(bar)
+        value = calculate()
+    }
 
-  /**
-   * @param up the upper indicator
-   * @param low the lower indicator
-   * @param barCount test whether crossed up within las barCount
-   */
-  public CrossIndicator(final NumericIndicator up, final NumericIndicator low, final int barCount) {
-    this.up = up;
-    this.low = low;
-    this.previousUp = up.previous(barCount);
-    this.previousLow = low.previous(barCount);
-  }
+    override val isStable
+        get() = up.isStable && low.isStable && previousUp.isStable && previousLow.isStable
 
-
-  protected Boolean calculate() {
-    final var greaterThanNow = this.up.getValue().isGreaterThan(this.low.getValue());
-    final var lessThanPreviously = this.previousUp.getValue().isLessThanOrEqual(this.previousLow.getValue());
-    return greaterThanNow && lessThanPreviously;
-  }
-
-
-  @Override
-  public void updateState(final Bar bar) {
-    this.low.onBar(bar);
-    this.up.onBar(bar);
-    this.previousUp.onBar(bar);
-    this.previousLow.onBar(bar);
-    this.value = calculate();
-  }
-
-
-  @Override
-  public boolean isStable() {
-    return this.up.isStable() && this.low.isStable() && this.previousUp.isStable() && this.previousLow.isStable();
-  }
-
-
-  /** @return the initial lower indicator */
-  public NumericIndicator getLow() {
-    return this.low;
-  }
-
-
-  /** @return the initial upper indicator */
-  public NumericIndicator getUp() {
-    return this.up;
-  }
-
-
-  @Override
-  public String toString() {
-    return String.format(
-        "Cross(%s, %s, %s, %s) => %s",
-        this.up,
-        this.low,
-        this.previousUp,
-        this.previousLow,
-        getValue()
-    );
-  }
+    override fun toString() =
+        "Cross($up, $low, $previousUp, $previousLow) => $value"
 }
+

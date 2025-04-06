@@ -21,87 +21,59 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.ta4j.core.indicators.numeric.average;
+package org.ta4j.core.indicators.numeric.average
 
-import org.ta4j.core.api.Indicator;
-import org.ta4j.core.api.series.Bar;
-import org.ta4j.core.indicators.helpers.previous.PreviousNumericValueIndicator;
-import org.ta4j.core.indicators.numeric.NumericIndicator;
-import org.ta4j.core.num.Num;
+import org.ta4j.core.api.series.Bar
+import org.ta4j.core.indicators.numeric.NumericIndicator
+import org.ta4j.core.num.Num
 
 /**
  * Zero-lag exponential moving average indicator.
  *
- * @see <a href=
- *     "http://www.fmlabs.com/reference/default.htm?url=ZeroLagExpMA.htm">
- *     http://www.fmlabs.com/reference/default.htm?url=ZeroLagExpMA.htm</a>
+ * @see [
+ * http://www.fmlabs.com/reference/default.htm?url=ZeroLagExpMA.htm](http://www.fmlabs.com/reference/default.htm?url=ZeroLagExpMA.htm)
  */
-public class ZLEMAIndicator extends NumericIndicator {
-
-  private final NumericIndicator indicator;
-  private final int barCount;
-  private final Num k;
-  private final Num oneMinusK;
-  private final PreviousNumericValueIndicator lagPreviousValue;
-  private final int lag;
-  private int barsPassed;
+class ZLEMAIndicator(private val indicator: NumericIndicator, private val barCount: Int) :
+    NumericIndicator(indicator.numFactory) {
+    private val k = numFactory.two().dividedBy(numFactory.numOf(barCount + 1))
+    private val oneMinusK = numFactory.one().minus(k)
+    private val lag = (barCount - 1) / 2
+    private val lagPreviousValue = indicator.previous(lag)
+    private var barsPassed = 0
 
 
-  /**
-   * Constructor.
-   *
-   * @param indicator the {@link Indicator}
-   * @param barCount the time frame
-   */
-  public ZLEMAIndicator(final NumericIndicator indicator, final int barCount) {
-    super(indicator.getNumFactory());
-    this.indicator = indicator;
-    this.barCount = barCount;
-    this.k = getNumFactory().two().dividedBy(getNumFactory().numOf(barCount + 1));
-    this.oneMinusK = getNumFactory().one().minus(this.k);
-    this.lag = (barCount - 1) / 2;
-
-    if (this.lag == 0) {
-      throw new IllegalArgumentException("The bar count must be greater than 2");
+    init {
+        require(lag != 0) { "The bar count must be greater than 2" }
     }
 
-    this.lagPreviousValue = indicator.previous(this.lag);
-  }
 
+    private fun calculate(): Num {
+        if (barsPassed <= lag) {
+            return indicator.value
+        }
 
-  protected Num calculate() {
-    if (this.barsPassed <= this.lag) {
-      return this.indicator.getValue();
-    }
-
-    final Num zlemaPrev = getValue();
-    return this.k.multipliedBy(
-            getNumFactory()
+        val zlemaPrev = value
+        return k.multipliedBy(
+            numFactory
                 .two()
-                .multipliedBy(this.indicator.getValue())
-                .minus(this.lagPreviousValue.getValue())
+                .multipliedBy(indicator.value)
+                .minus(lagPreviousValue.value)
         )
-        .plus(this.oneMinusK.multipliedBy(zlemaPrev));
-  }
+            .plus(oneMinusK.multipliedBy(zlemaPrev))
+    }
 
 
-  @Override
-  public void updateState(final Bar bar) {
-    ++this.barsPassed;
-    this.indicator.onBar(bar);
-    this.lagPreviousValue.onBar(bar);
-    this.value = calculate();
-  }
+    override fun updateState(bar: Bar) {
+        ++barsPassed
+        indicator.onBar(bar)
+        lagPreviousValue.onBar(bar)
+        value = calculate()
+    }
 
 
-  @Override
-  public boolean isStable() {
-    return this.barsPassed >= this.lag && this.lagPreviousValue.isStable() && this.indicator.isStable();
-  }
+    override val isStable: Boolean
+        get() = barsPassed >= lag && lagPreviousValue.isStable && indicator.isStable
 
 
-  @Override
-  public String toString() {
-    return String.format("ZLEMA(%d) => %s", this.barCount, getValue());
-  }
+    override fun toString() = "ZLEMA($barCount) => $value"
 }

@@ -21,50 +21,36 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  *  CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.ta4j.core.indicators.helpers.previous;
+package org.ta4j.core.indicators.helpers.previous
 
-import org.ta4j.core.api.series.Bar;
-import org.ta4j.core.indicators.numeric.NumericIndicator;
-import org.ta4j.core.num.Num;
-import org.ta4j.core.num.NumFactory;
+import org.ta4j.core.api.series.Bar
+import org.ta4j.core.indicators.numeric.NumericIndicator
+import org.ta4j.core.num.Num
 
 /**
  * @author Lukáš Kvídera
  */
-public class PreviousNumericValueIndicator extends NumericIndicator {
-
-  private final NumFactory numFactory;
-  private final PreviousValueHelper<Num> previousValueHelper;
+class PreviousNumericValueIndicator(indicator: NumericIndicator, n: Int) : NumericIndicator(indicator.numFactory) {
+    private val previousValueHelper = PreviousValueHelper<Num>(indicator, n)
 
 
-  public PreviousNumericValueIndicator(final NumericIndicator indicator, final int n) {
-    super(indicator.getNumFactory());
-    this.numFactory = indicator.getNumFactory();
-    this.previousValueHelper = new PreviousValueHelper<>(indicator, n);
-  }
+    private fun calculate(): Num {
+        val value = previousValueHelper.value
+        return if (value == null) numFactory.zero() else value
+    }
 
 
-  private Num calculate() {
-    final var value = this.previousValueHelper.getValue();
-    return value == null ? this.numFactory.zero() : value;
-  }
+    override fun updateState(bar: Bar) {
+        previousValueHelper.onBar(bar)
+        value = calculate()
+    }
 
 
-  @Override
-  public void updateState(final Bar bar) {
-    this.previousValueHelper.onBar(bar);
-    this.value = calculate();
-  }
+    override val isStable: Boolean
+        get() = previousValueHelper.isStable
 
 
-  @Override
-  public boolean isStable() {
-    return this.previousValueHelper.isStable();
-  }
-
-
-  @Override
-  public String toString() {
-    return this.previousValueHelper.toString();
-  }
+    override fun toString(): String {
+        return previousValueHelper.toString()
+    }
 }

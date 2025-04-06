@@ -20,113 +20,53 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.ta4j.core.indicators.numeric.operation;
+package org.ta4j.core.indicators.numeric.operation
 
-import java.util.function.BinaryOperator;
-import java.util.function.Function;
-
-import org.ta4j.core.api.series.Bar;
-import org.ta4j.core.indicators.numeric.NumericIndicator;
-import org.ta4j.core.num.Num;
+import org.ta4j.core.api.series.Bar
+import org.ta4j.core.indicators.numeric.NumericIndicator
+import org.ta4j.core.num.Num
+import java.util.function.BinaryOperator
 
 /**
  * Combine indicator.
  *
- * <p>
  * Combines two Num indicators by using common math operations.
  */
-public class CombineIndicator extends NumericIndicator {
+class CombineIndicator(
+    private val indicatorLeft: NumericIndicator,
+    private val indicatorRight: NumericIndicator,
+    private val combineFunction: BinaryOperator<Num>,
+) : NumericIndicator(indicatorLeft.numFactory) {
 
-  private final NumericIndicator indicatorLeft;
-  private final NumericIndicator indicatorRight;
-  private final BinaryOperator<Num> combineFunction;
+    private fun calculate() = combineFunction.apply(indicatorLeft.value, indicatorRight.value)
 
+    public override fun updateState(bar: Bar) {
+        indicatorLeft.onBar(bar)
+        indicatorRight.onBar(bar)
+        value = calculate()
+    }
 
-  /**
-   * Constructor.
-   *
-   * @param indicatorLeft the indicator for the left hand side of the calculation
-   * @param indicatorRight the indicator for the right hand side of the
-   *     calculation
-   * @param combination a {@link Function} describing the combination function
-   *     to combine the values of the indicators
-   */
-  public CombineIndicator(
-      final NumericIndicator indicatorLeft,
-      final NumericIndicator indicatorRight,
-      final BinaryOperator<Num> combination
-  ) {
-    super(indicatorLeft.getNumFactory());
-    this.indicatorLeft = indicatorLeft;
-    this.indicatorRight = indicatorRight;
-    this.combineFunction = combination;
-  }
+    override val isStable
+        get() = indicatorLeft.isStable && indicatorRight.isStable
 
+    companion object {
+        fun plus(indicatorLeft: NumericIndicator, indicatorRight: NumericIndicator) =
+            CombineIndicator(indicatorLeft, indicatorRight) { a, b -> a.plus(b) }
 
-  protected Num calculate() {
-    return this.combineFunction.apply(this.indicatorLeft.getValue(), this.indicatorRight.getValue());
-  }
+        fun minus(indicatorLeft: NumericIndicator, indicatorRight: NumericIndicator) =
+            CombineIndicator(indicatorLeft, indicatorRight) { a, b -> a.minus(b) }
 
+        fun divide(indicatorLeft: NumericIndicator, indicatorRight: NumericIndicator) =
+            CombineIndicator(indicatorLeft, indicatorRight) { a, b -> a.dividedBy(b) }
 
-  @Override
-  public void updateState(final Bar bar) {
-    this.indicatorLeft.onBar(bar);
-    this.indicatorRight.onBar(bar);
-    this.value = calculate();
-  }
+        fun multiply(indicatorLeft: NumericIndicator, indicatorRight: NumericIndicator) =
+            CombineIndicator(indicatorLeft, indicatorRight) { a, b -> a.multipliedBy(b) }
 
+        fun max(indicatorLeft: NumericIndicator, indicatorRight: NumericIndicator) =
+            CombineIndicator(indicatorLeft, indicatorRight) { a, b -> a.max(b) }
 
-  @Override
-  public boolean isStable() {
-    return this.indicatorLeft.isStable() && this.indicatorRight.isStable();
-  }
-
-
-  /**
-   * Combines the two input indicators by indicatorLeft.plus(indicatorRight).
-   */
-  public static CombineIndicator plus(final NumericIndicator indicatorLeft, final NumericIndicator indicatorRight) {
-    return new CombineIndicator(indicatorLeft, indicatorRight, Num::plus);
-  }
-
-
-  /**
-   * Combines the two input indicators by indicatorLeft.minus(indicatorRight).
-   */
-  public static CombineIndicator minus(final NumericIndicator indicatorLeft, final NumericIndicator indicatorRight) {
-    return new CombineIndicator(indicatorLeft, indicatorRight, Num::minus);
-  }
-
-
-  /**
-   * Combines the two input indicators by indicatorLeft.dividedBy(indicatorRight).
-   */
-  public static CombineIndicator divide(final NumericIndicator indicatorLeft, final NumericIndicator indicatorRight) {
-    return new CombineIndicator(indicatorLeft, indicatorRight, Num::dividedBy);
-  }
-
-
-  /**
-   * Combines the two input indicators by
-   * indicatorLeft.multipliedBy(indicatorRight).
-   */
-  public static CombineIndicator multiply(final NumericIndicator indicatorLeft, final NumericIndicator indicatorRight) {
-    return new CombineIndicator(indicatorLeft, indicatorRight, Num::multipliedBy);
-  }
-
-
-  /**
-   * Combines the two input indicators by indicatorLeft.max(indicatorRight).
-   */
-  public static CombineIndicator max(final NumericIndicator indicatorLeft, final NumericIndicator indicatorRight) {
-    return new CombineIndicator(indicatorLeft, indicatorRight, Num::max);
-  }
-
-
-  /**
-   * Combines the two input indicators by indicatorLeft.min(indicatorRight).
-   */
-  public static CombineIndicator min(final NumericIndicator indicatorLeft, final NumericIndicator indicatorRight) {
-    return new CombineIndicator(indicatorLeft, indicatorRight, Num::min);
-  }
+        fun min(indicatorLeft: NumericIndicator, indicatorRight: NumericIndicator) =
+            CombineIndicator(indicatorLeft, indicatorRight) { a, b -> a.min(b) }
+    }
 }
+

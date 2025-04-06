@@ -42,7 +42,7 @@ class TimeInTradeCriterionTest {
   @DisplayName("Should calculate zero for no positions")
   void calculateWithNoPositions() {
     this.context = new MarketEventTestContext()
-        .withNumFactory(DoubleNumFactory.getInstance())
+        .withNumFactory(DoubleNumFactory.INSTANCE)
         .toTradingRecordContext()
         .withCriterion(TimeInTradeCriterion.minutes());
 
@@ -54,7 +54,7 @@ class TimeInTradeCriterionTest {
   @DisplayName("Should calculate correct time for two positions")
   void calculateWithTwoPositions() {
     this.context = new MarketEventTestContext()
-        .withNumFactory(DoubleNumFactory.getInstance())
+        .withNumFactory(DoubleNumFactory.INSTANCE)
         .withCandleDuration(ChronoUnit.MINUTES)
         .withCandlePrices(100.0, 0, 110.0, 100.0, 0, 0, 105.0)
         .toTradingRecordContext()
@@ -77,7 +77,7 @@ class TimeInTradeCriterionTest {
     this.context = new MarketEventTestContext()
         .withCandleDuration(ChronoUnit.MINUTES)
         .withCandlePrices(100.0, 0, 0, 70.0)
-        .withNumFactory(DoubleNumFactory.getInstance())
+        .withNumFactory(DoubleNumFactory.INSTANCE)
         .toTradingRecordContext()
         .withCriterion(TimeInTradeCriterion.minutes())
         .withTradeType(TradeType.BUY);
@@ -96,7 +96,7 @@ class TimeInTradeCriterionTest {
     this.context = new MarketEventTestContext()
         .withCandleDuration(ChronoUnit.MINUTES)
         .withCandlePrices(100.0, 0, 0, 70.0)
-        .withNumFactory(DoubleNumFactory.getInstance())
+        .withNumFactory(DoubleNumFactory.INSTANCE)
         .toTradingRecordContext()
         .withCriterion(TimeInTradeCriterion.minutes())
         .withTradeType(TradeType.BUY);

@@ -20,73 +20,60 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.ta4j.core.indicators.bool;
+package org.ta4j.core.indicators.bool
 
-import java.time.Instant;
+import org.ta4j.core.api.Indicator
+import org.ta4j.core.api.series.Bar
+import org.ta4j.core.indicators.bool.chandelier.ChandelierExitLongIndicator
+import org.ta4j.core.indicators.bool.chandelier.ChandelierExitShortIndicator
+import org.ta4j.core.indicators.helpers.previous.PreviousBooleanValueIndicator
+import org.ta4j.core.num.NumFactoryProvider
+import org.ta4j.core.strategy.rules.BooleanIndicatorRule
+import java.time.Instant
 
-import org.ta4j.core.api.Indicator;
-import org.ta4j.core.api.series.Bar;
-import org.ta4j.core.indicators.bool.chandelier.ChandelierExitLongIndicator;
-import org.ta4j.core.indicators.bool.chandelier.ChandelierExitShortIndicator;
-import org.ta4j.core.indicators.helpers.previous.PreviousBooleanValueIndicator;
-import org.ta4j.core.num.NumFactoryProvider;
-import org.ta4j.core.strategy.rules.BooleanIndicatorRule;
+abstract class BooleanIndicator : Indicator<Boolean> {
+    private var currentBeginTime: Instant = Instant.MIN
+    override var value = false
+        protected set
 
-public abstract class BooleanIndicator implements Indicator<Boolean> {
-
-  private Instant currentBeginTime = Instant.MIN;
-
-  protected boolean value;
-
-
-  public BooleanIndicatorRule toRule() {
-    return new BooleanIndicatorRule(this);
-  }
+    fun toRule(): BooleanIndicatorRule = BooleanIndicatorRule(this)
 
 
-  public PreviousBooleanValueIndicator previous(final int barCount) {
-    return new PreviousBooleanValueIndicator(this, barCount);
-  }
+    fun previous(barCount: Int) = PreviousBooleanValueIndicator(this, barCount)
 
-
-  public static ChandelierExitLongIndicator chandelierExitLong(
-      final int barCount,
-      final double coefficient
-  ) {
-    return new ChandelierExitLongIndicator(NumFactoryProvider.getDefaultNumFactory(), barCount, coefficient);
-  }
-
-
-  public static ChandelierExitShortIndicator chandelierExitShort(
-      final int barCount,
-      final double coefficient
-  ) {
-    return new ChandelierExitShortIndicator(NumFactoryProvider.getDefaultNumFactory(), barCount, coefficient);
-  }
-
-
-  @Override
-  public final Boolean getValue() {
-    return this.value;
-  }
-
-
-  @Override
-  public final void onBar(final Bar bar) {
-    if (bar.beginTime().isAfter(this.currentBeginTime)) {
-      updateState(bar);
-      this.currentBeginTime = bar.beginTime();
+    override fun onBar(bar: Bar) {
+        if (bar.beginTime.isAfter(currentBeginTime)) {
+            updateState(bar)
+            currentBeginTime = bar.beginTime
+        }
     }
-  }
 
 
-  /**
-   * Updates internal stqte of indicator.
-   *
-   * If indicator depends on other indicators, it is required to call {@link #onBar(Bar)} on them to refresh their state
-   * before calculation
-   *
-   * @param bar that comes from exchange's stream
-   */
-  protected abstract void updateState(final Bar bar);
+    /**
+     * Updates internal state of indicator.
+     *
+     * If indicator depends on other indicators, it is required to call [.onBar] on them to refresh their state
+     * before calculation
+     *
+     * @param bar that comes from exchange's stream
+     */
+    protected abstract fun updateState(bar: Bar)
+
+    companion object {
+        @JvmStatic
+        fun chandelierExitLong(
+            barCount: Int,
+            coefficient: Double,
+        ): ChandelierExitLongIndicator {
+            return ChandelierExitLongIndicator(NumFactoryProvider.defaultNumFactory, barCount, coefficient)
+        }
+
+        @JvmStatic
+        fun chandelierExitShort(
+            barCount: Int,
+            coefficient: Double,
+        ): ChandelierExitShortIndicator {
+            return ChandelierExitShortIndicator(NumFactoryProvider.defaultNumFactory, barCount, coefficient)
+        }
+    }
 }
