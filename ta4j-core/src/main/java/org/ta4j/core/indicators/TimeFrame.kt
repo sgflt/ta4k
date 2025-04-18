@@ -25,36 +25,28 @@ package org.ta4j.core.indicators
 /**
  * @param name name of timeframe. f.e.: 1m, 2m 5m, 1h, 4h, 1d or any custom
  */
-@JvmRecord
-data class TimeFrame(val name: String?) {
+@JvmInline
+value class TimeFrame(val name: String) {
+
     companion object {
-        val UNDEFINED: TimeFrame = TimeFrame("UNDEFINED")
+        val UNDEFINED = TimeFrame("UNDEFINED")
 
-        @JvmField
-        val MINUTES_1: TimeFrame = TimeFrame("1m")
+        val MINUTES_1 = TimeFrame("1m")
 
-        @JvmField
-        val MINUTES_5: TimeFrame = TimeFrame("5m")
+        val MINUTES_5 = TimeFrame("5m")
 
-        @JvmField
-        val MINUTES_15: TimeFrame = TimeFrame("15m")
+        val MINUTES_15 = TimeFrame("15m")
 
-        @JvmField
-        val MINUTES_30: TimeFrame = TimeFrame("30m")
+        val MINUTES_30 = TimeFrame("30m")
 
-        @JvmField
-        val HOURS_1: TimeFrame = TimeFrame("1h")
+        val HOURS_1 = TimeFrame("1h")
 
-        @JvmField
-        val HOURS_4: TimeFrame = TimeFrame("4h")
+        val HOURS_4 = TimeFrame("4h")
 
-        @JvmField
-        val DAY: TimeFrame = TimeFrame("1d")
+        val DAY = TimeFrame("1d")
 
-        @JvmField
-        val WEEK: TimeFrame = TimeFrame("1w")
+        val WEEK = TimeFrame("1w")
 
-        @JvmField
-        val MONTH: TimeFrame = TimeFrame("1M")
+        val MONTH = TimeFrame("1M")
     }
 }

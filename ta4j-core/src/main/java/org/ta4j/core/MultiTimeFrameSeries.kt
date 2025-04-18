@@ -78,7 +78,7 @@ class MultiTimeFrameSeries<B : BarSeries> {
         }
 
 
-        fun getLastEventTime(timeFrame: TimeFrame?): Instant? {
+        fun getLastEventTime(timeFrame: TimeFrame): Instant {
             return state.getOrDefault(timeFrame, Instant.EPOCH)
         }
     }

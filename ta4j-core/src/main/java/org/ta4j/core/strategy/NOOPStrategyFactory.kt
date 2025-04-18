@@ -44,7 +44,7 @@ class NOOPStrategyFactory : StrategyFactory<Strategy> {
             timeFrames = mutableSetOf(),
             entryRule = Rule.NOOP,
             exitRule = Rule.NOOP,
-            indicatorContext = empty(null)
+            indicatorContext = empty()
         )
     }
 }
