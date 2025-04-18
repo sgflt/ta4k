@@ -40,6 +40,8 @@ class DXIndicator(numFactory: NumFactory, barCount: Int) : NumericIndicator(numF
     private val plusDIIndicator = plusDII(barCount)
     private val minusDIIndicator = minusDII(barCount)
 
+    override val lag: Int
+        get() = plusDIIndicator.lag
 
     private fun calculate(): Num {
         val pdiValue = plusDIIndicator.value

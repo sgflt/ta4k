@@ -36,6 +36,7 @@ import org.ta4j.core.num.NumFactory
  */
 class TRIndicator(numFactory: NumFactory) : NumericIndicator(numFactory) {
     private var previousBar: Bar? = null
+    override val lag = 2
     override var isStable = false
         private set
 

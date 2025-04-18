@@ -139,4 +139,10 @@ class ThreeBlackCrowsIndicator(numFactory: NumFactory, barCount: Int, factor: Do
 
     override val isStable
         get() = averageLowerShadowInd.isStable
+
+    override val lag = maxOf(
+        4,
+        averageLowerShadowInd.lag,
+        lowerShadows.maxOf { it.lag }
+    )
 }

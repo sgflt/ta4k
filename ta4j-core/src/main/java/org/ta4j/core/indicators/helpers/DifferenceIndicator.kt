@@ -43,6 +43,8 @@ class DifferenceIndicator(private val indicator: NumericIndicator) : NumericIndi
         value = calculate()
     }
 
+    override val lag = 2
+
 
     override val isStable
         get() = previousValue != null

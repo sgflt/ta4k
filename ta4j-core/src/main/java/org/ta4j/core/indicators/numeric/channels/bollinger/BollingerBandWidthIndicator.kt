@@ -60,5 +60,8 @@ class BollingerBandWidthIndicator
     override val isStable
         get() = bbl.isStable && bbu.isStable && bbm.isStable
 
+    override val lag: Int
+        get() = maxOf(bbl.lag, bbu.lag, bbm.lag)
+
     override fun toString() = "BolBaWidth(${bbu}, ${bbm}, ${bbl}) => $value"
 }

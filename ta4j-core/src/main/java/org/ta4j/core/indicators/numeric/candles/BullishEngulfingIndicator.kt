@@ -66,6 +66,8 @@ class BullishEngulfingIndicator(series: BarSeries) : SeriesRelatedBooleanIndicat
         value = calculate(bar)
     }
 
+    override val lag = 2
+
 
     override val isStable: Boolean
         get() = previousBar != null

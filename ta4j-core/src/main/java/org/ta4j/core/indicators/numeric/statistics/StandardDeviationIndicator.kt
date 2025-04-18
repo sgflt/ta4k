@@ -49,5 +49,9 @@ class StandardDeviationIndicator(indicator: NumericIndicator, barCount: Int) : N
         get() = variance.isStable
 
 
+    override val lag: Int
+        get() = variance.lag
+
+
     override fun toString() = "STDDEV($variance) => $value"
 }

@@ -35,6 +35,8 @@ import org.ta4j.core.num.Num
 class RunningTotalIndicator(private val indicator: NumericIndicator, private val barCount: Int) : NumericIndicator(
     indicator.numFactory
 ) {
+    override val lag = barCount
+
     private val previousValue = PreviousNumericValueIndicator(indicator, barCount)
     private var previousSum = numFactory.zero()
     private var processedBars = 0
@@ -55,7 +57,7 @@ class RunningTotalIndicator(private val indicator: NumericIndicator, private val
 
 
     override fun toString(): String {
-        return javaClass.getSimpleName() + " barCount: " + barCount
+        return javaClass.simpleName + " barCount: " + barCount
     }
 
 

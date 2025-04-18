@@ -59,4 +59,7 @@ class KeltnerChannelMiddleIndicator(indicator: NumericIndicator, barCountEMA: In
 
     override val isStable: Boolean
         get() = emaIndicator.isStable
+
+    override val lag: Int
+        get() = emaIndicator.lag
 }

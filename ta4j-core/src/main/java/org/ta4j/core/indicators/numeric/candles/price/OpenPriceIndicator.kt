@@ -43,4 +43,6 @@ class OpenPriceIndicator(numFactory: NumFactory) : SeriesRelatedNumericIndicator
     override fun toString(): String {
         return String.format("Open() => %s", value)
     }
+
+    override val lag = 0
 }

@@ -98,6 +98,8 @@ class PearsonCorrelationIndicator(
     override val isStable: Boolean
         get() = indicator1.isStable && indicator2.isStable
 
+    override val lag: Int
+        get() = barCount
 
     @JvmRecord
     private data class XY(val x: Num, val y: Num)

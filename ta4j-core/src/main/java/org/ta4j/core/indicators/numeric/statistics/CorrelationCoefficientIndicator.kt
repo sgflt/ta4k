@@ -62,4 +62,7 @@ class CorrelationCoefficientIndicator(
 
     override val isStable
         get() = variance1.isStable && variance2.isStable && covariance.isStable
+
+    override val lag: Int
+        get() = variance1.lag
 }

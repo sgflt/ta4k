@@ -59,5 +59,8 @@ class PlusDIIndicator(numFactory: NumFactory, private val barCount: Int) : Numer
     override val isStable
         get() = barsPassed >= barCount && atrIndicator.isStable && avgPlusDMIndicator.isStable
 
+    override val lag: Int
+        get() = barCount
+
     override fun toString() = "PDII($barCount) => $value"
 }

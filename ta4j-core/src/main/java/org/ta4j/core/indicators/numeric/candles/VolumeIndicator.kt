@@ -35,4 +35,6 @@ class VolumeIndicator(numFactory: NumFactory) : SeriesRelatedNumericIndicator(nu
     override fun updateState(bar: Bar) {
         value = bar.volume
     }
+
+    override val lag: Int = 0
 }

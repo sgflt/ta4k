@@ -71,4 +71,7 @@ class KeltnerChannelUpperIndicator(
 
     override val isStable: Boolean
         get() = keltnerMiddleIndicator.isStable && averageTrueRangeIndicator.isStable
+
+    override val lag: Int
+        get() = maxOf(keltnerMiddleIndicator.lag, averageTrueRangeIndicator.lag)
 }

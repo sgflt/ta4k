@@ -37,5 +37,8 @@ class BollingerBandsMiddleIndicator(private val indicator: NumericIndicator) : N
     override val isStable
         get() = indicator.isStable
 
+    override val lag: Int
+        get() = indicator.lag
+
     override fun toString() = "BolBaMid(${indicator}) => $value"
 }

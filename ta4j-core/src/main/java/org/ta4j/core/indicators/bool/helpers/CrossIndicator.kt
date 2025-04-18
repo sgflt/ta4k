@@ -51,6 +51,9 @@ class CrossIndicator(
         value = calculate()
     }
 
+    override val lag
+        get() = previousUp.lag
+
     override val isStable
         get() = up.isStable && low.isStable && previousUp.isStable && previousLow.isStable
 

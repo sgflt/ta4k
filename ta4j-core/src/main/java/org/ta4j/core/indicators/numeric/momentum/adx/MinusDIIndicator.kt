@@ -61,5 +61,7 @@ class MinusDIIndicator(numFactory: NumFactory, private val barCount: Int) : Nume
     override val isStable
         get() = atrIndicator.isStable && avgMinusDMIndicator.isStable
 
+    override val lag = barCount
+
     override fun toString() = "MDII($barCount) => $value"
 }

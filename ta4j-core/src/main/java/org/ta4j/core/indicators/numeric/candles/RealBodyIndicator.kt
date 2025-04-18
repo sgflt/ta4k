@@ -44,4 +44,6 @@ class RealBodyIndicator(numFactory: NumFactory) : SeriesRelatedNumericIndicator(
     public override fun updateState(bar: Bar) {
         value = calculate(bar)
     }
+
+    override val lag: Int = 0
 }

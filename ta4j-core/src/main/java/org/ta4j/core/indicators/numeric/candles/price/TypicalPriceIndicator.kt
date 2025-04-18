@@ -50,4 +50,6 @@ class TypicalPriceIndicator(numFactory: NumFactory) : SeriesRelatedNumericIndica
     override fun updateState(bar: Bar) {
         value = calculate(bar)
     }
+
+    override val lag = 0
 }

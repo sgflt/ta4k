@@ -40,6 +40,7 @@ abstract class AbstractEMAIndicator(
     private var previousValue: Num? = null
     private var barsPassed = 0
 
+    override val lag = barCount
 
     private fun calculate(): Num {
         if (previousValue == null) {

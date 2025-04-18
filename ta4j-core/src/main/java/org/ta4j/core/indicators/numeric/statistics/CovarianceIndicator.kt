@@ -106,6 +106,8 @@ class CovarianceIndicator(
     override val isStable
         get() = window.size == barCount && indicator1.isStable && indicator2.isStable
 
+    override val lag: Int
+        get() = barCount
 
     override fun toString() = "COV($barCount) => $value"
 

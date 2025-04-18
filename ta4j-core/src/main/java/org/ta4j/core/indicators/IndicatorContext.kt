@@ -30,9 +30,9 @@ import org.ta4j.core.indicators.numeric.NumericIndicator
 import java.util.*
 
 class IndicatorContext private constructor(
-    internal val timeFrame: TimeFrame?,
+    internal val timeFrame: TimeFrame,
     vararg indicators: Indicator<*>,
-) : BarListener {
+) : BarListener, Iterable<Indicator<*>> {
 
     var isStable: Boolean = false
         get() {
@@ -45,7 +45,10 @@ class IndicatorContext private constructor(
         }
         private set
 
-    private val indicators = indicators.associateBy { generatePlaceholderName() }.toMutableMap()
+    private val _indicators = indicators.associateBy { generatePlaceholderName() }.toMutableMap()
+    val indicators: Map<IndicatorIdentification, Indicator<*>>
+        get() = _indicators
+
     private val changeListeners = mutableSetOf<IndicatorChangeListener>()
     private val updateListeners = mutableSetOf<IndicatorContextUpdateListener>()
 
@@ -59,16 +62,18 @@ class IndicatorContext private constructor(
 
 
     fun add(indicator: Indicator<*>) {
-        indicators[generatePlaceholderName()] = indicator
+        _indicators[generatePlaceholderName()] = indicator
     }
 
     fun add(indicator: Indicator<*>, name: IndicatorIdentification) {
-        indicators[name] = indicator
+        _indicators[name] = indicator
     }
 
 
     val first: Indicator<*>?
         get() = indicators.values.firstOrNull()
+
+    override fun iterator(): Iterator<Indicator<*>> = indicators.values.iterator()
 
     private operator fun get(name: IndicatorIdentification): Indicator<*>? = indicators[name]
 
@@ -79,7 +84,7 @@ class IndicatorContext private constructor(
         this[indicatorId] as? BooleanIndicator
 
     fun addAll(vararg indicators: Indicator<*>) {
-        indicators.forEach { this.indicators[generatePlaceholderName()] = it }
+        indicators.forEach { _indicators[generatePlaceholderName()] = it }
     }
 
     override fun onBar(bar: Bar) {
@@ -97,18 +102,20 @@ class IndicatorContext private constructor(
     operator fun contains(indicatorId: IndicatorIdentification): Boolean =
         indicators.containsKey(indicatorId)
 
-    fun timeFrame(): TimeFrame? = timeFrame
+    fun timeFrame(): TimeFrame = timeFrame
 
-    data class IndicatorIdentification(val name: String?)
+    @JvmInline
+    value class IndicatorIdentification(val name: String)
+
     companion object {
         @JvmStatic
         private fun generatePlaceholderName() = IndicatorIdentification(UUID.randomUUID().toString())
 
-        fun of(timeFrame: TimeFrame?, vararg indicators: Indicator<*>): IndicatorContext =
+        fun of(timeFrame: TimeFrame, vararg indicators: Indicator<*>): IndicatorContext =
             IndicatorContext(timeFrame, *indicators)
 
         @JvmStatic
-        fun empty(timeFrame: TimeFrame?): IndicatorContext =
+        fun empty(timeFrame: TimeFrame = TimeFrame.UNDEFINED): IndicatorContext =
             IndicatorContext(timeFrame)
     }
 }

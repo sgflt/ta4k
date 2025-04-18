@@ -67,4 +67,10 @@ public class MockIndicator implements Indicator<Num> {
   public boolean isStable() {
     return true;
   }
+
+
+  @Override
+  public int getLag() {
+    return 0;
+  }
 }

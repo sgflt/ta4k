@@ -36,6 +36,8 @@ class MinusDMIndicator(numFactory: NumFactory) : NumericIndicator(numFactory) {
     override var isStable = false
         private set
 
+    override val lag: Int = 2
+
     private fun calculate(bar: Bar) = when {
         previousBar == null -> {
             previousBar = bar

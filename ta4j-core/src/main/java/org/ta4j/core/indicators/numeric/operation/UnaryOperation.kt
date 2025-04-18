@@ -54,6 +54,9 @@ class UnaryOperation private constructor(
         get() = operand.isStable
 
 
+    override val lag = 0
+
+
     override fun toString() = "UI<$operand> => $value"
 
     companion object {

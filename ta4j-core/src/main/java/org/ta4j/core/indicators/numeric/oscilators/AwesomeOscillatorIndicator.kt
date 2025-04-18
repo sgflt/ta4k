@@ -37,10 +37,10 @@ class AwesomeOscillatorIndicator @JvmOverloads constructor(
     numFactory: NumFactory,
     indicator: NumericIndicator = medianPrice(),
     shortBarCount: Int = 5,
-    longBarCOunt: Int = 34,
+    longBarCount: Int = 34,
 ) : NumericIndicator(numFactory) {
     private val shortSma = indicator.sma(shortBarCount)
-    private val longSma = indicator.sma(longBarCOunt)
+    private val longSma = indicator.sma(longBarCount)
 
 
     private fun calculate() = shortSma.value.minus(longSma.value)
@@ -55,4 +55,7 @@ class AwesomeOscillatorIndicator @JvmOverloads constructor(
 
     override val isStable
         get() = shortSma.isStable && longSma.isStable
+
+    override val lag: Int
+        get() = shortSma.lag
 }

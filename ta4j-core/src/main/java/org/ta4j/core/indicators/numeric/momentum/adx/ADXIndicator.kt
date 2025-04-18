@@ -52,7 +52,7 @@ class ADXIndicator(numFactory: NumFactory, private val diBarCount: Int, private 
 
 
     override fun toString(): String {
-        return javaClass.getSimpleName() + " diBarCount: " + this.diBarCount + " adxBarCount: " + this.adxBarCount
+        return javaClass.simpleName + " diBarCount: " + this.diBarCount + " adxBarCount: " + this.adxBarCount
     }
 
 
@@ -67,4 +67,7 @@ class ADXIndicator(numFactory: NumFactory, private val diBarCount: Int, private 
 
     override val isStable
         get() = averageDXIndicator.isStable
+
+    override val lag: Int
+        get() = averageDXIndicator.lag
 }

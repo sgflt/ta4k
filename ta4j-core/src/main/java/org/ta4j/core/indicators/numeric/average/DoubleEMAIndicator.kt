@@ -44,10 +44,10 @@ class DoubleEMAIndicator(indicator: NumericIndicator, private val barCount: Int)
         value = calculate()
     }
 
+    override val lag = barCount
 
     override val isStable
         get() = ema.isStable && emaEma.isStable
-
 
     private fun calculate() = ema.value.multipliedBy(numFactory.two()).minus(emaEma.value)
 

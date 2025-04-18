@@ -37,6 +37,9 @@ import java.util.*
 class HighestValueIndicator(private val indicator: NumericIndicator, private val barCount: Int) : NumericIndicator(
     indicator.numFactory
 ) {
+
+    override val lag = barCount
+
     /** circular array  */
     private val window = arrayOfNulls<Num>(barCount)
     private val deque = LinkedList<Int>()

@@ -40,4 +40,6 @@ class ClosePriceIndicator(numFactory: NumFactory) : SeriesRelatedNumericIndicato
     }
 
     override fun toString() = "Close() => $value"
+
+    override val lag: Int = 0
 }

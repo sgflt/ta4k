@@ -41,7 +41,7 @@ import org.ta4j.core.num.Num
  */
 class InSlopeIndicator(
     ref: NumericIndicator,
-    nthPrevious: Int,
+    private val nthPrevious: Int,
     /** The minimum slope between ref and prev.  */
     private val minSlope: Num,
     /** The maximum slope between ref and prev.  */
@@ -94,6 +94,8 @@ class InSlopeIndicator(
         diff.onBar(bar)
         value = calculate()
     }
+
+    override val lag = nthPrevious
 
     override val isStable get() = diff.isStable
 }

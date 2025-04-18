@@ -54,4 +54,7 @@ class SigmaIndicator(private val ref: NumericIndicator, barCount: Int) : Numeric
 
     override val isStable: Boolean
         get() = ref.isStable && mean.isStable && sd.isStable
+
+    override val lag: Int
+        get() = ref.lag
 }

@@ -62,7 +62,10 @@ class HMAIndicator(indicator: NumericIndicator, private val barCount: Int) : Num
         value = calculate()
     }
 
-    override val isStable
+    override val lag: Int
+        get() = barCount
+
+    override val isStable: Boolean
         get() = sqrtWma.isStable
 
     override fun toString() = "HMA($barCount) => $value"

@@ -33,6 +33,8 @@ class StandardErrorIndicator(indicator: NumericIndicator, barCount: Int) : Numer
     private val divisor = numFactory.numOf(barCount).sqrt()
     private val sdev = indicator.stddev(barCount)
 
+    override val lag: Int
+        get() = sdev.lag
 
     private fun calculate() = sdev.value.dividedBy(divisor)
 

@@ -126,6 +126,8 @@ class SimpleLinearRegressionIndicator @JvmOverloads constructor(
         value = calculate()
     }
 
+    override val lag: Int
+        get() = barCount
 
     override val isStable
         get() = indicator.isStable

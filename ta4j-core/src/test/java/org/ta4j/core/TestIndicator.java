@@ -1,5 +1,6 @@
 package org.ta4j.core;
 
+import org.jetbrains.annotations.NotNull;
 import org.ta4j.core.api.Indicator;
 import org.ta4j.core.api.series.Bar;
 import org.ta4j.core.backtest.BacktestBarSeries;
@@ -25,7 +26,7 @@ public class TestIndicator<T> implements Indicator<T> {
 
 
   @Override
-  public void onBar(final Bar bar) {
+  public void onBar(@NotNull final Bar bar) {
     this.indicator.onBar(bar);
   }
 
@@ -38,5 +39,11 @@ public class TestIndicator<T> implements Indicator<T> {
 
   public BacktestBarSeries getBarSeries() {
     return this.series;
+  }
+
+
+  @Override
+  public int getLag() {
+    return 0;
   }
 }

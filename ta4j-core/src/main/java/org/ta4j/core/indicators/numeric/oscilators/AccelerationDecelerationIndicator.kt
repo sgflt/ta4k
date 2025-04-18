@@ -37,7 +37,7 @@ class AccelerationDecelerationIndicator @JvmOverloads constructor(
     longBarCount: Int = 34,
 ) : NumericIndicator(numFactory) {
     private val awesome = awesomeOscillator(shortBarCount, longBarCount)
-    private val sma = this.awesome.sma(shortBarCount)
+    private val sma = awesome.sma(shortBarCount)
 
 
     private fun calculate(): Num = awesome.value.minus(sma.value)
@@ -52,4 +52,7 @@ class AccelerationDecelerationIndicator @JvmOverloads constructor(
 
     override val isStable: Boolean
         get() = awesome.isStable && sma.isStable
+
+    override val lag: Int
+        get() = awesome.lag
 }

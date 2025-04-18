@@ -53,5 +53,9 @@ class ChandelierExitShortIndicator @JvmOverloads constructor(
         value = calculate()
     }
 
-    override val isStable get() = close.isStable && low.isStable && atr.isStable
+    override val lag: Int
+        get() = atr.lag
+
+    override val isStable
+        get() = close.isStable && low.isStable && atr.isStable
 }

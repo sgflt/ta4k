@@ -41,7 +41,9 @@ class TransformIndicator(
     private val transformationFunction: UnaryOperator<Num>,
 ) : NumericIndicator(indicator.numFactory) {
 
-    protected fun calculate() = transformationFunction.apply(indicator.value)
+    override val lag = 0
+
+    private fun calculate() = transformationFunction.apply(indicator.value)
 
     override fun updateState(bar: Bar) {
         indicator.onBar(bar)

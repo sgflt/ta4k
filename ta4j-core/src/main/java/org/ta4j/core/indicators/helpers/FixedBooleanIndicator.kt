@@ -42,6 +42,8 @@ class FixedBooleanIndicator(vararg values: Boolean?) : BooleanIndicator() {
         value = indicator.value!!
     }
 
+    override val lag
+        get() = indicator.lag
 
     override val isStable
         get() = indicator.isStable

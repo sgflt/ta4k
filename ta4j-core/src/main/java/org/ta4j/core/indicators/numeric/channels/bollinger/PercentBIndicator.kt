@@ -74,4 +74,7 @@ class PercentBIndicator(private val indicator: NumericIndicator, barCount: Int, 
         get() = indicator.isStable && bbl.isStable && bbu.isStable
 
     override fun toString() = "%%Bi(${indicator}) => $value"
+
+    override val lag: Int
+        get() = maxOf(indicator.lag, bbl.lag, bbu.lag)
 }

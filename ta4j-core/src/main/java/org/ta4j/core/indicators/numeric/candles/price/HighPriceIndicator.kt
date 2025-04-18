@@ -40,4 +40,6 @@ class HighPriceIndicator(numFactory: NumFactory) : SeriesRelatedNumericIndicator
     }
 
     override fun toString() = "High() => $value"
+
+    override val lag: Int = 0
 }

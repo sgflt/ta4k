@@ -63,5 +63,8 @@ class BollingerBandsUpperIndicator
     override val isStable
         get() = bbm.isStable && deviation.isStable
 
+    override val lag: Int
+        get() = maxOf(bbm.lag, deviation.lag)
+
     override fun toString() = "BolBaUp(${bbm}, ${k}) => $value"
 }

@@ -43,4 +43,6 @@ class MedianPriceIndicator(numFactory: NumFactory) : SeriesRelatedNumericIndicat
     public override fun updateState(bar: Bar) {
         value = calculate(bar)
     }
+
+    override val lag: Int = 0
 }

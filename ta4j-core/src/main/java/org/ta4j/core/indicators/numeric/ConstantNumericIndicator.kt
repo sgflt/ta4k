@@ -38,6 +38,8 @@ class ConstantNumericIndicator(t: Num) : NumericIndicator(t.numFactory) {
         // NOOP
     }
 
+    override val lag = 0
+
     override val isStable = true
 
     override fun toString() = "C => $value"

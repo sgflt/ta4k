@@ -47,6 +47,8 @@ class AroonDownIndicator(
     private var index = 0
     private val previousValues: ArrayList<Num> // TODO CircularNumArray
 
+    override val lag: Int
+        get() = barCount
 
     /**
      * Constructor.

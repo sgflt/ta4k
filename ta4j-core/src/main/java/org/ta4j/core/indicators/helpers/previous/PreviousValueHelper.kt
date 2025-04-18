@@ -34,6 +34,7 @@ internal class PreviousValueHelper<T>(private val indicator: Indicator<T>, priva
     private val previousValues = LinkedList<T>()
     override var value: T? = null
         private set
+    override val lag = n
     private var currentBar: Bar? = null
 
     /**

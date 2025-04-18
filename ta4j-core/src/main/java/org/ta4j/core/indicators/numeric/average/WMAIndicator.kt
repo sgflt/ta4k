@@ -63,6 +63,9 @@ class WMAIndicator(private val indicator: NumericIndicator, private val barCount
         value = calculate()
     }
 
+    override val lag: Int
+        get() = barCount
+
 
     override val isStable: Boolean
         get() = barsPassed >= barCount && indicator.isStable

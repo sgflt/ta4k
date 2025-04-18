@@ -115,6 +115,8 @@ class AroonUpIndicator(numFactory: NumFactory, private val highIndicator: Numeri
     override val isStable: Boolean
         get() = index > barCount && highIndicator.isStable && highestHighValueIndicator.isStable
 
+    override val lag: Int
+        get() = barCount
 
     override fun toString() = "AroonUp($highIndicator) => $value"
 }

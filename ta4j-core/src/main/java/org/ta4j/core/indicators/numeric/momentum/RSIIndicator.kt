@@ -65,4 +65,7 @@ class RSIIndicator(indicator: NumericIndicator, barCount: Int) : NumericIndicato
 
     override val isStable
         get() = averageGainIndicator.isStable && averageLossIndicator.isStable
+
+    override val lag: Int
+        get() = averageGainIndicator.lag
 }

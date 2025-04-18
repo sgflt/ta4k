@@ -50,12 +50,8 @@ class DojiIndicator(numFactory: NumFactory, barCount: Int, bodyFactor: Double) :
     /** The factor used when checking if a candle is Doji.  */
     private val factor = numFactory.numOf(bodyFactor)
 
-    private var _isStable: Boolean = false
-    override var value: Boolean = false
-        set(value) {
-            _isStable = true
-            super.value = value
-        }
+    override val lag: Int
+        get() = averageBodyHeightInd.lag
 
 
     private fun calculate(): Boolean {
@@ -74,5 +70,5 @@ class DojiIndicator(numFactory: NumFactory, barCount: Int, bodyFactor: Double) :
 
 
     override val isStable: Boolean
-        get() = _isStable
+        get() = averageBodyHeightInd.isStable
 }

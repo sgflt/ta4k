@@ -49,6 +49,8 @@ class CombineIndicator(
     override val isStable
         get() = indicatorLeft.isStable && indicatorRight.isStable
 
+    override val lag = 0
+
     companion object {
         fun plus(indicatorLeft: NumericIndicator, indicatorRight: NumericIndicator) =
             CombineIndicator(indicatorLeft, indicatorRight) { a, b -> a.plus(b) }

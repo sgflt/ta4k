@@ -53,5 +53,8 @@ class BollingerBandsLowerIndicator @JvmOverloads constructor(
     override val isStable
         get() = indicator.isStable && bbm.isStable
 
+    override val lag: Int
+        get() = maxOf(bbm.lag, indicator.lag)
+
     override fun toString() = "BolBaLo(${bbm}, ${k}) => $value"
 }

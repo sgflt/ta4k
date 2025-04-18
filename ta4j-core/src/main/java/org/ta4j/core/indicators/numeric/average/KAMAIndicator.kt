@@ -114,6 +114,9 @@ class KAMAIndicator @JvmOverloads constructor(
         value = calculate()
     }
 
+    override val lag: Int
+        get() = barCountEffectiveRatio
+
 
     override val isStable: Boolean
         get() = barsPassed >= barCountEffectiveRatio

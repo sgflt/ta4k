@@ -90,5 +90,8 @@ class VarianceIndicator(private val indicator: NumericIndicator, private val bar
     override val isStable: Boolean
         get() = currentIndex >= barCount && indicator.isStable
 
+    override val lag: Int
+        get() = barCount
+
     override fun toString() = "VAR($indicator, $barCount) => $value"
 }

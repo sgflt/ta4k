@@ -36,6 +36,9 @@ import org.ta4j.core.num.Num
  * of the previous bar (otherwise, [NumFactory.zero] is returned).
  */
 class GainIndicator(private val indicator: NumericIndicator) : NumericIndicator(indicator.numFactory) {
+    override val lag: Int
+        get() = previousValueIndicator.lag
+
     private val previousValueIndicator = indicator.previous()
 
 

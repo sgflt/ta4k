@@ -31,8 +31,7 @@ import org.ta4j.core.indicators.bool.BooleanIndicator
  * @author Lukáš Kvídera
  */
 class PreviousBooleanValueIndicator(indicator: BooleanIndicator, n: Int) : BooleanIndicator() {
-    private val previousValueHelper: PreviousValueHelper<Boolean?> =
-        PreviousValueHelper<Boolean?>(indicator as Indicator<Boolean?>, n)
+    private val previousValueHelper = PreviousValueHelper(indicator as Indicator<Boolean?>, n)
 
 
     private fun calculate() = previousValueHelper.value == true
@@ -42,6 +41,8 @@ class PreviousBooleanValueIndicator(indicator: BooleanIndicator, n: Int) : Boole
         value = calculate()
     }
 
+    override val lag
+        get() = previousValueHelper.lag
 
     override val isStable
         get() = previousValueHelper.isStable

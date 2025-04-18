@@ -64,6 +64,8 @@ class BearishHaramiIndicator(series: BarSeries) : SeriesRelatedBooleanIndicator(
         value = calculate(bar)
     }
 
+    override val lag = 2
+
 
     override val isStable
         get() = previousBar != null

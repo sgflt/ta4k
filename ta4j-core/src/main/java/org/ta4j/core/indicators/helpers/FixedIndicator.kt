@@ -56,16 +56,18 @@ internal class FixedIndicator<T> @SafeVarargs constructor(vararg values: T) : In
      * @param value the value to onCandle
      */
     fun addValue(value: T) {
-        this.values.add(value)
+        values.add(value)
     }
 
 
     override val value: T
-        get() = this.values[this.index]
+        get() = values[index]
+
+    override val lag = 0
 
 
     override fun onBar(bar: Bar) {
-        ++this.index
+        ++index
     }
 
 

@@ -74,6 +74,9 @@ class FixedDecimalIndicator : NumericIndicator {
         value = calculate()
     }
 
+    override val lag: Int
+        get() = fixedIndicator.lag
+
 
     override val isStable
         get() = fixedIndicator.isStable

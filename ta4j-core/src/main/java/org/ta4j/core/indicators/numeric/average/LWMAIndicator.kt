@@ -79,6 +79,9 @@ class LWMAIndicator(private val indicator: NumericIndicator, private val barCoun
         value = calculate()
     }
 
+    override val lag: Int
+        get() = barCount
+
 
     override val isStable: Boolean
         get() = !values.isNotFull && indicator.isStable

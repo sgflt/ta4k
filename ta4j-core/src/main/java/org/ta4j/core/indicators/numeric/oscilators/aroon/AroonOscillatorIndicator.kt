@@ -90,4 +90,7 @@ class AroonOscillatorIndicator : NumericIndicator {
 
     override val isStable: Boolean
         get() = aroonUpIndicator.isStable && aroonDownIndicator.isStable
+
+    override val lag: Int
+        get() = aroonUpIndicator.lag
 }

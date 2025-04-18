@@ -44,6 +44,9 @@ class SMAIndicator(indicator: NumericIndicator, private val barCount: Int) : Num
 
     private fun partialSum() = sum.value
 
+    override val lag: Int
+        get() = barCount
+
     override val isStable
         get() = processedBars >= barCount && sum.isStable
 

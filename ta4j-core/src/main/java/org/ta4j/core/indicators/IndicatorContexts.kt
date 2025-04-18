@@ -23,13 +23,12 @@
 package org.ta4j.core.indicators
 
 import org.ta4j.core.strategy.ObservableStrategyFactoryBuilder.ObservableStrategy
-import java.util.function.Consumer
 
 /**
  * Aggregation class that stores indicator contexts related to defined timeframes.
  */
 class IndicatorContexts private constructor() {
-    private val timeFramedContexts: MutableMap<TimeFrame?, IndicatorContext> = HashMap<TimeFrame?, IndicatorContext>()
+    private val timeFramedContexts: MutableMap<TimeFrame, IndicatorContext> = HashMap<TimeFrame, IndicatorContext>()
 
 
     fun add(context: IndicatorContext) {
@@ -37,21 +36,13 @@ class IndicatorContexts private constructor() {
     }
 
 
-    operator fun get(timeFrame: TimeFrame?): IndicatorContext {
-        return this.timeFramedContexts.computeIfAbsent(timeFrame) { timeFrame: TimeFrame? ->
-            IndicatorContext.Companion.empty(
-                timeFrame
-            )
-        }
+    operator fun get(timeFrame: TimeFrame): IndicatorContext {
+        return this.timeFramedContexts.computeIfAbsent(timeFrame) { IndicatorContext.empty(it) }
     }
 
 
     fun register(observableStrategy: ObservableStrategy) {
-        this.timeFramedContexts.values.forEach(Consumer { indicatorContext: IndicatorContext? ->
-            indicatorContext!!.register(
-                observableStrategy
-            )
-        })
+        this.timeFramedContexts.values.forEach { indicatorContext -> indicatorContext.register(observableStrategy) }
     }
 
 

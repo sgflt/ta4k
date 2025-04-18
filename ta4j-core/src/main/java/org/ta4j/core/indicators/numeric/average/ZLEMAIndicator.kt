@@ -37,13 +37,12 @@ class ZLEMAIndicator(private val indicator: NumericIndicator, private val barCou
     NumericIndicator(indicator.numFactory) {
     private val k = numFactory.two().dividedBy(numFactory.numOf(barCount + 1))
     private val oneMinusK = numFactory.one().minus(k)
-    private val lag = (barCount - 1) / 2
-    private val lagPreviousValue = indicator.previous(lag)
+    private val lagPreviousValue = indicator.previous((barCount - 1) / 2)
     private var barsPassed = 0
 
 
     init {
-        require(lag != 0) { "The bar count must be greater than 2" }
+        require(barCount > 2) { "The bar count must be greater than 2" }
     }
 
 
@@ -70,6 +69,7 @@ class ZLEMAIndicator(private val indicator: NumericIndicator, private val barCou
         value = calculate()
     }
 
+    override val lag = barCount
 
     override val isStable: Boolean
         get() = barsPassed >= lag && lagPreviousValue.isStable && indicator.isStable

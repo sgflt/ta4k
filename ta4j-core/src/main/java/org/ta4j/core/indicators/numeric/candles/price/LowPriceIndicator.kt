@@ -39,4 +39,6 @@ class LowPriceIndicator(series: NumFactory) : SeriesRelatedNumericIndicator(seri
 
 
     override fun toString() = "Low() => $value"
+
+    override val lag: Int = 0
 }

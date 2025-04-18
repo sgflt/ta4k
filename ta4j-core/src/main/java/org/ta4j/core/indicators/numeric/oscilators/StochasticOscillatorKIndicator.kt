@@ -94,4 +94,7 @@ class StochasticOscillatorKIndicator(
 
     override val isStable: Boolean
         get() = indicator.isStable && highestHigh.isStable && lowestMin.isStable
+
+    override val lag: Int
+        get() = highestHigh.lag
 }

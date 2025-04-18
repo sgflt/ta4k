@@ -110,4 +110,7 @@ class MeanDeviationIndicator(private val indicator: NumericIndicator, private va
 
     override val isStable
         get() = currentBar >= barCount
+
+    override val lag: Int
+        get() = barCount
 }

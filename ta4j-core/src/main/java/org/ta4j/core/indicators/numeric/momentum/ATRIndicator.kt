@@ -35,6 +35,8 @@ import org.ta4j.core.num.NumFactory
 class ATRIndicator(numFactory: NumFactory, tr: NumericIndicator, barCount: Int) : NumericIndicator(numFactory) {
     private val averageTrueRangeIndicator = MMAIndicator(tr, barCount)
 
+    override val lag: Int
+        get() = averageTrueRangeIndicator.lag
 
     /**
      * Constructor.

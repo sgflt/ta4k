@@ -53,6 +53,8 @@ class BinaryOperation private constructor(
     override val isStable
         get() = left.isStable && right.isStable
 
+    override val lag = 0
+
     override fun toString() = "BI<$left, $right> => $value"
 
     companion object {

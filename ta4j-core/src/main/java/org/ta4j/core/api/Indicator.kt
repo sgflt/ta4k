@@ -40,6 +40,11 @@ interface Indicator<out T> {
     val value: T
 
     /**
+     * @return how much this indicator lags behind the current bar. Usually it is a barCount. Indicators without lag returns 0.
+     */
+    val lag: Int
+
+    /**
      * updates its state based on current bar
      *
      * Implementation of indicator should be aware of that it may be called multiple

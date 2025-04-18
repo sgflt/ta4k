@@ -43,6 +43,8 @@ class CloseLocationValueIndicator(numFactory: NumFactory) : NumericIndicator(num
         value = calculate(bar)
     }
 
+    override val lag = 0
+
     override val isStable
         get() = !value.isNaN
 }

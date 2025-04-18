@@ -31,12 +31,12 @@ import org.ta4j.core.num.Num
  * @author Lukáš Kvídera
  */
 class PreviousNumericValueIndicator(indicator: NumericIndicator, n: Int) : NumericIndicator(indicator.numFactory) {
-    private val previousValueHelper = PreviousValueHelper<Num>(indicator, n)
+    private val previousValueHelper = PreviousValueHelper(indicator, n)
 
 
     private fun calculate(): Num {
         val value = previousValueHelper.value
-        return if (value == null) numFactory.zero() else value
+        return value ?: numFactory.zero()
     }
 
 
@@ -44,6 +44,9 @@ class PreviousNumericValueIndicator(indicator: NumericIndicator, n: Int) : Numer
         previousValueHelper.onBar(bar)
         value = calculate()
     }
+
+    override val lag
+        get() = previousValueHelper.lag
 
 
     override val isStable: Boolean

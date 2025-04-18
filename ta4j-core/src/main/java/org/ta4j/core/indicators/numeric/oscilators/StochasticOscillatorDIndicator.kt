@@ -52,4 +52,6 @@ class StochasticOscillatorDIndicator private constructor(
 
     override val isStable
         get() = indicator.isStable && barsPassed >= 3
+
+    override val lag = 3
 }
