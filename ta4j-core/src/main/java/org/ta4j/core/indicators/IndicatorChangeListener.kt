@@ -26,9 +26,6 @@ import org.ta4j.core.api.Indicator
 import org.ta4j.core.indicators.IndicatorContext.IndicatorIdentification
 import java.time.Instant
 
-/**
- * @author Lukáš Kvídera
- */
-interface IndicatorChangeListener {
-    fun accept(tick: Instant?, indicatorId: IndicatorIdentification?, indicator: Indicator<*>?)
+fun interface IndicatorChangeListener {
+    fun accept(tick: Instant, indicatorId: IndicatorIdentification, indicator: Indicator<*>)
 }

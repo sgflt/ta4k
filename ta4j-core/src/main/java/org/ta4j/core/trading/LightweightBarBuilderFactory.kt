@@ -1,8 +1,7 @@
-/**
+/*
  * The MIT License (MIT)
  *
- * Copyright (c) 2017-2024 Ta4j Organization & respective
- * authors (see AUTHORS)
+ * Copyright (c) 2017-2024 Ta4j Organization & respective authors (see AUTHORS)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -21,7 +20,7 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.ta4j.core.live
+package org.ta4j.core.trading
 
 import org.ta4j.core.api.series.BarBuilderFactory
 import org.ta4j.core.api.series.BarSeries
@@ -29,8 +28,8 @@ import org.ta4j.core.api.series.BarSeries
 /**
  * @author Lukáš Kvídera
  */
-internal class LiveBarBuilderFactory : BarBuilderFactory {
-    override fun createBarBuilder(series: BarSeries): LiveBarBuilder {
-        return LiveBarBuilder(series)
+internal class LightweightBarBuilderFactory : BarBuilderFactory {
+    override fun createBarBuilder(series: BarSeries): LightweightBarBuilder {
+        return LightweightBarBuilder(series)
     }
 }

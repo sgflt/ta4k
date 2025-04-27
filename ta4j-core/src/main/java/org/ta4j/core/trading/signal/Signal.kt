@@ -20,13 +20,22 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.ta4j.core.api.callback
 
-import org.ta4j.core.Signal
+package org.ta4j.core.trading.signal
 
-/**
- * @author Lukáš Kvídera
- */
-fun interface EntrySignalListener {
-    fun onSignal(signal: Signal?)
+import java.time.Instant
+
+interface Signal {
+    val whenReceived: Instant
+    val strategyName: String
 }
+
+data class BuySignal(
+    override val whenReceived: Instant,
+    override val strategyName: String,
+) : Signal
+
+data class SellSignal(
+    override val whenReceived: Instant,
+    override val strategyName: String,
+) : Signal

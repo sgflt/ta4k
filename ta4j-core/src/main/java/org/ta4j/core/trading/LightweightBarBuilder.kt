@@ -1,8 +1,7 @@
-/**
+/*
  * The MIT License (MIT)
  *
- * Copyright (c) 2017-2024 Ta4j Organization & respective
- * authors (see AUTHORS)
+ * Copyright (c) 2017-2024 Ta4j Organization & respective authors (see AUTHORS)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -21,7 +20,7 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.ta4j.core.live
+package org.ta4j.core.trading
 
 import org.ta4j.core.api.series.BarBuilder
 import org.ta4j.core.api.series.BarSeries
@@ -34,7 +33,7 @@ import java.time.Instant
  * A builder to build a new `LiveBar` with conversion from a
  * [Number] of type `T` to a [Num implementation][Num].
  */
-internal class LiveBarBuilder(private val series: BarSeries) : BarBuilder {
+internal class LightweightBarBuilder(private val series: BarSeries) : BarBuilder {
     private val numFactory: NumFactory = series.numFactory
     private var startTime: Instant = Instant.EPOCH
     private var endTime: Instant = Instant.EPOCH
@@ -45,13 +44,13 @@ internal class LiveBarBuilder(private val series: BarSeries) : BarBuilder {
     private var volume: Num = NaN
 
 
-    override fun startTime(startTime: Instant): LiveBarBuilder {
+    override fun startTime(startTime: Instant): LightweightBarBuilder {
         this.startTime = startTime
         return this
     }
 
 
-    override fun endTime(endTime: Instant): LiveBarBuilder {
+    override fun endTime(endTime: Instant): LightweightBarBuilder {
         this.endTime = endTime
         return this
     }
@@ -62,7 +61,7 @@ internal class LiveBarBuilder(private val series: BarSeries) : BarBuilder {
      *
      * @return `this`
      */
-    override fun openPrice(openPrice: Number): LiveBarBuilder {
+    override fun openPrice(openPrice: Number): LightweightBarBuilder {
         this.openPrice = this.numFactory.numOf(openPrice)
         return this
     }
@@ -73,7 +72,7 @@ internal class LiveBarBuilder(private val series: BarSeries) : BarBuilder {
      *
      * @return `this`
      */
-    fun openPrice(openPrice: String): LiveBarBuilder {
+    fun openPrice(openPrice: String): LightweightBarBuilder {
         this.openPrice = this.numFactory.numOf(openPrice)
         return this
     }
@@ -84,7 +83,7 @@ internal class LiveBarBuilder(private val series: BarSeries) : BarBuilder {
      *
      * @return `this`
      */
-    override fun highPrice(highPrice: Number): LiveBarBuilder {
+    override fun highPrice(highPrice: Number): LightweightBarBuilder {
         this.highPrice = this.numFactory.numOf(highPrice)
         return this
     }
@@ -95,7 +94,7 @@ internal class LiveBarBuilder(private val series: BarSeries) : BarBuilder {
      *
      * @return `this`
      */
-    fun highPrice(highPrice: String): LiveBarBuilder {
+    fun highPrice(highPrice: String): LightweightBarBuilder {
         this.highPrice = this.numFactory.numOf(highPrice)
         return this
     }
@@ -106,7 +105,7 @@ internal class LiveBarBuilder(private val series: BarSeries) : BarBuilder {
      *
      * @return `this`
      */
-    override fun lowPrice(lowPrice: Number): LiveBarBuilder {
+    override fun lowPrice(lowPrice: Number): LightweightBarBuilder {
         this.lowPrice = this.numFactory.numOf(lowPrice)
         return this
     }
@@ -117,7 +116,7 @@ internal class LiveBarBuilder(private val series: BarSeries) : BarBuilder {
      *
      * @return `this`
      */
-    fun lowPrice(lowPrice: String): LiveBarBuilder {
+    fun lowPrice(lowPrice: String): LightweightBarBuilder {
         this.lowPrice = this.numFactory.numOf(lowPrice)
         return this
     }
@@ -128,7 +127,7 @@ internal class LiveBarBuilder(private val series: BarSeries) : BarBuilder {
      *
      * @return `this`
      */
-    override fun closePrice(closePrice: Number): LiveBarBuilder {
+    override fun closePrice(closePrice: Number): LightweightBarBuilder {
         this.closePrice = this.numFactory.numOf(closePrice)
         return this
     }
@@ -139,7 +138,7 @@ internal class LiveBarBuilder(private val series: BarSeries) : BarBuilder {
      *
      * @return `this`
      */
-    fun closePrice(closePrice: String): LiveBarBuilder {
+    fun closePrice(closePrice: String): LightweightBarBuilder {
         this.closePrice = this.numFactory.numOf(closePrice)
         return this
     }
@@ -150,7 +149,7 @@ internal class LiveBarBuilder(private val series: BarSeries) : BarBuilder {
      *
      * @return `this`
      */
-    override fun volume(volume: Number): LiveBarBuilder {
+    override fun volume(volume: Number): LightweightBarBuilder {
         this.volume = this.numFactory.numOf(volume)
         return this
     }
@@ -161,14 +160,14 @@ internal class LiveBarBuilder(private val series: BarSeries) : BarBuilder {
      *
      * @return `this`
      */
-    fun volume(volume: String): LiveBarBuilder {
+    fun volume(volume: String): LightweightBarBuilder {
         this.volume = this.numFactory.numOf(volume)
         return this
     }
 
 
-    fun build(): LiveBar {
-        return LiveBar(
+    fun build(): LightweightBar {
+        return LightweightBar(
             startTime,
             endTime,
             openPrice,

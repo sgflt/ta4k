@@ -25,15 +25,19 @@ package org.ta4j.core.indicators
 import org.ta4j.core.api.Indicator
 import org.ta4j.core.api.callback.BarListener
 import org.ta4j.core.api.series.Bar
+import org.ta4j.core.indicators.IndicatorContext.IndicatorIdentification
 import org.ta4j.core.indicators.bool.BooleanIndicator
 import org.ta4j.core.indicators.numeric.NumericIndicator
+import org.ta4j.core.num.Num
 import java.util.*
+import kotlin.collections.Map.Entry
 
 class IndicatorContext private constructor(
     internal val timeFrame: TimeFrame,
     vararg indicators: Indicator<*>,
-) : BarListener, Iterable<Indicator<*>> {
+) : BarListener, Iterable<Entry<IndicatorIdentification, Indicator<*>>> {
 
+    private var history: IndicatorHistory? = null
     var isStable: Boolean = false
         get() {
             if (field) {
@@ -73,7 +77,7 @@ class IndicatorContext private constructor(
     val first: Indicator<*>?
         get() = indicators.values.firstOrNull()
 
-    override fun iterator(): Iterator<Indicator<*>> = indicators.values.iterator()
+    override fun iterator(): Iterator<Entry<IndicatorIdentification, Indicator<*>>> = indicators.iterator()
 
     private operator fun get(name: IndicatorIdentification): Indicator<*>? = indicators[name]
 
@@ -85,6 +89,11 @@ class IndicatorContext private constructor(
 
     fun addAll(vararg indicators: Indicator<*>) {
         indicators.forEach { _indicators[generatePlaceholderName()] = it }
+    }
+
+    fun previousValue(indicatorId: IndicatorIdentification, bars: Int = 1): Num? {
+        return history?.previous(indicatorId, bars)
+            ?: throw IllegalStateException("History is not enabled for this context.")
     }
 
     override fun onBar(bar: Bar) {
@@ -104,18 +113,32 @@ class IndicatorContext private constructor(
 
     fun timeFrame(): TimeFrame = timeFrame
 
+    fun enableHistory(historyWindow: Int) {
+        history = IndicatorHistory(historyWindow)
+        register(history!!)
+    }
+
     @JvmInline
     value class IndicatorIdentification(val name: String)
+
+    @JvmRecord
+    data class HistoryValue(
+        val indicatorId: IndicatorIdentification,
+        val value: Num,
+    )
 
     companion object {
         @JvmStatic
         private fun generatePlaceholderName() = IndicatorIdentification(UUID.randomUUID().toString())
 
-        fun of(timeFrame: TimeFrame, vararg indicators: Indicator<*>): IndicatorContext =
+        fun of(timeFrame: TimeFrame, vararg indicators: Indicator<*>) =
             IndicatorContext(timeFrame, *indicators)
 
         @JvmStatic
-        fun empty(timeFrame: TimeFrame = TimeFrame.UNDEFINED): IndicatorContext =
-            IndicatorContext(timeFrame)
+        fun empty(timeFrame: TimeFrame = TimeFrame.UNDEFINED, historyWindow: Int? = null): IndicatorContext {
+            val context = IndicatorContext(timeFrame)
+            historyWindow?.let { context.enableHistory(it) }
+            return context
+        }
     }
 }

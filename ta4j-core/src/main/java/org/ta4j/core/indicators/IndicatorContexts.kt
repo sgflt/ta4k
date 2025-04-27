@@ -22,38 +22,38 @@
  */
 package org.ta4j.core.indicators
 
-import org.ta4j.core.strategy.ObservableStrategyFactoryBuilder.ObservableStrategy
+import org.ta4j.core.trading.signal.ObservableStrategy
+import kotlin.collections.Map.Entry
 
 /**
  * Aggregation class that stores indicator contexts related to defined timeframes.
  */
-class IndicatorContexts private constructor() {
-    private val timeFramedContexts: MutableMap<TimeFrame, IndicatorContext> = HashMap<TimeFrame, IndicatorContext>()
+class IndicatorContexts private constructor() : Iterable<Entry<TimeFrame, IndicatorContext>> {
+    private val timeFramedContexts = HashMap<TimeFrame, IndicatorContext>()
 
+    override fun iterator(): Iterator<Entry<TimeFrame, IndicatorContext>> = timeFramedContexts.entries.iterator()
 
     fun add(context: IndicatorContext) {
-        this.timeFramedContexts.put(context.timeFrame(), context)
+        timeFramedContexts.put(context.timeFrame(), context)
     }
 
 
     operator fun get(timeFrame: TimeFrame): IndicatorContext {
-        return this.timeFramedContexts.computeIfAbsent(timeFrame) { IndicatorContext.empty(it) }
+        return timeFramedContexts.computeIfAbsent(timeFrame) { IndicatorContext.empty(it) }
     }
 
 
     fun register(observableStrategy: ObservableStrategy) {
-        this.timeFramedContexts.values.forEach { indicatorContext -> indicatorContext.register(observableStrategy) }
+        timeFramedContexts.values.forEach { indicatorContext -> indicatorContext.register(observableStrategy) }
     }
 
 
     val timeFrames = timeFramedContexts.keys
 
     val isEmpty: Boolean
-        get() = this.timeFramedContexts.isEmpty()
+        get() = timeFramedContexts.isEmpty()
 
     companion object {
-        fun empty(): IndicatorContexts {
-            return IndicatorContexts()
-        }
+        fun empty() = IndicatorContexts()
     }
 }

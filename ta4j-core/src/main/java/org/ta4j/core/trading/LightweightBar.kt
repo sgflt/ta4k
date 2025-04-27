@@ -1,8 +1,7 @@
 /*
  * The MIT License (MIT)
  *
- * Copyright (c) 2017-2024 Ta4j Organization & respective
- * authors (see AUTHORS)
+ * Copyright (c) 2017-2024 Ta4j Organization & respective authors (see AUTHORS)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -21,7 +20,8 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.ta4j.core.live
+
+package org.ta4j.core.trading
 
 import org.ta4j.core.api.series.Bar
 import org.ta4j.core.num.Num
@@ -30,10 +30,10 @@ import java.time.Instant
 import java.time.ZoneId
 
 /**
- * Live trading implementation of a [Bar].
+ * Live trading implementation of a [org.ta4j.core.api.series.Bar].
  */
 @JvmRecord
-internal data class LiveBar(
+internal data class LightweightBar(
     override val beginTime: Instant,
     override val endTime: Instant,
     override val openPrice: Num,

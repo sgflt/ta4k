@@ -1,7 +1,8 @@
 /*
  * The MIT License (MIT)
  *
- * Copyright (c) 2017-2024 Ta4j Organization & respective authors (see AUTHORS)
+ * Copyright (c) 2017-2024 Ta4j Organization & respective
+ * authors (see AUTHORS)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -20,13 +21,23 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.ta4j.core.api.callback
+package org.ta4j.core.live
 
-import org.ta4j.core.Signal
+import org.ta4j.core.MultiTimeFrameSeries
+import org.ta4j.core.MultiTimeFrameSeries.TimeFrameState
+import org.ta4j.core.api.series.BarSeries
+import org.ta4j.core.events.CandleReceived
+import org.ta4j.core.strategy.Strategy
 
 /**
- * @author Lukáš Kvídera
+ * Unlike LiveTrading, this class aggregates multiple strategies and generates signals if some strategy has triggered entry or exit event.
  */
-fun interface ExitSignalListener {
-    fun onSignal(signal: Signal?)
+class SignalTrading(private val series: MultiTimeFrameSeries<BarSeries>, private val strategies: List<Strategy>) {
+    fun onCandle(candle: CandleReceived) {
+        this.series.onCandle(candle)
+    }
+
+
+    val lastEventTimes: TimeFrameState
+        get() = this.series.lastEventTimes
 }

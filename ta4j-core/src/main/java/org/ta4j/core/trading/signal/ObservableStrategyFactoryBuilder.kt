@@ -20,36 +20,27 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.ta4j.core.strategy
 
-import org.ta4j.core.Signal
-import org.ta4j.core.api.callback.EntrySignalListener
-import org.ta4j.core.api.callback.ExitSignalListener
-import org.ta4j.core.indicators.IndicatorContextUpdateListener
+package org.ta4j.core.trading.signal
+
 import org.ta4j.core.indicators.IndicatorContexts
+import org.ta4j.core.strategy.RuntimeContext
+import org.ta4j.core.strategy.Strategy
+import org.ta4j.core.strategy.StrategyFactory
 import org.ta4j.core.strategy.configuration.StrategyConfiguration
-import java.time.Instant
 
 /**
  * @author Lukáš Kvídera
  */
 class ObservableStrategyFactoryBuilder {
-    private val entrySignalListeners: MutableList<EntrySignalListener> = ArrayList<EntrySignalListener>(1)
-    private val exitSignalListeners: MutableList<ExitSignalListener> = ArrayList<ExitSignalListener>(1)
+    private val signalListeners = ArrayList<SignalListener>(2)
     private lateinit var strategyFactory: StrategyFactory<Strategy>
 
 
-    fun withEntryListener(entrySignalListener: EntrySignalListener): ObservableStrategyFactoryBuilder {
-        entrySignalListeners.add(entrySignalListener)
+    fun withSignalListener(entrySignalListener: SignalListener): ObservableStrategyFactoryBuilder {
+        signalListeners += entrySignalListener
         return this
     }
-
-
-    fun withExitListener(exitSignalListener: ExitSignalListener): ObservableStrategyFactoryBuilder {
-        exitSignalListeners.add(exitSignalListener)
-        return this
-    }
-
 
     fun withStrategyFactory(strategyFactory: StrategyFactory<Strategy>): ObservableStrategyFactoryBuilder {
         this.strategyFactory = strategyFactory
@@ -73,8 +64,7 @@ class ObservableStrategyFactoryBuilder {
                         runtimeContext,
                         indicatorContexts
                     ),
-                    this@ObservableStrategyFactoryBuilder.entrySignalListeners,
-                    this@ObservableStrategyFactoryBuilder.exitSignalListeners
+                    this@ObservableStrategyFactoryBuilder.signalListeners,
                 )
                 indicatorContexts.register(observableStrategy)
                 return observableStrategy
@@ -83,37 +73,5 @@ class ObservableStrategyFactoryBuilder {
     }
 
 
-    class ObservableStrategy(
-        private val strategy: Strategy,
-        private val entrySignalListeners: MutableList<EntrySignalListener>,
-        private val exitSignalListeners: MutableList<ExitSignalListener>,
-    ) : Strategy, IndicatorContextUpdateListener {
-        private var lastCallTime: Instant = Instant.MIN
-
-
-        override val name = strategy.name
-        override val timeFrames = strategy.timeFrames
-        override val entryRule = strategy.entryRule
-        override val exitRule = strategy.exitRule
-
-        override val isStable: Boolean
-            get() {
-                return strategy.isStable
-            }
-
-
-        override fun onContextUpdate(time: Instant) {
-            if (time.isAfter(lastCallTime)) {
-                lastCallTime = time
-
-                if (isStable && entryRule.isSatisfied) {
-                    entrySignalListeners.forEach { it.onSignal(Signal(time, name)) }
-                } else if (isStable && exitRule.isSatisfied) {
-                    exitSignalListeners.forEach { it.onSignal(Signal(time, name)) }
-                }
-            }
-        }
-    }
 }
-
 

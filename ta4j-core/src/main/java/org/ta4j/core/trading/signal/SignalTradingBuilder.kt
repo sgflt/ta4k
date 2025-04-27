@@ -23,32 +23,32 @@
  */
 package org.ta4j.core.live
 
-import lombok.extern.slf4j.Slf4j
 import org.ta4j.core.MultiTimeFrameSeries
 import org.ta4j.core.api.series.BarBuilderFactory
 import org.ta4j.core.api.series.BarSeries
+import org.ta4j.core.backtest.strategy.runtime.NOOPRuntimeContext
 import org.ta4j.core.indicators.IndicatorContexts
 import org.ta4j.core.indicators.TimeFrame
 import org.ta4j.core.num.NumFactory
 import org.ta4j.core.num.NumFactoryProvider.defaultNumFactory
-import org.ta4j.core.strategy.NOOPStrategyFactory
 import org.ta4j.core.strategy.RuntimeContext
 import org.ta4j.core.strategy.Strategy
 import org.ta4j.core.strategy.StrategyFactory
 import org.ta4j.core.strategy.configuration.StrategyConfiguration
+import org.ta4j.core.trading.LightweightBarBuilderFactory
+import org.ta4j.core.trading.LiveBarSeries
 
 /**
  * A builder to build a new [BacktestBarSeries].
  */
-@Slf4j
-class LiveTradingBuilder {
+class SignalTradingBuilder {
     private var name: String = UNNAMED_SERIES_NAME
     private var numFactory = defaultNumFactory
-    private var barBuilderFactory: BarBuilderFactory = LiveBarBuilderFactory()
-    private var strategyFactory: StrategyFactory<Strategy> = NOOPStrategyFactory()
-    private var runtimeContext: RuntimeContext? = null
+    private var barBuilderFactory: BarBuilderFactory = LightweightBarBuilderFactory()
+    private var strategyFactories: List<StrategyFactory<Strategy>> = mutableListOf()
+    private var runtimeContext: RuntimeContext = NOOPRuntimeContext()
     private var indicatorContexts: IndicatorContexts = IndicatorContexts.empty()
-    private var configuration: StrategyConfiguration? = null
+    private var configuration: StrategyConfiguration = StrategyConfiguration()
 
 
     /**
@@ -56,7 +56,7 @@ class LiveTradingBuilder {
      *
      * @return `this`
      */
-    fun withNumFactory(numFactory: NumFactory): LiveTradingBuilder {
+    fun withNumFactory(numFactory: NumFactory): SignalTradingBuilder {
         this.numFactory = numFactory
         return this
     }
@@ -67,7 +67,7 @@ class LiveTradingBuilder {
      *
      * @return `this`
      */
-    fun withName(name: String): LiveTradingBuilder {
+    fun withName(name: String): SignalTradingBuilder {
         this.name = name
         return this
     }
@@ -78,55 +78,54 @@ class LiveTradingBuilder {
      *
      * @return `this`
      */
-    fun withBarBuilderFactory(barBuilderFactory: BarBuilderFactory): LiveTradingBuilder {
+    fun withBarBuilderFactory(barBuilderFactory: BarBuilderFactory): SignalTradingBuilder {
         this.barBuilderFactory = barBuilderFactory
         return this
     }
 
 
-    fun withStrategyFactory(strategy: StrategyFactory<Strategy>): LiveTradingBuilder {
-        this.strategyFactory = strategy
+    fun withStrategyFactory(strategy: List<StrategyFactory<Strategy>>): SignalTradingBuilder {
+        this.strategyFactories += strategy
         return this
     }
 
 
-    fun withRuntimeContext(runtimeContext: RuntimeContext?): LiveTradingBuilder {
+    fun withRuntimeContext(runtimeContext: RuntimeContext): SignalTradingBuilder {
         this.runtimeContext = runtimeContext
         return this
     }
 
 
-    fun withIndicatorContexts(indicatorContexts: IndicatorContexts): LiveTradingBuilder {
+    fun withIndicatorContexts(indicatorContexts: IndicatorContexts): SignalTradingBuilder {
         this.indicatorContexts = indicatorContexts
         return this
     }
 
 
-    fun withConfiguration(configuration: StrategyConfiguration?): LiveTradingBuilder {
+    fun withConfiguration(configuration: StrategyConfiguration): SignalTradingBuilder {
         this.configuration = configuration
         return this
     }
-
 
     /**
      * Have to be called after initialization of indicatorContexts.
      *
      * @return instance for live trading or live indicator calculation
      */
-    fun build(): LiveTrading {
-        if (strategyFactory is NOOPStrategyFactory) {
-            log.warn("Using NOOP strategy")
+    fun build(): SignalTrading {
+        require(strategyFactories.isNotEmpty()) { "No strategy factory provided" }
+
+        val strategies = strategyFactories.map {
+            it.createStrategy(configuration, runtimeContext, indicatorContexts)
         }
 
-        val strategy = strategyFactory.createStrategy(configuration!!, runtimeContext!!, indicatorContexts)
         val series = MultiTimeFrameSeries<BarSeries>().apply {
-            (strategy.timeFrames + indicatorContexts.timeFrames)
+            (indicatorContexts.timeFrames)
                 .distinct()
-                .filterNotNull()
                 .forEach { add(createSeriesPerTimeFrame(it)) }
         }
 
-        return LiveTrading(series, strategy)
+        return SignalTrading(series, strategies)
     }
 
 
@@ -136,13 +135,13 @@ class LiveTradingBuilder {
             timeFrame = timeFrame,
             numFactory = numFactory,
             barBuilderFactory = barBuilderFactory,
-            indicatorContext = indicatorContexts.get(timeFrame)
+            indicatorContext = indicatorContexts[timeFrame]
         )
     }
 
     companion object {
         /** The [.name] for an unnamed bar series.  */
         private const val UNNAMED_SERIES_NAME = "unnamed_series"
-        val log = org.slf4j.LoggerFactory.getLogger(LiveTradingBuilder::class.java)
+        val log = org.slf4j.LoggerFactory.getLogger(SignalTradingBuilder::class.java)
     }
 }
