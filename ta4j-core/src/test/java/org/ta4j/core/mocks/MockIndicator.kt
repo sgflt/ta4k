@@ -1,8 +1,7 @@
 /*
  * The MIT License (MIT)
  *
- * Copyright (c) 2017-2024 Ta4j Organization & respective
- * authors (see AUTHORS)
+ * Copyright (c) 2017-2024 Ta4j Organization & respective authors (see AUTHORS)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -21,56 +20,29 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.ta4j.core.mocks;
+package org.ta4j.core.mocks
 
-import java.util.List;
-
-import org.ta4j.core.api.Indicator;
-import org.ta4j.core.api.series.Bar;
-import org.ta4j.core.num.Num;
+import org.ta4j.core.api.Indicator
+import org.ta4j.core.api.series.Bar
+import org.ta4j.core.num.Num
 
 // FIXME isn't it FixedIndicator?
-public class MockIndicator implements Indicator<Num> {
+class MockIndicator(private val values: List<Num>) : Indicator<Num> {
+    private var currentIndex = -1
 
-  private final List<Num> values;
-  private int currentIndex = -1;
+    /**
+     * Gets a value from the Indicator
+     *
+     * @return Num Indicator value at index
+     */
+    override val value
+        get() = values[currentIndex]
 
+    override fun onBar(bar: Bar) {
+        ++currentIndex
+    }
 
-  /**
-   * Constructor.
-   *
-   * @param values Indicator values
-   */
-  public MockIndicator(final List<Num> values) {
-    this.values = values;
-  }
+    override val isStable = true
 
-
-  /**
-   * Gets a value from the Indicator
-   *
-   * @return Num Indicator value at index
-   */
-  @Override
-  public Num getValue() {
-    return this.values.get(this.currentIndex);
-  }
-
-
-  @Override
-  public void onBar(final Bar bar) {
-    ++this.currentIndex;
-  }
-
-
-  @Override
-  public boolean isStable() {
-    return true;
-  }
-
-
-  @Override
-  public int getLag() {
-    return 0;
-  }
+    override val lag = 0
 }
