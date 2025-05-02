@@ -1,4 +1,4 @@
-/**
+/*
  * The MIT License (MIT)
  *
  * Copyright (c) 2017-2023 Ta4j Organization & respective
@@ -23,285 +23,214 @@
  */
 package org.ta4j.core.analysis;
 
-import static org.junit.Assert.assertEquals;
 import static org.ta4j.core.TestUtils.assertNumEquals;
 
-import java.util.Collections;
-import java.util.function.Function;
+import java.time.Instant;
 
-import org.junit.Test;
-import org.ta4j.core.BarSeries;
-import org.ta4j.core.BaseTradingRecord;
-import org.ta4j.core.Indicator;
-import org.ta4j.core.Trade;
-import org.ta4j.core.TradingRecord;
-import org.ta4j.core.indicators.AbstractIndicatorTest;
-import org.ta4j.core.mocks.MockBar;
-import org.ta4j.core.mocks.MockBarSeries;
-import org.ta4j.core.num.Num;
+import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.ta4j.core.MarketEventTestContext;
+import org.ta4j.core.TradeType;
+import org.ta4j.core.backtest.analysis.CashFlow;
+import org.ta4j.core.num.NumFactory;
 
-public class CashFlowTest extends AbstractIndicatorTest<Indicator<Num>, Num> {
+@Slf4j
+class CashFlowTest {
 
-    public CashFlowTest(Function<Number, Num> numFunction) {
-        super(numFunction);
+  @ParameterizedTest
+  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
+  void cashFlowBuyWithOnlyOnePosition(final NumFactory numFactory) {
+    final var tradingContext = new MarketEventTestContext()
+        .withNumFactory(numFactory)
+        .withCandlePrices(1, 2)
+        .toTradingRecordContext()
+        .enter(1).after(1)
+        .exit(1).after(1);
+
+    final var cashFlow = new CashFlow(tradingContext.getTradingRecord());
+
+    assertNumEquals(numFactory.one(), cashFlow.getValue(tradingContext.getBarSeries().getBar(0).getEndTime()));
+    assertNumEquals(numFactory.numOf(2), cashFlow.getValue(tradingContext.getBarSeries().getBar(1).getEndTime()));
+  }
+
+
+  @ParameterizedTest
+  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
+  void cashFlowShortSellWith20PercentGain(final NumFactory numFactory) {
+    final var tradingContext = new MarketEventTestContext()
+        .withNumFactory(numFactory)
+        .withCandlePrices(100, 90, 80)
+        .toTradingRecordContext()
+        .withTradeType(TradeType.SELL)
+        .enter(1).after(1)
+        .exit(1).after(2);
+
+    final var cashFlow = new CashFlow(tradingContext.getTradingRecord());
+    final var bars = tradingContext.getBarSeries();
+
+    assertNumEquals(numFactory.one(), cashFlow.getValue(bars.getBar(0).getEndTime()));
+    assertNumEquals(numFactory.numOf(1.1), cashFlow.getValue(bars.getBar(1).getEndTime()));
+    assertNumEquals(numFactory.numOf(1.2), cashFlow.getValue(bars.getBar(2).getEndTime()));
+  }
+
+
+  @ParameterizedTest
+  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
+  void cashFlowLongWith50PercentLoss(final NumFactory numFactory) {
+    final var tradingContext = new MarketEventTestContext()
+        .withNumFactory(numFactory)
+        .withCandlePrices(200, 190, 180, 170, 160, 150, 140, 130, 120, 110, 100)
+        .toTradingRecordContext()
+        .withTradeType(TradeType.BUY);
+
+    tradingContext.enter(1).after(1);
+    tradingContext.exit(1).after(10);
+
+    final var cashFlow = new CashFlow(tradingContext.getTradingRecord());
+    final var bars = tradingContext.getBarSeries();
+
+    // Check values at each step (price increases by 10 each bar)
+    for (int i = 0; i <= 10; i++) {
+      log.debug("{}: {}@{}", i, bars.getBar(i).getEndTime(), bars.getBar(i).getClosePrice());
+      final var expectedValue = i < 1 ?
+                                numFactory.one() :
+                                numFactory.one().minus(
+                                    numFactory.numOf(0.05).multipliedBy(numFactory.numOf(i))
+                                );
+      log.debug("expected {}", expectedValue);
+      assertNumEquals(expectedValue, cashFlow.getValue(bars.getBar(i).getEndTime()));
     }
+  }
 
-    @Test
-    public void cashFlowSize() {
-        BarSeries sampleBarSeries = new MockBarSeries(numFunction, 1d, 2d, 3d, 4d, 5d);
-        CashFlow cashFlow = new CashFlow(sampleBarSeries, new BaseTradingRecord());
-        assertEquals(5, cashFlow.getSize());
 
-        assertNumEquals(1, cashFlow.getValue(0));
-        assertNumEquals(1, cashFlow.getValue(1));
-        assertNumEquals(1, cashFlow.getValue(2));
-        assertNumEquals(1, cashFlow.getValue(3));
-        assertNumEquals(1, cashFlow.getValue(4));
+  @ParameterizedTest
+  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
+  void cashFlowShortSellWith100PercentLoss(final NumFactory numFactory) {
 
+    final var tradingContext = new MarketEventTestContext()
+        .withNumFactory(numFactory)
+        .withCandlePrices(100, 110, 120, 130, 140, 150, 160, 170, 180, 190, 200)
+        .toTradingRecordContext()
+        .withTradeType(TradeType.SELL)
+        .enter(1).after(1)
+        .exit(1).after(10);
+
+    final var cashFlow = new CashFlow(tradingContext.getTradingRecord());
+    final var bars = tradingContext.getBarSeries();
+
+    // Check values at each step (price increases by 10 each bar)
+    for (int i = 0; i <= 10; i++) {
+      log.debug("{}: {}@{}", i, bars.getBar(i).getEndTime(), bars.getBar(i).getClosePrice());
+      final var expectedValue = i < 1 ?
+                                numFactory.one() :
+                                numFactory.one().minus(
+                                    numFactory.numOf(0.1).multipliedBy(numFactory.numOf(i))
+                                );
+      log.debug("expected {}", expectedValue);
+      assertNumEquals(expectedValue, cashFlow.getValue(bars.getBar(i).getEndTime()));
     }
+  }
 
-    @Test
-    public void cashFlowBuyWithOnlyOnePosition() {
-        BarSeries sampleBarSeries = new MockBarSeries(numFunction, 1d, 2d);
-        TradingRecord tradingRecord = new BaseTradingRecord(Trade.buyAt(0, sampleBarSeries),
-                Trade.sellAt(1, sampleBarSeries));
 
-        CashFlow cashFlow = new CashFlow(sampleBarSeries, tradingRecord);
+  @ParameterizedTest
+  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
+  void cashFlowWithNoTrades(final NumFactory numFactory) {
+    final var context = new MarketEventTestContext()
+        .withNumFactory(numFactory);
+    final var tradingRecord = context.toTradingRecordContext().getTradingRecord();
+    final var cashFlow = new CashFlow(tradingRecord);
 
-        assertNumEquals(1, cashFlow.getValue(0));
-        assertNumEquals(2, cashFlow.getValue(1));
-    }
+    assertNumEquals(numFactory.one(), cashFlow.getValue(Instant.EPOCH));
+  }
 
-    @Test
-    public void cashFlowWithSellAndBuyTrades() {
-        BarSeries sampleBarSeries = new MockBarSeries(numFunction, 2, 1, 3, 5, 6, 3, 20);
-        TradingRecord tradingRecord = new BaseTradingRecord(Trade.buyAt(0, sampleBarSeries),
-                Trade.sellAt(1, sampleBarSeries), Trade.buyAt(3, sampleBarSeries), Trade.sellAt(4, sampleBarSeries),
-                Trade.sellAt(5, sampleBarSeries), Trade.buyAt(6, sampleBarSeries));
 
-        CashFlow cashFlow = new CashFlow(sampleBarSeries, tradingRecord);
+  @ParameterizedTest
+  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
+  void cashFlowHODL(final NumFactory numFactory) {
 
-        assertNumEquals(1, cashFlow.getValue(0));
-        assertNumEquals("0.5", cashFlow.getValue(1));
-        assertNumEquals("0.5", cashFlow.getValue(2));
-        assertNumEquals("0.5", cashFlow.getValue(3));
-        assertNumEquals("0.6", cashFlow.getValue(4));
-        assertNumEquals("0.6", cashFlow.getValue(5));
-        assertNumEquals("-2.8", cashFlow.getValue(6));
-    }
+    final var tradingContext = new MarketEventTestContext()
+        .withNumFactory(numFactory)
+        .withCandlePrices(100, 120, 150, 135, 100, 100, 100, 200, 200, 160)
+        .toTradingRecordContext()
+        .withTradeType(TradeType.BUY);
 
-    @Test
-    public void cashFlowSell() {
-        BarSeries sampleBarSeries = new MockBarSeries(numFunction, 1, 2, 4, 8, 16, 32);
-        TradingRecord tradingRecord = new BaseTradingRecord(Trade.sellAt(2, sampleBarSeries),
-                Trade.buyAt(3, sampleBarSeries));
+    // Position 1: 100 -> 160 (profit: +60%)
+    tradingContext.enter(1).after(1);
+    tradingContext.exit(1).after(9);
 
-        CashFlow cashFlow = new CashFlow(sampleBarSeries, tradingRecord);
+    final var cashFlow = new CashFlow(tradingContext.getTradingRecord());
+    final var bars = tradingContext.getBarSeries();
 
-        assertNumEquals(1, cashFlow.getValue(0));
-        assertNumEquals(1, cashFlow.getValue(1));
-        assertNumEquals(1, cashFlow.getValue(2));
-        assertNumEquals(0, cashFlow.getValue(3));
-        assertNumEquals(0, cashFlow.getValue(4));
-        assertNumEquals(0, cashFlow.getValue(5));
-    }
+    // Initial value
+    assertNumEquals(numFactory.one(), cashFlow.getValue(bars.getBar(0).getEndTime()));
 
-    @Test
-    public void cashFlowShortSell() {
-        BarSeries sampleBarSeries = new MockBarSeries(numFunction, 1, 2, 4, 8, 16, 32);
-        TradingRecord tradingRecord = new BaseTradingRecord(Trade.buyAt(0, sampleBarSeries),
-                Trade.sellAt(2, sampleBarSeries), Trade.sellAt(2, sampleBarSeries), Trade.buyAt(4, sampleBarSeries),
-                Trade.buyAt(4, sampleBarSeries), Trade.sellAt(5, sampleBarSeries));
+    // After Position 1 close: 120/100 = 1.20
+    assertNumEquals(numFactory.numOf(1.20), cashFlow.getValue(bars.getBar(1).getEndTime()));
 
-        CashFlow cashFlow = new CashFlow(sampleBarSeries, tradingRecord);
+    // After Position 2 close: 135/100 = 0.9
+    assertNumEquals(numFactory.numOf(1.35), cashFlow.getValue(bars.getBar(3).getEndTime()));
 
-        assertNumEquals(1, cashFlow.getValue(0));
-        assertNumEquals(2, cashFlow.getValue(1));
-        assertNumEquals(4, cashFlow.getValue(2));
-        assertNumEquals(0, cashFlow.getValue(3));
-        assertNumEquals(-8, cashFlow.getValue(4));
-        assertNumEquals(-8, cashFlow.getValue(5));
-    }
+    // After Position 3 close: 100/100
+    assertNumEquals(numFactory.numOf(1.0), cashFlow.getValue(bars.getBar(5).getEndTime()));
 
-    @Test
-    public void cashFlowShortSellWith20PercentGain() {
-        BarSeries sampleBarSeries = new MockBarSeries(numFunction, 110, 100, 90, 80);
-        TradingRecord tradingRecord = new BaseTradingRecord(Trade.sellAt(1, sampleBarSeries),
-                Trade.buyAt(3, sampleBarSeries));
+    // After Position 4 close: 200/100 = 2.0
+    assertNumEquals(numFactory.numOf(2.0), cashFlow.getValue(bars.getBar(7).getEndTime()));
 
-        CashFlow cashFlow = new CashFlow(sampleBarSeries, tradingRecord);
+    // After Position 5 close: 160 / 100 = 1.6
+    assertNumEquals(numFactory.numOf(1.6), cashFlow.getValue(bars.getBar(9).getEndTime()));
+  }
 
-        assertNumEquals(1, cashFlow.getValue(0));
-        assertNumEquals(1, cashFlow.getValue(1));
-        assertNumEquals(1.1, cashFlow.getValue(2));
-        assertNumEquals(1.2, cashFlow.getValue(3));
-    }
 
-    @Test
-    public void cashFlowShortSellWith20PercentLoss() {
-        BarSeries sampleBarSeries = new MockBarSeries(numFunction, 90, 100, 110, 120);
-        TradingRecord tradingRecord = new BaseTradingRecord(Trade.sellAt(1, sampleBarSeries),
-                Trade.buyAt(3, sampleBarSeries));
+  @ParameterizedTest
+  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
+  void cashFlowWithMultipleBuyPositions(final NumFactory numFactory) {
 
-        CashFlow cashFlow = new CashFlow(sampleBarSeries, tradingRecord);
+    final var tradingContext = new MarketEventTestContext()
+        .withNumFactory(numFactory)
+        .withCandlePrices(100, 120, 150, 135, 100, 100, 100, 200, 200, 160)
+        .toTradingRecordContext()
+        .withTradeType(TradeType.BUY);
 
-        assertNumEquals(1, cashFlow.getValue(0));
-        assertNumEquals(1, cashFlow.getValue(1));
-        assertNumEquals(0.9, cashFlow.getValue(2));
-        assertNumEquals(0.8, cashFlow.getValue(3));
-    }
+    // Position 1: 100 -> 120 (profit: +20%)
+    tradingContext.enter(1).after(1);
+    tradingContext.exit(1).after(1);
 
-    @Test
-    public void cashFlowShortSellWith100PercentLoss() {
-        BarSeries sampleBarSeries = new MockBarSeries(numFunction, 90, 100, 110, 120, 130, 140, 150, 160, 170, 180, 190,
-                200);
-        TradingRecord tradingRecord = new BaseTradingRecord(Trade.sellAt(1, sampleBarSeries),
-                Trade.buyAt(11, sampleBarSeries));
+    // Position 2: 150 -> 135 (loss: -10%)
+    tradingContext.enter(1).after(1);
+    tradingContext.exit(1).after(1);
 
-        CashFlow cashFlow = new CashFlow(sampleBarSeries, tradingRecord);
+    // Position 3: 100 -> 100 (neutral)
+    tradingContext.enter(1).after(1);
+    tradingContext.exit(1).after(1);
 
-        assertNumEquals(1, cashFlow.getValue(0));
-        assertNumEquals(1, cashFlow.getValue(1));
-        assertNumEquals(0.9, cashFlow.getValue(2));
-        assertNumEquals(0.8, cashFlow.getValue(3));
-        assertNumEquals(0.7, cashFlow.getValue(4));
-        assertNumEquals(0.6, cashFlow.getValue(5));
-        assertNumEquals(0.5, cashFlow.getValue(6));
-        assertNumEquals(0.4, cashFlow.getValue(7));
-        assertNumEquals(0.3, cashFlow.getValue(8));
-        assertNumEquals(0.2, cashFlow.getValue(9));
-        assertNumEquals(0.1, cashFlow.getValue(10));
-        assertNumEquals(0.0, cashFlow.getValue(11));
-    }
+    // Position 4: 100 -> 200 (profit: +100%)
+    tradingContext.enter(1).after(1);
+    tradingContext.exit(1).after(1);
 
-    @Test
-    public void cashFlowShortSellWithOver100PercentLoss() {
-        BarSeries sampleBarSeries = new MockBarSeries(numFunction, 100, 150, 200, 210);
-        TradingRecord tradingRecord = new BaseTradingRecord(Trade.sellAt(0, sampleBarSeries),
-                Trade.buyAt(3, sampleBarSeries));
+    // Position 5: 200 -> 160 (loss: -20%)
+    tradingContext.enter(1).after(1);
+    tradingContext.exit(1).after(1);
 
-        CashFlow cashFlow = new CashFlow(sampleBarSeries, tradingRecord);
+    final var cashFlow = new CashFlow(tradingContext.getTradingRecord());
+    final var bars = tradingContext.getBarSeries();
 
-        assertNumEquals(1, cashFlow.getValue(0));
-        assertNumEquals(0.5, cashFlow.getValue(1));
-        assertNumEquals(0.0, cashFlow.getValue(2));
-        assertNumEquals(-0.1, cashFlow.getValue(3));
-    }
+    // Initial value
+    assertNumEquals(numFactory.one(), cashFlow.getValue(bars.getBar(0).getEndTime()));
 
-    @Test
-    public void cashFlowShortSellBigLossWithNegativeCashFlow() {
-        BarSeries sampleBarSeries = new MockBarSeries(numFunction, 3, 20);
-        TradingRecord tradingRecord = new BaseTradingRecord(Trade.sellAt(0, sampleBarSeries),
-                Trade.buyAt(1, sampleBarSeries));
+    // After Position 1 close: 120/100 = 1.20
+    assertNumEquals(numFactory.numOf(1.20), cashFlow.getValue(bars.getBar(1).getEndTime()));
 
-        CashFlow cashFlow = new CashFlow(sampleBarSeries, tradingRecord);
+    // After Position 2 close: 135/150 = 0.9
+    assertNumEquals(numFactory.numOf(0.9), cashFlow.getValue(bars.getBar(3).getEndTime()));
 
-        assertNumEquals(1, cashFlow.getValue(0));
-        assertNumEquals(-4.6667, cashFlow.getValue(1));
-    }
+    // After Position 3 close: 100/100
+    assertNumEquals(numFactory.numOf(1.0), cashFlow.getValue(bars.getBar(5).getEndTime()));
 
-    @Test
-    public void cashFlowValueWithOnlyOnePositionAndAGapBefore() {
-        BarSeries sampleBarSeries = new MockBarSeries(numFunction, 1d, 1d, 2d);
-        TradingRecord tradingRecord = new BaseTradingRecord(Trade.buyAt(1, sampleBarSeries),
-                Trade.sellAt(2, sampleBarSeries));
+    // After Position 4 close: 200/100 = 2.0
+    assertNumEquals(numFactory.numOf(2.0), cashFlow.getValue(bars.getBar(7).getEndTime()));
 
-        CashFlow cashFlow = new CashFlow(sampleBarSeries, tradingRecord);
-
-        assertNumEquals(1, cashFlow.getValue(0));
-        assertNumEquals(1, cashFlow.getValue(1));
-        assertNumEquals(2, cashFlow.getValue(2));
-    }
-
-    @Test
-    public void cashFlowValueWithOnlyOnePositionAndAGapAfter() {
-        BarSeries sampleBarSeries = new MockBarSeries(numFunction, 1d, 2d, 2d);
-        TradingRecord tradingRecord = new BaseTradingRecord(Trade.buyAt(0, sampleBarSeries),
-                Trade.sellAt(1, sampleBarSeries));
-
-        CashFlow cashFlow = new CashFlow(sampleBarSeries, tradingRecord);
-
-        assertEquals(3, cashFlow.getSize());
-        assertNumEquals(1, cashFlow.getValue(0));
-        assertNumEquals(2, cashFlow.getValue(1));
-        assertNumEquals(2, cashFlow.getValue(2));
-    }
-
-    @Test
-    public void cashFlowValueWithTwoPositionsAndLongTimeWithoutTrades() {
-        BarSeries sampleBarSeries = new MockBarSeries(numFunction, 1d, 2d, 4d, 8d, 16d, 32d);
-        TradingRecord tradingRecord = new BaseTradingRecord(Trade.buyAt(1, sampleBarSeries),
-                Trade.sellAt(2, sampleBarSeries), Trade.buyAt(4, sampleBarSeries), Trade.sellAt(5, sampleBarSeries));
-
-        CashFlow cashFlow = new CashFlow(sampleBarSeries, tradingRecord);
-
-        assertNumEquals(1, cashFlow.getValue(0));
-        assertNumEquals(1, cashFlow.getValue(1));
-        assertNumEquals(2, cashFlow.getValue(2));
-        assertNumEquals(2, cashFlow.getValue(3));
-        assertNumEquals(2, cashFlow.getValue(4));
-        assertNumEquals(4, cashFlow.getValue(5));
-    }
-
-    @Test
-    public void cashFlowValue() {
-        // First sample series
-        BarSeries sampleBarSeries = new MockBarSeries(numFunction, 3d, 2d, 5d, 1000d, 5000d, 0.0001d, 4d, 7d, 6d, 7d,
-                8d, 5d, 6d);
-        TradingRecord tradingRecord = new BaseTradingRecord(Trade.buyAt(0, sampleBarSeries),
-                Trade.sellAt(2, sampleBarSeries), Trade.buyAt(6, sampleBarSeries), Trade.sellAt(8, sampleBarSeries),
-                Trade.buyAt(9, sampleBarSeries), Trade.sellAt(11, sampleBarSeries));
-
-        CashFlow cashFlow = new CashFlow(sampleBarSeries, tradingRecord);
-
-        assertNumEquals(1, cashFlow.getValue(0));
-        assertNumEquals(2d / 3, cashFlow.getValue(1));
-        assertNumEquals(5d / 3, cashFlow.getValue(2));
-        assertNumEquals(5d / 3, cashFlow.getValue(3));
-        assertNumEquals(5d / 3, cashFlow.getValue(4));
-        assertNumEquals(5d / 3, cashFlow.getValue(5));
-        assertNumEquals(5d / 3, cashFlow.getValue(6));
-        assertNumEquals(5d / 3 * 7d / 4, cashFlow.getValue(7));
-        assertNumEquals(5d / 3 * 6d / 4, cashFlow.getValue(8));
-        assertNumEquals(5d / 3 * 6d / 4, cashFlow.getValue(9));
-        assertNumEquals(5d / 3 * 6d / 4 * 8d / 7, cashFlow.getValue(10));
-        assertNumEquals(5d / 3 * 6d / 4 * 5d / 7, cashFlow.getValue(11));
-        assertNumEquals(5d / 3 * 6d / 4 * 5d / 7, cashFlow.getValue(12));
-
-        // Second sample series
-        sampleBarSeries = new MockBarSeries(numFunction, 5d, 6d, 3d, 7d, 8d, 6d, 10d, 15d, 6d);
-        tradingRecord = new BaseTradingRecord(Trade.buyAt(4, sampleBarSeries), Trade.sellAt(5, sampleBarSeries),
-                Trade.buyAt(6, sampleBarSeries), Trade.sellAt(8, sampleBarSeries));
-
-        CashFlow flow = new CashFlow(sampleBarSeries, tradingRecord);
-        assertNumEquals(1, flow.getValue(0));
-        assertNumEquals(1, flow.getValue(1));
-        assertNumEquals(1, flow.getValue(2));
-        assertNumEquals(1, flow.getValue(3));
-        assertNumEquals(1, flow.getValue(4));
-        assertNumEquals("0.75", flow.getValue(5));
-        assertNumEquals("0.75", flow.getValue(6));
-        assertNumEquals("1.125", flow.getValue(7));
-        assertNumEquals("0.45", flow.getValue(8));
-    }
-
-    @Test
-    public void cashFlowValueWithNoPositions() {
-        BarSeries sampleBarSeries = new MockBarSeries(numFunction, 3d, 2d, 5d, 4d, 7d, 6d, 7d, 8d, 5d, 6d);
-        CashFlow cashFlow = new CashFlow(sampleBarSeries, new BaseTradingRecord());
-        assertNumEquals(1, cashFlow.getValue(4));
-        assertNumEquals(1, cashFlow.getValue(7));
-        assertNumEquals(1, cashFlow.getValue(9));
-    }
-
-    @Test
-    public void reallyLongCashFlow() {
-        int size = 1000000;
-        BarSeries sampleBarSeries = new MockBarSeries(Collections.nCopies(size, new MockBar(10, numFunction)));
-        TradingRecord tradingRecord = new BaseTradingRecord(Trade.buyAt(0, sampleBarSeries),
-                Trade.sellAt(size - 1, sampleBarSeries));
-        CashFlow cashFlow = new CashFlow(sampleBarSeries, tradingRecord);
-        assertNumEquals(1, cashFlow.getValue(size - 1));
-    }
-
+    // After Position 5 close: 160 / 200 = 0.8
+    assertNumEquals(numFactory.numOf(0.8), cashFlow.getValue(bars.getBar(9).getEndTime()));
+  }
 }

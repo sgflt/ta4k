@@ -1,7 +1,7 @@
-/**
+/*
  * The MIT License (MIT)
  *
- * Copyright (c) 2017-2023 Ta4j Organization & respective
+ * Copyright (c) 2017-2024 Ta4j Organization & respective
  * authors (see AUTHORS)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
@@ -23,99 +23,126 @@
  */
 package org.ta4j.core.criteria.pnl;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.ta4j.core.TestUtils.assertNumEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.util.function.Function;
-
-import org.junit.Test;
-import org.ta4j.core.AnalysisCriterion;
-import org.ta4j.core.BaseTradingRecord;
-import org.ta4j.core.Trade;
-import org.ta4j.core.TradingRecord;
-import org.ta4j.core.analysis.cost.LinearTransactionCostModel;
-import org.ta4j.core.analysis.cost.ZeroCostModel;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.ta4j.core.TradeType;
+import org.ta4j.core.TradingRecordTestContext;
+import org.ta4j.core.backtest.analysis.cost.LinearTransactionCostModel;
+import org.ta4j.core.backtest.criteria.pnl.LossCriterion;
 import org.ta4j.core.criteria.AbstractCriterionTest;
-import org.ta4j.core.mocks.MockBarSeries;
-import org.ta4j.core.num.Num;
+import org.ta4j.core.num.NumFactory;
 
-public class LossCriterionTest extends AbstractCriterionTest {
+class LossCriterionTest extends AbstractCriterionTest {
 
-    public LossCriterionTest(Function<Number, Num> numFunction) {
-        super(params -> new LossCriterion((boolean) params[0]), numFunction);
-    }
+  @ParameterizedTest
+  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
+  void calculateComparingIncludingVsExcludingCosts(final NumFactory numFactory) {
+    final var context = new TradingRecordTestContext()
+        .withNumFactory(numFactory)
+        .withTradeType(TradeType.BUY)
+        .withTransactionCostModel(new LinearTransactionCostModel(0.01));
 
-    @Test
-    public void calculateComparingIncludingVsExcludingCosts() {
-        MockBarSeries series = new MockBarSeries(numFunction, 100, 95, 100, 80, 85, 70);
-        LinearTransactionCostModel transactionCost = new LinearTransactionCostModel(0.01);
-        ZeroCostModel holdingCost = new ZeroCostModel();
-        TradingRecord tradingRecord = new BaseTradingRecord(Trade.TradeType.BUY, transactionCost, holdingCost);
+    // First trade: buy at 100, sell at 95
+    context.enter(1).at(100)
+        .exit(1).at(95);
 
-        // entry price = 100 (cost = 100*0.01 = 1) => netPrice = 101, grossPrice = 100
-        tradingRecord.enter(0, series.getBar(0).getClosePrice(), numOf(1));
-        // exit price = 95 (cost = 95*0.01 = 0.95) => netPrice = 94.05, grossPrice = 95
-        tradingRecord.exit(1, series.getBar(1).getClosePrice(),
-                tradingRecord.getCurrentPosition().getEntry().getAmount());
+    // Second trade: buy at 100, sell at 70
+    context.enter(1).at(100)
+        .exit(1).at(70);
 
-        // entry price = 100 (cost = 100*0.01 = 1) => netPrice = 101, grossPrice = 100
-        tradingRecord.enter(2, series.getBar(2).getClosePrice(), numOf(1));
-        // exit price = 70 (cost = 70*0.01 = 0.70) => netPrice = 69.3, grossPrice = 70
-        tradingRecord.exit(5, series.getBar(5).getClosePrice(),
-                tradingRecord.getCurrentPosition().getEntry().getAmount());
+    // Calculate with costs included
+    context.withCriterion(new LossCriterion(false))
+        .assertResults(-38.65);
 
-        // include costs, i.e. loss - costs:
-        // [(94.05 - 101)] + [(69.3 - 101)] = -6.95 + (-31.7) = -38.65 loss
-        // [(95 - 100)] + [(70 - 100)] = -5 + (-30) = -35 loss - 3.65 = -38.65 loss
-        AnalysisCriterion lossIncludingCosts = getCriterion(false);
-        assertNumEquals(-38.65, lossIncludingCosts.calculate(series, tradingRecord));
+    // Calculate with costs excluded
+    context.withCriterion(new LossCriterion(true))
+        .assertResults(-35);
+  }
 
-        // exclude costs, i.e. costs are not contained:
-        // [(95 - 100)] + [(70 - 100)] = -5 + (-30) = -35 loss
-        AnalysisCriterion lossExcludingCosts = getCriterion(true);
-        assertNumEquals(-35, lossExcludingCosts.calculate(series, tradingRecord));
-    }
 
-    @Test
-    public void calculateOnlyWithProfitPositions() {
-        MockBarSeries series = new MockBarSeries(numFunction, 100, 105, 110, 100, 95, 105);
-        TradingRecord tradingRecord = new BaseTradingRecord(Trade.buyAt(0, series), Trade.sellAt(2, series),
-                Trade.buyAt(3, series), Trade.sellAt(5, series));
+  @ParameterizedTest
+  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
+  void calculateOnlyWithProfitPositions(final NumFactory numFactory) {
+    final var context = new TradingRecordTestContext()
+        .withNumFactory(numFactory)
+        .withTradeType(TradeType.BUY)
+        .withCriterion(new LossCriterion(true));
 
-        AnalysisCriterion loss = getCriterion(true);
-        assertNumEquals(0, loss.calculate(series, tradingRecord));
-    }
+    // First trade: buy at 100, sell at 110
+    context.enter(1).at(100)
+        .exit(1).at(110);
 
-    @Test
-    public void calculateOnlyWithLossPositions() {
-        MockBarSeries series = new MockBarSeries(numFunction, 100, 95, 100, 80, 85, 70);
-        TradingRecord tradingRecord = new BaseTradingRecord(Trade.buyAt(0, series), Trade.sellAt(1, series),
-                Trade.buyAt(2, series), Trade.sellAt(5, series));
+    // Second trade: buy at 100, sell at 105
+    context.enter(1).at(100)
+        .exit(1).at(105);
 
-        AnalysisCriterion loss = getCriterion(true);
-        assertNumEquals(-35, loss.calculate(series, tradingRecord));
-    }
+    context.assertResults(0);
+  }
 
-    @Test
-    public void calculateProfitWithShortPositions() {
-        MockBarSeries series = new MockBarSeries(numFunction, 95, 100, 70, 80, 85, 100);
-        TradingRecord tradingRecord = new BaseTradingRecord(Trade.sellAt(0, series), Trade.buyAt(1, series),
-                Trade.sellAt(2, series), Trade.buyAt(5, series));
 
-        AnalysisCriterion loss = getCriterion(true);
-        assertNumEquals(-35, loss.calculate(series, tradingRecord));
-    }
+  @ParameterizedTest
+  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
+  void calculateOnlyWithLossPositions(final NumFactory numFactory) {
+    final var context = new TradingRecordTestContext()
+        .withNumFactory(numFactory)
+        .withTradeType(TradeType.BUY)
+        .withCriterion(new LossCriterion(true));
 
-    @Test
-    public void betterThan() {
-        AnalysisCriterion criterion = getCriterion(true);
-        assertTrue(criterion.betterThan(numOf(2.0), numOf(1.5)));
-        assertFalse(criterion.betterThan(numOf(1.5), numOf(2.0)));
-    }
+    // First trade: buy at 100, sell at 95
+    context.enter(1).at(100)
+        .exit(1).at(95);
 
-    @Test
-    public void testCalculateOneOpenPositionShouldReturnZero() {
-        openedPositionUtils.testCalculateOneOpenPositionShouldReturnExpectedValue(numFunction, getCriterion(true), 0);
-    }
+    // Second trade: buy at 100, sell at 70
+    context.enter(1).at(100)
+        .exit(1).at(70);
+
+    context.assertResults(-35);
+  }
+
+
+  @ParameterizedTest
+  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
+  void calculateProfitWithShortPositions(final NumFactory numFactory) {
+    final var context = new TradingRecordTestContext()
+        .withNumFactory(numFactory)
+        .withTradeType(TradeType.SELL)
+        .withCriterion(new LossCriterion(true));
+
+    // First trade: sell at 95, buy at 100
+    context.enter(1).at(95)
+        .exit(1).at(100);
+
+    // Second trade: sell at 70, buy at 100
+    context.enter(1).at(70)
+        .exit(1).at(100);
+
+    context.assertResults(-35);
+  }
+
+
+  @ParameterizedTest
+  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
+  void betterThan(final NumFactory numFactory) {
+    final var criterion = new LossCriterion(true);
+    assertTrue(criterion.betterThan(numFactory.numOf(2.0), numFactory.numOf(1.5)));
+    assertFalse(criterion.betterThan(numFactory.numOf(1.5), numFactory.numOf(2.0)));
+  }
+
+
+  @ParameterizedTest
+  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
+  void calculateOneOpenPosition(final NumFactory numFactory) {
+    final var context = new TradingRecordTestContext()
+        .withNumFactory(numFactory)
+        .withTradeType(TradeType.BUY)
+        .withCriterion(new LossCriterion(true));
+
+    // Open position without closing it
+    context.enter(1).at(100);
+
+    context.assertResults(0);
+  }
 }

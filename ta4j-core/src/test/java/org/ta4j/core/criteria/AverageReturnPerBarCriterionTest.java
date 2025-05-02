@@ -1,4 +1,4 @@
-/**
+/*
  * The MIT License (MIT)
  *
  * Copyright (c) 2017-2023 Ta4j Organization & respective
@@ -23,82 +23,114 @@
  */
 package org.ta4j.core.criteria;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.ta4j.core.TestUtils.assertNumEquals;
+import java.time.temporal.ChronoUnit;
 
-import java.util.function.Function;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.ta4j.core.MarketEventTestContext;
+import org.ta4j.core.TradeType;
+import org.ta4j.core.backtest.criteria.AverageReturnPerBarCriterion;
+import org.ta4j.core.num.NumFactory;
 
-import org.junit.Test;
-import org.ta4j.core.AnalysisCriterion;
-import org.ta4j.core.BaseTradingRecord;
-import org.ta4j.core.Position;
-import org.ta4j.core.Trade;
-import org.ta4j.core.TradingRecord;
-import org.ta4j.core.mocks.MockBarSeries;
-import org.ta4j.core.num.Num;
+class AverageReturnPerBarCriterionTest {
 
-public class AverageReturnPerBarCriterionTest extends AbstractCriterionTest {
-    private MockBarSeries series;
+  private final MarketEventTestContext context = new MarketEventTestContext();
 
-    public AverageReturnPerBarCriterionTest(Function<Number, Num> numFunction) {
-        super(params -> new AverageReturnPerBarCriterion(), numFunction);
-    }
 
-    @Test
-    public void calculateOnlyWithGainPositions() {
-        series = new MockBarSeries(numFunction, 100d, 105d, 110d, 100d, 95d, 105d);
-        TradingRecord tradingRecord = new BaseTradingRecord(Trade.buyAt(0, series), Trade.sellAt(2, series),
-                Trade.buyAt(3, series), Trade.sellAt(5, series));
-        AnalysisCriterion averageProfit = getCriterion();
-        assertNumEquals(1.0243, averageProfit.calculate(series, tradingRecord));
-    }
+  @ParameterizedTest
+  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
+  void calculateOnlyWithGainPositions(final NumFactory numFactory) {
+    final var tradingContext = this.context
+        .withNumFactory(numFactory)
+        .withCandlePrices(100d, 105d, 110d, 100d, 95d, 105d)
+        .toTradingRecordContext()
+        .withCriterion(new AverageReturnPerBarCriterion(numFactory, ChronoUnit.DAYS))
+        .enter(1).asap()
+        .exit(1).after(2)
+        .enter(1).asap()
+        .exit(1).after(2);
 
-    @Test
-    public void calculateWithASimplePosition() {
-        series = new MockBarSeries(numFunction, 100d, 105d, 110d, 100d, 95d, 105d);
-        TradingRecord tradingRecord = new BaseTradingRecord(Trade.buyAt(0, series), Trade.sellAt(2, series));
-        AnalysisCriterion averageProfit = getCriterion();
-        assertNumEquals(numOf(110d / 100).pow(numOf(1d / 3)), averageProfit.calculate(series, tradingRecord));
-    }
+    tradingContext.assertResults(Math.pow((110. / 100.) * (105. / 100.), (1. / 4.)));
+  }
 
-    @Test
-    public void calculateOnlyWithLossPositions() {
-        series = new MockBarSeries(numFunction, 100, 95, 100, 80, 85, 70);
-        TradingRecord tradingRecord = new BaseTradingRecord(Trade.buyAt(0, series), Trade.sellAt(1, series),
-                Trade.buyAt(2, series), Trade.sellAt(5, series));
-        AnalysisCriterion averageProfit = getCriterion();
-        assertNumEquals(numOf(95d / 100 * 70d / 100).pow(numOf(1d / 6)),
-                averageProfit.calculate(series, tradingRecord));
-    }
 
-    @Test
-    public void calculateWithLosingAShortPositions() {
-        series = new MockBarSeries(numFunction, 100d, 105d, 110d, 100d, 95d, 105d);
-        TradingRecord tradingRecord = new BaseTradingRecord(Trade.sellAt(0, series), Trade.buyAt(2, series));
-        AnalysisCriterion averageProfit = getCriterion();
-        assertNumEquals(numOf(90d / 100).pow(numOf(1d / 3)), averageProfit.calculate(series, tradingRecord));
-    }
+  @ParameterizedTest
+  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
+  void calculateWithASimplePosition(final NumFactory numFactory) {
+    final var tradingContext = this.context
+        .withNumFactory(numFactory)
+        .withCandlePrices(100d, 105d, 110d)
+        .toTradingRecordContext()
+        .withCriterion(new AverageReturnPerBarCriterion(numFactory, ChronoUnit.DAYS))
+        .enter(1).asap()
+        .exit(1).after(2);
 
-    @Test
-    public void calculateWithNoBarsShouldReturn1() {
-        series = new MockBarSeries(numFunction, 100, 95, 100, 80, 85, 70);
-        AnalysisCriterion averageProfit = getCriterion();
-        assertNumEquals(1, averageProfit.calculate(series, new BaseTradingRecord()));
-    }
+    final var expectedReturn = numFactory.numOf(110d).dividedBy(numFactory.numOf(100))
+        .pow(numFactory.numOf(1. / 2));
+    tradingContext.assertResults(expectedReturn.doubleValue());
+  }
 
-    @Test
-    public void calculateWithOnePosition() {
-        series = new MockBarSeries(numFunction, 100, 105);
-        Position position = new Position(Trade.buyAt(0, series), Trade.sellAt(1, series));
-        AnalysisCriterion average = getCriterion();
-        assertNumEquals(numOf(105d / 100).pow(numOf(0.5)), average.calculate(series, position));
-    }
 
-    @Test
-    public void betterThan() {
-        AnalysisCriterion criterion = getCriterion();
-        assertTrue(criterion.betterThan(numOf(2.0), numOf(1.5)));
-        assertFalse(criterion.betterThan(numOf(1.5), numOf(2.0)));
-    }
+  @ParameterizedTest
+  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
+  void calculateOnlyWithLossPositions(final NumFactory numFactory) {
+    final var tradingContext = this.context
+        .withNumFactory(numFactory)
+        .withCandlePrices(100d, 95d, 100d, 80d, 85d, 70d)
+        .toTradingRecordContext()
+        .withCriterion(new AverageReturnPerBarCriterion(numFactory, ChronoUnit.DAYS))
+        .enter(1).asap()
+        .exit(1).asap()
+        .enter(1).asap()
+        .exit(1).after(3);
+
+    final var expectedReturn = numFactory.numOf(95. / 100. * 70. / 100.).pow(numFactory.numOf(1. / 4.));
+    tradingContext.assertResults(expectedReturn.doubleValue());
+  }
+
+
+  @ParameterizedTest
+  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
+  void calculateWithLosingShortPositions(final NumFactory numFactory) {
+    final var tradingContext = this.context
+        .withNumFactory(numFactory)
+        .withCandlePrices(100., 105., 90.)
+        .toTradingRecordContext()
+        .withTradeType(TradeType.SELL)
+        .withCriterion(new AverageReturnPerBarCriterion(numFactory, ChronoUnit.DAYS))
+        .enter(1).asap()
+        .exit(1).after(2);
+
+    final var expectedReturn = numFactory.numOf((100. - 90.) / 100 + 1).pow(numFactory.numOf(1. / 2.));
+    tradingContext.assertResults(expectedReturn.doubleValue());
+  }
+
+
+  @ParameterizedTest
+  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
+  void calculateWithNoBarsShouldReturnOne(final NumFactory numFactory) {
+    final var tradingContext = this.context
+        .withNumFactory(numFactory)
+        .withCandlePrices(100d, 95d, 100d, 80d, 85d, 70d)
+        .toTradingRecordContext()
+        .withCriterion(new AverageReturnPerBarCriterion(numFactory, ChronoUnit.DAYS));
+
+    tradingContext.assertResults(1.0);
+  }
+
+
+  @ParameterizedTest
+  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
+  void calculateWithOnePosition(final NumFactory numFactory) {
+    final var tradingContext = this.context
+        .withNumFactory(numFactory)
+        .withCandlePrices(100d, 105d)
+        .toTradingRecordContext()
+        .withCriterion(new AverageReturnPerBarCriterion(numFactory, ChronoUnit.DAYS))
+        .enter(1).asap()
+        .exit(1).asap();
+
+    final var expectedReturn = numFactory.numOf(105d / 100).pow(numFactory.numOf(1.0));
+    tradingContext.assertResults(expectedReturn.doubleValue());
+  }
 }

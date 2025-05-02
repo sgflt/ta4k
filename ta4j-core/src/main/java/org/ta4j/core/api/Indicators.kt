@@ -1,0 +1,183 @@
+/*
+ * The MIT License (MIT)
+ *
+ * Copyright (c) 2017-2024 Ta4j Organization & respective authors (see AUTHORS)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of
+ * this software and associated documentation files (the "Software"), to deal in
+ * the Software without restriction, including without limitation the rights to
+ * use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+ * the Software, and to permit persons to whom the Software is furnished to do so,
+ * subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+ * FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+ * COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+ * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+ * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ */
+package org.ta4j.core.api
+
+import org.ta4j.core.indicators.numeric.CloseLocationValueIndicator
+import org.ta4j.core.indicators.numeric.NumericIndicator
+import org.ta4j.core.indicators.numeric.candles.LowerShadowIndicator
+import org.ta4j.core.indicators.numeric.candles.RealBodyIndicator
+import org.ta4j.core.indicators.numeric.candles.VolumeIndicator
+import org.ta4j.core.indicators.numeric.candles.price.*
+import org.ta4j.core.indicators.numeric.channels.bollinger.BollingerBandFacade
+import org.ta4j.core.indicators.numeric.momentum.ATRIndicator
+import org.ta4j.core.indicators.numeric.momentum.adx.*
+import org.ta4j.core.indicators.numeric.oscilators.AwesomeOscillatorIndicator
+import org.ta4j.core.indicators.numeric.oscilators.StochasticOscillatorDIndicator
+import org.ta4j.core.indicators.numeric.oscilators.StochasticOscillatorKIndicator
+import org.ta4j.core.indicators.numeric.oscilators.aroon.AroonDownIndicator
+import org.ta4j.core.indicators.numeric.oscilators.aroon.AroonOscillatorIndicator
+import org.ta4j.core.indicators.numeric.oscilators.aroon.AroonUpIndicator
+import org.ta4j.core.num.NumFactory
+import org.ta4j.core.num.NumFactoryProvider
+
+/**
+ * @author Lukáš Kvídera
+ */
+object Indicators {
+    @JvmStatic
+    fun medianPrice() = extended().medianPrice()
+
+    @JvmStatic
+    fun closePrice() = extended().closePrice()
+
+    @JvmStatic
+    fun openPrice() = extended().openPrice()
+
+    @JvmStatic
+    fun lowPrice() = extended().lowPrice()
+
+    @JvmStatic
+    fun highPrice() = extended().highPrice()
+
+    @JvmStatic
+    fun typicalPrice() = extended().typicalPrice()
+
+    @JvmStatic
+    fun closeLocationValue() = extended().closeLocationValue()
+
+    @JvmStatic
+    fun volume() = extended().volume()
+
+    @JvmStatic
+    fun bollingerBands(barCount: Int, k: Number) = extended().bollingerBands(barCount, k)
+
+    @JvmStatic
+    fun realBody() = extended().realBody()
+
+    @JvmStatic
+    fun aroonOscillator(barCount: Int) = extended().aroonOscillator(barCount)
+
+    @JvmStatic
+    fun aroonUp(barCount: Int) = extended().aroonUp(barCount)
+
+    @JvmStatic
+    fun aroonDown(barCount: Int) = extended().aroonDown(barCount)
+
+    @JvmStatic
+    fun atr(barCount: Int) = extended().atr(barCount)
+
+    @JvmStatic
+    fun adx(diBarCount: Int, adxBarCount: Int) = extended().adx(diBarCount, adxBarCount)
+
+    @JvmStatic
+    fun adx(barCount: Int) = adx(barCount, barCount)
+
+    @JvmStatic
+    fun plusDMI() = extended().plusDMI()
+
+    @JvmStatic
+    fun plusDII(barCount: Int) = extended().plusDII(barCount)
+
+    @JvmStatic
+    fun minusDMI() = extended().minusDMI()
+
+    @JvmStatic
+    fun minusDII(barCount: Int) = extended().minusDII(barCount)
+
+    @JvmStatic
+    fun lowerShadow() = extended().lowerShadow()
+
+    @JvmStatic
+    fun stochasticKOscillator(barCount: Int) = extended().stochasticKOscillator(barCount)
+
+    @JvmStatic
+    fun stochasticOscillator(barCount: Int) = extended().stochasticOscillator(barCount)
+
+    @JvmStatic
+    fun awesomeOscillator(shortBarCount: Int, longBarCount: Int) =
+        extended().awesomeOscillator(shortBarCount, longBarCount)
+
+    @JvmStatic
+    private fun extended() = extended(NumFactoryProvider.defaultNumFactory)
+
+    @JvmStatic
+    fun extended(numFactory: NumFactory) = ExtendedIndicatorFactory(numFactory)
+
+    class ExtendedIndicatorFactory(private val numFactory: NumFactory) {
+        fun medianPrice() = MedianPriceIndicator(numFactory)
+
+        fun closePrice() = ClosePriceIndicator(numFactory)
+
+        fun openPrice() = OpenPriceIndicator(numFactory)
+
+        fun lowPrice() = LowPriceIndicator(numFactory)
+
+        fun highPrice() = HighPriceIndicator(numFactory)
+
+        fun typicalPrice() = TypicalPriceIndicator(numFactory)
+
+        fun volume() = VolumeIndicator(numFactory)
+
+        fun bollingerBands(barCount: Int, k: Number) = BollingerBandFacade(closePrice(), barCount, k)
+
+        fun realBody() = RealBodyIndicator(numFactory)
+
+        fun aroonOscillator(barCount: Int) = AroonOscillatorIndicator(numFactory, barCount)
+
+        fun aroonUp(barCount: Int) = AroonUpIndicator(numFactory, barCount)
+
+        fun aroonDown(barCount: Int) = AroonDownIndicator(numFactory, barCount)
+
+        fun atr(barCount: Int) = ATRIndicator(numFactory, barCount)
+
+        fun adx(diBarCount: Int, adxBarCount: Int) = ADXIndicator(numFactory, diBarCount, adxBarCount)
+
+        fun adx(barCount: Int) = adx(barCount, barCount)
+
+        fun plusDMI() = PlusDMIndicator(numFactory)
+
+        fun plusDII(barCount: Int) = PlusDIIndicator(numFactory, barCount)
+
+        fun minusDMI() = MinusDMIndicator(numFactory)
+
+        fun minusDII(barCount: Int) = MinusDIIndicator(numFactory, barCount)
+
+        fun lowerShadow() = LowerShadowIndicator(numFactory)
+
+        fun stochasticOscillator(barCount: Int) =
+            StochasticOscillatorDIndicator(numFactory, stochasticKOscillator(barCount))
+
+        fun stochasticKOscillator(barCount: Int) = StochasticOscillatorKIndicator(numFactory, barCount)
+
+        fun awesomeOscillator(
+            indicator: NumericIndicator,
+            shortBarCount: Int,
+            longBarCount: Int,
+        ) = AwesomeOscillatorIndicator(numFactory, indicator, shortBarCount, longBarCount)
+
+        fun awesomeOscillator(shortBarCount: Int, longBarCount: Int) =
+            awesomeOscillator(medianPrice(), shortBarCount, longBarCount)
+
+        fun closeLocationValue() = CloseLocationValueIndicator(numFactory)
+    }
+}

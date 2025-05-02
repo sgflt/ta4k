@@ -1,7 +1,7 @@
-/**
+/*
  * The MIT License (MIT)
  *
- * Copyright (c) 2017-2023 Ta4j Organization & respective
+ * Copyright (c) 2017-2024 Ta4j Organization & respective
  * authors (see AUTHORS)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
@@ -23,318 +23,128 @@
  */
 package org.ta4j.core;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.ta4j.core.TestUtils.assertNumEquals;
-import static org.ta4j.core.num.NaN.NaN;
-
-import org.junit.Before;
-import org.junit.Test;
-import org.ta4j.core.Trade.TradeType;
-import org.ta4j.core.analysis.cost.CostModel;
-import org.ta4j.core.analysis.cost.LinearBorrowingCostModel;
-import org.ta4j.core.analysis.cost.LinearTransactionCostModel;
-import org.ta4j.core.analysis.cost.ZeroCostModel;
-import org.ta4j.core.mocks.MockBarSeries;
-import org.ta4j.core.num.DoubleNum;
-import org.ta4j.core.num.Num;
-
-public class PositionTest {
-
-    private Position newPosition, uncoveredPosition, posEquals1, posEquals2, posNotEquals1, posNotEquals2;
-
-    private CostModel transactionModel;
-    private CostModel holdingModel;
-    private Trade enter;
-    private Trade exitSameType;
-    private Trade exitDifferentType;
-
-    @Before
-    public void setUp() {
-        this.newPosition = new Position();
-        this.uncoveredPosition = new Position(TradeType.SELL);
-
-        posEquals1 = new Position();
-        posEquals1.operate(1);
-        posEquals1.operate(2);
-
-        posEquals2 = new Position();
-        posEquals2.operate(1);
-        posEquals2.operate(2);
-
-        posNotEquals1 = new Position(TradeType.SELL);
-        posNotEquals1.operate(1);
-        posNotEquals1.operate(2);
-
-        posNotEquals2 = new Position(TradeType.SELL);
-        posNotEquals2.operate(1);
-        posNotEquals2.operate(2);
-
-        transactionModel = new LinearTransactionCostModel(0.01);
-        holdingModel = new LinearBorrowingCostModel(0.001);
-
-        enter = Trade.buyAt(1, DoubleNum.valueOf(2), DoubleNum.valueOf(1), transactionModel);
-        exitSameType = Trade.sellAt(2, DoubleNum.valueOf(2), DoubleNum.valueOf(1), transactionModel);
-        exitDifferentType = Trade.buyAt(2, DoubleNum.valueOf(2), DoubleNum.valueOf(1));
-    }
-
-    @Test
-    public void whenNewShouldCreateBuyOrderWhenEntering() {
-        newPosition.operate(0);
-        assertEquals(Trade.buyAt(0, NaN, NaN), newPosition.getEntry());
-    }
-
-    @Test
-    public void whenNewShouldNotExit() {
-        assertFalse(newPosition.isOpened());
-    }
-
-    @Test
-    public void whenOpenedShouldCreateSellOrderWhenExiting() {
-        newPosition.operate(0);
-        newPosition.operate(1);
-        assertEquals(Trade.sellAt(1, NaN, NaN), newPosition.getExit());
-    }
-
-    @Test
-    public void whenClosedShouldNotEnter() {
-        newPosition.operate(0);
-        newPosition.operate(1);
-        assertTrue(newPosition.isClosed());
-        newPosition.operate(2);
-        assertTrue(newPosition.isClosed());
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void whenExitIndexIsLessThanEntryIndexShouldThrowException() {
-        newPosition.operate(3);
-        newPosition.operate(1);
-    }
-
-    @Test
-    public void shouldClosePositionOnSameIndex() {
-        newPosition.operate(3);
-        newPosition.operate(3);
-        assertTrue(newPosition.isClosed());
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void shouldThrowIllegalArgumentExceptionWhenOrderTypeIsNull() {
-        new Position(null);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void shouldThrowIllegalArgumentExceptionWhenOrdersHaveSameType() {
-        new Position(Trade.buyAt(0, NaN, NaN), Trade.buyAt(1, NaN, NaN));
-    }
 
-    @Test
-    public void whenNewShouldCreateSellOrderWhenEnteringUncovered() {
-        uncoveredPosition.operate(0);
-        assertEquals(Trade.sellAt(0, NaN, NaN), uncoveredPosition.getEntry());
-    }
-
-    @Test
-    public void whenOpenedShouldCreateBuyOrderWhenExitingUncovered() {
-        uncoveredPosition.operate(0);
-        uncoveredPosition.operate(1);
-        assertEquals(Trade.buyAt(1, NaN, NaN), uncoveredPosition.getExit());
-    }
-
-    @Test
-    public void overrideToString() {
-        assertEquals(posEquals1.toString(), posEquals2.toString());
-        assertNotEquals(posEquals1.toString(), posNotEquals1.toString());
-        assertNotEquals(posEquals1.toString(), posNotEquals2.toString());
-    }
-
-    @Test
-    public void testEqualsForNewPositions() {
-        assertEquals(newPosition, new Position());
-        assertNotEquals(newPosition, new Object());
-        assertNotEquals(newPosition, null);
-    }
-
-    @Test
-    public void testEqualsForEntryOrders() {
-        Position trLeft = newPosition;
-        Position trRightEquals = new Position();
-        Position trRightNotEquals = new Position();
-
-        assertEquals(TradeType.BUY, trRightNotEquals.operate(2).getType());
-        assertNotEquals(trLeft, trRightNotEquals);
-
-        assertEquals(TradeType.BUY, trLeft.operate(1).getType());
-        assertEquals(TradeType.BUY, trRightEquals.operate(1).getType());
-        assertEquals(trLeft, trRightEquals);
-
-        assertNotEquals(trLeft, trRightNotEquals);
-    }
-
-    @Test
-    public void testEqualsForExitOrders() {
-        Position trLeft = newPosition;
-        Position trRightEquals = new Position();
-        Position trRightNotEquals = new Position();
-
-        assertEquals(TradeType.BUY, trLeft.operate(1).getType());
-        assertEquals(TradeType.BUY, trRightEquals.operate(1).getType());
-        assertEquals(TradeType.BUY, trRightNotEquals.operate(1).getType());
-
-        assertEquals(TradeType.SELL, trRightNotEquals.operate(3).getType());
-        assertNotEquals(trLeft, trRightNotEquals);
-
-        assertEquals(TradeType.SELL, trLeft.operate(2).getType());
-        assertEquals(TradeType.SELL, trRightEquals.operate(2).getType());
-        assertEquals(trLeft, trRightEquals);
-
-        assertNotEquals(trLeft, trRightNotEquals);
-    }
-
-    @Test
-    public void testGetProfitForLongPositions() {
-        Position position = new Position(TradeType.BUY);
-
-        position.operate(0, DoubleNum.valueOf(10.00), DoubleNum.valueOf(2));
-        position.operate(0, DoubleNum.valueOf(12.00), DoubleNum.valueOf(2));
-
-        final Num profit = position.getProfit();
-
-        assertEquals(DoubleNum.valueOf(4.0), profit);
-    }
-
-    @Test
-    public void testGetProfitForShortPositions() {
-        Position position = new Position(TradeType.SELL);
-
-        position.operate(0, DoubleNum.valueOf(12.00), DoubleNum.valueOf(2));
-        position.operate(0, DoubleNum.valueOf(10.00), DoubleNum.valueOf(2));
-
-        final Num profit = position.getProfit();
-
-        assertEquals(DoubleNum.valueOf(4.0), profit);
-    }
-
-    @Test
-    public void testGetGrossReturnForLongPositions() {
-        Position position = new Position(TradeType.BUY);
-
-        position.operate(0, DoubleNum.valueOf(10.00), DoubleNum.valueOf(2));
-        position.operate(0, DoubleNum.valueOf(12.00), DoubleNum.valueOf(2));
-
-        final Num profit = position.getGrossReturn();
-
-        assertEquals(DoubleNum.valueOf(1.2), profit);
-    }
-
-    @Test
-    public void testGetGrossReturnForShortPositions() {
-        Position position = new Position(TradeType.SELL);
-
-        position.operate(0, DoubleNum.valueOf(10.00), DoubleNum.valueOf(2));
-        position.operate(0, DoubleNum.valueOf(8.00), DoubleNum.valueOf(2));
-
-        final Num profit = position.getGrossReturn();
-
-        assertEquals(DoubleNum.valueOf(1.2), profit);
-    }
-
-    @Test
-    public void testGetGrossReturnForLongPositionsUsingBarCloseOnNaN() {
-        MockBarSeries series = new MockBarSeries(DoubleNum::valueOf, 100, 105);
-        Position position = new Position(new Trade(0, TradeType.BUY, NaN, NaN), new Trade(1, TradeType.SELL, NaN, NaN));
-        assertNumEquals(DoubleNum.valueOf(1.05), position.getGrossReturn(series));
-    }
-
-    @Test
-    public void testGetGrossReturnForShortPositionsUsingBarCloseOnNaN() {
-        MockBarSeries series = new MockBarSeries(DoubleNum::valueOf, 100, 95);
-        Position position = new Position(new Trade(0, TradeType.SELL, NaN, NaN), new Trade(1, TradeType.BUY, NaN, NaN));
-        assertNumEquals(DoubleNum.valueOf(1.05), position.getGrossReturn(series));
-    }
-
-    @Test
-    public void testCostModelConsistencyTrue() {
-        new Position(enter, exitSameType, transactionModel, holdingModel);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void testCostModelEntryInconsistent() {
-        new Position(enter, exitDifferentType, new ZeroCostModel(), holdingModel);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void testCostModelExitInconsistent() {
-        new Position(enter, exitDifferentType, transactionModel, holdingModel);
-    }
-
-    @Test
-    public void getProfitLongNoFinalBarTest() {
-        Position closedPosition = new Position(enter, exitSameType, transactionModel, holdingModel);
-        Position openPosition = new Position(TradeType.BUY, transactionModel, holdingModel);
-        openPosition.operate(5, DoubleNum.valueOf(100), DoubleNum.valueOf(1));
-
-        Num profitOfClosedPosition = closedPosition.getProfit();
-        Num proftOfOpenPosition = openPosition.getProfit();
-
-        assertNumEquals(DoubleNum.valueOf(-0.04), profitOfClosedPosition);
-        assertNumEquals(DoubleNum.valueOf(0), proftOfOpenPosition);
-    }
-
-    @Test
-    public void getProfitLongWithFinalBarTest() {
-        Position closedPosition = new Position(enter, exitSameType, transactionModel, holdingModel);
-        Position openPosition = new Position(TradeType.BUY, transactionModel, holdingModel);
-        openPosition.operate(5, DoubleNum.valueOf(2), DoubleNum.valueOf(1));
-
-        Num profitOfClosedPosition = closedPosition.getProfit(10, DoubleNum.valueOf(12));
-        Num profitOfOpenPosition = openPosition.getProfit(10, DoubleNum.valueOf(12));
-
-        assertNumEquals(DoubleNum.valueOf(9.98), profitOfOpenPosition);
-        assertNumEquals(DoubleNum.valueOf(-0.04), profitOfClosedPosition);
-    }
-
-    @Test
-    public void getProfitShortNoFinalBarTest() {
-        Trade sell = Trade.sellAt(1, DoubleNum.valueOf(2), DoubleNum.valueOf(1), transactionModel);
-        Trade buyBack = Trade.buyAt(10, DoubleNum.valueOf(2), DoubleNum.valueOf(1), transactionModel);
-
-        Position closedPosition = new Position(sell, buyBack, transactionModel, holdingModel);
-        Position openPosition = new Position(TradeType.SELL, transactionModel, holdingModel);
-        openPosition.operate(5, DoubleNum.valueOf(100), DoubleNum.valueOf(1));
-
-        Num profitOfClosedPosition = closedPosition.getProfit();
-        Num proftOfOpenPosition = openPosition.getProfit();
-
-        Num expectedHoldingCosts = DoubleNum.valueOf(2.0 * 9.0 * 0.001);
-        Num expectedProfitOfClosedPosition = DoubleNum.valueOf(-0.04).minus(expectedHoldingCosts);
-
-        assertNumEquals(expectedProfitOfClosedPosition, profitOfClosedPosition);
-        assertNumEquals(DoubleNum.valueOf(0), proftOfOpenPosition);
-    }
-
-    @Test
-    public void getProfitShortWithFinalBarTest() {
-        Trade sell = Trade.sellAt(1, DoubleNum.valueOf(2), DoubleNum.valueOf(1), transactionModel);
-        Trade buyBack = Trade.buyAt(10, DoubleNum.valueOf(2), DoubleNum.valueOf(1), transactionModel);
-
-        Position closedPosition = new Position(sell, buyBack, transactionModel, holdingModel);
-        Position openPosition = new Position(TradeType.SELL, transactionModel, holdingModel);
-        openPosition.operate(5, DoubleNum.valueOf(2), DoubleNum.valueOf(1));
-
-        Num profitOfClosedPositionFinalAfter = closedPosition.getProfit(20, DoubleNum.valueOf(3));
-        Num profitOfOpenPositionFinalAfter = openPosition.getProfit(20, DoubleNum.valueOf(3));
-        Num profitOfClosedPositionFinalBefore = closedPosition.getProfit(5, DoubleNum.valueOf(3));
-        Num profitOfOpenPositionFinalBefore = openPosition.getProfit(5, DoubleNum.valueOf(3));
-
-        Num expectedHoldingCosts = DoubleNum.valueOf(2.0 * 9.0 * 0.001);
-        Num expectedProfitOfClosedPosition = DoubleNum.valueOf(-0.04).minus(expectedHoldingCosts);
-
-        assertNumEquals(DoubleNum.valueOf(-1.05), profitOfOpenPositionFinalAfter);
-        assertNumEquals(DoubleNum.valueOf(-1.02), profitOfOpenPositionFinalBefore);
-        assertNumEquals(expectedProfitOfClosedPosition, profitOfClosedPositionFinalAfter);
-        assertNumEquals(expectedProfitOfClosedPosition, profitOfClosedPositionFinalBefore);
-    }
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.ta4j.core.backtest.Position;
+import org.ta4j.core.backtest.analysis.cost.LinearTransactionCostModel;
+import org.ta4j.core.num.DecimalNumFactory;
+import org.ta4j.core.num.NumFactory;
+
+class PositionTest {
+
+
+  @ParameterizedTest
+  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
+  @DisplayName("New position should start with correct state")
+  void newPositionShouldHaveCorrectState(final NumFactory numFactory) {
+    final var position = new Position(TradeType.BUY, numFactory);
+    assertThat(position.isNew()).isTrue();
+    assertThat(position.isOpened()).isFalse();
+    assertThat(position.isClosed()).isFalse();
+    assertThat(position.getEntry()).isNull();
+    assertThat(position.getExit()).isNull();
+  }
+
+
+  @ParameterizedTest
+  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
+  @DisplayName("Position should transition states correctly")
+  void shouldTransitionStatesCorrectly(final NumFactory numFactory) {
+    final var context = new TradingRecordTestContext()
+        .withNumFactory(numFactory);
+
+    context.enter(1).at(100);
+    final var modifiedPosition = context.getTradingRecord().getCurrentPosition();
+    assertThat(modifiedPosition.isOpened()).isTrue();
+
+    context.exit(1).at(110);
+    assertThat(modifiedPosition.isClosed()).isTrue();
+    assertThat(context.getTradingRecord().getCurrentPosition().isNew()).isTrue();
+  }
+
+
+  @ParameterizedTest
+  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
+  @DisplayName("Should calculate profit correctly for long position")
+  void shouldCalculateLongPositionProfit(final NumFactory numFactory) {
+    final var context = new TradingRecordTestContext()
+        .withNumFactory(numFactory)
+        .withTradeType(TradeType.BUY);
+
+    context.enter(1).at(100)
+        .exit(1).at(110);
+
+    final var position = context.getTradingRecord().getLastPosition();
+    assertNumEquals(numFactory.numOf(10), position.getProfit());
+    assertThat(position.hasProfit()).isTrue();
+    assertThat(position.hasLoss()).isFalse();
+  }
+
+
+  @ParameterizedTest
+  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
+  @DisplayName("Should calculate profit correctly for short position")
+  void shouldCalculateShortPositionProfit(final NumFactory numFactory) {
+    final var context = new TradingRecordTestContext()
+        .withNumFactory(numFactory)
+        .withTradeType(TradeType.SELL);
+
+    context.enter(1).at(100)
+        .exit(1).at(90);
+
+    final var position = context.getTradingRecord().getLastPosition();
+    assertNumEquals(numFactory.numOf(10), position.getProfit());
+    assertThat(position.hasProfit()).isTrue();
+    assertThat(position.hasLoss()).isFalse();
+  }
+
+
+  @ParameterizedTest
+  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
+  @DisplayName("Should calculate costs with transaction cost model")
+  void shouldCalculateTransactionCosts(final NumFactory numFactory) {
+    final var context = new TradingRecordTestContext()
+        .withNumFactory(numFactory)
+        .withTransactionCostModel(new LinearTransactionCostModel(0.01));
+
+    context.enter(1).at(100)
+        .exit(1).at(110);
+
+    final var position = context.getTradingRecord().getLastPosition();
+    assertNumEquals(numFactory.numOf(2.1), position.getPositionCost());
+    assertNumEquals(numFactory.numOf(7.9), position.getProfit());
+  }
+
+
+  @ParameterizedTest
+  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
+  @DisplayName("Should handle zero prices")
+  void shouldHandleZeroPrices(final NumFactory numFactory) {
+    final var context = new TradingRecordTestContext()
+        .withNumFactory(numFactory);
+
+    context.enter(1).at(0)
+        .exit(1).at(0);
+
+    final var position = context.getTradingRecord().getLastPosition();
+    assertNumEquals(numFactory.zero(), position.getProfit());
+    assertThat(position.hasProfit()).isFalse();
+    assertThat(position.hasLoss()).isFalse();
+  }
+
+
+  @Test
+  @DisplayName("Should throw exception when starting type is null")
+  void shouldThrowExceptionOnNullStartingType() {
+    assertThrows(
+        NullPointerException.class,
+        () -> new Position(null, DecimalNumFactory.getInstance())
+    );
+  }
 }

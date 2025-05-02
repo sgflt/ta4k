@@ -1,7 +1,7 @@
-/**
+/*
  * The MIT License (MIT)
  *
- * Copyright (c) 2017-2023 Ta4j Organization & respective
+ * Copyright (c) 2017-2024 Ta4j Organization & respective
  * authors (see AUTHORS)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
@@ -23,66 +23,103 @@
  */
 package org.ta4j.core.criteria.pnl;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.ta4j.core.TestUtils.assertNumEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.util.function.Function;
-
-import org.junit.Test;
-import org.ta4j.core.AnalysisCriterion;
-import org.ta4j.core.BaseTradingRecord;
-import org.ta4j.core.Trade;
-import org.ta4j.core.TradingRecord;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.ta4j.core.TradeType;
+import org.ta4j.core.TradingRecordTestContext;
+import org.ta4j.core.backtest.criteria.pnl.AverageProfitCriterion;
 import org.ta4j.core.criteria.AbstractCriterionTest;
-import org.ta4j.core.mocks.MockBarSeries;
-import org.ta4j.core.num.Num;
+import org.ta4j.core.num.NumFactory;
 
-public class AverageProfitCriterionTest extends AbstractCriterionTest {
+class AverageProfitCriterionTest extends AbstractCriterionTest {
 
-    public AverageProfitCriterionTest(Function<Number, Num> numFunction) {
-        super(params -> new AverageProfitCriterion(), numFunction);
-    }
+  @ParameterizedTest
+  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
+  void calculateOnlyWithProfitPositions(final NumFactory numFactory) {
+    final var context = new TradingRecordTestContext()
+        .withNumFactory(numFactory)
+        .withTradeType(TradeType.BUY)
+        .withCriterion(new AverageProfitCriterion());
 
-    @Test
-    public void calculateOnlyWithProfitPositions() {
-        MockBarSeries series = new MockBarSeries(numFunction, 100, 105, 110, 100, 95, 105);
-        TradingRecord tradingRecord = new BaseTradingRecord(Trade.buyAt(0, series), Trade.sellAt(2, series),
-                Trade.buyAt(3, series), Trade.sellAt(5, series));
+    // First trade: buy at 100, sell at 110 (profit: +10)
+    context.enter(1).at(100)
+        .exit(1).at(110);
 
-        AnalysisCriterion avgProfit = getCriterion();
-        assertNumEquals(7.5, avgProfit.calculate(series, tradingRecord));
-    }
+    // Second trade: buy at 100, sell at 105 (profit: +5)
+    context.enter(1).at(100)
+        .exit(1).at(105);
 
-    @Test
-    public void calculateOnlyWithLossPositions() {
-        MockBarSeries series = new MockBarSeries(numFunction, 100, 95, 100, 80, 85, 70);
-        TradingRecord tradingRecord = new BaseTradingRecord(Trade.buyAt(0, series), Trade.sellAt(1, series),
-                Trade.buyAt(2, series), Trade.sellAt(5, series));
+    // Average profit should be (10 + 5) / 2 = 7.5
+    context.assertResults(7.5);
+  }
 
-        AnalysisCriterion avgProfit = getCriterion();
-        assertNumEquals(0, avgProfit.calculate(series, tradingRecord));
-    }
 
-    @Test
-    public void calculateProfitWithShortPositions() {
-        MockBarSeries series = new MockBarSeries(numFunction, 100, 85, 80, 70, 100, 95);
-        TradingRecord tradingRecord = new BaseTradingRecord(Trade.sellAt(0, series), Trade.buyAt(1, series),
-                Trade.sellAt(2, series), Trade.buyAt(5, series));
+  @ParameterizedTest
+  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
+  void calculateOnlyWithLossPositions(final NumFactory numFactory) {
+    final var context = new TradingRecordTestContext()
+        .withNumFactory(numFactory)
+        .withTradeType(TradeType.BUY)
+        .withCriterion(new AverageProfitCriterion());
 
-        AnalysisCriterion avgProfit = getCriterion();
-        assertNumEquals(15, avgProfit.calculate(series, tradingRecord));
-    }
+    // First trade: buy at 100, sell at 95 (loss: -5)
+    context.enter(1).at(100)
+        .exit(1).at(95);
 
-    @Test
-    public void betterThan() {
-        AnalysisCriterion criterion = getCriterion();
-        assertTrue(criterion.betterThan(numOf(2.0), numOf(1.5)));
-        assertFalse(criterion.betterThan(numOf(1.5), numOf(2.0)));
-    }
+    // Second trade: buy at 100, sell at 70 (loss: -30)
+    context.enter(1).at(100)
+        .exit(1).at(70);
 
-    @Test
-    public void testCalculateOneOpenPositionShouldReturnZero() {
-        openedPositionUtils.testCalculateOneOpenPositionShouldReturnExpectedValue(numFunction, getCriterion(), 0);
-    }
+    // No profits, so average profit should be 0
+    context.assertResults(0);
+  }
+
+
+  @ParameterizedTest
+  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
+  void calculateProfitWithShortPositions(final NumFactory numFactory) {
+    final var context = new TradingRecordTestContext()
+        .withNumFactory(numFactory)
+        .withTradeType(TradeType.SELL)
+        .withCriterion(new AverageProfitCriterion());
+
+    // First trade: sell at 100, buy at 85 (profit: +15)
+    context.enter(1).at(100)
+        .exit(1).at(85);
+
+    // Second trade: sell at 80, buy at 95 (loss: -15)
+    context.enter(1).at(80)
+        .exit(1).at(95);
+
+    // Average profit should be (15 + 0) / 2 = 15
+    context.assertResults(15);
+  }
+
+
+  @ParameterizedTest
+  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
+  void betterThan(final NumFactory numFactory) {
+    final var criterion = new AverageProfitCriterion();
+    assertTrue(criterion.betterThan(numFactory.numOf(2.0), numFactory.numOf(1.5)));
+    assertFalse(criterion.betterThan(numFactory.numOf(1.5), numFactory.numOf(2.0)));
+  }
+
+
+  @ParameterizedTest
+  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
+  void calculateOneOpenPosition(final NumFactory numFactory) {
+    final var context = new TradingRecordTestContext()
+        .withNumFactory(numFactory)
+        .withTradeType(TradeType.BUY)
+        .withCriterion(new AverageProfitCriterion());
+
+    // Open position without closing it
+    context.enter(1).at(100);
+
+    // Open position should return 0
+    context.assertResults(0);
+  }
 }

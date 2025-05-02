@@ -1,7 +1,7 @@
-/**
+/*
  * The MIT License (MIT)
  *
- * Copyright (c) 2017-2023 Ta4j Organization & respective
+ * Copyright (c) 2017-2024 Ta4j Organization & respective
  * authors (see AUTHORS)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
@@ -23,52 +23,40 @@
  */
 package org.ta4j.core.analysis.cost;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 import static org.ta4j.core.TestUtils.assertNumEquals;
 
-import org.junit.Test;
-import org.ta4j.core.Position;
-import org.ta4j.core.Trade;
-import org.ta4j.core.num.DoubleNum;
-import org.ta4j.core.num.Num;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.ta4j.core.TradingRecordTestContext;
+import org.ta4j.core.backtest.analysis.cost.ZeroCostModel;
+import org.ta4j.core.num.NumFactory;
 
-public class ZeroCostModelTest {
+class ZeroCostModelTest {
 
-    @Test
-    public void calculatePerPosition() {
-        // calculate costs per position
-        ZeroCostModel model = new ZeroCostModel();
+  @ParameterizedTest
+  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
+  void calculatePerPosition(final NumFactory numFactory) {
+    final var context = new TradingRecordTestContext()
+        .withNumFactory(numFactory)
+        .withTransactionCostModel(ZeroCostModel.INSTANCE)
+        .withHoldingCostModel(ZeroCostModel.INSTANCE);
 
-        int holdingPeriod = 2;
-        Trade entry = Trade.buyAt(0, DoubleNum.valueOf(100), DoubleNum.valueOf(1), model);
-        Trade exit = Trade.sellAt(holdingPeriod, DoubleNum.valueOf(110), DoubleNum.valueOf(1), model);
+    context
+        .enter(1).at(100)
+        .exit(1).at(110);
 
-        Position position = new Position(entry, exit, model, model);
-        Num cost = model.calculate(position, holdingPeriod);
+    final var position = context.getTradingRecord().getPositions().getFirst();
+    final var cost = position.getPositionCost();
 
-        assertNumEquals(cost, DoubleNum.valueOf(0));
+    assertNumEquals(numFactory.zero(), cost);
+  }
 
-    }
 
-    @Test
-    public void calculatePerPrice() {
-        // calculate costs per position
-        ZeroCostModel model = new ZeroCostModel();
-        Num cost = model.calculate(DoubleNum.valueOf(100), DoubleNum.valueOf(1));
-
-        assertNumEquals(cost, DoubleNum.valueOf(0));
-    }
-
-    @Test
-    public void testEquality() {
-        ZeroCostModel model = new ZeroCostModel();
-        CostModel modelSame = new ZeroCostModel();
-        CostModel modelOther = new LinearTransactionCostModel(0.1);
-        boolean equality = model.equals(modelSame);
-        boolean inequality = model.equals(modelOther);
-
-        assertTrue(equality);
-        assertFalse(inequality);
-    }
+  @ParameterizedTest
+  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
+  void calculatePerPrice(final NumFactory numFactory) {
+    final var model = ZeroCostModel.INSTANCE;
+    final var cost = model.calculate(numFactory.numOf(100), numFactory.numOf(1));
+    assertNumEquals(numFactory.zero(), cost);
+  }
 }

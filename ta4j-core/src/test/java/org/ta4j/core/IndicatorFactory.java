@@ -1,4 +1,4 @@
-/**
+/*
  * The MIT License (MIT)
  *
  * Copyright (c) 2017-2023 Ta4j Organization & respective
@@ -23,16 +23,19 @@
  */
 package org.ta4j.core;
 
+import org.ta4j.core.api.Indicator;
+import org.ta4j.core.backtest.BacktestBarSeries;
+
 @FunctionalInterface
-public interface IndicatorFactory<D, I> {
+public interface IndicatorFactory<I> {
 
     /**
      * Applies parameters and data to an IndicatorFactory and returns the Indicator.
-     * 
+     *
      * @param data   source data for building the indicator
      * @param params indicator parameters
      * @return Indicator<I> with the indicator parameters applied
      */
-    Indicator<I> getIndicator(D data, Object... params);
+    Indicator<I> getIndicator(BacktestBarSeries data, Object... params);
 
 }

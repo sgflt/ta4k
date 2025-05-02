@@ -1,7 +1,7 @@
-/**
+/*
  * The MIT License (MIT)
  *
- * Copyright (c) 2017-2023 Ta4j Organization & respective
+ * Copyright (c) 2017-2024 Ta4j Organization & respective
  * authors (see AUTHORS)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
@@ -23,60 +23,64 @@
  */
 package org.ta4j.core.criteria.helpers;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.ta4j.core.TestUtils.assertNumEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.util.function.Function;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.ta4j.core.MarketEventTestContext;
+import org.ta4j.core.backtest.criteria.helpers.RelativeStandardDeviationCriterion;
+import org.ta4j.core.backtest.criteria.pnl.ProfitLossCriterion;
+import org.ta4j.core.num.NumFactory;
 
-import org.junit.Test;
-import org.ta4j.core.AnalysisCriterion;
-import org.ta4j.core.BaseTradingRecord;
-import org.ta4j.core.Trade;
-import org.ta4j.core.TradingRecord;
-import org.ta4j.core.criteria.AbstractCriterionTest;
-import org.ta4j.core.criteria.pnl.ProfitLossCriterion;
-import org.ta4j.core.mocks.MockBarSeries;
-import org.ta4j.core.num.NaN;
-import org.ta4j.core.num.Num;
+class RelativeStandardDeviationCriterionTest {
 
-public class RelativeStandardDeviationCriterionTest extends AbstractCriterionTest {
+  @ParameterizedTest
+  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
+  void calculateStandardDeviationPnL(final NumFactory numFactory) {
+    final var context = new MarketEventTestContext()
+        .withNumFactory(numFactory)
+        .withCandlePrices(100, 105, 110, 100, 95, 105)
+        .toTradingRecordContext()
+        .withCriterion(new RelativeStandardDeviationCriterion(new ProfitLossCriterion()));
 
-    public RelativeStandardDeviationCriterionTest(Function<Number, Num> numFunction) {
-        super(params -> params.length == 2
-                ? new RelativeStandardDeviationCriterion((AnalysisCriterion) params[0], (boolean) params[1])
-                : new RelativeStandardDeviationCriterion((AnalysisCriterion) params[0]), numFunction);
-    }
+    context.enter(1).asap()  // buy at 100
+        .exit(1).after(2)   // sell at 110
+        .enter(1).asap()  // buy at 100
+        .exit(1).after(2);  // sell at 105
 
-    @Test
-    public void calculateStandardDeviationPnL() {
-        MockBarSeries series = new MockBarSeries(numFunction, 100, 105, 110, 100, 95, 105);
-        TradingRecord tradingRecord = new BaseTradingRecord(Trade.buyAt(0, series, series.one()),
-                Trade.sellAt(2, series, series.one()), Trade.buyAt(3, series, series.one()),
-                Trade.sellAt(5, series, series.one()));
+    context.assertResults(0.3333333333333333);
+  }
 
-        AnalysisCriterion criterion = getCriterion(new ProfitLossCriterion());
-        assertNumEquals(0.3333333333333333, criterion.calculate(series, tradingRecord));
-    }
 
-    @Test
-    public void betterThanWithLessIsBetter() {
-        AnalysisCriterion criterion = getCriterion(new ProfitLossCriterion(), true);
-        assertFalse(criterion.betterThan(numOf(5000), numOf(4500)));
-        assertTrue(criterion.betterThan(numOf(4500), numOf(5000)));
-    }
+  @ParameterizedTest
+  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
+  void betterThanWithLessIsBetter(final NumFactory numFactory) {
+    final var criterion = new RelativeStandardDeviationCriterion(new ProfitLossCriterion(), true);
+    assertFalse(criterion.betterThan(numFactory.numOf(5000), numFactory.numOf(4500)));
+    assertTrue(criterion.betterThan(numFactory.numOf(4500), numFactory.numOf(5000)));
+  }
 
-    @Test
-    public void betterThanWithLessIsNotBetter() {
-        AnalysisCriterion criterion = getCriterion(new ProfitLossCriterion());
-        assertTrue(criterion.betterThan(numOf(5000), numOf(4500)));
-        assertFalse(criterion.betterThan(numOf(4500), numOf(5000)));
-    }
 
-    @Test
-    public void testCalculateOneOpenPositionShouldReturnZero() {
-        openedPositionUtils.testCalculateOneOpenPositionShouldReturnExpectedValue(numFunction,
-                getCriterion(new ProfitLossCriterion()), NaN.NaN);
-    }
+  @ParameterizedTest
+  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
+  void betterThanWithLessIsNotBetter(final NumFactory numFactory) {
+    final var criterion = new RelativeStandardDeviationCriterion(new ProfitLossCriterion());
+    assertTrue(criterion.betterThan(numFactory.numOf(5000), numFactory.numOf(4500)));
+    assertFalse(criterion.betterThan(numFactory.numOf(4500), numFactory.numOf(5000)));
+  }
 
+
+  @ParameterizedTest
+  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
+  void oneOpenPositionShouldReturnNaN(final NumFactory numFactory) {
+    final var context = new MarketEventTestContext()
+        .withNumFactory(numFactory)
+        .withCandlePrices(100, 105)
+        .toTradingRecordContext()
+        .withCriterion(new RelativeStandardDeviationCriterion(new ProfitLossCriterion()));
+
+    context.enter(1).asap()
+        .assertResults(0.0);
+  }
 }

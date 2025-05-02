@@ -1,7 +1,7 @@
-/**
+/*
  * The MIT License (MIT)
  *
- * Copyright (c) 2017-2023 Ta4j Organization & respective
+ * Copyright (c) 2017-2024 Ta4j Organization & respective
  * authors (see AUTHORS)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
@@ -23,106 +23,75 @@
  */
 package org.ta4j.core;
 
-import static org.ta4j.core.TestUtils.assertIndicatorEquals;
-import static org.ta4j.core.TestUtils.assertIndicatorNotEquals;
 import static org.ta4j.core.TestUtils.assertNumEquals;
 import static org.ta4j.core.TestUtils.assertNumNotEquals;
 
 import java.math.BigDecimal;
-import java.time.Duration;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
-import java.util.function.Function;
 
-import org.junit.Test;
-import org.ta4j.core.indicators.AbstractIndicatorTest;
-import org.ta4j.core.indicators.helpers.ClosePriceIndicator;
-import org.ta4j.core.num.Num;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.ta4j.core.num.NumFactory;
 
-public class TestUtilsTest extends AbstractIndicatorTest<BarSeries, Num> {
+class TestUtilsTest {
 
-    private static final String stringDouble = "1234567890.12345";
-    private static final String diffStringDouble = "1234567890.12346";
-    private static final BigDecimal bigDecimalDouble = new BigDecimal(stringDouble);
-    private static final BigDecimal diffBigDecimalDouble = new BigDecimal(diffStringDouble);
-    private static final int aInt = 1234567890;
-    private static final int diffInt = 1234567891;
-    private static final double aDouble = 1234567890.1234;
-    private static final double diffDouble = 1234567890.1235;
-    private static Num numStringDouble;
-    private static Num diffNumStringDouble;
-    private static Num numInt;
-    private static Num diffNumInt;
-    private static Num numDouble;
-    private static Num diffNumDouble;
-    private static Indicator<Num> indicator;
-    private static Indicator<Num> diffIndicator;
+  private static final String STRING_DOUBLE = "1234567890.12345";
+  private static final String DIFF_STRING_DOUBLE = "1234567890.12346";
+  private static final BigDecimal BIG_DECIMAL_DOUBLE = new BigDecimal(STRING_DOUBLE);
+  private static final BigDecimal DIFF_BIG_DECIMAL_DOUBLE = new BigDecimal(DIFF_STRING_DOUBLE);
+  private static final int A_INT = 1234567890;
+  private static final int DIFF_INT = 1234567891;
+  private static final double A_DOUBLE = 1234567890.1234;
+  private static final double DIFF_DOUBLE = 1234567890.1235;
 
-    public TestUtilsTest(Function<Number, Num> numFunction) {
-        super(numFunction);
-        numStringDouble = numOf(bigDecimalDouble);
-        diffNumStringDouble = numOf(diffBigDecimalDouble);
-        numInt = numOf(aInt);
-        diffNumInt = numOf(diffInt);
-        numDouble = numOf(aDouble);
-        diffNumDouble = numOf(diffDouble);
-        BarSeries series = randomSeries();
-        BarSeries diffSeries = randomSeries();
-        indicator = new ClosePriceIndicator(series);
-        diffIndicator = new ClosePriceIndicator(diffSeries);
-    }
 
-    private BarSeries randomSeries() {
-        BaseBarSeriesBuilder builder = new BaseBarSeriesBuilder();
-        BarSeries series = builder.withNumTypeOf(numFunction).build();
-        ZonedDateTime time = ZonedDateTime.of(1970, 1, 1, 1, 1, 1, 1, ZoneId.systemDefault());
-        double random;
-        for (int i = 0; i < 1000; i++) {
-            random = Math.random();
-            time = time.plusDays(i);
-            series.addBar(new BaseBar(Duration.ofDays(1), time, random, random, random, random, random, random, 0,
-                    numFunction));
-        }
-        return series;
-    }
+  @ParameterizedTest
+  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
+  void testStringNum(final NumFactory numFactory) {
+    final var numStringDouble = numFactory.numOf(BIG_DECIMAL_DOUBLE);
+    final var diffNumStringDouble = numFactory.numOf(DIFF_BIG_DECIMAL_DOUBLE);
 
-    @Test
-    public void testStringNum() {
-        assertNumEquals(stringDouble, numStringDouble);
-        assertNumNotEquals(stringDouble, diffNumStringDouble);
-        assertNumNotEquals(diffStringDouble, numStringDouble);
-        assertNumEquals(diffStringDouble, diffNumStringDouble);
-    }
+    assertNumEquals(STRING_DOUBLE, numStringDouble);
+    assertNumNotEquals(STRING_DOUBLE, diffNumStringDouble);
+    assertNumNotEquals(DIFF_STRING_DOUBLE, numStringDouble);
+    assertNumEquals(DIFF_STRING_DOUBLE, diffNumStringDouble);
+  }
 
-    @Test
-    public void testNumNum() {
-        assertNumEquals(numStringDouble, numStringDouble);
-        assertNumNotEquals(numStringDouble, diffNumStringDouble);
-        assertNumNotEquals(diffNumStringDouble, numStringDouble);
-        assertNumEquals(diffNumStringDouble, diffNumStringDouble);
-    }
 
-    @Test
-    public void testIntNum() {
-        assertNumEquals(aInt, numInt);
-        assertNumNotEquals(aInt, diffNumInt);
-        assertNumNotEquals(diffInt, numInt);
-        assertNumEquals(diffInt, diffNumInt);
-    }
+  @ParameterizedTest
+  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
+  void testNumNum(final NumFactory numFactory) {
+    final var numStringDouble = numFactory.numOf(BIG_DECIMAL_DOUBLE);
+    final var diffNumStringDouble = numFactory.numOf(DIFF_BIG_DECIMAL_DOUBLE);
 
-    @Test
-    public void testDoubleNum() {
-        assertNumEquals(aDouble, numDouble);
-        assertNumNotEquals(aDouble, diffNumDouble);
-        assertNumNotEquals(diffDouble, numDouble);
-        assertNumEquals(diffDouble, diffNumDouble);
-    }
+    assertNumEquals(numStringDouble, numStringDouble);
+    assertNumNotEquals(numStringDouble, diffNumStringDouble);
+    assertNumNotEquals(diffNumStringDouble, numStringDouble);
+    assertNumEquals(diffNumStringDouble, diffNumStringDouble);
+  }
 
-    @Test
-    public void testIndicator() {
-        assertIndicatorEquals(indicator, indicator);
-        assertIndicatorNotEquals(indicator, diffIndicator);
-        assertIndicatorNotEquals(diffIndicator, indicator);
-        assertIndicatorEquals(diffIndicator, diffIndicator);
-    }
+
+  @ParameterizedTest
+  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
+  void testIntNum(final NumFactory numFactory) {
+    final var numInt = numFactory.numOf(A_INT);
+    final var diffNumInt = numFactory.numOf(DIFF_INT);
+
+    assertNumEquals(A_INT, numInt);
+    assertNumNotEquals(A_INT, diffNumInt);
+    assertNumNotEquals(DIFF_INT, numInt);
+    assertNumEquals(DIFF_INT, diffNumInt);
+  }
+
+
+  @ParameterizedTest
+  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
+  void testDoubleNum(final NumFactory numFactory) {
+    final var numDouble = numFactory.numOf(A_DOUBLE);
+    final var diffNumDouble = numFactory.numOf(DIFF_DOUBLE);
+
+    assertNumEquals(A_DOUBLE, numDouble);
+    assertNumNotEquals(A_DOUBLE, diffNumDouble);
+    assertNumNotEquals(DIFF_DOUBLE, numDouble);
+    assertNumEquals(DIFF_DOUBLE, diffNumDouble);
+  }
 }

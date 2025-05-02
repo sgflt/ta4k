@@ -1,7 +1,7 @@
-/**
+/*
  * The MIT License (MIT)
  *
- * Copyright (c) 2017-2023 Ta4j Organization & respective
+ * Copyright (c) 2017-2024 Ta4j Organization & respective
  * authors (see AUTHORS)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
@@ -23,83 +23,145 @@
  */
 package org.ta4j.core.criteria.pnl;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.ta4j.core.TestUtils.assertNumEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.util.function.Function;
-
-import org.junit.Test;
-import org.ta4j.core.AnalysisCriterion;
-import org.ta4j.core.BaseTradingRecord;
-import org.ta4j.core.Trade;
-import org.ta4j.core.TradingRecord;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.ta4j.core.TradeType;
+import org.ta4j.core.TradingRecordTestContext;
+import org.ta4j.core.backtest.criteria.pnl.ProfitLossPercentageCriterion;
 import org.ta4j.core.criteria.AbstractCriterionTest;
-import org.ta4j.core.mocks.MockBarSeries;
-import org.ta4j.core.num.Num;
+import org.ta4j.core.num.NumFactory;
 
-public class ProfitLossPercentageCriterionTest extends AbstractCriterionTest {
+class ProfitLossPercentageCriterionTest extends AbstractCriterionTest {
 
-    public ProfitLossPercentageCriterionTest(Function<Number, Num> numFunction) {
-        super(params -> new ProfitLossPercentageCriterion(), numFunction);
-    }
+  @ParameterizedTest
+  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
+  void calculateWithWinningLongPositions(final NumFactory numFactory) {
+    final var context = new TradingRecordTestContext()
+        .withNumFactory(numFactory)
+        .withTradeType(TradeType.BUY)
+        .withCriterion(new ProfitLossPercentageCriterion());
 
-    @Test
-    public void calculateWithWinningLongPositions() {
-        MockBarSeries series = new MockBarSeries(numFunction, 100, 105, 110, 100, 95, 105);
-        TradingRecord tradingRecord = new BaseTradingRecord(Trade.buyAt(0, series), Trade.sellAt(2, series),
-                Trade.buyAt(3, series), Trade.sellAt(5, series));
-        AnalysisCriterion profit = getCriterion();
-        assertNumEquals(10 + 5, profit.calculate(series, tradingRecord));
-    }
+    // First trade: buy at 100, sell at 110 (profit: +10%)
+    context.enter(1).at(100)
+        .exit(1).at(110);
 
-    @Test
-    public void calculateWithLosingLongPositions() {
-        MockBarSeries series = new MockBarSeries(numFunction, 100, 95, 100, 80, 85, 70);
-        TradingRecord tradingRecord = new BaseTradingRecord(Trade.buyAt(0, series), Trade.sellAt(1, series),
-                Trade.buyAt(2, series), Trade.sellAt(5, series));
+    // Second trade: buy at 100, sell at 105 (profit: +5%)
+    context.enter(1).at(100)
+        .exit(1).at(105);
 
-        AnalysisCriterion profit = getCriterion();
-        assertNumEquals(-5 + -30, profit.calculate(series, tradingRecord));
-    }
+    // Total percentage profit should be 10% + 5% = 15%
+    context.assertResults(15);
+  }
 
-    @Test
-    public void calculateWithOneWinningAndOneLosingLongPositions() {
-        MockBarSeries series = new MockBarSeries(numFunction, 100, 195, 100, 80, 85, 70);
-        TradingRecord tradingRecord = new BaseTradingRecord(Trade.buyAt(0, series), Trade.sellAt(1, series),
-                Trade.buyAt(2, series), Trade.sellAt(5, series));
 
-        AnalysisCriterion profit = getCriterion();
-        assertNumEquals(95 + -30, profit.calculate(series, tradingRecord));
-    }
+  @ParameterizedTest
+  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
+  void calculateWithLosingLongPositions(final NumFactory numFactory) {
+    final var context = new TradingRecordTestContext()
+        .withNumFactory(numFactory)
+        .withTradeType(TradeType.BUY)
+        .withCriterion(new ProfitLossPercentageCriterion());
 
-    @Test
-    public void calculateWithWinningShortPositions() {
-        MockBarSeries series = new MockBarSeries(numFunction, 100, 90, 100, 95, 95, 100);
-        TradingRecord tradingRecord = new BaseTradingRecord(Trade.sellAt(0, series), Trade.buyAt(1, series),
-                Trade.sellAt(2, series), Trade.buyAt(3, series));
-        AnalysisCriterion profit = getCriterion();
-        assertNumEquals(10 + 5, profit.calculate(series, tradingRecord));
-    }
+    // First trade: buy at 100, sell at 95 (loss: -5%)
+    context.enter(1).at(100)
+        .exit(1).at(95);
 
-    @Test
-    public void calculateWithLosingShortPositions() {
-        MockBarSeries series = new MockBarSeries(numFunction, 100, 110, 100, 105, 95, 105);
-        TradingRecord tradingRecord = new BaseTradingRecord(Trade.sellAt(0, series), Trade.buyAt(1, series),
-                Trade.sellAt(2, series), Trade.buyAt(3, series));
-        AnalysisCriterion profit = getCriterion();
-        assertNumEquals(-10 - 5, profit.calculate(series, tradingRecord));
-    }
+    // Second trade: buy at 100, sell at 70 (loss: -30%)
+    context.enter(1).at(100)
+        .exit(1).at(70);
 
-    @Test
-    public void betterThan() {
-        AnalysisCriterion criterion = getCriterion();
-        assertTrue(criterion.betterThan(numOf(50), numOf(45)));
-        assertFalse(criterion.betterThan(numOf(45), numOf(50)));
-    }
+    // Total percentage loss should be -5% + -30% = -35%
+    context.assertResults(-35);
+  }
 
-    @Test
-    public void testCalculateOneOpenPositionShouldReturnZero() {
-        openedPositionUtils.testCalculateOneOpenPositionShouldReturnExpectedValue(numFunction, getCriterion(), 0);
-    }
+
+  @ParameterizedTest
+  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
+  void calculateWithOneWinningAndOneLosingLongPositions(final NumFactory numFactory) {
+    final var context = new TradingRecordTestContext()
+        .withNumFactory(numFactory)
+        .withTradeType(TradeType.BUY)
+        .withCriterion(new ProfitLossPercentageCriterion());
+
+    // First trade: buy at 100, sell at 195 (profit: +95%)
+    context.enter(1).at(100)
+        .exit(1).at(195);
+
+    // Second trade: buy at 100, sell at 70 (loss: -30%)
+    context.enter(1).at(100)
+        .exit(1).at(70);
+
+    // Net percentage should be +95% + -30% = +65%
+    context.assertResults(65);
+  }
+
+
+  @ParameterizedTest
+  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
+  void calculateWithWinningShortPositions(final NumFactory numFactory) {
+    final var context = new TradingRecordTestContext()
+        .withNumFactory(numFactory)
+        .withTradeType(TradeType.SELL)
+        .withCriterion(new ProfitLossPercentageCriterion());
+
+    // First trade: sell at 100, buy at 90 (profit: +10%)
+    context.enter(1).at(100)
+        .exit(1).at(90);
+
+    // Second trade: sell at 100, buy at 95 (profit: +5%)
+    context.enter(1).at(100)
+        .exit(1).at(95);
+
+    // Total percentage profit should be 10% + 5% = 15%
+    context.assertResults(15);
+  }
+
+
+  @ParameterizedTest
+  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
+  void calculateWithLosingShortPositions(final NumFactory numFactory) {
+    final var context = new TradingRecordTestContext()
+        .withNumFactory(numFactory)
+        .withTradeType(TradeType.SELL)
+        .withCriterion(new ProfitLossPercentageCriterion());
+
+    // First trade: sell at 100, buy at 110 (loss: -10%)
+    context.enter(1).at(100)
+        .exit(1).at(110);
+
+    // Second trade: sell at 100, buy at 105 (loss: -5%)
+    context.enter(1).at(100)
+        .exit(1).at(105);
+
+    // Total percentage loss should be -10% + -5% = -15%
+    context.assertResults(-15);
+  }
+
+
+  @ParameterizedTest
+  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
+  void betterThan(final NumFactory numFactory) {
+    final var criterion = new ProfitLossPercentageCriterion();
+    assertTrue(criterion.betterThan(numFactory.numOf(50), numFactory.numOf(45)));
+    assertFalse(criterion.betterThan(numFactory.numOf(45), numFactory.numOf(50)));
+  }
+
+
+  @ParameterizedTest
+  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
+  void calculateOneOpenPosition(final NumFactory numFactory) {
+    final var context = new TradingRecordTestContext()
+        .withNumFactory(numFactory)
+        .withTradeType(TradeType.BUY)
+        .withCriterion(new ProfitLossPercentageCriterion());
+
+    // Open position without closing it
+    context.enter(1).at(100);
+
+    // Open position should return 0
+    context.assertResults(0);
+  }
 }

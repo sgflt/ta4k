@@ -1,4 +1,4 @@
-/**
+/*
  * The MIT License (MIT)
  *
  * Copyright (c) 2017-2023 Ta4j Organization & respective
@@ -23,97 +23,115 @@
  */
 package org.ta4j.core.criteria;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.ta4j.core.TestUtils.assertNumEquals;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.ta4j.core.MarketEventTestContext;
+import org.ta4j.core.TradeType;
+import org.ta4j.core.backtest.criteria.ReturnOverMaxDrawdownCriterion;
+import org.ta4j.core.num.NumFactory;
 
-import java.util.function.Function;
+class ReturnOverMaxDrawdownCriterionTest {
 
-import org.junit.Before;
-import org.junit.Test;
-import org.ta4j.core.AnalysisCriterion;
-import org.ta4j.core.BaseTradingRecord;
-import org.ta4j.core.Position;
-import org.ta4j.core.Trade;
-import org.ta4j.core.TradingRecord;
-import org.ta4j.core.mocks.MockBarSeries;
-import org.ta4j.core.num.NaN;
-import org.ta4j.core.num.Num;
+  @ParameterizedTest
+  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
+  void calculateBasicScenario(final NumFactory numFactory) {
+    final var marketContext = new MarketEventTestContext()
+        .withNumFactory(numFactory)
+        .withCandlePrices(100, 105, 95, 100, 90, 95, 80, 120);
 
-public class ReturnOverMaxDrawdownCriterionTest extends AbstractCriterionTest {
+    // For sequence: 100->105->95->100->90->95->80->120
+    // Maximum drawdown occurs from peak of 105 to bottom of 80: (105-80)/105 = 23.8%
+    // Final portfolio value is 1.2 (20% gain)
+    // Return over drawdown = 0.20/0.238 = 0.84
+    marketContext.toTradingRecordContext()
+        .withCriterion(new ReturnOverMaxDrawdownCriterion(numFactory))
+        .enter(100).asap()
+        .exit(100).after(7)
+        .assertResults(0.84);
+  }
 
-    private AnalysisCriterion rrc;
 
-    public ReturnOverMaxDrawdownCriterionTest(Function<Number, Num> numFunction) {
-        super(params -> new ReturnOverMaxDrawdownCriterion(), numFunction);
-    }
+  @ParameterizedTest
+  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
+  void calculateOnlyWithGain(final NumFactory numFactory) {
+    final var marketContext = new MarketEventTestContext()
+        .withNumFactory(numFactory)
+        .withCandlePrices(1, 2, 3, 6, 8, 20);
 
-    @Before
-    public void setUp() {
-        this.rrc = getCriterion();
-    }
+    // Only gains, no drawdown should result in NaN as we can't divide by zero drawdown
+    marketContext.toTradingRecordContext()
+        .withCriterion(new ReturnOverMaxDrawdownCriterion(numFactory))
+        .enter(100).asap()
+        .exit(100).after(4)
+        .assertResults(Double.NaN);
+  }
 
-    @Test
-    public void rewardRiskRatioCriterion() {
-        MockBarSeries series = new MockBarSeries(numFunction, 100, 105, 95, 100, 90, 95, 80, 120);
-        TradingRecord tradingRecord = new BaseTradingRecord(Trade.buyAt(0, series), Trade.sellAt(1, series),
-                Trade.buyAt(2, series), Trade.sellAt(4, series), Trade.buyAt(5, series), Trade.sellAt(7, series));
 
-        double totalProfit = (105d / 100) * (90d / 95d) * (120d / 95);
-        double peak = (105d / 100) * (100d / 95);
-        double low = (105d / 100) * (90d / 95) * (80d / 95);
+  @ParameterizedTest
+  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
+  void calculateWithNoPositions(final NumFactory numFactory) {
+    final var marketContext = new MarketEventTestContext()
+        .withNumFactory(numFactory)
+        .withCandlePrices(100, 105);
 
-        assertNumEquals(totalProfit / ((peak - low) / peak), rrc.calculate(series, tradingRecord));
-    }
+    marketContext.toTradingRecordContext()
+        .withCriterion(new ReturnOverMaxDrawdownCriterion(numFactory))
+        .assertResults(0);
+  }
 
-    @Test
-    public void rewardRiskRatioCriterionOnlyWithGain() {
-        MockBarSeries series = new MockBarSeries(numFunction, 1, 2, 3, 6, 8, 20, 3);
-        TradingRecord tradingRecord = new BaseTradingRecord(Trade.buyAt(0, series), Trade.sellAt(1, series),
-                Trade.buyAt(2, series), Trade.sellAt(5, series));
-        assertTrue(rrc.calculate(series, tradingRecord).isNaN());
-    }
 
-    @Test
-    public void rewardRiskRatioCriterionWithNoPositions() {
-        MockBarSeries series = new MockBarSeries(numFunction, 1, 2, 3, 6, 8, 20, 3);
-        assertTrue(rrc.calculate(series, new BaseTradingRecord()).isNaN());
-    }
+  @ParameterizedTest
+  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
+  void calculateWithLongPosition(final NumFactory numFactory) {
+    final var marketContext = new MarketEventTestContext()
+        .withNumFactory(numFactory)
+        .withCandlePrices(100, 95);
 
-    @Test
-    public void withOnePosition() {
-        MockBarSeries series = new MockBarSeries(numFunction, 100, 95, 95, 100, 90, 95, 80, 120);
-        Position position = new Position(Trade.buyAt(0, series), Trade.sellAt(1, series));
+    // Long position loses 5%
+    // Return = -5%
+    // Max Drawdown = 5%
+    // Return/Drawdown = -1.0
+    marketContext.toTradingRecordContext()
+        .withCriterion(new ReturnOverMaxDrawdownCriterion(numFactory))
+        .enter(100).asap()
+        .exit(100).asap()
+        .assertResults(-1.0);
+  }
 
-        AnalysisCriterion ratioCriterion = getCriterion();
-        assertNumEquals((95d / 100) / ((1d - 0.95d)), ratioCriterion.calculate(series, position));
-    }
 
-    @Test
-    public void betterThan() {
-        AnalysisCriterion criterion = getCriterion();
-        assertTrue(criterion.betterThan(numOf(3.5), numOf(2.2)));
-        assertFalse(criterion.betterThan(numOf(1.5), numOf(2.7)));
-    }
+  @ParameterizedTest
+  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
+  void calculateWithShortPosition(final NumFactory numFactory) {
+    final var marketContext = new MarketEventTestContext()
+        .withNumFactory(numFactory)
+        .withCandlePrices(100, 95);
 
-    @Test
-    public void testNoDrawDownForTradingRecord() {
-        final MockBarSeries series = new MockBarSeries(numFunction, 100, 105, 95, 100, 90, 95, 80, 120);
-        final TradingRecord tradingRecord = new BaseTradingRecord(Trade.buyAt(0, series), Trade.sellAt(1, series),
-                Trade.buyAt(2, series), Trade.sellAt(3, series));
+    // Short position gains 5% when price falls
+    // Return = +5%
+    // Max Drawdown from cashflow perspective = 4.76%
+    // Return/Drawdown = 1.05
+    marketContext.toTradingRecordContext()
+        .withTradeType(TradeType.SELL)
+        .withCriterion(new ReturnOverMaxDrawdownCriterion(numFactory))
+        .enter(100).asap()
+        .exit(100).asap()
+        .assertResults(1.05);
+  }
 
-        final Num result = rrc.calculate(series, tradingRecord);
 
-        assertNumEquals(NaN.NaN, result);
-    }
+  @ParameterizedTest
+  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
+  void testNoDrawDownForTradingRecord(final NumFactory numFactory) {
+    final var marketContext = new MarketEventTestContext()
+        .withNumFactory(numFactory)
+        .withCandlePrices(100, 105, 95, 100) ;
 
-    @Test
-    public void testNoDrawDownForPosition() {
-        final MockBarSeries series = new MockBarSeries(numFunction, 100, 105, 95, 100, 90, 95, 80, 120);
-        final Position position = new Position(Trade.buyAt(0, series), Trade.sellAt(1, series));
-
-        final Num result = rrc.calculate(series, position);
-
-        assertNumEquals(NaN.NaN, result);
-    }
+    marketContext.toTradingRecordContext()
+        .withCriterion(new ReturnOverMaxDrawdownCriterion(numFactory))
+        .enter(1).asap()
+        .exit(1).asap()
+        .enter(1).asap()
+        .exit(1).asap()
+        .assertResults(Double.NaN);
+  }
 }

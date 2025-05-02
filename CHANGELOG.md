@@ -5,6 +5,7 @@ Changelog for `ta4j`, roughly following [keepachangelog.com](http://keepachangel
 
 
 ## 0.16 (released May 15, 2024)
+- **Implemented inner cache for SMAIndicator**
 
 ### Breaking
 - **Upgraded to Java 11**

@@ -1,7 +1,7 @@
-/**
+/*
  * The MIT License (MIT)
  *
- * Copyright (c) 2017-2023 Ta4j Organization & respective
+ * Copyright (c) 2017-2024 Ta4j Organization & respective
  * authors (see AUTHORS)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
@@ -23,75 +23,64 @@
  */
 package org.ta4j.core.criteria;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.ta4j.core.TestUtils.assertNumEquals;
+import org.junit.jupiter.api.Test;
+import org.ta4j.core.MarketEventTestContext;
+import org.ta4j.core.backtest.criteria.ValueAtRiskCriterion;
+import org.ta4j.core.num.DoubleNumFactory;
 
-import java.util.function.Function;
+class ValueAtRiskCriterionTest {
 
-import org.junit.Test;
-import org.ta4j.core.AnalysisCriterion;
-import org.ta4j.core.BaseTradingRecord;
-import org.ta4j.core.Position;
-import org.ta4j.core.Trade;
-import org.ta4j.core.TradingRecord;
-import org.ta4j.core.mocks.MockBarSeries;
-import org.ta4j.core.num.DoubleNum;
-import org.ta4j.core.num.Num;
+  @Test
+  void calculateOnlyWithGainPositions() {
+    new MarketEventTestContext()
+        .withNumFactory(DoubleNumFactory.INSTANCE)
+        .withCandlePrices(100d, 105d, 106d, 107d, 108d, 115d)
+        .toTradingRecordContext()
+        .withSeriesRelatedCriterion(series -> new ValueAtRiskCriterion(series.getNumFactory(), 0.95))
+        .enter(1).after(1)
+        .exit(1).after(2)
+        .enter(1).after(1)
+        .exit(1).after(2)
+        .assertResults(0);
+  }
 
-public class ValueAtRiskCriterionTest extends AbstractCriterionTest {
-    private MockBarSeries series;
 
-    public ValueAtRiskCriterionTest(Function<Number, Num> numFunction) {
-        // LOG returns requre DoubleNum implementation
-        super(params -> new ValueAtRiskCriterion(0.95), DoubleNum::valueOf);
-    }
+  @Test
+  void calculateWithASimplePosition() {
+    new MarketEventTestContext()
+        .withNumFactory(DoubleNumFactory.INSTANCE)
+        .withCandlePrices(100d, 104d, 90d, 100d, 95d, 105d)
+        .toTradingRecordContext()
+        .withSeriesRelatedCriterion(series -> new ValueAtRiskCriterion(series.getNumFactory(), 0.95))
+        .enter(1).after(2)
+        .exit(1).after(1)
+        .assertResults(90. / 104. - 1.);
+  }
 
-    @Test
-    public void calculateOnlyWithGainPositions() {
-        series = new MockBarSeries(numFunction, 100d, 105d, 106d, 107d, 108d, 115d);
-        TradingRecord tradingRecord = new BaseTradingRecord(Trade.buyAt(0, series), Trade.sellAt(2, series),
-                Trade.buyAt(3, series), Trade.sellAt(5, series));
-        AnalysisCriterion varCriterion = getCriterion();
-        assertNumEquals(numOf(0.0), varCriterion.calculate(series, tradingRecord));
-    }
 
-    @Test
-    public void calculateWithASimplePosition() {
-        series = new MockBarSeries(numFunction, 100d, 104d, 90d, 100d, 95d, 105d);
-        TradingRecord tradingRecord = new BaseTradingRecord(Trade.buyAt(0, series), Trade.sellAt(2, series));
-        AnalysisCriterion varCriterion = getCriterion();
-        assertNumEquals(numOf(Math.log(90d / 104)), varCriterion.calculate(series, tradingRecord));
-    }
+  @Test
+  void calculateOnlyWithLossPositions() {
+    new MarketEventTestContext()
+        .withNumFactory(DoubleNumFactory.INSTANCE)
+        .withCandlePrices(0, 100d, 95d, 100d, 80d, 85d, 70d)
+        .toTradingRecordContext()
+        .withSeriesRelatedCriterion(series -> new ValueAtRiskCriterion(series.getNumFactory(), 0.95))
+        .enter(1).after(2)
+        .exit(1).after(1)
+        .enter(1).after(1)
+        .exit(1).after(3)
+        .assertResults(80. / 100. - 1.);
+  }
 
-    @Test
-    public void calculateOnlyWithLossPositions() {
-        series = new MockBarSeries(numFunction, 100d, 95d, 100d, 80d, 85d, 70d);
-        TradingRecord tradingRecord = new BaseTradingRecord(Trade.buyAt(0, series), Trade.sellAt(1, series),
-                Trade.buyAt(2, series), Trade.sellAt(5, series));
-        AnalysisCriterion varCriterion = getCriterion();
-        assertNumEquals(numOf(Math.log(80d / 100)), varCriterion.calculate(series, tradingRecord));
-    }
 
-    @Test
-    public void calculateWithNoBarsShouldReturn0() {
-        series = new MockBarSeries(numFunction, 100d, 95d, 100d, 80d, 85d, 70d);
-        AnalysisCriterion varCriterion = getCriterion();
-        assertNumEquals(numOf(0), varCriterion.calculate(series, new BaseTradingRecord()));
-    }
+  @Test
+  void calculateWithNoTrades() {
+    final var context = new MarketEventTestContext()
+        .withNumFactory(DoubleNumFactory.INSTANCE)
+        .withCandlePrices(0, 100d, 95d, 100d, 80d, 85d, 70d)
+        .toTradingRecordContext()
+        .withSeriesRelatedCriterion(series -> new ValueAtRiskCriterion(series.getNumFactory(), 0.95));
 
-    @Test
-    public void calculateWithBuyAndHold() {
-        series = new MockBarSeries(numFunction, 100d, 99d);
-        Position position = new Position(Trade.buyAt(0, series), Trade.sellAt(1, series));
-        AnalysisCriterion varCriterion = getCriterion();
-        assertNumEquals(numOf(Math.log(99d / 100)), varCriterion.calculate(series, position));
-    }
-
-    @Test
-    public void betterThan() {
-        AnalysisCriterion criterion = getCriterion();
-        assertTrue(criterion.betterThan(numOf(-0.1), numOf(-0.2)));
-        assertFalse(criterion.betterThan(numOf(-0.1), numOf(0.0)));
-    }
+    context.assertResults(0);
+  }
 }

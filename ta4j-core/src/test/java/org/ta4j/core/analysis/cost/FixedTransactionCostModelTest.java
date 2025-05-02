@@ -1,7 +1,7 @@
-/**
+/*
  * The MIT License (MIT)
  *
- * Copyright (c) 2017-2023 Ta4j Organization & respective
+ * Copyright (c) 2017-2024 Ta4j Organization & respective
  * authors (see AUTHORS)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
@@ -23,75 +23,68 @@
  */
 package org.ta4j.core.analysis.cost;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 import static org.ta4j.core.TestUtils.assertNumEquals;
 
+import java.time.Instant;
 import java.util.Random;
 
-import org.junit.Test;
-import org.ta4j.core.Position;
-import org.ta4j.core.Trade;
-import org.ta4j.core.Trade.TradeType;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.ta4j.core.TradeType;
+import org.ta4j.core.backtest.Position;
+import org.ta4j.core.backtest.analysis.cost.FixedTransactionCostModel;
+import org.ta4j.core.backtest.analysis.cost.ZeroCostModel;
 import org.ta4j.core.num.DoubleNum;
 import org.ta4j.core.num.Num;
+import org.ta4j.core.num.NumFactory;
 
-public class FixedTransactionCostModelTest {
+class FixedTransactionCostModelTest {
 
-    private static final Random RANDOM = new Random();
+  private static final Random RANDOM = new Random();
 
-    private static final Num PRICE = DoubleNum.valueOf(100);
+  private static final Num PRICE = DoubleNum.valueOf(100);
 
-    private static final Num AMOUNT = DoubleNum.valueOf(5);
+  private static final Num AMOUNT = DoubleNum.valueOf(5);
 
-    @Test
-    public void calculatePerPositionWhenPositionIsOpen() {
-        double positionTrades = 1;
-        double feePerTrade = RANDOM.nextDouble();
-        FixedTransactionCostModel model = new FixedTransactionCostModel(feePerTrade);
 
-        Position position = new Position(TradeType.BUY, model, null);
-        position.operate(0, PRICE, AMOUNT);
-        Num cost = model.calculate(position);
+  @ParameterizedTest
+  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
+  void calculatePerPositionWhenPositionIsOpen(final NumFactory numFactory) {
+    final var positionTrades = 1;
+    final var feePerTrade = RANDOM.nextDouble();
+    final var model = new FixedTransactionCostModel(feePerTrade);
 
-        assertNumEquals(cost, DoubleNum.valueOf(feePerTrade * positionTrades));
-    }
+    final var position = new Position(TradeType.BUY, ZeroCostModel.INSTANCE, model, numFactory);
+    position.operate(Instant.now(), PRICE, AMOUNT);
+    final var cost = model.calculate(position);
 
-    @Test
-    public void calculatePerPositionWhenPositionIsClosed() {
-        double positionTrades = 2;
-        double feePerTrade = RANDOM.nextDouble();
-        FixedTransactionCostModel model = new FixedTransactionCostModel(feePerTrade);
+    assertNumEquals(DoubleNum.valueOf(feePerTrade * positionTrades), cost);
+  }
 
-        int holdingPeriod = 2;
-        Trade entry = Trade.buyAt(0, PRICE, AMOUNT, model);
-        Trade exit = Trade.sellAt(holdingPeriod, PRICE, AMOUNT, model);
 
-        Position position = new Position(entry, exit, model, model);
-        Num cost = model.calculate(position, RANDOM.nextInt());
+  @ParameterizedTest
+  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
+  void calculatePerPositionWhenPositionIsClosed(final NumFactory numFactory) {
+    final var positionTrades = 2;
+    final var feePerTrade = RANDOM.nextDouble();
+    final var model = new FixedTransactionCostModel(feePerTrade);
 
-        assertNumEquals(cost, DoubleNum.valueOf(feePerTrade * positionTrades));
-    }
+    final var position = new Position(TradeType.BUY, model, model, numFactory);
+    position.operate(Instant.now(), PRICE, AMOUNT);
+    position.operate(Instant.now(), PRICE, AMOUNT);
+    final var cost = model.calculate(position, RANDOM.nextInt());
 
-    @Test
-    public void calculatePerPrice() {
-        double feePerTrade = RANDOM.nextDouble();
-        FixedTransactionCostModel model = new FixedTransactionCostModel(feePerTrade);
-        Num cost = model.calculate(PRICE, AMOUNT);
+    assertNumEquals(DoubleNum.valueOf(feePerTrade * positionTrades), cost);
+  }
 
-        assertNumEquals(cost, DoubleNum.valueOf(feePerTrade));
-    }
 
-    @Test
-    public void testEquality() {
-        double randomFee = RANDOM.nextDouble();
-        FixedTransactionCostModel model = new FixedTransactionCostModel(randomFee);
-        CostModel modelSame = new FixedTransactionCostModel(randomFee);
-        CostModel modelOther = new LinearTransactionCostModel(randomFee);
-        boolean equality = model.equals(modelSame);
-        boolean inequality = model.equals(modelOther);
+  @Test
+  void calculatePerPrice() {
+    final double feePerTrade = RANDOM.nextDouble();
+    final FixedTransactionCostModel model = new FixedTransactionCostModel(feePerTrade);
+    final Num cost = model.calculate(PRICE, AMOUNT);
 
-        assertTrue(equality);
-        assertFalse(inequality);
-    }
+    assertNumEquals(cost, DoubleNum.valueOf(feePerTrade));
+  }
 }

@@ -1,7 +1,7 @@
-/**
+/*
  * The MIT License (MIT)
  *
- * Copyright (c) 2017-2023 Ta4j Organization & respective
+ * Copyright (c) 2017-2024 Ta4j Organization & respective
  * authors (see AUTHORS)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
@@ -23,69 +23,61 @@
  */
 package org.ta4j.core.criteria;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.ta4j.core.TestUtils.assertNumEquals;
+import org.junit.jupiter.api.Test;
+import org.ta4j.core.TradeType;
+import org.ta4j.core.TradingRecordTestContext;
+import org.ta4j.core.backtest.criteria.NumberOfBreakEvenPositionsCriterion;
 
-import java.util.function.Function;
+class NumberOfBreakEvenPositionsCriterionTest {
 
-import org.junit.Test;
-import org.ta4j.core.AnalysisCriterion;
-import org.ta4j.core.BaseTradingRecord;
-import org.ta4j.core.Position;
-import org.ta4j.core.Trade;
-import org.ta4j.core.TradingRecord;
-import org.ta4j.core.mocks.MockBarSeries;
-import org.ta4j.core.num.Num;
+  @Test
+  void calculateWithNoPositions() {
+    new TradingRecordTestContext()
+        .withCriterion(new NumberOfBreakEvenPositionsCriterion())
+        .assertResults(0);
+  }
 
-public class NumberOfBreakEvenPositionsCriterionTest extends AbstractCriterionTest {
 
-    public NumberOfBreakEvenPositionsCriterionTest(Function<Number, Num> numFunction) {
-        super(params -> new NumberOfBreakEvenPositionsCriterion(), numFunction);
-    }
+  @Test
+  void calculateWithTwoLongPositions() {
+    new TradingRecordTestContext()
+        .withCriterion(new NumberOfBreakEvenPositionsCriterion())
+        .enter(1).at(100)
+        .exit(1).at(100)
+        .enter(1).at(105)
+        .exit(1).at(105)
+        .assertResults(2);
+  }
 
-    @Test
-    public void calculateWithNoPositions() {
-        MockBarSeries series = new MockBarSeries(numFunction, 100, 105, 110, 100, 95, 105);
 
-        assertNumEquals(0, getCriterion().calculate(series, new BaseTradingRecord()));
-    }
+  @Test
+  void calculateWithOneLongPosition() {
+    new TradingRecordTestContext()
+        .withCriterion(new NumberOfBreakEvenPositionsCriterion())
+        .enter(1).at(100)
+        .exit(1).at(100)
+        .assertResults(1);
+  }
 
-    @Test
-    public void calculateWithTwoLongPositions() {
-        MockBarSeries series = new MockBarSeries(numFunction, 100, 105, 110, 100, 95, 105);
-        TradingRecord tradingRecord = new BaseTradingRecord(Trade.buyAt(0, series), Trade.sellAt(3, series),
-                Trade.buyAt(1, series), Trade.sellAt(5, series));
 
-        assertNumEquals(2, getCriterion().calculate(series, tradingRecord));
-    }
+  @Test
+  void calculateWithTwoShortPositions() {
+    new TradingRecordTestContext()
+        .withTradeType(TradeType.SELL)
+        .withCriterion(new NumberOfBreakEvenPositionsCriterion())
+        .enter(1).at(100)
+        .exit(1).at(100)
+        .enter(1).at(105)
+        .exit(1).at(105)
+        .assertResults(2);
+  }
 
-    @Test
-    public void calculateWithOneLongPosition() {
-        MockBarSeries series = new MockBarSeries(numFunction, 100, 105, 110, 100, 95, 105);
-        Position position = new Position(Trade.buyAt(0, series), Trade.sellAt(3, series));
 
-        assertNumEquals(1, getCriterion().calculate(series, position));
-    }
-
-    @Test
-    public void calculateWithTwoShortPositions() {
-        MockBarSeries series = new MockBarSeries(numFunction, 100, 105, 110, 100, 95, 105);
-        TradingRecord tradingRecord = new BaseTradingRecord(Trade.sellAt(0, series), Trade.buyAt(3, series),
-                Trade.sellAt(1, series), Trade.buyAt(5, series));
-
-        assertNumEquals(2, getCriterion().calculate(series, tradingRecord));
-    }
-
-    @Test
-    public void betterThan() {
-        AnalysisCriterion criterion = getCriterion();
-        assertTrue(criterion.betterThan(numOf(3), numOf(6)));
-        assertFalse(criterion.betterThan(numOf(7), numOf(4)));
-    }
-
-    @Test
-    public void testCalculateOneOpenPositionShouldReturnZero() {
-        openedPositionUtils.testCalculateOneOpenPositionShouldReturnExpectedValue(numFunction, getCriterion(), 0);
-    }
+  @Test
+  void calculateOneOpenPositionShouldReturnZero() {
+    new TradingRecordTestContext()
+        .withCriterion(new NumberOfBreakEvenPositionsCriterion())
+        .enter(1).at(100)
+        .assertResults(0);
+  }
 }

@@ -1,7 +1,7 @@
-/**
+/*
  * The MIT License (MIT)
  *
- * Copyright (c) 2017-2023 Ta4j Organization & respective
+ * Copyright (c) 2017-2024 Ta4j Organization & respective
  * authors (see AUTHORS)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
@@ -23,66 +23,82 @@
  */
 package org.ta4j.core.criteria;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.ta4j.core.TestUtils.assertNumEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.function.Function;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.ta4j.core.MarketEventTestContext;
+import org.ta4j.core.backtest.criteria.NumberOfPositionsCriterion;
+import org.ta4j.core.num.NumFactory;
 
-import org.junit.Test;
-import org.ta4j.core.AnalysisCriterion;
-import org.ta4j.core.BaseTradingRecord;
-import org.ta4j.core.Position;
-import org.ta4j.core.Trade;
-import org.ta4j.core.TradingRecord;
-import org.ta4j.core.mocks.MockBarSeries;
-import org.ta4j.core.num.Num;
+class NumberOfPositionsCriterionTest {
 
-public class NumberOfPositionsCriterionTest extends AbstractCriterionTest {
+  @ParameterizedTest
+  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
+  void calculateWithNoPositions(final NumFactory numFactory) {
+    final var marketContext = new MarketEventTestContext()
+        .withNumFactory(numFactory)
+        .withCandlePrices(100, 105, 110, 100, 95, 105);
 
-    public NumberOfPositionsCriterionTest(Function<Number, Num> numFunction) {
-        super(params -> params.length == 0 ? new NumberOfPositionsCriterion()
-                : new NumberOfPositionsCriterion((boolean) params[0]), numFunction);
-    }
+    final var context = marketContext.toTradingRecordContext()
+        .withCriterion(new NumberOfPositionsCriterion());
 
-    @Test
-    public void calculateWithNoPositions() {
-        MockBarSeries series = new MockBarSeries(numFunction, 100, 105, 110, 100, 95, 105);
+    context.assertResults(0);
+  }
 
-        AnalysisCriterion buyAndHold = getCriterion();
-        assertNumEquals(0, buyAndHold.calculate(series, new BaseTradingRecord()));
-    }
 
-    @Test
-    public void calculateWithTwoPositions() {
-        MockBarSeries series = new MockBarSeries(numFunction, 100, 105, 110, 100, 95, 105);
-        TradingRecord tradingRecord = new BaseTradingRecord(Trade.buyAt(0, series), Trade.sellAt(2, series),
-                Trade.buyAt(3, series), Trade.sellAt(5, series));
+  @ParameterizedTest
+  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
+  void calculateWithTwoPositions(final NumFactory numFactory) {
+    final var marketContext = new MarketEventTestContext()
+        .withNumFactory(numFactory)
+        .withCandlePrices(100, 105, 110, 100, 95, 105);
 
-        AnalysisCriterion buyAndHold = getCriterion();
-        assertNumEquals(2, buyAndHold.calculate(series, tradingRecord));
-    }
+    final var context = marketContext.toTradingRecordContext()
+        .withCriterion(new NumberOfPositionsCriterion());
 
-    @Test
-    public void calculateWithOnePosition() {
-        MockBarSeries series = new MockBarSeries(numFunction, 100, 105, 110, 100, 95, 105);
-        Position position = new Position();
-        AnalysisCriterion positionsCriterion = getCriterion();
+    context
+        .enter(1).asap()
+        .exit(1).after(2)
+        .enter(1).after(1)
+        .exit(1).after(2);
 
-        assertNumEquals(1, positionsCriterion.calculate(series, position));
-    }
+    context.assertResults(2);
+  }
 
-    @Test
-    public void betterThanWithLessIsBetter() {
-        AnalysisCriterion criterion = getCriterion();
-        assertTrue(criterion.betterThan(numOf(3), numOf(6)));
-        assertFalse(criterion.betterThan(numOf(7), numOf(4)));
-    }
 
-    @Test
-    public void betterThanWithLessIsNotBetter() {
-        AnalysisCriterion criterion = getCriterion(false);
-        assertFalse(criterion.betterThan(numOf(3), numOf(6)));
-        assertTrue(criterion.betterThan(numOf(7), numOf(4)));
-    }
+  @ParameterizedTest
+  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
+  void calculateWithOnePosition(final NumFactory numFactory) {
+    final var marketContext = new MarketEventTestContext()
+        .withNumFactory(numFactory)
+        .withCandlePrices(100, 105, 110, 100, 95, 105);
+
+    final var context = marketContext.toTradingRecordContext()
+        .withCriterion(new NumberOfPositionsCriterion());
+
+    context
+        .enter(1).asap()
+        .exit(1).after(2);
+
+    context.assertResults(1);
+  }
+
+
+  @ParameterizedTest
+  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
+  void betterThanWithLessIsBetter(final NumFactory numFactory) {
+    final var criterion = new NumberOfPositionsCriterion();
+    assertThat(criterion.betterThan(numFactory.numOf(3), numFactory.numOf(6))).isTrue();
+    assertThat(criterion.betterThan(numFactory.numOf(7), numFactory.numOf(4))).isFalse();
+  }
+
+
+  @ParameterizedTest
+  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
+  void betterThanWithLessIsNotBetter(final NumFactory numFactory) {
+    final var criterion = new NumberOfPositionsCriterion(false);
+    assertThat(criterion.betterThan(numFactory.numOf(3), numFactory.numOf(6))).isFalse();
+    assertThat(criterion.betterThan(numFactory.numOf(7), numFactory.numOf(4))).isTrue();
+  }
 }

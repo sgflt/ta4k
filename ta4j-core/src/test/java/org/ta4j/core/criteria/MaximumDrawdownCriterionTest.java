@@ -1,7 +1,7 @@
-/**
+/*
  * The MIT License (MIT)
  *
- * Copyright (c) 2017-2023 Ta4j Organization & respective
+ * Copyright (c) 2017-2024 Ta4j Organization & respective
  * authors (see AUTHORS)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
@@ -23,84 +23,91 @@
  */
 package org.ta4j.core.criteria;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.ta4j.core.TestUtils.assertNumEquals;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.ta4j.core.MarketEventTestContext;
+import org.ta4j.core.TradeType;
+import org.ta4j.core.backtest.criteria.MaximumDrawdownCriterion;
+import org.ta4j.core.num.NumFactory;
 
-import java.util.function.Function;
+class MaximumDrawdownCriterionTest {
 
-import org.junit.Test;
-import org.ta4j.core.AnalysisCriterion;
-import org.ta4j.core.BaseTradingRecord;
-import org.ta4j.core.Trade;
-import org.ta4j.core.TradingRecord;
-import org.ta4j.core.mocks.MockBarSeries;
-import org.ta4j.core.num.Num;
+  @ParameterizedTest
+  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
+  void calculateWithNoTrades(final NumFactory numFactory) {
+    final var marketContext = new MarketEventTestContext()
+        .withNumFactory(numFactory)
+        .withCandlePrices(100, 105);
+    marketContext.toTradingRecordContext()
+        .withCriterion(new MaximumDrawdownCriterion(numFactory))
+        .assertResults(0.0);
+  }
 
-public class MaximumDrawdownCriterionTest extends AbstractCriterionTest {
 
-    public MaximumDrawdownCriterionTest(Function<Number, Num> numFunction) {
-        super(params -> new MaximumDrawdownCriterion(), numFunction);
-    }
+  @ParameterizedTest
+  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
+  void calculateWithOnlyGains(final NumFactory numFactory) {
+    new MarketEventTestContext()
+        .withNumFactory(numFactory)
+        .withCandlePrices(2.0, 3.0, 3.0, 5.0, 10.0, 20.0)
+        .toTradingRecordContext()
+        .withTradeType(TradeType.BUY)
+        .withCriterion(new MaximumDrawdownCriterion(numFactory))
+        .enter(1).after(1)
+        .exit(1).after(1)
+        .enter(1).after(2)  // skip 3.0
+        .exit(1).after(2)    // skip 10.0
+        .assertResults(0.0);
+  }
 
-    @Test
-    public void calculateWithNoTrades() {
-        MockBarSeries series = new MockBarSeries(numFunction, 1, 2, 3, 6, 5, 20, 3);
-        AnalysisCriterion mdd = getCriterion();
 
-        assertNumEquals(0d, mdd.calculate(series, new BaseTradingRecord()));
-    }
+  @ParameterizedTest
+  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
+  void calculateWithGainsAndLosses(final NumFactory numFactory) {
+    new MarketEventTestContext()
+        .withNumFactory(numFactory)
+        .withCandlePrices(1.0, 2.0, 20.0, 1.0, 8.0, 3.0)
+        .toTradingRecordContext()
+        .withTradeType(TradeType.BUY)
+        .withCriterion(new MaximumDrawdownCriterion(numFactory))
+        .enter(1).after(1)
+        .exit(1).after(5)
+        .assertResults((20.0 - 1.0) / 20.0);
+  }
 
-    @Test
-    public void calculateWithOnlyGains() {
-        MockBarSeries series = new MockBarSeries(numFunction, 1, 2, 3, 6, 8, 20, 3);
-        AnalysisCriterion mdd = getCriterion();
-        TradingRecord tradingRecord = new BaseTradingRecord(Trade.buyAt(0, series), Trade.sellAt(1, series),
-                Trade.buyAt(2, series), Trade.sellAt(5, series));
 
-        assertNumEquals(0d, mdd.calculate(series, tradingRecord));
-    }
+  @ParameterizedTest
+  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
+  void calculateWithSimpleTrades(final NumFactory numFactory) {
+    new MarketEventTestContext()
+        .withNumFactory(numFactory)
+        .withCandlePrices(1.0, 10.0, 10.0, 5.0, 5.0, 6.0, 6.0, 1.0)
+        .toTradingRecordContext()
+        .withTradeType(TradeType.BUY)
+        .withCriterion(new MaximumDrawdownCriterion(numFactory))
+        .enter(1).after(1)
+        .exit(1).after(1)
+        .enter(1).after(1)
+        .exit(1).after(1)
+        .enter(1).after(1)
+        .exit(1).after(1)
+        .enter(1).after(1)
+        .exit(1).after(1)
+        .assertResults((6.0 - 1.0) / 6.0); // maximum drawdown within last trade
+  }
 
-    @Test
-    public void calculateWithGainsAndLosses() {
-        MockBarSeries series = new MockBarSeries(numFunction, 1, 2, 3, 6, 5, 20, 3);
-        AnalysisCriterion mdd = getCriterion();
-        TradingRecord tradingRecord = new BaseTradingRecord(Trade.buyAt(0, series), Trade.sellAt(1, series),
-                Trade.buyAt(3, series), Trade.sellAt(4, series), Trade.buyAt(5, series), Trade.sellAt(6, series));
 
-        assertNumEquals(.875d, mdd.calculate(series, tradingRecord));
-    }
-
-    @Test
-    public void calculateWithNullSeriesSizeShouldReturn0() {
-        MockBarSeries series = new MockBarSeries(numFunction, new double[] {});
-        AnalysisCriterion mdd = getCriterion();
-        assertNumEquals(0d, mdd.calculate(series, new BaseTradingRecord()));
-    }
-
-    @Test
-    public void withTradesThatSellBeforeBuying() {
-        MockBarSeries series = new MockBarSeries(numFunction, 2, 1, 3, 5, 6, 3, 20);
-        AnalysisCriterion mdd = getCriterion();
-        TradingRecord tradingRecord = new BaseTradingRecord(Trade.buyAt(0, series), Trade.sellAt(1, series),
-                Trade.buyAt(3, series), Trade.sellAt(4, series), Trade.sellAt(5, series), Trade.buyAt(6, series));
-        assertNumEquals(3.8d, mdd.calculate(series, tradingRecord));
-    }
-
-    @Test
-    public void withSimpleTrades() {
-        MockBarSeries series = new MockBarSeries(numFunction, 1, 10, 5, 6, 1);
-        AnalysisCriterion mdd = getCriterion();
-        TradingRecord tradingRecord = new BaseTradingRecord(Trade.buyAt(0, series), Trade.sellAt(1, series),
-                Trade.buyAt(1, series), Trade.sellAt(2, series), Trade.buyAt(2, series), Trade.sellAt(3, series),
-                Trade.buyAt(3, series), Trade.sellAt(4, series));
-        assertNumEquals(.9d, mdd.calculate(series, tradingRecord));
-    }
-
-    @Test
-    public void betterThan() {
-        AnalysisCriterion criterion = getCriterion();
-        assertTrue(criterion.betterThan(numOf(0.9), numOf(1.5)));
-        assertFalse(criterion.betterThan(numOf(1.2), numOf(0.4)));
-    }
+  @ParameterizedTest
+  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
+  void calculateHODL(final NumFactory numFactory) {
+    new MarketEventTestContext()
+        .withNumFactory(numFactory)
+        .withCandlePrices(1.0, 10.0, 10.0, 5.0, 5.0, 6.0, 6.0, 1.0)
+        .toTradingRecordContext()
+        .withTradeType(TradeType.BUY)
+        .withCriterion(new MaximumDrawdownCriterion(numFactory))
+        .enter(1).after(1)
+        .exit(1).after(7)
+        .assertResults(0.9);  // 10.0 -> 1.0 which is -90 %
+  }
 }

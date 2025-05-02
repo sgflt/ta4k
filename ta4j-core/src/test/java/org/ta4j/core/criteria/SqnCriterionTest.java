@@ -1,7 +1,7 @@
-/**
+/*
  * The MIT License (MIT)
  *
- * Copyright (c) 2017-2023 Ta4j Organization & respective
+ * Copyright (c) 2017-2024 Ta4j Organization & respective
  * authors (see AUTHORS)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
@@ -23,86 +23,129 @@
  */
 package org.ta4j.core.criteria;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.ta4j.core.TestUtils.assertNumEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.function.Function;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.ta4j.core.MarketEventTestContext;
+import org.ta4j.core.TradeType;
+import org.ta4j.core.backtest.criteria.SqnCriterion;
+import org.ta4j.core.num.NumFactory;
 
-import org.junit.Test;
-import org.ta4j.core.AnalysisCriterion;
-import org.ta4j.core.BaseTradingRecord;
-import org.ta4j.core.Trade;
-import org.ta4j.core.TradingRecord;
-import org.ta4j.core.mocks.MockBarSeries;
-import org.ta4j.core.num.Num;
+class SqnCriterionTest {
 
-public class SqnCriterionTest extends AbstractCriterionTest {
+  @ParameterizedTest
+  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
+  void calculateWithWinningLongPositions(final NumFactory factory) {
+    final var context = new MarketEventTestContext()
+        .withNumFactory(factory)
+        .withCandlePrices(100, 105, 110, 100, 95, 105);
 
-    public SqnCriterionTest(Function<Number, Num> numFunction) {
-        super(params -> new SqnCriterion(), numFunction);
-    }
+    final var tradingContext = context.toTradingRecordContext()
+        .withCriterion(new SqnCriterion())
+        .enter(1.0).asap()
+        .exit(1.0).after(2)
+        .enter(1.0).asap()
+        .exit(1.0).after(2);
 
-    @Test
-    public void calculateWithWinningLongPositions() {
-        MockBarSeries series = new MockBarSeries(numFunction, 100, 105, 110, 100, 95, 105);
-        TradingRecord tradingRecord = new BaseTradingRecord(Trade.buyAt(0, series), Trade.sellAt(2, series),
-                Trade.buyAt(3, series), Trade.sellAt(5, series));
+    tradingContext.assertResults(4.242640687119286);
+  }
 
-        AnalysisCriterion sqnCriterion = getCriterion();
-        assertNumEquals(4.242640687119286, sqnCriterion.calculate(series, tradingRecord));
-    }
 
-    @Test
-    public void calculateWithLosingLongPositions() {
-        MockBarSeries series = new MockBarSeries(numFunction, 100, 95, 100, 80, 85, 70);
-        TradingRecord tradingRecord = new BaseTradingRecord(Trade.buyAt(0, series), Trade.sellAt(1, series),
-                Trade.buyAt(2, series), Trade.sellAt(5, series));
+  @ParameterizedTest
+  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
+  void calculateWithLosingLongPositions(final NumFactory factory) {
+    final var context = new MarketEventTestContext()
+        .withNumFactory(factory)
+        .withCandlePrices(100, 95, 100, 80, 85, 70);
 
-        AnalysisCriterion sqnCriterion = getCriterion();
-        assertNumEquals(-1.9798989873223332, sqnCriterion.calculate(series, tradingRecord));
-    }
+    final var tradingContext = context.toTradingRecordContext()
+        .withCriterion(new SqnCriterion())
+        .enter(1.0).asap()
+        .exit(1.0).asap()
+        .enter(1.0).asap()
+        .exit(1.0).after(3);
 
-    @Test
-    public void calculateWithOneWinningAndOneLosingLongPositions() {
-        MockBarSeries series = new MockBarSeries(numFunction, 100, 195, 100, 80, 85, 70);
-        TradingRecord tradingRecord = new BaseTradingRecord(Trade.buyAt(0, series), Trade.sellAt(1, series),
-                Trade.buyAt(2, series), Trade.sellAt(5, series));
+    tradingContext.assertResults(-1.9798989873223332);
+  }
 
-        AnalysisCriterion sqnCriterion = getCriterion();
-        assertNumEquals(0.7353910524340095, sqnCriterion.calculate(series, tradingRecord));
-    }
 
-    @Test
-    public void calculateWithWinningShortPositions() {
-        MockBarSeries series = new MockBarSeries(numFunction, 100, 90, 100, 95, 95, 100);
-        TradingRecord tradingRecord = new BaseTradingRecord(Trade.sellAt(0, series), Trade.buyAt(1, series),
-                Trade.sellAt(2, series), Trade.buyAt(3, series));
+  @ParameterizedTest
+  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
+  void calculateWithOneWinningAndOneLosingLongPositions(final NumFactory factory) {
+    final var context = new MarketEventTestContext()
+        .withNumFactory(factory)
+        .withCandlePrices(100, 195, 100, 80, 85, 70);
 
-        AnalysisCriterion sqnCriterion = getCriterion();
-        assertNumEquals(4.242640687119286, sqnCriterion.calculate(series, tradingRecord));
-    }
+    final var tradingContext = context.toTradingRecordContext()
+        .withCriterion(new SqnCriterion())
+        .enter(1.0).asap()
+        .exit(1.0).asap()
+        .enter(1.0).asap()
+        .exit(1.0).after(3);
 
-    @Test
-    public void calculateWithLosingShortPositions() {
-        MockBarSeries series = new MockBarSeries(numFunction, 100, 110, 100, 105, 95, 105);
-        TradingRecord tradingRecord = new BaseTradingRecord(Trade.sellAt(0, series), Trade.buyAt(1, series),
-                Trade.sellAt(2, series), Trade.buyAt(3, series));
+    tradingContext.assertResults(0.7353910524340095);
+  }
 
-        AnalysisCriterion sqnCriterion = getCriterion();
-        assertNumEquals(-4.242640687119286, sqnCriterion.calculate(series, tradingRecord));
-    }
 
-    @Test
-    public void betterThan() {
-        AnalysisCriterion criterion = getCriterion();
-        assertTrue(criterion.betterThan(numOf(50), numOf(45)));
-        assertFalse(criterion.betterThan(numOf(45), numOf(50)));
-    }
+  @ParameterizedTest
+  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
+  void calculateWithWinningShortPositions(final NumFactory factory) {
+    final var context = new MarketEventTestContext()
+        .withNumFactory(factory)
+        .withCandlePrices(100, 90, 100, 95, 95, 100);
 
-    @Test
-    public void testCalculateOneOpenPositionShouldReturnZero() {
-        openedPositionUtils.testCalculateOneOpenPositionShouldReturnExpectedValue(numFunction, getCriterion(), 0);
-    }
+    final var tradingContext = context.toTradingRecordContext()
+        .withTradeType(TradeType.SELL)
+        .withCriterion(new SqnCriterion())
+        .enter(1.0).asap()
+        .exit(1.0).asap()
+        .enter(1.0).asap()
+        .exit(1.0).asap();
 
+    tradingContext.assertResults(4.242640687119286);
+  }
+
+
+  @ParameterizedTest
+  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
+  void calculateWithLosingShortPositions(final NumFactory factory) {
+    final var context = new MarketEventTestContext()
+        .withNumFactory(factory)
+        .withCandlePrices(100, 110, 100, 105, 95, 105);
+
+    final var tradingContext = context.toTradingRecordContext()
+        .withTradeType(TradeType.SELL)
+        .withCriterion(new SqnCriterion())
+        .enter(1.0).asap()
+        .exit(1.0).asap()
+        .enter(1.0).asap()
+        .exit(1.0).asap();
+
+    tradingContext.assertResults(-4.242640687119286);
+  }
+
+
+  @ParameterizedTest
+  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
+  void betterThan(final NumFactory factory) {
+    final var criterion = new SqnCriterion();
+    assertThat(criterion.betterThan(factory.numOf(50), factory.numOf(45))).isTrue();
+    assertThat(criterion.betterThan(factory.numOf(45), factory.numOf(50))).isFalse();
+  }
+
+
+  @ParameterizedTest
+  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
+  void calculateOneOpenPositionShouldReturnZero(final NumFactory factory) {
+    final var context = new MarketEventTestContext()
+        .withNumFactory(factory)
+        .withCandlePrices(100, 105);
+
+    final var tradingContext = context.toTradingRecordContext()
+        .withCriterion(new SqnCriterion())
+        .enter(1.0).asap();
+
+    tradingContext.assertResults(0);
+  }
 }
