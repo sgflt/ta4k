@@ -23,13 +23,18 @@
 
 package org.ta4j.core.trading
 
+import java.time.Instant
 import org.ta4j.core.api.callback.BarListener
-import org.ta4j.core.api.series.*
+import org.ta4j.core.api.series.Bar
+import org.ta4j.core.api.series.BarBuilderFactory
+import org.ta4j.core.api.series.BarSeries
+import org.ta4j.core.api.series.PastCandleParadoxException
+import org.ta4j.core.api.series.WrongTimeFrameException
 import org.ta4j.core.events.CandleReceived
 import org.ta4j.core.indicators.IndicatorContext
 import org.ta4j.core.indicators.TimeFrame
 import org.ta4j.core.num.NumFactory
-import java.time.Instant
+import org.ta4j.core.strategy.RuntimeContext
 
 /**
  * Class deigned for use as live trading backing. Stores only current bar for analysis.
@@ -44,8 +49,12 @@ internal class LiveBarSeries(
     override val numFactory: NumFactory,
     private val barBuilderFactory: BarBuilderFactory,
     indicatorContext: IndicatorContext,
+    runtimeContext: RuntimeContext,
 ) : BarSeries {
-    private val barListeners: MutableList<BarListener> = ArrayList<BarListener>().apply { add(indicatorContext) }
+    private val barListeners: MutableList<BarListener> = ArrayList<BarListener>().apply {
+        add(indicatorContext)
+        add(runtimeContext)
+    }
 
     override lateinit var bar: Bar
         private set

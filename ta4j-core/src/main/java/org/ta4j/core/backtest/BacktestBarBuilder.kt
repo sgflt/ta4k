@@ -23,17 +23,17 @@
  */
 package org.ta4j.core.backtest
 
+import java.time.Instant
 import org.ta4j.core.api.series.BarBuilder
 import org.ta4j.core.api.series.BarSeries
 import org.ta4j.core.num.NaN
 import org.ta4j.core.num.Num
 import org.ta4j.core.num.NumFactory
-import java.time.Instant
 
 /**
  * A builder to build a new [BacktestBar].
  */
-open class BacktestBarBuilder(private val barSeries: BarSeries) : BarBuilder {
+open class BacktestBarBuilder(private val series: BarSeries) : BarBuilder {
     private var startTime: Instant? = null
     private var endTime: Instant? = null
     private var openPrice: Num = NaN
@@ -41,9 +41,9 @@ open class BacktestBarBuilder(private val barSeries: BarSeries) : BarBuilder {
     private var lowPrice: Num = NaN
     private var closePrice: Num = NaN
     private var volume: Num = NaN
-    private var amount: Num = barSeries.numFactory.zero()
+    private var amount: Num = series.numFactory.zero()
     private var trades: Long = 0
-    private val numFactory: NumFactory = barSeries.numFactory
+    private val numFactory: NumFactory = series.numFactory
 
 
     fun trades(trades: String): BacktestBarBuilder {
@@ -285,6 +285,7 @@ open class BacktestBarBuilder(private val barSeries: BarSeries) : BarBuilder {
 
     open fun build(): BacktestBar {
         val backtestBar = BacktestBar(
+            series.timeFrame,
             startTime!!,
             endTime!!,
             openPrice,
@@ -314,6 +315,6 @@ open class BacktestBarBuilder(private val barSeries: BarSeries) : BarBuilder {
 
 
     override fun add() {
-        barSeries.addBar(build())
+        series.addBar(build())
     }
 }

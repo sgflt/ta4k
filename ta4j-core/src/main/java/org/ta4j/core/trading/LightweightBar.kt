@@ -23,17 +23,19 @@
 
 package org.ta4j.core.trading
 
-import org.ta4j.core.api.series.Bar
-import org.ta4j.core.num.Num
 import java.time.Duration
 import java.time.Instant
 import java.time.ZoneId
+import org.ta4j.core.api.series.Bar
+import org.ta4j.core.indicators.TimeFrame
+import org.ta4j.core.num.Num
 
 /**
  * Live trading implementation of a [org.ta4j.core.api.series.Bar].
  */
 @JvmRecord
 internal data class LightweightBar(
+    override val timeFrame: TimeFrame,
     override val beginTime: Instant,
     override val endTime: Instant,
     override val openPrice: Num,

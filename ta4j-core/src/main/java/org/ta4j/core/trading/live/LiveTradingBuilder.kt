@@ -26,6 +26,7 @@ import org.slf4j.LoggerFactory
 import org.ta4j.core.MultiTimeFrameSeries
 import org.ta4j.core.api.series.BarBuilderFactory
 import org.ta4j.core.api.series.BarSeries
+import org.ta4j.core.backtest.strategy.runtime.NOOPRuntimeContext
 import org.ta4j.core.indicators.IndicatorContexts
 import org.ta4j.core.indicators.TimeFrame
 import org.ta4j.core.num.NumFactory
@@ -42,11 +43,12 @@ import org.ta4j.core.trading.LiveBarSeries
  * A builder to build a new [BacktestBarSeries].
  */
 class LiveTradingBuilder {
+    private var windowSize: Int? = null
     private var name: String = UNNAMED_SERIES_NAME
     private var numFactory = defaultNumFactory
     private var barBuilderFactory: BarBuilderFactory = LightweightBarBuilderFactory()
     private var strategyFactory: StrategyFactory<Strategy> = NOOPStrategyFactory()
-    private var runtimeContext: RuntimeContext? = null
+    private var runtimeContext: RuntimeContext = NOOPRuntimeContext()
     private var indicatorContexts: IndicatorContexts = IndicatorContexts.empty()
     private var configuration: StrategyConfiguration? = null
 
@@ -107,6 +109,11 @@ class LiveTradingBuilder {
         return this
     }
 
+    fun enableHistory(windowSize: Int): LiveTradingBuilder {
+        this.windowSize = windowSize
+        return this
+    }
+
     /**
      * Have to be called after initialization of indicatorContexts.
      *
@@ -117,12 +124,14 @@ class LiveTradingBuilder {
             log.warn("Using NOOP strategy")
         }
 
-        val strategy = strategyFactory.createStrategy(configuration!!, runtimeContext!!, indicatorContexts)
+        val strategy = strategyFactory.createStrategy(configuration!!, runtimeContext, indicatorContexts)
         val series = MultiTimeFrameSeries<BarSeries>().apply {
             (strategy.timeFrames + indicatorContexts.timeFrames)
                 .distinct()
                 .forEach { add(createSeriesPerTimeFrame(it)) }
         }
+
+        windowSize?.let { indicatorContexts.enableHistory(it) }
 
         return LiveTrading(series, strategy)
     }
@@ -134,7 +143,8 @@ class LiveTradingBuilder {
             timeFrame = timeFrame,
             numFactory = numFactory,
             barBuilderFactory = barBuilderFactory,
-            indicatorContext = indicatorContexts[timeFrame]
+            indicatorContext = indicatorContexts[timeFrame],
+            runtimeContext = runtimeContext,
         )
     }
 

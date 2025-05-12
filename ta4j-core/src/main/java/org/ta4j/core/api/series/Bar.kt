@@ -22,19 +22,26 @@
  */
 package org.ta4j.core.api.series
 
-import org.ta4j.core.api.Indicators.closePrice
-import org.ta4j.core.api.Indicators.openPrice
-import org.ta4j.core.num.Num
 import java.time.Duration
 import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
+import org.ta4j.core.api.Indicators.closePrice
+import org.ta4j.core.api.Indicators.openPrice
+import org.ta4j.core.indicators.TimeFrame
+import org.ta4j.core.num.Num
 
 /**
  * A `Bar` is aggregated open/high/low/close/volume/etc. data over a time
  * period. It represents the "end bar" of a time period.
  */
 interface Bar {
+
+    /**
+     * @return the time frame of the bar
+     */
+    val timeFrame: TimeFrame
+
     /**
      * @return the time period of the bar
      */

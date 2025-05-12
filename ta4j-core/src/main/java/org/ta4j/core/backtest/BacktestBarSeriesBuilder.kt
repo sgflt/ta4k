@@ -28,7 +28,6 @@ import org.ta4j.core.indicators.IndicatorContext
 import org.ta4j.core.indicators.TimeFrame
 import org.ta4j.core.num.NumFactory
 import org.ta4j.core.num.NumFactoryProvider.defaultNumFactory
-import java.util.List
 
 /**
  * A builder to build a new [BacktestBarSeries].
@@ -92,7 +91,7 @@ class BacktestBarSeriesBuilder {
      */
     fun withIndicatorContext(indicatorContext: IndicatorContext): BacktestBarSeriesBuilder {
         this.indicatorContext = indicatorContext
-        this.timeFrame = indicatorContext.timeFrame!!
+        this.timeFrame = indicatorContext.timeFrame
         return this
     }
 
@@ -103,7 +102,7 @@ class BacktestBarSeriesBuilder {
             this.timeFrame,
             this.numFactory,
             this.barBuilderFactory,
-            List.of<IndicatorContext?>(this.indicatorContext)
+            listOf(this.indicatorContext)
         )
     }
 }

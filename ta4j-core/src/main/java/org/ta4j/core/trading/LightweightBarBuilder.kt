@@ -22,12 +22,12 @@
  */
 package org.ta4j.core.trading
 
+import java.time.Instant
 import org.ta4j.core.api.series.BarBuilder
 import org.ta4j.core.api.series.BarSeries
 import org.ta4j.core.num.NaN
 import org.ta4j.core.num.Num
 import org.ta4j.core.num.NumFactory
-import java.time.Instant
 
 /**
  * A builder to build a new `LiveBar` with conversion from a
@@ -168,6 +168,7 @@ internal class LightweightBarBuilder(private val series: BarSeries) : BarBuilder
 
     fun build(): LightweightBar {
         return LightweightBar(
+            series.timeFrame,
             startTime,
             endTime,
             openPrice,

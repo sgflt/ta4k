@@ -23,14 +23,16 @@
  */
 package org.ta4j.core.backtest
 
-import org.ta4j.core.api.series.Bar
-import org.ta4j.core.num.Num
 import java.math.BigDecimal
 import java.time.Duration
 import java.time.Instant
 import java.util.function.Function
+import org.ta4j.core.api.series.Bar
+import org.ta4j.core.indicators.TimeFrame
+import org.ta4j.core.num.Num
 
 data class BacktestBar(
+    override val timeFrame: TimeFrame,
     override val beginTime: Instant,
     override val endTime: Instant,
     override var openPrice: Num,

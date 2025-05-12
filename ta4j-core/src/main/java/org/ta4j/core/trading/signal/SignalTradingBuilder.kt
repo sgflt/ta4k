@@ -23,6 +23,7 @@
  */
 package org.ta4j.core.live
 
+import org.slf4j.Logger
 import org.ta4j.core.MultiTimeFrameSeries
 import org.ta4j.core.api.series.BarBuilderFactory
 import org.ta4j.core.api.series.BarSeries
@@ -42,6 +43,7 @@ import org.ta4j.core.trading.LiveBarSeries
  * A builder to build a new [BacktestBarSeries].
  */
 class SignalTradingBuilder {
+    private var windowSize: Int? = null
     private var name: String = UNNAMED_SERIES_NAME
     private var numFactory = defaultNumFactory
     private var barBuilderFactory: BarBuilderFactory = LightweightBarBuilderFactory()
@@ -107,6 +109,11 @@ class SignalTradingBuilder {
         return this
     }
 
+    fun withWindowSize(windowSize: Int): SignalTradingBuilder {
+        this.windowSize = windowSize
+        return this
+    }
+
     /**
      * Have to be called after initialization of indicatorContexts.
      *
@@ -125,6 +132,8 @@ class SignalTradingBuilder {
                 .forEach { add(createSeriesPerTimeFrame(it)) }
         }
 
+        windowSize?.let { indicatorContexts.enableHistory(it) }
+
         return SignalTrading(series, strategies)
     }
 
@@ -135,13 +144,14 @@ class SignalTradingBuilder {
             timeFrame = timeFrame,
             numFactory = numFactory,
             barBuilderFactory = barBuilderFactory,
-            indicatorContext = indicatorContexts[timeFrame]
+            indicatorContext = indicatorContexts[timeFrame],
+            runtimeContext = runtimeContext,
         )
     }
 
     companion object {
         /** The [.name] for an unnamed bar series.  */
         private const val UNNAMED_SERIES_NAME = "unnamed_series"
-        val log = org.slf4j.LoggerFactory.getLogger(SignalTradingBuilder::class.java)
+        val log: Logger = org.slf4j.LoggerFactory.getLogger(SignalTradingBuilder::class.java)
     }
 }
