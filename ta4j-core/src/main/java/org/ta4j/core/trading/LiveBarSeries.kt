@@ -51,7 +51,7 @@ internal class LiveBarSeries(
     indicatorContext: IndicatorContext,
     runtimeContext: RuntimeContext,
 ) : BarSeries {
-    private val barListeners: MutableList<BarListener> = ArrayList<BarListener>().apply {
+    private val barListeners = ArrayList<BarListener>().apply {
         add(indicatorContext)
         add(runtimeContext)
     }
@@ -101,10 +101,7 @@ internal class LiveBarSeries(
 
     private fun checkTimeFrame(candleReceived: CandleReceived) {
         if (candleReceived.timeFrame != timeFrame) {
-            throw WrongTimeFrameException(
-                timeFrame,
-                candleReceived.timeFrame
-            )
+            throw WrongTimeFrameException(timeFrame, candleReceived.timeFrame)
         }
     }
 }

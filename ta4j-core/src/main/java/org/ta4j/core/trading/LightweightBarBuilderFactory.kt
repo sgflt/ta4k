@@ -29,7 +29,5 @@ import org.ta4j.core.api.series.BarSeries
  * @author Lukáš Kvídera
  */
 internal class LightweightBarBuilderFactory : BarBuilderFactory {
-    override fun createBarBuilder(series: BarSeries): LightweightBarBuilder {
-        return LightweightBarBuilder(series)
-    }
+    override fun createBarBuilder(series: BarSeries) = LightweightBarBuilder(series)
 }
