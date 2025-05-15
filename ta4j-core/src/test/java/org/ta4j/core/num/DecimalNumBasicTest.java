@@ -90,15 +90,15 @@ class DecimalNumBasicTest {
     assertThat(two.minus(three)).hasToString("-1");
 
     // Multiplication
-    assertThat(two.multipliedBy(three)).hasToString("6");
-    assertThat(two.multipliedBy(minusTwo)).hasToString("-4");
+    assertThat(two.times(three)).hasToString("6");
+    assertThat(two.times(minusTwo)).hasToString("-4");
 
     // Division
-    assertThat(six.dividedBy(two)).hasToString("3");
-    assertThat(six.dividedBy(three)).hasToString("2");
+    assertThat(six.div(two)).hasToString("3");
+    assertThat(six.div(three)).hasToString("2");
 
     // Division by zero should return NaN
-    assertThat(six.dividedBy(DecimalNum.valueOf("0", TEST_CONTEXT)).isNaN()).isTrue();
+    assertThat(six.div(DecimalNum.valueOf("0", TEST_CONTEXT)).isNaN()).isTrue();
   }
 
 
@@ -110,18 +110,6 @@ class DecimalNumBasicTest {
     final var twoAgain = DecimalNum.valueOf("2", TEST_CONTEXT);
     final var zero = DecimalNum.valueOf("0", TEST_CONTEXT);
     final var minusTwo = DecimalNum.valueOf("-2", TEST_CONTEXT);
-
-    // Equality
-    assertTrue(two.isEqual(twoAgain));
-    assertFalse(two.isEqual(three));
-
-    // Greater than
-    assertTrue(three.isGreaterThan(two));
-    assertFalse(two.isGreaterThan(three));
-
-    // Less than
-    assertTrue(two.isLessThan(three));
-    assertFalse(three.isLessThan(two));
 
     // Zero checks
     assertTrue(zero.isZero());

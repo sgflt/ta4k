@@ -76,10 +76,10 @@ class VarianceCriterion : AnalysisCriterion {
         val numberOfPositions = this.numberOfPositionsCriterion.calculate(position)
 
         var variance = defaultNumFactory.zero()
-        val average = criterionValue.dividedBy(numberOfPositions)
+        val average = criterionValue / numberOfPositions
         val pow = this.criterion.calculate(position).minus(average).pow(2)
-        variance = variance.plus(pow)
-        variance = variance.dividedBy(numberOfPositions)
+        variance = variance + pow
+        variance = variance / numberOfPositions
         return variance
     }
 
@@ -92,25 +92,13 @@ class VarianceCriterion : AnalysisCriterion {
         val numberOfPositions = this.numberOfPositionsCriterion.calculate(tradingRecord)
 
         var variance = defaultNumFactory.zero()
-        val average = criterionValue.dividedBy(numberOfPositions)
+        val average = criterionValue / numberOfPositions
 
         for (position in tradingRecord.positions) {
             val pow = this.criterion.calculate(position).minus(average).pow(2)
-            variance = variance.plus(pow)
+            variance = variance + pow
         }
-        variance = variance.dividedBy(numberOfPositions)
+        variance = variance / numberOfPositions
         return variance
-    }
-
-
-    /**
-     * If [.lessIsBetter] == false, then the lower the criterion value, the
-     * better, otherwise the higher the criterion value the better.
-     */
-    override fun betterThan(criterionValue1: Num, criterionValue2: Num): Boolean {
-        return if (this.lessIsBetter)
-            criterionValue1.isLessThan(criterionValue2)
-        else
-            criterionValue1.isGreaterThan(criterionValue2)
     }
 }

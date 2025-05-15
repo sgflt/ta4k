@@ -22,13 +22,13 @@
  */
 package org.ta4j.core.backtest.analysis
 
+import java.time.Instant
+import java.util.*
 import org.ta4j.core.backtest.Position
 import org.ta4j.core.backtest.Trade
 import org.ta4j.core.backtest.TradingRecord
 import org.ta4j.core.num.Num
 import org.ta4j.core.num.NumFactory
-import java.time.Instant
-import java.util.*
 
 /**
  * Tracks the money cash flow involved by a list of positions over time.
@@ -149,7 +149,7 @@ class RealizedCashFlow {
 
         // Interpolate between the two values
         val valueRange = nextEntry.value!!.minus(lastEntry.value)
-        return lastEntry.value!!.plus(valueRange.multipliedBy(progress))
+        return lastEntry.value!! + valueRange * progress
     }
 
 
@@ -163,7 +163,7 @@ class RealizedCashFlow {
 
         // Get the value at entry and multiply by ratio for exit value
         val entryValue = getValue(entry.whenExecuted)
-        values.put(exit.whenExecuted, entryValue.multipliedBy(ratio))
+        values.put(exit.whenExecuted, entryValue * ratio)
     }
 
 
@@ -184,7 +184,7 @@ class RealizedCashFlow {
         val currentPrice = entry.pricePerAsset
         val adjustedPrice: Num = addCost(currentPrice, holdingCost, isLongTrade)
         val ratio = calculateRatio(isLongTrade, entryPrice, adjustedPrice)
-        values.put(evaluationTime, entryValue.multipliedBy(ratio))
+        values.put(evaluationTime, entryValue * ratio)
     }
 
 
@@ -214,13 +214,12 @@ class RealizedCashFlow {
      */
     private fun calculateRatio(isLongTrade: Boolean, entryPrice: Num, exitPrice: Num): Num {
         if (isLongTrade) {
-            return exitPrice.dividedBy(entryPrice)
+            return exitPrice / entryPrice
         }
 
         // For short positions, when price goes down we gain
         // If price drops from 100 to 90, we gain 0.1 (10%)
-        // ratio should be 1 + (entry - exit)/entry
-        return numFactory.one().plus(entryPrice.minus(exitPrice).dividedBy(entryPrice))
+        return numFactory.one() + (entryPrice - exitPrice) / entryPrice
     }
 
 

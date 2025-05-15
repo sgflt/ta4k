@@ -44,7 +44,10 @@ class ChandelierExitShortIndicator @JvmOverloads constructor(
     private val k = numFactory.numOf(k)
     private val close = Indicators.closePrice()
 
-    private fun calculate(): Boolean = close.isGreaterThan(low.value.plus(atr.value.multipliedBy(k)).doubleValue())
+    private fun calculate(): Boolean {
+        val threshold = low.value + atr.value * k
+        return close.isGreaterThan(threshold.doubleValue())
+    }
 
     override fun updateState(bar: Bar) {
         close.onBar(bar)

@@ -23,7 +23,9 @@
  */
 package org.ta4j.core.criteria.pnl
 
-import org.junit.jupiter.api.Assertions
+import java.time.Clock
+import java.time.Instant
+import java.time.ZoneId
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
 import org.ta4j.core.TestUtils.assertNumEquals
@@ -34,9 +36,6 @@ import org.ta4j.core.backtest.criteria.pnl.ReturnCriterion
 import org.ta4j.core.backtest.strategy.BackTestTradingRecord
 import org.ta4j.core.criteria.AbstractCriterionTest
 import org.ta4j.core.num.NumFactory
-import java.time.Clock
-import java.time.Instant
-import java.time.ZoneId
 
 internal class ReturnCriterionTest : AbstractCriterionTest() {
     private val clock: Clock = Clock.fixed(Instant.now(), ZoneId.systemDefault())
@@ -177,14 +176,5 @@ internal class ReturnCriterionTest : AbstractCriterionTest() {
         // Add entry operation
         position.operate(now, numFactory.numOf(100), numFactory.numOf(1))
         assertNumEquals(0.0, withoutBase.calculate(position))
-    }
-
-
-    @ParameterizedTest
-    @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
-    fun betterThan(numFactory: NumFactory) {
-        val criterion = ReturnCriterion()
-        Assertions.assertTrue(criterion.betterThan(numFactory.numOf(2.0), numFactory.numOf(1.5)))
-        Assertions.assertFalse(criterion.betterThan(numFactory.numOf(1.5), numFactory.numOf(2.0)))
     }
 }

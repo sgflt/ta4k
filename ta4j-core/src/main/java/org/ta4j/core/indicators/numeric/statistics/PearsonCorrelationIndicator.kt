@@ -23,11 +23,11 @@
  */
 package org.ta4j.core.indicators.numeric.statistics
 
+import java.util.*
 import org.ta4j.core.api.series.Bar
 import org.ta4j.core.indicators.numeric.NumericIndicator
 import org.ta4j.core.num.NaN
 import org.ta4j.core.num.Num
-import java.util.*
 
 /**
  * Indicator-Pearson-Correlation
@@ -54,37 +54,30 @@ class PearsonCorrelationIndicator(
         window.offer(XY(x, y))
 
         if (window.size > barCount) {
-            val polled = window.poll()
-            removeOldValue(polled)
+            removeOldValue(window.poll())
         }
 
+        sx += x
+        sy += y
+        sxy += x * y
+        sxx += x * x
+        syy += y * y
 
-        sx = sx.plus(x)
-        sy = sy.plus(y)
-        sxy = sxy.plus(x.multipliedBy(y))
-        sxx = sxx.plus(x.multipliedBy(x))
-        syy = syy.plus(y.multipliedBy(y))
+        val toSqrt = (n * sxx - sx * sx) * (n * syy - sy * sy)
 
-        // (n * Sxx - Sx * Sx) * (n * Syy - Sy * Sy)
-        val toSqrt = (n.multipliedBy(sxx).minus(sx.multipliedBy(sx)))
-            .multipliedBy(n.multipliedBy(syy).minus(sy.multipliedBy(sy)))
-
-        if (toSqrt.isGreaterThan(numFactory.zero())) {
-            // pearson = (n * Sxy - Sx * Sy) / sqrt((n * Sxx - Sx * Sx) * (n * Syy - Sy *
-            // Sy))
-            return (n.multipliedBy(sxy).minus(sx.multipliedBy(sy))).dividedBy(toSqrt.sqrt())
+        return if (toSqrt > numFactory.zero()) {
+            (n * sxy - sx * sy) / toSqrt.sqrt()
+        } else {
+            NaN
         }
-
-        return NaN
     }
 
-
-    private fun removeOldValue(polled: XY) {
-        sx = sx.minus(polled.x)
-        sy = sy.minus(polled.y)
-        sxy = sxy.minus(polled.x.multipliedBy(polled.y))
-        sxx = sxx.minus(polled.x.multipliedBy(polled.x))
-        syy = syy.minus(polled.y.multipliedBy(polled.y))
+    private fun removeOldValue(polled: XY) = with(polled) {
+        sx -= x
+        sy -= y
+        sxy -= x * y
+        sxx -= x * x
+        syy -= y * y
     }
 
 

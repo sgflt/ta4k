@@ -22,12 +22,12 @@
  */
 package org.ta4j.core.backtest.criteria
 
+import kotlin.math.max
 import org.ta4j.core.backtest.Position
 import org.ta4j.core.backtest.TradingRecord
 import org.ta4j.core.backtest.analysis.Returns
 import org.ta4j.core.num.Num
 import org.ta4j.core.num.NumFactory
-import kotlin.math.max
 
 /**
  * Value at Risk criterion, returned in decimal format.
@@ -74,16 +74,10 @@ class ValueAtRiskCriterion(
         returnRates.sort()
         var valueAtRisk = returnRates[max(0, nInTail - 1)]
 
-        if (valueAtRisk.isGreaterThan(zero)) {
+        if (valueAtRisk > zero) {
             valueAtRisk = zero
         }
 
         return valueAtRisk
-    }
-
-
-    override fun betterThan(criterionValue1: Num, criterionValue2: Num): Boolean {
-        // because it represents a loss, VaR is non-positive
-        return criterionValue1.isGreaterThan(criterionValue2)
     }
 }

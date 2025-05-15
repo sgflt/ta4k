@@ -23,8 +23,6 @@
  */
 package org.ta4j.core.criteria;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.ta4j.core.MarketEventTestContext;
@@ -123,15 +121,6 @@ class SqnCriterionTest {
         .exit(1.0).asap();
 
     tradingContext.assertResults(-4.242640687119286);
-  }
-
-
-  @ParameterizedTest
-  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
-  void betterThan(final NumFactory factory) {
-    final var criterion = new SqnCriterion();
-    assertThat(criterion.betterThan(factory.numOf(50), factory.numOf(45))).isTrue();
-    assertThat(criterion.betterThan(factory.numOf(45), factory.numOf(50))).isFalse();
   }
 
 

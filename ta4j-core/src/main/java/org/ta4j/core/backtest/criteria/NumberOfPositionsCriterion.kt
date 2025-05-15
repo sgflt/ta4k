@@ -65,16 +65,4 @@ class NumberOfPositionsCriterion : AnalysisCriterion {
     override fun calculate(tradingRecord: TradingRecord): Num {
         return defaultNumFactory.numOf(tradingRecord.positionCount)
     }
-
-
-    /**
-     * If [.lessIsBetter] == false, then the lower the criterion value, the
-     * better, otherwise the higher the criterion value the better.
-     */
-    override fun betterThan(criterionValue1: Num, criterionValue2: Num): Boolean {
-        return if (lessIsBetter)
-            criterionValue1.isLessThan(criterionValue2)
-        else
-            criterionValue1.isGreaterThan(criterionValue2)
-    }
 }

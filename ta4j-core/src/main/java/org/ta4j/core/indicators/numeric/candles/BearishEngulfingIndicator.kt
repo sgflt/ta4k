@@ -52,10 +52,10 @@ class BearishEngulfingIndicator(series: BarSeries) : SeriesRelatedBooleanIndicat
             val prevClosePrice = prevBar.closePrice
             val currOpenPrice = bar.openPrice
             val currClosePrice = bar.closePrice
-            return currOpenPrice.isGreaterThan(prevOpenPrice)
-                    && currOpenPrice.isGreaterThan(prevClosePrice)
-                    && currClosePrice.isLessThan(prevOpenPrice)
-                    && currClosePrice.isLessThan(prevClosePrice)
+            return currOpenPrice > prevOpenPrice
+                    && currOpenPrice > prevClosePrice
+                    && currClosePrice < prevOpenPrice
+                    && currClosePrice < prevClosePrice
         }
 
         return false

@@ -23,25 +23,44 @@
  */
 package org.ta4j.core.indicators.numeric
 
+import java.time.Instant
 import org.ta4j.core.api.Indicator
 import org.ta4j.core.api.series.Bar
 import org.ta4j.core.indicators.bool.helpers.CrossIndicator
 import org.ta4j.core.indicators.helpers.DifferenceIndicator
 import org.ta4j.core.indicators.helpers.previous.PreviousNumericValueIndicator
-import org.ta4j.core.indicators.numeric.average.*
-import org.ta4j.core.indicators.numeric.helpers.*
+import org.ta4j.core.indicators.numeric.average.DoubleEMAIndicator
+import org.ta4j.core.indicators.numeric.average.EMAIndicator
+import org.ta4j.core.indicators.numeric.average.HMAIndicator
+import org.ta4j.core.indicators.numeric.average.KAMAIndicator
+import org.ta4j.core.indicators.numeric.average.LWMAIndicator
+import org.ta4j.core.indicators.numeric.average.MMAIndicator
+import org.ta4j.core.indicators.numeric.average.SMAIndicator
+import org.ta4j.core.indicators.numeric.average.TripleEMAIndicator
+import org.ta4j.core.indicators.numeric.average.WMAIndicator
+import org.ta4j.core.indicators.numeric.average.ZLEMAIndicator
+import org.ta4j.core.indicators.numeric.helpers.GainIndicator
+import org.ta4j.core.indicators.numeric.helpers.HighestValueIndicator
+import org.ta4j.core.indicators.numeric.helpers.LossIndicator
+import org.ta4j.core.indicators.numeric.helpers.LowestValueIndicator
+import org.ta4j.core.indicators.numeric.helpers.RunningTotalIndicator
 import org.ta4j.core.indicators.numeric.momentum.RSIIndicator
 import org.ta4j.core.indicators.numeric.operation.BinaryOperation
 import org.ta4j.core.indicators.numeric.operation.UnaryOperation
 import org.ta4j.core.indicators.numeric.oscilators.aroon.AroonDownIndicator
 import org.ta4j.core.indicators.numeric.oscilators.aroon.AroonUpIndicator
-import org.ta4j.core.indicators.numeric.statistics.*
+import org.ta4j.core.indicators.numeric.statistics.CovarianceIndicator
+import org.ta4j.core.indicators.numeric.statistics.MeanDeviationIndicator
+import org.ta4j.core.indicators.numeric.statistics.SigmaIndicator
+import org.ta4j.core.indicators.numeric.statistics.SimpleLinearRegressionIndicator
+import org.ta4j.core.indicators.numeric.statistics.StandardDeviationIndicator
+import org.ta4j.core.indicators.numeric.statistics.StandardErrorIndicator
+import org.ta4j.core.indicators.numeric.statistics.VarianceIndicator
 import org.ta4j.core.num.NaN
 import org.ta4j.core.num.Num
 import org.ta4j.core.num.NumFactory
 import org.ta4j.core.strategy.rules.OverIndicatorRule
 import org.ta4j.core.strategy.rules.UnderIndicatorRule
-import java.time.Instant
 
 /**
  * NumericIndicator is a fluent class. It provides
@@ -358,7 +377,7 @@ abstract class NumericIndicator protected constructor(
      *
      * @return he current comparison of `this` and `other`
      */
-    fun isGreaterThan(other: NumericIndicator) = value!!.isGreaterThan(other.value)
+    fun isGreaterThan(other: NumericIndicator) = value > other.value
 
 
     /**
@@ -379,7 +398,7 @@ abstract class NumericIndicator protected constructor(
      *
      * @return he current comparison of `this` and `other`
      */
-    fun isLessThan(other: NumericIndicator) = value.isLessThan(other.value)
+    fun isLessThan(other: NumericIndicator) = value < other.value
 
 
     fun isLessThanRule(other: NumericIndicator) = UnderIndicatorRule(this, other)

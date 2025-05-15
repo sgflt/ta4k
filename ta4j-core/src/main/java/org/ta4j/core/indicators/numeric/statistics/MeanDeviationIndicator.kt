@@ -23,10 +23,10 @@
  */
 package org.ta4j.core.indicators.numeric.statistics
 
+import java.util.*
 import org.ta4j.core.api.series.Bar
 import org.ta4j.core.indicators.numeric.NumericIndicator
 import org.ta4j.core.num.Num
-import java.util.*
 
 /**
  * Mean deviation indicator.
@@ -55,45 +55,36 @@ class MeanDeviationIndicator(private val indicator: NumericIndicator, private va
 
 
     private fun unstablePath(): Num {
-        // Add new value
         val newValue = indicator.value
         window.offer(newValue)
-        val oldMean =
-            if (window.size == 1) newValue else sum.dividedBy(numFactory.numOf(window.size - 1))
-        sum = sum.plus(newValue)
-        val newMean = sum.dividedBy(numFactory.numOf(window.size))
+        val oldMean = if (window.size == 1) newValue else sum / numFactory.numOf(window.size - 1)
+        sum += newValue
+        val newMean = sum / numFactory.numOf(window.size)
 
-        // Update deviationSum
-        deviationSum = deviationSum.plus(newValue.minus(newMean).abs())
+        deviationSum += (newValue - newMean).abs()
 
-        // Adjust other values in the window for the new mean
         for (value in window) {
             if (value != newValue) {
-                deviationSum = deviationSum.plus(
-                    value.minus(newMean).abs().minus(value.minus(oldMean).abs())
-                )
+                deviationSum += (value - newMean).abs() - (value - oldMean).abs()
             }
         }
 
-        // Calculate and return the mean deviation
-        return deviationSum.dividedBy(numFactory.numOf(window.size))
+        return deviationSum / numFactory.numOf(window.size)
     }
 
 
     private fun stablePath() {
         val oldestValue = window.poll()
-        val oldMean = sum.dividedBy(divisor)
+        val oldMean = sum / divisor
 
         // Remove contribution of oldest value
-        sum = sum.minus(oldestValue)
-        deviationSum = deviationSum.minus(oldestValue.minus(oldMean).abs())
+        sum -= oldestValue
+        deviationSum -= (oldestValue - oldMean).abs()
 
         // Adjust deviationSum for the change in mean
+        val newMean = sum / numFactory.numOf(barCount - 1)
         for (value in window) {
-            deviationSum = deviationSum.plus(
-                value.minus(sum.dividedBy(numFactory.numOf(barCount - 1))).abs()
-                    .minus(value.minus(oldMean).abs())
-            )
+            deviationSum += (value - newMean).abs() - (value - oldMean).abs()
         }
     }
 

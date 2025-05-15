@@ -63,10 +63,4 @@ class LossCriterion
             .map(this::calculate)
             .reduce(defaultNumFactory.zero(), { obj: Num, augend: Num -> obj.plus(augend) })
     }
-
-
-    /** The higher the criterion value (= the less the loss), the better.  */
-    override fun betterThan(criterionValue1: Num, criterionValue2: Num): Boolean {
-        return criterionValue1.isGreaterThan(criterionValue2)
-    }
 }

@@ -67,6 +67,6 @@ class LinearTransactionCostModel
 
 
     override fun calculate(price: Num, amount: Num): Num {
-        return amount.numFactory.numOf(this.feePerPosition).multipliedBy(price).multipliedBy(amount)
+        return amount.numFactory.numOf(this.feePerPosition) * price * amount
     }
 }

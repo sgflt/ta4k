@@ -23,8 +23,6 @@
  */
 package org.ta4j.core.criteria.helpers;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.ta4j.core.MarketEventTestContext;
@@ -49,26 +47,6 @@ class VarianceCriterionTest {
         .exit(1).after(2);
 
     tradingRecordContext.assertResults(6.25);
-  }
-
-
-  @ParameterizedTest
-  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
-  void betterThanWithLessIsBetter(final NumFactory numFactory) {
-    final var criterion = new VarianceCriterion(new ProfitLossCriterion(), true);
-
-    assertThat(criterion.betterThan(numFactory.numOf(5000), numFactory.numOf(4500))).isFalse();
-    assertThat(criterion.betterThan(numFactory.numOf(4500), numFactory.numOf(5000))).isTrue();
-  }
-
-
-  @ParameterizedTest
-  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
-  void betterThanWithLessIsNotBetter(final NumFactory numFactory) {
-    final var criterion = new VarianceCriterion(new ProfitLossCriterion());
-
-    assertThat(criterion.betterThan(numFactory.numOf(5000), numFactory.numOf(4500))).isTrue();
-    assertThat(criterion.betterThan(numFactory.numOf(4500), numFactory.numOf(5000))).isFalse();
   }
 
 

@@ -44,7 +44,7 @@ class LowerShadowIndicator(numFactory: NumFactory) : SeriesRelatedNumericIndicat
         val openPrice = bar.openPrice
         val closePrice = bar.closePrice
 
-        if (closePrice.isGreaterThan(openPrice)) {
+        if (closePrice > openPrice) {
             // Bullish
             return openPrice.minus(bar.lowPrice)
         }

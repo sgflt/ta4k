@@ -55,8 +55,8 @@ class StandardErrorCriterion : AnalysisCriterion {
      * calculated
      */
     constructor(criterion: AnalysisCriterion) {
-        this.standardDeviationCriterion = StandardDeviationCriterion(criterion)
-        this.lessIsBetter = true
+        standardDeviationCriterion = StandardDeviationCriterion(criterion)
+        lessIsBetter = true
     }
 
 
@@ -68,14 +68,14 @@ class StandardErrorCriterion : AnalysisCriterion {
      * @param lessIsBetter the [.lessIsBetter]
      */
     constructor(criterion: AnalysisCriterion, lessIsBetter: Boolean) {
-        this.standardDeviationCriterion = StandardDeviationCriterion(criterion)
+        standardDeviationCriterion = StandardDeviationCriterion(criterion)
         this.lessIsBetter = lessIsBetter
     }
 
 
     override fun calculate(position: Position): Num {
-        val numberOfPositions = this.numberOfPositionsCriterion.calculate(position)
-        return this.standardDeviationCriterion.calculate(position).dividedBy(numberOfPositions.sqrt())
+        val numberOfPositions = numberOfPositionsCriterion.calculate(position)
+        return standardDeviationCriterion.calculate(position) / numberOfPositions.sqrt()
     }
 
 
@@ -83,19 +83,7 @@ class StandardErrorCriterion : AnalysisCriterion {
         if (tradingRecord.positions.isEmpty()) {
             return defaultNumFactory.zero()
         }
-        val numberOfPositions = this.numberOfPositionsCriterion.calculate(tradingRecord)
-        return this.standardDeviationCriterion.calculate(tradingRecord).dividedBy(numberOfPositions.sqrt())
-    }
-
-
-    /**
-     * If [.lessIsBetter] == false, then the lower the criterion value, the
-     * better, otherwise the higher the criterion value the better.
-     */
-    override fun betterThan(criterionValue1: Num, criterionValue2: Num): Boolean {
-        return if (this.lessIsBetter)
-            criterionValue1.isLessThan(criterionValue2)
-        else
-            criterionValue1.isGreaterThan(criterionValue2)
+        val numberOfPositions = numberOfPositionsCriterion.calculate(tradingRecord)
+        return standardDeviationCriterion.calculate(tradingRecord) / numberOfPositions.sqrt()
     }
 }

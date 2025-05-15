@@ -56,7 +56,7 @@ class AverageCriterion : AnalysisCriterion {
      */
     constructor(criterion: AnalysisCriterion) {
         this.criterion = criterion
-        this.lessIsBetter = false
+        lessIsBetter = false
     }
 
 
@@ -73,8 +73,8 @@ class AverageCriterion : AnalysisCriterion {
 
 
     override fun calculate(position: Position): Num {
-        val numberOfPositions = this.numberOfPositionsCriterion.calculate(position)
-        return this.criterion.calculate(position).dividedBy(numberOfPositions)
+        val numberOfPositions = numberOfPositionsCriterion.calculate(position)
+        return criterion.calculate(position) / numberOfPositions
     }
 
 
@@ -82,19 +82,7 @@ class AverageCriterion : AnalysisCriterion {
         if (tradingRecord.positions.isEmpty()) {
             return defaultNumFactory.zero()
         }
-        val numberOfPositions = this.numberOfPositionsCriterion.calculate(tradingRecord)
-        return this.criterion.calculate(tradingRecord).dividedBy(numberOfPositions)
-    }
-
-
-    /**
-     * If [.lessIsBetter] == false, then the lower the criterion value, the
-     * better, otherwise the higher the criterion value the better.
-     */
-    override fun betterThan(criterionValue1: Num, criterionValue2: Num): Boolean {
-        return if (this.lessIsBetter)
-            criterionValue1.isLessThan(criterionValue2)
-        else
-            criterionValue1.isGreaterThan(criterionValue2)
+        val numberOfPositions = numberOfPositionsCriterion.calculate(tradingRecord)
+        return criterion.calculate(tradingRecord) / numberOfPositions
     }
 }

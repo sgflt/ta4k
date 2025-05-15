@@ -56,8 +56,8 @@ class SqnCriterion @JvmOverloads constructor(
         // SQN = (Average (PnL) / StdDev(PnL)) * SquareRoot(NumberOfTrades)
         val numberOfPositions = numberOfPositionsCriterion.calculate(position)
         val pnl = criterion.calculate(position)
-        val avgPnl = pnl.dividedBy(numberOfPositions)
-        return avgPnl.dividedBy(stdDevPnl).multipliedBy(numberOfPositions.sqrt())
+        val avgPnl = pnl / numberOfPositions
+        return avgPnl / stdDevPnl * numberOfPositions.sqrt()
     }
 
 
@@ -72,21 +72,12 @@ class SqnCriterion @JvmOverloads constructor(
 
         var numberOfPositions = numberOfPositionsCriterion.calculate(tradingRecord)
         val pnl = criterion.calculate(tradingRecord)
-        val avgPnl = pnl.dividedBy(numberOfPositions)
-        if (nPositions != null && numberOfPositions.isGreaterThan(
-                defaultNumFactory
-                    .hundred()
-            )
+        val avgPnl = pnl / numberOfPositions
+        if (nPositions != null && numberOfPositions > defaultNumFactory.hundred()
         ) {
             numberOfPositions = defaultNumFactory.numOf(nPositions)
         }
         // SQN = (Average (PnL) / StdDev(PnL)) * SquareRoot(NumberOfTrades)
-        return avgPnl.dividedBy(stdDevPnl).multipliedBy(numberOfPositions.sqrt())
-    }
-
-
-    /** The higher the criterion value, the better.  */
-    override fun betterThan(criterionValue1: Num, criterionValue2: Num): Boolean {
-        return criterionValue1.isGreaterThan(criterionValue2)
+        return avgPnl / stdDevPnl * numberOfPositions.sqrt()
     }
 }

@@ -30,7 +30,7 @@ import kotlin.math.pow
 /**
  * Representation of [Double]. High performance, lower precision.
  */
-class DoubleNum private constructor(override val delegate: Double) : Num {
+data class DoubleNum private constructor(override val delegate: Double) : Num {
     override val numFactory = DoubleNumFactory
 
 
@@ -46,12 +46,12 @@ class DoubleNum private constructor(override val delegate: Double) : Num {
     }
 
 
-    override fun multipliedBy(multiplicand: Num): Num {
+    override fun times(multiplicand: Num): Num {
         return if (multiplicand.isNaN) NaN else DoubleNum(delegate * (multiplicand as DoubleNum).delegate)
     }
 
 
-    override fun dividedBy(divisor: Num): Num {
+    override fun div(divisor: Num): Num {
         if (divisor.isNaN || divisor.isZero) {
             return NaN
         }
@@ -60,7 +60,7 @@ class DoubleNum private constructor(override val delegate: Double) : Num {
     }
 
 
-    override fun remainder(divisor: Num): Num {
+    override fun rem(divisor: Num): Num {
         return if (divisor.isNaN) NaN else DoubleNum(delegate % (divisor as DoubleNum).delegate)
     }
 
@@ -103,7 +103,7 @@ class DoubleNum private constructor(override val delegate: Double) : Num {
     }
 
 
-    override fun negate(): Num {
+    override fun unaryMinus(): Num {
         return DoubleNum(-delegate)
     }
 
@@ -124,56 +124,11 @@ class DoubleNum private constructor(override val delegate: Double) : Num {
         get() = delegate <= 0
 
 
-    override fun isEqual(other: Num): Boolean {
-        return !other.isNaN && delegate == (other as DoubleNum).delegate
-    }
-
-
     override fun log(): Num {
         if (delegate <= 0) {
             return NaN
         }
         return DoubleNum(ln(delegate))
-    }
-
-
-    override fun isGreaterThan(other: Num): Boolean {
-        return !other.isNaN && compareTo(other) > 0
-    }
-
-
-    override fun isGreaterThanOrEqual(other: Num): Boolean {
-        return !other.isNaN && compareTo(other) > -1
-    }
-
-
-    override fun isLessThan(other: Num): Boolean {
-        return !other.isNaN && compareTo(other) < 0
-    }
-
-
-    override fun isLessThanOrEqual(other: Num): Boolean {
-        return !other.isNaN && compareTo(other) < 1
-    }
-
-
-    override fun min(other: Num): Num {
-        return if (other.isNaN) NaN else DoubleNum(
-            kotlin.math.min(
-                delegate,
-                (other as DoubleNum).delegate
-            )
-        )
-    }
-
-
-    override fun max(other: Num): Num {
-        return if (other.isNaN) NaN else DoubleNum(
-            kotlin.math.max(
-                delegate,
-                (other as DoubleNum).delegate
-            )
-        )
     }
 
 

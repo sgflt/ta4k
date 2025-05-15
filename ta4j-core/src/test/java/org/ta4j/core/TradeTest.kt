@@ -23,6 +23,7 @@
  */
 package org.ta4j.core
 
+import java.time.Instant
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
@@ -33,7 +34,6 @@ import org.ta4j.core.backtest.analysis.cost.LinearTransactionCostModel
 import org.ta4j.core.backtest.analysis.cost.ZeroCostModel
 import org.ta4j.core.num.DoubleNum
 import org.ta4j.core.num.NumFactory
-import java.time.Instant
 
 internal class TradeTest {
     @Test
@@ -114,6 +114,6 @@ internal class TradeTest {
         )
 
         // Cost should scale linearly with amount
-        assertNumEquals(largeTrade.cost, smallTrade.cost.multipliedBy(numFactory.numOf(10)))
+        assertNumEquals(largeTrade.cost, smallTrade.cost * numFactory.numOf(10))
     }
 }

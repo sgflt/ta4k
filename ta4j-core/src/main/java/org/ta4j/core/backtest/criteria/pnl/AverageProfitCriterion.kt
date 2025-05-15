@@ -38,33 +38,27 @@ class AverageProfitCriterion : AnalysisCriterion {
 
 
     override fun calculate(position: Position): Num {
-        val numberOfWinningPositions = this.numberOfWinningPositionsCriterion.calculate(position)
+        val numberOfWinningPositions = numberOfWinningPositionsCriterion.calculate(position)
         if (numberOfWinningPositions.isZero) {
             return defaultNumFactory.zero()
         }
-        val grossProfit = this.grossProfitCriterion.calculate(position)
+        val grossProfit = grossProfitCriterion.calculate(position)
         if (grossProfit.isZero) {
             return defaultNumFactory.zero()
         }
-        return grossProfit.dividedBy(numberOfWinningPositions)
+        return grossProfit / numberOfWinningPositions
     }
 
 
     override fun calculate(tradingRecord: TradingRecord): Num {
-        val numberOfWinningPositions = this.numberOfWinningPositionsCriterion.calculate(tradingRecord)
+        val numberOfWinningPositions = numberOfWinningPositionsCriterion.calculate(tradingRecord)
         if (numberOfWinningPositions.isZero) {
             return defaultNumFactory.zero()
         }
-        val grossProfit = this.grossProfitCriterion.calculate(tradingRecord)
+        val grossProfit = grossProfitCriterion.calculate(tradingRecord)
         if (grossProfit.isZero) {
             return defaultNumFactory.zero()
         }
-        return grossProfit.dividedBy(numberOfWinningPositions)
-    }
-
-
-    /** The higher the criterion value, the better.  */
-    override fun betterThan(criterionValue1: Num, criterionValue2: Num): Boolean {
-        return criterionValue1.isGreaterThan(criterionValue2)
+        return grossProfit / numberOfWinningPositions
     }
 }

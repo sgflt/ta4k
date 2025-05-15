@@ -39,11 +39,8 @@ import org.ta4j.core.num.NumFactory
 </pre> *
  */
 class TypicalPriceIndicator(numFactory: NumFactory) : SeriesRelatedNumericIndicator(numFactory) {
-    private fun calculate(bar: Bar): Num {
-        val highPrice = bar.highPrice
-        val lowPrice = bar.lowPrice
-        val closePrice = bar.closePrice
-        return highPrice.plus(lowPrice).plus(closePrice).dividedBy(numFactory.three())
+    private fun calculate(bar: Bar): Num = with(bar) {
+        (highPrice + lowPrice + closePrice) / numFactory.three()
     }
 
 

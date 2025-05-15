@@ -45,10 +45,7 @@ class MinusDIIndicator(numFactory: NumFactory, private val barCount: Int) : Nume
     private val avgMinusDMIndicator = minusDMI().mma(barCount)
 
 
-    private fun calculate() =
-        avgMinusDMIndicator.value
-            .dividedBy(atrIndicator.value)
-            .multipliedBy(numFactory.hundred())
+    private fun calculate() = (avgMinusDMIndicator.value / atrIndicator.value) * numFactory.hundred()
 
 
     override fun updateState(bar: Bar) {

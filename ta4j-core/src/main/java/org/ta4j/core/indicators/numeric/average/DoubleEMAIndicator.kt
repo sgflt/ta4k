@@ -49,7 +49,7 @@ class DoubleEMAIndicator(indicator: NumericIndicator, private val barCount: Int)
     override val isStable
         get() = ema.isStable && emaEma.isStable
 
-    private fun calculate() = ema.value.multipliedBy(numFactory.two()).minus(emaEma.value)
+    private fun calculate() = ema.value * numFactory.two() - emaEma.value
 
     override fun toString() = "DoEMA(${barCount}) => $value"
 }

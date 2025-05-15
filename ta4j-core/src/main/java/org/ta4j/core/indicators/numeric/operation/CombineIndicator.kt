@@ -22,10 +22,10 @@
  */
 package org.ta4j.core.indicators.numeric.operation
 
+import java.util.function.BinaryOperator
 import org.ta4j.core.api.series.Bar
 import org.ta4j.core.indicators.numeric.NumericIndicator
 import org.ta4j.core.num.Num
-import java.util.function.BinaryOperator
 
 /**
  * Combine indicator.
@@ -53,22 +53,22 @@ class CombineIndicator(
 
     companion object {
         fun plus(indicatorLeft: NumericIndicator, indicatorRight: NumericIndicator) =
-            CombineIndicator(indicatorLeft, indicatorRight) { a, b -> a.plus(b) }
+            CombineIndicator(indicatorLeft, indicatorRight, Num::plus)
 
         fun minus(indicatorLeft: NumericIndicator, indicatorRight: NumericIndicator) =
-            CombineIndicator(indicatorLeft, indicatorRight) { a, b -> a.minus(b) }
+            CombineIndicator(indicatorLeft, indicatorRight, Num::minus)
 
         fun divide(indicatorLeft: NumericIndicator, indicatorRight: NumericIndicator) =
-            CombineIndicator(indicatorLeft, indicatorRight) { a, b -> a.dividedBy(b) }
+            CombineIndicator(indicatorLeft, indicatorRight, Num::div)
 
         fun multiply(indicatorLeft: NumericIndicator, indicatorRight: NumericIndicator) =
-            CombineIndicator(indicatorLeft, indicatorRight) { a, b -> a.multipliedBy(b) }
+            CombineIndicator(indicatorLeft, indicatorRight, Num::times)
 
         fun max(indicatorLeft: NumericIndicator, indicatorRight: NumericIndicator) =
-            CombineIndicator(indicatorLeft, indicatorRight) { a, b -> a.max(b) }
+            CombineIndicator(indicatorLeft, indicatorRight) { a, b -> maxOf(a, b) }
 
         fun min(indicatorLeft: NumericIndicator, indicatorRight: NumericIndicator) =
-            CombineIndicator(indicatorLeft, indicatorRight) { a, b -> a.min(b) }
+            CombineIndicator(indicatorLeft, indicatorRight, { a, b -> minOf(a, b) })
     }
 }
 

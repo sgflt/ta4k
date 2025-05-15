@@ -44,10 +44,4 @@ class NumberOfLosingPositionsCriterion : AnalysisCriterion {
             tradingRecord.positions.stream().filter({ obj: Position? -> obj!!.hasLoss() }).count()
         return defaultNumFactory.numOf(numberOfLosingPositions)
     }
-
-
-    /** The lower the criterion value, the better.  */
-    override fun betterThan(criterionValue1: Num, criterionValue2: Num): Boolean {
-        return criterionValue1.isLessThan(criterionValue2)
-    }
 }

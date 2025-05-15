@@ -23,9 +23,6 @@
  */
 package org.ta4j.core.criteria;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.ta4j.core.MarketEventTestContext;
@@ -95,15 +92,6 @@ class NumberOfWinningPositionsCriterionTest {
         .enter(1).asap()
         .exit(1).after(2)
         .assertResults(2);
-  }
-
-
-  @ParameterizedTest
-  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
-  void betterThan(final NumFactory numFactory) {
-    final var criterion = new NumberOfWinningPositionsCriterion();
-    assertTrue(criterion.betterThan(numFactory.numOf(6), numFactory.numOf(3)));
-    assertFalse(criterion.betterThan(numFactory.numOf(4), numFactory.numOf(7)));
   }
 
 

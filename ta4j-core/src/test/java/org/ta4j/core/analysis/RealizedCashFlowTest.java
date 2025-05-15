@@ -163,8 +163,9 @@ class RealizedCashFlowTest {
       if (i <= 1) {
         expectedValue = numFactory.one();
       } else {
-        final Num decline = numFactory.numOf(0.1).multipliedBy(numFactory.numOf(i - 1));
-        expectedValue = numFactory.one().minus(decline).max(numFactory.zero());
+        final Num decline = numFactory.numOf(0.1).times(numFactory.numOf(i - 1));
+        final var x = numFactory.one().minus(decline);
+        expectedValue = x.compareTo(numFactory.zero()) == 1 ? x : numFactory.zero();
       }
       assertNumEquals(
           expectedValue,

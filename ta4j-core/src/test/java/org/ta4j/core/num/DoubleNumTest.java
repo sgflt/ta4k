@@ -23,26 +23,28 @@
  */
 package org.ta4j.core.num;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertNotEquals;
 
 import org.junit.Test;
 
 public class DoubleNumTest {
 
-    @Test
-    public void testEqualsDoubleNumWithDecimalNum() {
-        final DecimalNum decimalNum = DecimalNum.valueOf(3.0);
-        final DoubleNum doubleNum = DoubleNum.valueOf(3.0);
+  @Test
+  public void testEqualsDoubleNumWithDecimalNum() {
+    final DecimalNum decimalNum = DecimalNum.valueOf(3.0);
+    final DoubleNum doubleNum = DoubleNum.valueOf(3.0);
 
-        assertFalse(doubleNum.equals(decimalNum));
-    }
+    assertNotEquals(doubleNum, decimalNum);
+  }
 
-    @Test
-    public void testZeroEquals() {
-        final Num num1 = DoubleNum.valueOf(-0.0);
-        final Num num2 = DoubleNum.valueOf(0.0);
 
-        assertTrue(num1.isEqual(num2));
-    }
+  @Test
+  public void testZeroEquals() {
+    final Num num1 = DoubleNum.valueOf(-0.0);
+    final Num num2 = DoubleNum.valueOf(0.0);
+
+    assertThat(num1).isEqualTo(num2);
+  }
 }

@@ -23,9 +23,6 @@
  */
 package org.ta4j.core.criteria.pnl;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.ta4j.core.TradeType;
@@ -96,14 +93,5 @@ class ProfitLossCriterionTest extends AbstractCriterionTest {
         .enter(50).at(100)
         .exit(50).at(70)
         .assertResults(250 + 1500);
-  }
-
-
-  @ParameterizedTest
-  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
-  void betterThan(final NumFactory numFactory) {
-    final var criterion = new ProfitLossCriterion();
-    assertTrue(criterion.betterThan(numFactory.numOf(5000), numFactory.numOf(4500)));
-    assertFalse(criterion.betterThan(numFactory.numOf(4500), numFactory.numOf(5000)));
   }
 }

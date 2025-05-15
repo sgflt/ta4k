@@ -60,14 +60,10 @@ object NaN : Num {
     }
 
 
-    override fun floatValue(): Float {
-        return Float.Companion.NaN
-    }
+    override fun floatValue(): Float = Float.Companion.NaN
 
 
-    override fun doubleValue(): Double {
-        return Double.Companion.NaN
-    }
+    override fun doubleValue(): Double = Double.Companion.NaN
 
 
     override val delegate = Double.NaN
@@ -130,74 +126,46 @@ object NaN : Num {
     override val name = "NaN"
 
 
-    override fun plus(augend: Num): Num {
-        return this
-    }
+    override fun plus(augend: Num): Num = this
 
 
-    override fun minus(subtrahend: Num): Num {
-        return this
-    }
+    override fun minus(subtrahend: Num): Num = this
 
 
-    override fun multipliedBy(multiplicand: Num): Num {
-        return this
-    }
+    override fun times(multiplicand: Num): Num = this
 
 
-    override fun dividedBy(divisor: Num): Num {
-        return this
-    }
+    override fun div(divisor: Num): Num = this
 
 
-    override fun remainder(divisor: Num): Num {
-        return this
-    }
+    override fun rem(divisor: Num): Num = this
 
 
-    override fun floor(): Num {
-        return this
-    }
+    override fun floor(): Num = this
 
 
-    override fun ceil(): Num {
-        return this
-    }
+    override fun ceil(): Num = this
 
 
-    override fun pow(n: Int): Num {
-        return this
-    }
+    override fun pow(n: Int): Num = this
 
 
-    override fun pow(n: Num): Num {
-        return this
-    }
+    override fun pow(n: Num): Num = this
 
 
-    override fun log(): Num {
-        return this
-    }
+    override fun log(): Num = this
 
 
-    override fun sqrt(): Num {
-        return this
-    }
+    override fun sqrt(): Num = this
 
 
-    override fun sqrt(mathContext: MathContext): Num {
-        return this
-    }
+    override fun sqrt(mathContext: MathContext): Num = this
 
 
-    override fun abs(): Num {
-        return this
-    }
+    override fun abs(): Num = this
 
 
-    override fun negate(): Num {
-        return this
-    }
+    override fun unaryMinus(): Num = this
 
 
     override val isZero = false
@@ -209,50 +177,6 @@ object NaN : Num {
     override val isNegative = false
 
     override val isNegativeOrZero = false
-
-
-    /**
-     * **Warning:** This method returns `true` if `this` and
-     * `obj` are both [.NaN].
-     *
-     * @param other the other value, not null
-     *
-     * @return false if both values are not [.NaN]; true otherwise.
-     */
-    override fun isEqual(other: Num): Boolean {
-        return other == this
-    }
-
-
-    override fun isGreaterThan(other: Num): Boolean {
-        return false
-    }
-
-
-    override fun isGreaterThanOrEqual(other: Num): Boolean {
-        return false
-    }
-
-
-    override fun isLessThan(other: Num): Boolean {
-        return false
-    }
-
-
-    override fun isLessThanOrEqual(other: Num): Boolean {
-        return false
-    }
-
-
-    override fun min(other: Num): Num {
-        return this
-    }
-
-
-    override fun max(other: Num): Num {
-        return this
-    }
-
 
     override val isNaN = true
 }

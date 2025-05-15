@@ -23,9 +23,6 @@
  */
 package org.ta4j.core.criteria.pnl;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.ta4j.core.TradeType;
@@ -96,15 +93,6 @@ class AverageLossCriterionTest extends AbstractCriterionTest {
 
     // Average loss should be (-5 + -30) / 2 = -17.5
     context.assertResults(-17.5);
-  }
-
-
-  @ParameterizedTest
-  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
-  void betterThan(final NumFactory numFactory) {
-    final var criterion = new AverageLossCriterion();
-    assertTrue(criterion.betterThan(numFactory.numOf(2.0), numFactory.numOf(1.5)));
-    assertFalse(criterion.betterThan(numFactory.numOf(1.5), numFactory.numOf(2.0)));
   }
 
 

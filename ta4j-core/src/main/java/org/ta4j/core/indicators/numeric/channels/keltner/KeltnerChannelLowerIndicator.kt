@@ -61,8 +61,7 @@ class KeltnerChannelLowerIndicator(
 
 
     private fun calculate(): Num {
-        return keltnerMiddleIndicator.value
-            .minus(ratio.multipliedBy(averageTrueRangeIndicator.value))
+        return keltnerMiddleIndicator.value - (ratio * averageTrueRangeIndicator.value)
     }
 
 

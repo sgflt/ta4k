@@ -35,8 +35,11 @@ class CloseLocationValueIndicator(numFactory: NumFactory) : NumericIndicator(num
     private fun calculate(bar: Bar) = with(bar) {
         val diffHighLow = highPrice.minus(lowPrice)
 
-        if (diffHighLow.isNaN || diffHighLow.isZero) numFactory.zero()
-        else closePrice.minus(lowPrice).minus(highPrice.minus(closePrice)).dividedBy(diffHighLow)
+        if (diffHighLow.isNaN || diffHighLow.isZero) {
+            numFactory.zero()
+        } else {
+            (closePrice - lowPrice - (highPrice - closePrice)) / diffHighLow
+        }
     }
 
     override fun updateState(bar: Bar) {

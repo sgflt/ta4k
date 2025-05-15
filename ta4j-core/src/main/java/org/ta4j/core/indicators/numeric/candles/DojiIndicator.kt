@@ -58,7 +58,7 @@ class DojiIndicator(numFactory: NumFactory, barCount: Int, bodyFactor: Double) :
         val averageBodyHeight = averageBodyHeightInd.value
         val currentBodyHeight = bodyHeightInd.value
 
-        return currentBodyHeight.isLessThan(averageBodyHeight.multipliedBy(factor))
+        return currentBodyHeight < averageBodyHeight * factor
     }
 
 

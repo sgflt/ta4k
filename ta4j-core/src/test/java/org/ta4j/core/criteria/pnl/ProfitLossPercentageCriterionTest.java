@@ -23,9 +23,6 @@
  */
 package org.ta4j.core.criteria.pnl;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.ta4j.core.TradeType;
@@ -138,15 +135,6 @@ class ProfitLossPercentageCriterionTest extends AbstractCriterionTest {
 
     // Total percentage loss should be -10% + -5% = -15%
     context.assertResults(-15);
-  }
-
-
-  @ParameterizedTest
-  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
-  void betterThan(final NumFactory numFactory) {
-    final var criterion = new ProfitLossPercentageCriterion();
-    assertTrue(criterion.betterThan(numFactory.numOf(50), numFactory.numOf(45)));
-    assertFalse(criterion.betterThan(numFactory.numOf(45), numFactory.numOf(50)));
   }
 
 

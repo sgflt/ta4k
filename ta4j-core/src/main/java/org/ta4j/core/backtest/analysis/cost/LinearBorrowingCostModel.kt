@@ -22,9 +22,9 @@
  */
 package org.ta4j.core.backtest.analysis.cost
 
+import java.time.temporal.ChronoUnit
 import org.ta4j.core.backtest.Position
 import org.ta4j.core.num.Num
-import java.time.temporal.ChronoUnit
 
 /**
  * With this cost model, the trading costs for borrowing a position (i.e.
@@ -65,9 +65,6 @@ class LinearBorrowingCostModel
 
     private fun calculateBorrowingCost(tradingPeriods: Long, tradedValue: Num): Num {
         val numFactory = tradedValue.numFactory
-        return tradedValue.multipliedBy(
-            numFactory.numOf(tradingPeriods)
-                .multipliedBy(numFactory.numOf(this.feePerPeriod))
-        )
+        return tradedValue * numFactory.numOf(tradingPeriods) * numFactory.numOf(this.feePerPeriod)
     }
 }

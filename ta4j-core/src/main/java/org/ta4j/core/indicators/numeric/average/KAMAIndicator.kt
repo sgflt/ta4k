@@ -71,8 +71,8 @@ class KAMAIndicator @JvmOverloads constructor(
      */
     init {
         val two = numFactory.two()
-        fastest = two.dividedBy(numFactory.numOf(barCountFast + 1))
-        slowest = two.dividedBy(numFactory.numOf(barCountSlow + 1))
+        fastest = two / numFactory.numOf(barCountFast + 1)
+        slowest = two / numFactory.numOf(barCountSlow + 1)
     }
 
 
@@ -86,12 +86,12 @@ class KAMAIndicator @JvmOverloads constructor(
          * Volatility is the sum of the absolute value of the last ten price changes (Close - Prior Close).
          */
         val change = currentPrice.minus(priceAtStartOfRange.value).abs()
-        val er = change.dividedBy(previousVolatilities.value)
+        val er = change / previousVolatilities.value
         /*
          * Smoothing Constant (SC) SC = [ER x (fastest SC - slowest SC) + slowest SC]2
          * SC = [ER x (2/(2+1) - 2/(30+1)) + 2/(30+1)]2
          */
-        val sc = er.multipliedBy(fastest.minus(slowest)).plus(slowest).pow(2)
+        val sc = (er * (fastest - slowest) + slowest).pow(2)
 
 
         val priorKAMA = value
@@ -102,7 +102,7 @@ class KAMAIndicator @JvmOverloads constructor(
         /*
          * KAMA Current KAMA = Prior KAMA + SC x (Price - Prior KAMA)
          */
-        return priorKAMA.plus(sc.multipliedBy(currentPrice.minus(priorKAMA)))
+        return priorKAMA.plus(sc * currentPrice.minus(priorKAMA))
     }
 
 

@@ -41,11 +41,5 @@ class ProfitLossCriterion : AnalysisCriterion {
         tradingRecord.positions
             .filter { it.isClosed }
             .map { calculate(it) }
-            .fold(defaultNumFactory.zero()) { acc, num -> acc.plus(num) }
-
-
-    /** The higher the criterion value, the better.  */
-    override fun betterThan(criterionValue1: Num, criterionValue2: Num): Boolean {
-        return criterionValue1.isGreaterThan(criterionValue2)
-    }
+            .fold(defaultNumFactory.zero()) { acc, num -> acc + num }
 }

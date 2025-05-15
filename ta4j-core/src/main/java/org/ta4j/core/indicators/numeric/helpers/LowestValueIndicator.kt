@@ -22,10 +22,10 @@
  */
 package org.ta4j.core.indicators.numeric.helpers
 
+import java.util.*
 import org.ta4j.core.api.series.Bar
 import org.ta4j.core.indicators.numeric.NumericIndicator
 import org.ta4j.core.num.Num
-import java.util.*
 
 /**
  * Lowest value indicator.
@@ -75,7 +75,7 @@ class LowestValueIndicator(private val indicator: NumericIndicator, private val 
 
         while (
             deque.isNotEmpty()
-            && (window[deque.peekLast()]!!.isGreaterThan(currentValue)
+            && (window[deque.peekLast()]!! > currentValue
                     || window[deque.peekLast()]!!.isNaN
                     )
         ) {

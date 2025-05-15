@@ -61,9 +61,4 @@ class MaximumDrawdownCriterion(private val numFactory: NumFactory) : AnalysisCri
 
         return tradingRecord.maximumDrawdown!!
     }
-
-
-    override fun betterThan(criterionValue1: Num, criterionValue2: Num): Boolean {
-        return criterionValue1.isLessThan(criterionValue2)
-    }
 }

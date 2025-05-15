@@ -51,26 +51,7 @@ class PositionsRatioCriterion(private val positionFilter: PositionFilter) : Anal
 
     override fun calculate(tradingRecord: TradingRecord): Num {
         val numberOfPositions = numberOfPositionsCriterion.calculate(tradingRecord)
-        return numberOfPositions.dividedBy(
-            defaultNumFactory
-                .numOf(tradingRecord.positionCount)
-        )
-    }
-
-
-    /**
-     *
-     *  * For [PositionFilter.PROFIT]: The higher the criterion value, the
-     * better.
-     *  * For [PositionFilter.LOSS]: The lower the criterion value, the
-     * better.
-     *
-     */
-    override fun betterThan(criterionValue1: Num, criterionValue2: Num): Boolean {
-        return if (positionFilter == PositionFilter.PROFIT)
-            criterionValue1.isGreaterThan(criterionValue2)
-        else
-            criterionValue1.isLessThan(criterionValue2)
+        return numberOfPositions / defaultNumFactory.numOf(tradingRecord.positionCount)
     }
 
     companion object {

@@ -23,9 +23,6 @@
  */
 package org.ta4j.core.criteria.helpers;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.ta4j.core.MarketEventTestContext;
@@ -50,24 +47,6 @@ class StandardErrorCriterionTest {
         .exit(1).after(2);
 
     tradingTest.assertResults(1.7677669529663687);
-  }
-
-
-  @ParameterizedTest
-  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
-  void betterThanWithLessIsBetter(final NumFactory numFactory) {
-    final var criterion = new StandardErrorCriterion(new ProfitLossCriterion());
-    assertFalse(criterion.betterThan(numFactory.numOf(5000), numFactory.numOf(4500)));
-    assertTrue(criterion.betterThan(numFactory.numOf(4500), numFactory.numOf(5000)));
-  }
-
-
-  @ParameterizedTest
-  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
-  void betterThanWithLessIsNotBetter(final NumFactory numFactory) {
-    final var criterion = new StandardErrorCriterion(new ProfitLossCriterion(), false);
-    assertTrue(criterion.betterThan(numFactory.numOf(5000), numFactory.numOf(4500)));
-    assertFalse(criterion.betterThan(numFactory.numOf(4500), numFactory.numOf(5000)));
   }
 
 

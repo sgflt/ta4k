@@ -36,7 +36,7 @@ class StandardErrorIndicator(indicator: NumericIndicator, barCount: Int) : Numer
     override val lag: Int
         get() = sdev.lag
 
-    private fun calculate() = sdev.value.dividedBy(divisor)
+    private fun calculate() = sdev.value / divisor
 
 
     override fun updateState(bar: Bar) {

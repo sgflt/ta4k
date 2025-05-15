@@ -53,10 +53,10 @@ class TRIndicator(numFactory: NumFactory) : NumericIndicator(numFactory) {
 
         isStable = true
         val previousClose = previousBar!!.closePrice
-        val hc = high.minus(previousClose)
-        val cl = previousClose.minus(low)
+        val hc = high - previousClose
+        val cl = previousClose - low
         previousBar = bar
-        return hl.abs().max(hc.abs()).max(cl.abs())
+        return maxOf(hl.abs(), hc.abs(), cl.abs())
     }
 
 

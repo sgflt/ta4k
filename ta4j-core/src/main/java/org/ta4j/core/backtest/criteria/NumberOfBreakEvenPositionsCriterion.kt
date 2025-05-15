@@ -52,10 +52,4 @@ class NumberOfBreakEvenPositionsCriterion : AnalysisCriterion {
     private fun isBreakEvenPosition(position: Position): Boolean {
         return position.isClosed && position.profit.isZero
     }
-
-
-    /** The lower the criterion value, the better.  */
-    override fun betterThan(criterionValue1: Num, criterionValue2: Num): Boolean {
-        return criterionValue1.isLessThan(criterionValue2)
-    }
 }

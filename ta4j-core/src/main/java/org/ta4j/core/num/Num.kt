@@ -59,7 +59,7 @@ interface Num : Comparable<Num> {
      * @param augend value to be added to this `Num`
      * @return `this + augend`, rounded as necessary
      */
-    fun plus(augend: Num): Num
+    operator fun plus(augend: Num): Num
 
     /**
      * Returns a `Num` whose value is `(this - augend)`.
@@ -67,7 +67,7 @@ interface Num : Comparable<Num> {
      * @param subtrahend value to be subtracted from this `Num`
      * @return `this - subtrahend`, rounded as necessary
      */
-    fun minus(subtrahend: Num): Num
+    operator fun minus(subtrahend: Num): Num
 
     /**
      * Returns a `Num` whose value is `this * multiplicand`.
@@ -75,7 +75,7 @@ interface Num : Comparable<Num> {
      * @param multiplicand value to be multiplied by this `Num`
      * @return `this * multiplicand`, rounded as necessary
      */
-    fun multipliedBy(multiplicand: Num): Num
+    operator fun times(multiplicand: Num): Num
 
     /**
      * Returns a `Num` whose value is `(this / divisor)`.
@@ -83,7 +83,7 @@ interface Num : Comparable<Num> {
      * @param divisor value by which this `Num` is to be divided
      * @return `this / divisor`, rounded as necessary
      */
-    fun dividedBy(divisor: Num): Num
+    operator fun div(divisor: Num): Num
 
     /**
      * Returns a `Num` whose value is `(this % divisor)`.
@@ -91,7 +91,7 @@ interface Num : Comparable<Num> {
      * @param divisor value by which this `Num` is to be divided
      * @return `this % divisor`, rounded as necessary
      */
-    fun remainder(divisor: Num): Num
+    operator fun rem(divisor: Num): Num
 
     /**
      * Returns a `Num` whose value is rounded down to the nearest whole
@@ -159,7 +159,7 @@ interface Num : Comparable<Num> {
      *
      * @return `negate(this)`
      */
-    fun negate(): Num
+    operator fun unaryMinus(): Num
 
     /**
      * Checks if `this` is zero.
@@ -195,66 +195,6 @@ interface Num : Comparable<Num> {
      * @return true if `this ≤ 0`, false otherwise
      */
     val isNegativeOrZero: Boolean
-
-    /**
-     * Checks if `this` is equal to `other`.
-     *
-     * @param other the other value, not null
-     * @return true if `this == other`, false otherwise
-     */
-    fun isEqual(other: Num): Boolean
-
-    /**
-     * Checks if `this` is greater than `other`.
-     *
-     * @param other the other value, not null
-     * @return true if `this > other`, false otherwise
-     */
-    fun isGreaterThan(other: Num): Boolean
-
-    /**
-     * Checks if `this` is greater than or equal to `other`.
-     *
-     * @param other the other value, not null
-     * @return true if `this ≥ other`, false otherwise
-     */
-    fun isGreaterThanOrEqual(other: Num): Boolean
-
-    /**
-     * Checks if `this` is less than `other`.
-     *
-     * @param other the other value, not null
-     * @return true if `this < other`, false otherwise
-     */
-    fun isLessThan(other: Num): Boolean
-
-    /**
-     * Checks if `this` is less than `other`.
-     *
-     * @param other the other value, not null
-     * @return true if `this ≤ other`, false otherwise
-     */
-    fun isLessThanOrEqual(other: Num): Boolean
-
-    /**
-     * Returns the `Num` whose value is the smaller of `this` and
-     * `other`.
-     *
-     * @param other value with which to calculate the minimum
-     * @return the smaller of `this` and `other`. If they are equal,
-     * `this` is returned.
-     */
-    fun min(other: Num): Num
-
-    /**
-     * Returns the `Num` whose value is the greater of `this` and
-     * `other`.
-     *
-     * @param other value with which to calculate the maximum
-     * @return the greater of `this` and `other`. If they are equal,
-     * `this` is returned.
-     */
-    fun max(other: Num): Num
 
     /**
      * Returns true only if `this` is an instance of [NaN].

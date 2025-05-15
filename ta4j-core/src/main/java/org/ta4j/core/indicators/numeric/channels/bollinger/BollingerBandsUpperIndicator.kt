@@ -51,7 +51,7 @@ class BollingerBandsUpperIndicator
     private val k: Num = deviation.numFactory.two(),
 ) : NumericIndicator(deviation.numFactory) {
 
-    private fun calculate() = bbm.value.plus(deviation.value.multipliedBy(k))
+    private fun calculate() = bbm.value + (deviation.value * k)
 
     override fun updateState(bar: Bar) {
         bbm.onBar(bar)

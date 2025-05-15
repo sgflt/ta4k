@@ -58,8 +58,7 @@ class KeltnerChannelUpperIndicator(
     ) : this(numFactory, middle, ATRIndicator(numFactory, barCountATR), ratio)
 
 
-    private fun calculate() = keltnerMiddleIndicator.value
-        .plus(ratio.multipliedBy(averageTrueRangeIndicator.value))
+    private fun calculate() = keltnerMiddleIndicator.value + (ratio * averageTrueRangeIndicator.value)
 
 
     public override fun updateState(bar: Bar) {

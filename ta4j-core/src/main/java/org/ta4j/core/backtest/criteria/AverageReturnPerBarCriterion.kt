@@ -22,13 +22,13 @@
  */
 package org.ta4j.core.backtest.criteria
 
+import java.time.temporal.ChronoUnit
 import org.ta4j.core.backtest.Position
 import org.ta4j.core.backtest.TradingRecord
 import org.ta4j.core.backtest.criteria.pnl.ReturnCriterion
 import org.ta4j.core.num.Num
 import org.ta4j.core.num.NumFactory
 import org.ta4j.core.num.NumFactoryProvider.defaultNumFactory
-import java.time.temporal.ChronoUnit
 
 /**
  * Calculates the average return per bar criterion, returned in decimal format.
@@ -55,8 +55,7 @@ class AverageReturnPerBarCriterion(private val numFactory: NumFactory, averaging
         return if (bars.isZero)
             defaultNumFactory.one()
         else
-            this.grossReturn.calculate(position)
-                .pow(defaultNumFactory.one().dividedBy(bars))
+            this.grossReturn.calculate(position).pow(defaultNumFactory.one() / bars)
     }
 
 
@@ -65,12 +64,6 @@ class AverageReturnPerBarCriterion(private val numFactory: NumFactory, averaging
         return if (timeUnits.isZero)
             this.numFactory.one()
         else
-            this.grossReturn.calculate(tradingRecord).pow(this.numFactory.one().dividedBy(timeUnits))
-    }
-
-
-    /** The higher the criterion value, the better.  */
-    override fun betterThan(criterionValue1: Num, criterionValue2: Num): Boolean {
-        return criterionValue1.isGreaterThan(criterionValue2)
+            this.grossReturn.calculate(tradingRecord).pow(this.numFactory.one() / timeUnits)
     }
 }

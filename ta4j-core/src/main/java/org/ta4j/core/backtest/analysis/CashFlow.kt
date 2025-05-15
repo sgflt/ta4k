@@ -22,13 +22,13 @@
  */
 package org.ta4j.core.backtest.analysis
 
+import java.time.Instant
+import java.util.*
 import org.ta4j.core.backtest.Position
 import org.ta4j.core.backtest.Position.PositionValue
 import org.ta4j.core.backtest.TradingRecord
 import org.ta4j.core.num.Num
 import org.ta4j.core.num.NumFactoryProvider.defaultNumFactory
-import java.time.Instant
-import java.util.*
 
 /**
  * Tracks the portfolio value evolution over time considering all price movements.
@@ -100,7 +100,7 @@ class CashFlow {
                 return positionValue.value
             }
 
-            return oldValue.plus(positionValue.value)
+            return oldValue + positionValue.value
         }
     }
 }

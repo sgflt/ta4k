@@ -22,10 +22,10 @@
  */
 package org.ta4j.core.indicators.numeric.operation
 
+import java.util.function.BinaryOperator
 import org.ta4j.core.api.series.Bar
 import org.ta4j.core.indicators.numeric.NumericIndicator
 import org.ta4j.core.num.Num
-import java.util.function.BinaryOperator
 
 /**
  * Objects of this class defer evaluation of an arithmetic operation.
@@ -96,7 +96,7 @@ class BinaryOperation private constructor(
          * @see Num.multipliedBy
          */
         fun product(left: NumericIndicator, right: NumericIndicator) =
-            BinaryOperation({ a, b -> a.multipliedBy(b) }, left, right)
+            BinaryOperation({ a, b -> a * b }, left, right)
 
 
         /**
@@ -110,7 +110,7 @@ class BinaryOperation private constructor(
          * @see Num.dividedBy
          */
         fun quotient(left: NumericIndicator, right: NumericIndicator) =
-            BinaryOperation({ a, b -> a.dividedBy(b) }, left, right)
+            BinaryOperation({ a, b -> a / b }, left, right)
 
 
         /**
@@ -125,7 +125,7 @@ class BinaryOperation private constructor(
          *
          * @see Num.min
          */
-        fun min(left: NumericIndicator, right: NumericIndicator) = BinaryOperation({ a, b -> a.min(b) }, left, right)
+        fun min(left: NumericIndicator, right: NumericIndicator) = BinaryOperation({ a, b -> minOf(a, b) }, left, right)
 
 
         /**
@@ -140,6 +140,6 @@ class BinaryOperation private constructor(
          *
          * @see Num.max
          */
-        fun max(left: NumericIndicator, right: NumericIndicator) = BinaryOperation({ a, b -> a.max(b) }, left, right)
+        fun max(left: NumericIndicator, right: NumericIndicator) = BinaryOperation({ a, b -> maxOf(a, b) }, left, right)
     }
 }

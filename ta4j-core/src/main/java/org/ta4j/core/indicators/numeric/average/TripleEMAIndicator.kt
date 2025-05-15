@@ -47,10 +47,8 @@ class TripleEMAIndicator(indicator: NumericIndicator, private val barCount: Int)
 
 
     private fun calculate(): Num {
-        // trix = 3 * ( ema - emaEma ) + emaEmaEma
-        return numFactory.numOf(3)
-            .multipliedBy(ema.value.minus(emaEma.value))
-            .plus(emaEmaEma.value)
+        val three = numFactory.numOf(3)
+        return three * (ema.value - emaEma.value) + emaEmaEma.value
     }
 
 

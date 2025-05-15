@@ -61,12 +61,6 @@ class ExpectancyCriterion : AnalysisCriterion {
     }
 
 
-    /** The higher the criterion value, the better.  */
-    override fun betterThan(criterionValue1: Num, criterionValue2: Num): Boolean {
-        return criterionValue1.isGreaterThan(criterionValue2)
-    }
-
-
     private fun calculate(
         profitLossRatio: Num, numberOfWinningPositions: Num,
         numberOfAllPositions: Num,
@@ -76,7 +70,7 @@ class ExpectancyCriterion : AnalysisCriterion {
         }
         // Expectancy = ((1 + AW/AL) * ProbabilityToWinOnePosition) - 1
         val one = defaultNumFactory.one()
-        val probabiltyToWinOnePosition = numberOfWinningPositions.dividedBy(numberOfAllPositions)
-        return (one.plus(profitLossRatio)).multipliedBy(probabiltyToWinOnePosition).minus(one)
+        val probabiltyToWinOnePosition = numberOfWinningPositions / numberOfAllPositions
+        return (one + profitLossRatio) * probabiltyToWinOnePosition - one
     }
 }

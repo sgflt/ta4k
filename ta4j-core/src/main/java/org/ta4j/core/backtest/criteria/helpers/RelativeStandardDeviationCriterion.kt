@@ -57,9 +57,9 @@ class RelativeStandardDeviationCriterion : AnalysisCriterion {
      * is calculated
      */
     constructor(criterion: AnalysisCriterion) {
-        this.standardDeviationCriterion = StandardDeviationCriterion(criterion)
-        this.averageCriterion = AverageCriterion(criterion)
-        this.lessIsBetter = false
+        standardDeviationCriterion = StandardDeviationCriterion(criterion)
+        averageCriterion = AverageCriterion(criterion)
+        lessIsBetter = false
     }
 
 
@@ -71,15 +71,15 @@ class RelativeStandardDeviationCriterion : AnalysisCriterion {
      * @param lessIsBetter the [.lessIsBetter]
      */
     constructor(criterion: AnalysisCriterion, lessIsBetter: Boolean) {
-        this.standardDeviationCriterion = StandardDeviationCriterion(criterion)
-        this.averageCriterion = AverageCriterion(criterion)
+        standardDeviationCriterion = StandardDeviationCriterion(criterion)
+        averageCriterion = AverageCriterion(criterion)
         this.lessIsBetter = lessIsBetter
     }
 
 
     override fun calculate(position: Position): Num {
-        val average = this.averageCriterion.calculate(position)
-        return this.standardDeviationCriterion.calculate(position).dividedBy(average)
+        val average = averageCriterion.calculate(position)
+        return standardDeviationCriterion.calculate(position) / average
     }
 
 
@@ -87,19 +87,7 @@ class RelativeStandardDeviationCriterion : AnalysisCriterion {
         if (tradingRecord.positions.isEmpty()) {
             return defaultNumFactory.zero()
         }
-        val average = this.averageCriterion.calculate(tradingRecord)
-        return this.standardDeviationCriterion.calculate(tradingRecord).dividedBy(average)
-    }
-
-
-    /**
-     * If [.lessIsBetter] == false, then the lower the criterion value, the
-     * better, otherwise the higher the criterion value the better.
-     */
-    override fun betterThan(criterionValue1: Num, criterionValue2: Num): Boolean {
-        return if (this.lessIsBetter)
-            criterionValue1.isLessThan(criterionValue2)
-        else
-            criterionValue1.isGreaterThan(criterionValue2)
+        val average = averageCriterion.calculate(tradingRecord)
+        return standardDeviationCriterion.calculate(tradingRecord) / average
     }
 }

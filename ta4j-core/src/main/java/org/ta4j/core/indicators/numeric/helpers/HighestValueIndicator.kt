@@ -22,10 +22,10 @@
  */
 package org.ta4j.core.indicators.numeric.helpers
 
+import java.util.*
 import org.ta4j.core.api.series.Bar
 import org.ta4j.core.indicators.numeric.NumericIndicator
 import org.ta4j.core.num.Num
-import java.util.*
 
 /**
  * Highest value indicator.
@@ -59,7 +59,7 @@ class HighestValueIndicator(private val indicator: NumericIndicator, private val
         val currentValue = indicator.value
         window[actualIndex] = currentValue
 
-        while (deque.isNotEmpty() && (window[deque.peekLast()]!!.isLessThan(currentValue)
+        while (deque.isNotEmpty() && (window[deque.peekLast()]!! < currentValue
                     || window[deque.peekLast()]!!.isNaN
                     )
         ) {

@@ -71,15 +71,9 @@ class ReturnCriterion : AnalysisCriterion {
     override fun calculate(tradingRecord: TradingRecord): Num {
         val product = tradingRecord.positions
             .map { calculateProfit(it) }
-            .fold(defaultNumFactory.one()) { acc, multiplicand -> acc.multipliedBy(multiplicand!!) }
+            .fold(defaultNumFactory.one()) { acc, multiplicand -> acc * multiplicand }
 
         return product.minus(if (addBase) defaultNumFactory.zero() else defaultNumFactory.one())
-    }
-
-
-    /** The higher the criterion value, the better.  */
-    override fun betterThan(criterionValue1: Num, criterionValue2: Num): Boolean {
-        return criterionValue1.isGreaterThan(criterionValue2)
     }
 
 
@@ -90,7 +84,7 @@ class ReturnCriterion : AnalysisCriterion {
      *
      * @return the gross return of the position
      */
-    private fun calculateProfit(position: Position): Num? {
+    private fun calculateProfit(position: Position): Num {
         if (position.isClosed) {
             return position.grossReturn
         }

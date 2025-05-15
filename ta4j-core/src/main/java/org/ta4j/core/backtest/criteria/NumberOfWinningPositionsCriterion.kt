@@ -44,10 +44,4 @@ class NumberOfWinningPositionsCriterion : AnalysisCriterion {
             tradingRecord.positions.stream().filter({ obj: Position? -> obj!!.hasProfit() }).count()
         return defaultNumFactory.numOf(numberOfWinningPositions)
     }
-
-
-    /** The higher the criterion value, the better.  */
-    override fun betterThan(criterionValue1: Num, criterionValue2: Num): Boolean {
-        return criterionValue1.isGreaterThan(criterionValue2)
-    }
 }

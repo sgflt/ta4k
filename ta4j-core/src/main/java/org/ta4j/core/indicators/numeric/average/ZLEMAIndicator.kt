@@ -35,7 +35,7 @@ import org.ta4j.core.num.Num
  */
 class ZLEMAIndicator(private val indicator: NumericIndicator, private val barCount: Int) :
     NumericIndicator(indicator.numFactory) {
-    private val k = numFactory.two().dividedBy(numFactory.numOf(barCount + 1))
+    private val k = numFactory.two() / numFactory.numOf(barCount + 1)
     private val oneMinusK = numFactory.one().minus(k)
     private val lagPreviousValue = indicator.previous((barCount - 1) / 2)
     private var barsPassed = 0
@@ -52,13 +52,7 @@ class ZLEMAIndicator(private val indicator: NumericIndicator, private val barCou
         }
 
         val zlemaPrev = value
-        return k.multipliedBy(
-            numFactory
-                .two()
-                .multipliedBy(indicator.value)
-                .minus(lagPreviousValue.value)
-        )
-            .plus(oneMinusK.multipliedBy(zlemaPrev))
+        return k * (numFactory.two() * indicator.value - lagPreviousValue.value) + oneMinusK * zlemaPrev
     }
 
 

@@ -49,8 +49,8 @@ data class BacktestBar(
     fun addTrade(tradeVolume: Num, tradePrice: Num) {
         addPrice(tradePrice)
 
-        volume = volume.plus(tradeVolume)
-        amount = amount.plus(tradeVolume.multipliedBy(tradePrice))
+        volume = volume + tradeVolume
+        amount = amount + tradeVolume * tradePrice
         trades++
     }
 
@@ -92,12 +92,12 @@ data class BacktestBar(
         closePrice = price
         highPrice = when {
             highPrice.isNaN -> price
-            highPrice.isLessThan(price) -> price
+            highPrice < price -> price
             else -> highPrice
         }
         lowPrice = when {
             lowPrice.isNaN -> price
-            lowPrice.isGreaterThan(price) -> price
+            lowPrice > price -> price
             else -> lowPrice
         }
     }

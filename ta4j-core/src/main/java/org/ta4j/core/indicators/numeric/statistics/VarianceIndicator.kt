@@ -53,30 +53,23 @@ class VarianceIndicator(private val indicator: NumericIndicator, private val bar
 
     fun add(x: Num): Num {
         currentIndex++
-        val delta = x.minus(mean)
-        mean = mean.plus(delta.dividedBy(numFactory.numOf(currentIndex)))
-        return _value.plus(delta.multipliedBy(x.minus(mean)))
+        val delta = x - mean
+        mean += delta / numFactory.numOf(currentIndex)
+        return _value + delta * (x - mean)
     }
 
     private fun dropOldestAndAddNew(x: Num, y: Num): Num {
-        val deltaYX = y.minus(x)
-        val deltaX = x.minus(mean)
-        val deltaY = y.minus(mean)
-        mean = mean.plus(deltaYX.dividedBy(numFactory.numOf(barCount)))
-        val deltaYp = y.minus(mean)
-        return _value.minus(
-            numFactory.numOf(barCount)
-                .multipliedBy(
-                    deltaX.multipliedBy(deltaX)
-                        .minus(deltaY.multipliedBy(deltaYp))
-                        .dividedBy(divisor)
-                )
-        )
-            .minus(deltaYX.multipliedBy(deltaYp).dividedBy(divisor))
+        val deltaYX = y - x
+        val deltaX = x - mean
+        val deltaY = y - mean
+        mean += deltaYX / numFactory.numOf(barCount)
+        val deltaYp = y - mean
+        return _value - (numFactory.numOf(barCount) * (deltaX * deltaX - deltaY * deltaYp) / divisor) -
+                (deltaYX * deltaYp / divisor)
     }
 
     override var value: Num
-        get() = _value.dividedBy(divisor)
+        get() = _value / divisor
         protected set(value) {
             _value = value
         }

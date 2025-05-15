@@ -82,16 +82,4 @@ class StandardDeviationCriterion : AnalysisCriterion {
         }
         return this.varianceCriterion.calculate(tradingRecord).sqrt()
     }
-
-
-    /**
-     * If [.lessIsBetter] == false, then the lower the criterion value, the
-     * better, otherwise the higher the criterion value the better.
-     */
-    override fun betterThan(criterionValue1: Num, criterionValue2: Num): Boolean {
-        return if (this.lessIsBetter)
-            criterionValue1.isLessThan(criterionValue2)
-        else
-            criterionValue1.isGreaterThan(criterionValue2)
-    }
 }

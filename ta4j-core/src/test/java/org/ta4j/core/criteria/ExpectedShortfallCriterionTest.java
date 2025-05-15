@@ -23,8 +23,6 @@
  */
 package org.ta4j.core.criteria;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.ta4j.core.TestUtils.assertNumEquals;
 
 import org.junit.jupiter.params.ParameterizedTest;
@@ -163,14 +161,5 @@ class ExpectedShortfallCriterionTest {
     final var criterion = new ExpectedShortfallCriterion(numFactory, 0.95);
     final var tradingRecord = new BackTestTradingRecord(TradeType.BUY, numFactory);
     assertNumEquals(numFactory.numOf(0), criterion.calculate(tradingRecord));
-  }
-
-
-  @ParameterizedTest
-  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
-  void betterThan(final NumFactory numFactory) {
-    final var criterion = new ExpectedShortfallCriterion(numFactory, 0.95);
-    assertTrue(criterion.betterThan(numFactory.numOf(-0.1), numFactory.numOf(-0.2)));
-    assertFalse(criterion.betterThan(numFactory.numOf(-0.1), numFactory.numOf(0.0)));
   }
 }

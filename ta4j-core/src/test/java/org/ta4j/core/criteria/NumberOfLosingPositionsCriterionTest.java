@@ -23,9 +23,6 @@
  */
 package org.ta4j.core.criteria;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.ta4j.core.MarketEventTestContext;
@@ -47,6 +44,7 @@ class NumberOfLosingPositionsCriterionTest {
     context.assertResults(0);
   }
 
+
   @ParameterizedTest
   @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
   void calculateWithTwoLongPositions(final NumFactory factory) {
@@ -65,6 +63,7 @@ class NumberOfLosingPositionsCriterionTest {
     context.assertResults(2);
   }
 
+
   @ParameterizedTest
   @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
   void calculateWithOneLongPosition(final NumFactory factory) {
@@ -80,6 +79,7 @@ class NumberOfLosingPositionsCriterionTest {
 
     context.assertResults(1);
   }
+
 
   @ParameterizedTest
   @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
@@ -99,13 +99,6 @@ class NumberOfLosingPositionsCriterionTest {
     context.assertResults(2);
   }
 
-  @ParameterizedTest
-  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
-  void betterThan(final NumFactory factory) {
-    final var criterion = new NumberOfLosingPositionsCriterion();
-    assertTrue(criterion.betterThan(factory.numOf(3), factory.numOf(6)));
-    assertFalse(criterion.betterThan(factory.numOf(7), factory.numOf(4)));
-  }
 
   @ParameterizedTest
   @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")

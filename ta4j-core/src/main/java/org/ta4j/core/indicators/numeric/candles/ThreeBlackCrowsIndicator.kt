@@ -92,7 +92,7 @@ class ThreeBlackCrowsIndicator(numFactory: NumFactory, barCount: Int, factor: Do
         // We use the white candle index to remove to bias of the previous crows
         val averageLowerShadow = averageLowerShadowInd.value
 
-        return currentLowerShadow.isLessThan(averageLowerShadow.multipliedBy(factor))
+        return currentLowerShadow < averageLowerShadow * factor
     }
 
 
@@ -105,9 +105,9 @@ class ThreeBlackCrowsIndicator(numFactory: NumFactory, barCount: Int, factor: Do
         val (prevOpenPrice, prevClosePrice) = bars[index - 1]?.let { it.openPrice to it.closePrice } ?: return false
         val (currOpenPrice, currClosePrice) = bars[index]?.let { it.openPrice to it.closePrice } ?: return false
 
-        return currOpenPrice.isLessThan(prevOpenPrice) &&
-                currOpenPrice.isGreaterThan(prevClosePrice) &&
-                currClosePrice.isLessThan(prevClosePrice)
+        return currOpenPrice < prevOpenPrice
+                && currOpenPrice > prevClosePrice
+                && currClosePrice < prevClosePrice
     }
 
 
@@ -124,7 +124,7 @@ class ThreeBlackCrowsIndicator(numFactory: NumFactory, barCount: Int, factor: Do
         }
 
         return if (prevBar?.isBullish == true) {
-            hasVeryShortLowerShadow(index) && currBar.openPrice.isLessThan(prevBar.highPrice)
+            hasVeryShortLowerShadow(index) && currBar.openPrice < prevBar.highPrice
         } else {
             hasVeryShortLowerShadow(index) && isDeclining(index)
         }

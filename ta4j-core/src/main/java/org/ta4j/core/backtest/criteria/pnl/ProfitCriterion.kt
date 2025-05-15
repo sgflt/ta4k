@@ -59,15 +59,11 @@ class ProfitCriterion
 
     override fun calculate(tradingRecord: TradingRecord): Num {
         return tradingRecord.positions
-            .stream()
-            .filter(Position::isClosed)
-            .map(this::calculate)
-            .reduce(defaultNumFactory.zero(), { obj: Num, augend: Num -> obj.plus(augend) })
+            .filter { it.isClosed }
+            .sumOf { calculate(it) }
     }
 
-
-    /** The higher the criterion value (= the higher the profit), the better.  */
-    override fun betterThan(criterionValue1: Num, criterionValue2: Num): Boolean {
-        return criterionValue1.isGreaterThan(criterionValue2)
-    }
+    private fun Iterable<Position>.sumOf(selector: (Position) -> Num): Num =
+        fold(defaultNumFactory.zero()) { sum, element -> sum + selector(element) }
 }
+

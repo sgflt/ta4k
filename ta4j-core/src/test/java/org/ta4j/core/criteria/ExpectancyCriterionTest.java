@@ -23,9 +23,6 @@
  */
 package org.ta4j.core.criteria;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.ta4j.core.MarketEventTestContext;
@@ -141,15 +138,6 @@ class ExpectancyCriterionTest extends AbstractCriterionTest {
     // One winning trade and one losing trade
     // Expectancy = (1 winning trade / 2 total trades) = 0.25
     context.assertResults(0.25);
-  }
-
-
-  @ParameterizedTest
-  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
-  void betterThan(final NumFactory numFactory) {
-    final var criterion = new ExpectancyCriterion();
-    assertTrue(criterion.betterThan(numFactory.numOf(2.0), numFactory.numOf(1.5)));
-    assertFalse(criterion.betterThan(numFactory.numOf(1.5), numFactory.numOf(2.0)));
   }
 
 

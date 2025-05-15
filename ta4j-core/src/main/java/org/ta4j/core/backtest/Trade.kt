@@ -22,10 +22,10 @@
  */
 package org.ta4j.core.backtest
 
+import java.time.Instant
 import org.ta4j.core.TradeType
 import org.ta4j.core.backtest.analysis.cost.CostModel
 import org.ta4j.core.num.Num
-import java.time.Instant
 
 /**
  * A `Trade` is defined by:
@@ -93,12 +93,12 @@ class Trade(
     private fun setPricesAndCost(amount: Num, transactionCostModel: CostModel) {
         cost = transactionCostModel.calculate(pricePerAsset, amount)
 
-        val costPerAsset = cost.dividedBy(amount)
+        val costPerAsset = cost / amount
         // onCandle transaction costs to the pricePerAsset at the trade
-        if (isBuy) {
-            netPrice = pricePerAsset.plus(costPerAsset)
+        netPrice = if (isBuy) {
+            pricePerAsset.plus(costPerAsset)
         } else {
-            netPrice = pricePerAsset.minus(costPerAsset)
+            pricePerAsset.minus(costPerAsset)
         }
     }
 
@@ -121,7 +121,7 @@ class Trade(
         /**
          * @return the market value of a trade (without transaction cost)
          */
-        get() = pricePerAsset.multipliedBy(this.amount)
+        get() = pricePerAsset * amount
 
 
     override fun toString(): String {

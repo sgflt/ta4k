@@ -135,18 +135,18 @@ class LinearTransactionCostModelTest {
         .exit(25).after(1);
 
     final var firstPositionBuy = numFactory.one()
-        .plus(numFactory.one().multipliedBy(numFactory.numOf(0.0026)));
+        .plus(numFactory.one().times(numFactory.numOf(0.0026)));
     final var firstPositionSell = numFactory.two()
-        .minus(numFactory.two().multipliedBy(numFactory.numOf(0.0026)));
+        .minus(numFactory.two().times(numFactory.numOf(0.0026)));
     final var firstPositionProfit = firstPositionSell.minus(firstPositionBuy)
-        .multipliedBy(numFactory.numOf(25));
+        .times(numFactory.numOf(25));
 
     final var secondPositionBuy = numFactory.three()
-        .plus(numFactory.three().multipliedBy(numFactory.numOf(0.0026)));
+        .plus(numFactory.three().times(numFactory.numOf(0.0026)));
     final var secondPositionSell = numFactory.numOf(4)
-        .minus(numFactory.numOf(4).multipliedBy(numFactory.numOf(0.0026)));
+        .minus(numFactory.numOf(4).times(numFactory.numOf(0.0026)));
     final var secondPositionProfit = secondPositionSell.minus(secondPositionBuy)
-        .multipliedBy(numFactory.numOf(25));
+        .times(numFactory.numOf(25));
 
     final var overallProfit = firstPositionProfit.plus(secondPositionProfit);
 

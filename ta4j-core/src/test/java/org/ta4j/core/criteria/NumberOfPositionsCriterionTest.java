@@ -23,8 +23,6 @@
  */
 package org.ta4j.core.criteria;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.ta4j.core.MarketEventTestContext;
@@ -82,23 +80,5 @@ class NumberOfPositionsCriterionTest {
         .exit(1).after(2);
 
     context.assertResults(1);
-  }
-
-
-  @ParameterizedTest
-  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
-  void betterThanWithLessIsBetter(final NumFactory numFactory) {
-    final var criterion = new NumberOfPositionsCriterion();
-    assertThat(criterion.betterThan(numFactory.numOf(3), numFactory.numOf(6))).isTrue();
-    assertThat(criterion.betterThan(numFactory.numOf(7), numFactory.numOf(4))).isFalse();
-  }
-
-
-  @ParameterizedTest
-  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
-  void betterThanWithLessIsNotBetter(final NumFactory numFactory) {
-    final var criterion = new NumberOfPositionsCriterion(false);
-    assertThat(criterion.betterThan(numFactory.numOf(3), numFactory.numOf(6))).isFalse();
-    assertThat(criterion.betterThan(numFactory.numOf(7), numFactory.numOf(4))).isTrue();
   }
 }

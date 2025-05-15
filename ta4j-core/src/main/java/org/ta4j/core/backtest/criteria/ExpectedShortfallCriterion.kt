@@ -22,6 +22,8 @@
  */
 package org.ta4j.core.backtest.criteria
 
+import kotlin.math.ceil
+import kotlin.math.max
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.ta4j.core.backtest.Position
@@ -29,8 +31,6 @@ import org.ta4j.core.backtest.TradingRecord
 import org.ta4j.core.backtest.analysis.Returns
 import org.ta4j.core.num.Num
 import org.ta4j.core.num.NumFactory
-import kotlin.math.ceil
-import kotlin.math.max
 
 /**
  * Expected Shortfall criterion.
@@ -49,10 +49,10 @@ class ExpectedShortfallCriterion
     override fun calculate(position: Position): Num {
         if (position.entry == null || position.exit == null) {
             log.debug("Position has no entry or exit")
-            return this.numFactory.zero()
+            return numFactory.zero()
         }
         // TODO extract ReturnType to parameter
-        val returns = Returns(this.numFactory, position, Returns.ReturnType.ARITHMETIC)
+        val returns = Returns(numFactory, position, Returns.ReturnType.ARITHMETIC)
         val returnValues = returns.values.stream()
             .filter { num: Num? -> !num!!.isZero }  // Remove zero returns
             .toList()
@@ -65,10 +65,10 @@ class ExpectedShortfallCriterion
     override fun calculate(tradingRecord: TradingRecord): Num {
         if (tradingRecord.positions.isEmpty()) {
             log.debug("Trading record is empty")
-            return this.numFactory.zero()
+            return numFactory.zero()
         }
 
-        val returns = Returns(this.numFactory, tradingRecord, Returns.ReturnType.ARITHMETIC)
+        val returns = Returns(numFactory, tradingRecord, Returns.ReturnType.ARITHMETIC)
         val returnValues = returns.values.stream()
             .filter { num: Num? -> !num!!.isZero }  // Remove zero returns
             .toList()
@@ -77,19 +77,12 @@ class ExpectedShortfallCriterion
         return calculateExpectedShortfall(returnValues)
     }
 
-
-    override fun betterThan(criterionValue1: Num, criterionValue2: Num): Boolean {
-        // Higher (less negative) expected shortfall is better
-        return criterionValue1.isGreaterThan(criterionValue2)
-    }
-
-
     private fun calculateExpectedShortfall(returns: MutableList<Num>): Num {
         log.debug("Calculating ES for returns: {}", returns)
 
         if (returns.isEmpty()) {
             log.debug("Returns list is empty")
-            return this.numFactory.zero()
+            return numFactory.zero()
         }
 
         // Sort returns in ascending order (worst to best)
@@ -99,14 +92,14 @@ class ExpectedShortfallCriterion
         log.debug("Sorted returns: {}", sortedReturns)
 
         // Calculate number of returns to include (round up to ensure we take at least one)
-        val numberOfReturns = max(1.0, ceil(sortedReturns.size * (1 - this.confidenceLevel)).toInt().toDouble()).toInt()
+        val numberOfReturns = max(1.0, ceil(sortedReturns.size * (1 - confidenceLevel)).toInt().toDouble()).toInt()
         log.debug(
             "Taking {} lowest returns (confidence level: {}, total returns: {})",
-            numberOfReturns, this.confidenceLevel, sortedReturns.size
+            numberOfReturns, confidenceLevel, sortedReturns.size
         )
 
         // Calculate average of values below threshold (worst returns)
-        var sum = this.numFactory.zero()
+        var sum = numFactory.zero()
         for (i in 0..<numberOfReturns) {
             sum = sum.plus(sortedReturns[i])
             log.debug(
@@ -117,7 +110,7 @@ class ExpectedShortfallCriterion
             )
         }
 
-        val result = sum.dividedBy(this.numFactory.numOf(numberOfReturns))
+        val result = sum / numFactory.numOf(numberOfReturns)
         log.debug("Final ES result: {}", result)
         return result
     }

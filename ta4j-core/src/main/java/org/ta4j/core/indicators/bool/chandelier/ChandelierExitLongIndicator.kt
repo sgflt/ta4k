@@ -44,7 +44,7 @@ class ChandelierExitLongIndicator @JvmOverloads constructor(
     private val k = numFactory.numOf(k)
     private val close = Indicators.closePrice()
 
-    private fun calculate(): Boolean = close.isLessThan(high.value.minus(atr.value.multipliedBy(k)).doubleValue())
+    private fun calculate(): Boolean = close.isLessThan(high.value.minus(atr.value.times(k)).doubleValue())
 
     override fun updateState(bar: Bar) {
         close.onBar(bar)

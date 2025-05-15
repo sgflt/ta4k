@@ -46,7 +46,7 @@ class AverageLossCriterion : AnalysisCriterion {
         if (grossLoss.isZero) {
             return defaultNumFactory.zero()
         }
-        return grossLoss.dividedBy(numberOfLosingPositions)
+        return grossLoss / numberOfLosingPositions
     }
 
 
@@ -59,12 +59,6 @@ class AverageLossCriterion : AnalysisCriterion {
         if (grossLoss.isZero) {
             return defaultNumFactory.zero()
         }
-        return grossLoss.dividedBy(numberOfLosingPositions)
-    }
-
-
-    /** The higher the criterion value, the better.  */
-    override fun betterThan(criterionValue1: Num, criterionValue2: Num): Boolean {
-        return criterionValue1.isGreaterThan(criterionValue2)
+        return grossLoss / numberOfLosingPositions
     }
 }

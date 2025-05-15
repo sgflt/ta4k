@@ -65,12 +65,12 @@ class LWMAIndicator(private val indicator: NumericIndicator, private val barCoun
         }
 
         var count = 0
-        for (`val` in values) {
+        for (value in values) {
             val weight = weights[count++]
-            sum = sum.plus(`val`.multipliedBy(weight))
+            sum += value * weight
         }
 
-        return sum.dividedBy(denominator)
+        return sum / denominator
     }
 
 

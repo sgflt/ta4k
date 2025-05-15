@@ -98,14 +98,4 @@ interface AnalysisCriterion {
     //
     //    return bestStrategy;
     //  }
-    /**
-     * @param criterionValue1 the first value
-     * @param criterionValue2 the second value
-     *
-     * @return true if the first value is better than (according to the criterion)
-     * the second one, false otherwise
-     */
-    // FIXME This method does not makes sence. It would be better to use OOP. new CriterionX(tradingRecord).isBetterThan(new CriterionZ(tradingRecord))
-    // at second glance it simply compares uncomparable: PnL vs Return ???  it is different domain
-    fun betterThan(criterionValue1: Num, criterionValue2: Num): Boolean
 }

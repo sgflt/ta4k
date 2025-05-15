@@ -61,10 +61,10 @@ class DecimalNumEdgeCasesTest {
   void shouldHandleRecurringDecimals() {
     // 1/3 = 0.333...
     final var oneThird = DecimalNum.valueOf("1", TEST_CONTEXT)
-        .dividedBy(DecimalNum.valueOf("3", TEST_CONTEXT));
+        .div(DecimalNum.valueOf("3", TEST_CONTEXT));
 
     // Multiply back by 3
-    final var shouldBeOne = oneThird.multipliedBy(DecimalNum.valueOf("3", TEST_CONTEXT));
+    final var shouldBeOne = oneThird.times(DecimalNum.valueOf("3", TEST_CONTEXT));
 
     // Should equal 1 despite intermediate recurring decimal
     assertThat(shouldBeOne).hasToString("0.99999999999999999999999999999999");
@@ -83,8 +83,8 @@ class DecimalNumEdgeCasesTest {
 
     // Test extremely large numbers
     final var veryLarge = DecimalNum.valueOf("9".repeat(100), mc);
-    final var doubled = veryLarge.multipliedBy(DecimalNum.valueOf("2", mc));
-    assertThat(doubled.isGreaterThan(veryLarge)).isTrue();
+    final var doubled = veryLarge.times(DecimalNum.valueOf("2", mc));
+    assertThat(doubled.compareTo(veryLarge) == 1).isTrue();
   }
 
 
@@ -116,7 +116,7 @@ class DecimalNumEdgeCasesTest {
     final var lowPrecisionNum = DecimalNum.valueOf("1.1111111111111111111", lowPrecisionContext);
 
     // Operations between different precisions should use higher precision
-    final var result = highPrecisionNum.multipliedBy(lowPrecisionNum);
+    final var result = highPrecisionNum.times(lowPrecisionNum);
     assertThat(((DecimalNum) result).getDelegate().precision())
         .isLessThanOrEqualTo(highPrecisionContext.getPrecision());
   }

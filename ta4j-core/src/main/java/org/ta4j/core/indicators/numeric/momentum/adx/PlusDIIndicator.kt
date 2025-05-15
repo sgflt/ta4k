@@ -45,9 +45,7 @@ class PlusDIIndicator(numFactory: NumFactory, private val barCount: Int) : Numer
     private var barsPassed = 0
 
     private fun calculate(): Num =
-        avgPlusDMIndicator.value
-            .dividedBy(atrIndicator.value)
-            .multipliedBy(numFactory.hundred())
+        (avgPlusDMIndicator.value / atrIndicator.value) * numFactory.hundred()
 
     override fun updateState(bar: Bar) {
         ++barsPassed

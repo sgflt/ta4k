@@ -48,10 +48,7 @@ abstract class AbstractEMAIndicator(
             return previousValue!!
         }
 
-        val newValue = indicator.value
-            .minus(previousValue!!)
-            .multipliedBy(multiplier)
-            .plus(previousValue!!)
+        val newValue = (indicator.value - previousValue!!) * multiplier + previousValue!!
         previousValue = newValue
         return newValue
     }

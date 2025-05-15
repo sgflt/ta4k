@@ -22,11 +22,11 @@
  */
 package org.ta4j.core.backtest.criteria
 
+import java.time.temporal.ChronoUnit
 import org.ta4j.core.backtest.Position
 import org.ta4j.core.backtest.TradingRecord
 import org.ta4j.core.num.Num
 import org.ta4j.core.num.NumFactoryProvider.defaultNumFactory
-import java.time.temporal.ChronoUnit
 
 /**
  * Time in market criterion.
@@ -54,12 +54,6 @@ class TimeInTradeCriterion(private val unit: ChronoUnit) : AnalysisCriterion {
                 defaultNumFactory.zero(),
                 { obj: Num, augend: Num -> obj.plus(augend) }
             ) // FIXME it adds overlapping periods
-    }
-
-
-    /** The lower the criterion value, the better.  */
-    override fun betterThan(criterionValue1: Num, criterionValue2: Num): Boolean {
-        return criterionValue1.isLessThan(criterionValue2)
     }
 
     companion object {

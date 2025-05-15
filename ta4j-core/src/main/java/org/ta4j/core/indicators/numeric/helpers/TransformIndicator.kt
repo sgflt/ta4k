@@ -22,12 +22,12 @@
  */
 package org.ta4j.core.indicators.numeric.helpers
 
+import java.util.function.UnaryOperator
+import kotlin.math.ln
 import org.ta4j.core.api.series.Bar
 import org.ta4j.core.indicators.numeric.NumericIndicator
 import org.ta4j.core.num.DecimalNumFactory
 import org.ta4j.core.num.Num
-import java.util.function.UnaryOperator
-import kotlin.math.ln
 
 /**
  * Transform indicator.
@@ -58,27 +58,27 @@ class TransformIndicator(
     companion object {
         @JvmStatic
         fun plus(indicator: NumericIndicator, coefficient: Number) =
-            TransformIndicator(indicator) { it.plus(indicator.numFactory.numOf(coefficient)) }
+            TransformIndicator(indicator) { it + indicator.numFactory.numOf(coefficient) }
 
         @JvmStatic
         fun minus(indicator: NumericIndicator, coefficient: Number) =
-            TransformIndicator(indicator) { it.minus(indicator.numFactory.numOf(coefficient)) }
+            TransformIndicator(indicator) { it - indicator.numFactory.numOf(coefficient) }
 
         @JvmStatic
         fun divide(indicator: NumericIndicator, coefficient: Number) =
-            TransformIndicator(indicator) { it.dividedBy(indicator.numFactory.numOf(coefficient)) }
+            TransformIndicator(indicator) { it / indicator.numFactory.numOf(coefficient) }
 
         @JvmStatic
         fun multiply(indicator: NumericIndicator, coefficient: Number) =
-            TransformIndicator(indicator) { it.multipliedBy(indicator.numFactory.numOf(coefficient)) }
+            TransformIndicator(indicator) { it * indicator.numFactory.numOf(coefficient) }
 
         @JvmStatic
         fun max(indicator: NumericIndicator, coefficient: Number) =
-            TransformIndicator(indicator) { it.max(indicator.numFactory.numOf(coefficient)) }
+            TransformIndicator(indicator) { maxOf(it, indicator.numFactory.numOf(coefficient)) }
 
         @JvmStatic
         fun min(indicator: NumericIndicator, coefficient: Number) =
-            TransformIndicator(indicator) { it.min(indicator.numFactory.numOf(coefficient)) }
+            TransformIndicator(indicator) { minOf(it, indicator.numFactory.numOf(coefficient)) }
 
         @JvmStatic
         fun abs(indicator: NumericIndicator) =

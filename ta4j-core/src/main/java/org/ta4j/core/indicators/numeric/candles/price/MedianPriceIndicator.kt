@@ -38,7 +38,7 @@ import org.ta4j.core.num.NumFactory
 </pre> *
  */
 class MedianPriceIndicator(numFactory: NumFactory) : SeriesRelatedNumericIndicator(numFactory) {
-    private fun calculate(bar: Bar) = bar.highPrice.plus(bar.lowPrice).dividedBy(numFactory.two())
+    private fun calculate(bar: Bar) = (bar.highPrice + bar.lowPrice) / numFactory.two()
 
     public override fun updateState(bar: Bar) {
         value = calculate(bar)

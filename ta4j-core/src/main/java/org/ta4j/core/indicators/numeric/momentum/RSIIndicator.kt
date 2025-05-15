@@ -50,9 +50,9 @@ class RSIIndicator(indicator: NumericIndicator, barCount: Int) : NumericIndicato
             return if (averageGain.isZero) numFactory.fifty() else numFactory.hundred()
         }
 
-        val relativeStrength = averageGain.dividedBy(averageLoss)
+        val relativeStrength = averageGain / averageLoss
         // compute relative strength index
-        return numFactory.hundred().minus(numFactory.hundred().dividedBy(numFactory.one().plus(relativeStrength)))
+        return numFactory.hundred() - numFactory.hundred() / (numFactory.one() + relativeStrength)
     }
 
 

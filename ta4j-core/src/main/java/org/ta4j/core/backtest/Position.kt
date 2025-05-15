@@ -22,6 +22,9 @@
  */
 package org.ta4j.core.backtest
 
+import java.time.Instant
+import java.time.temporal.ChronoUnit
+import java.util.*
 import org.ta4j.core.TradeType
 import org.ta4j.core.api.callback.BarListener
 import org.ta4j.core.api.series.Bar
@@ -31,9 +34,6 @@ import org.ta4j.core.backtest.analysis.cost.CostModel
 import org.ta4j.core.backtest.analysis.cost.ZeroCostModel
 import org.ta4j.core.num.Num
 import org.ta4j.core.num.NumFactory
-import java.time.Instant
-import java.time.temporal.ChronoUnit
-import java.util.*
 
 /**
  * A `Position` is a pair of two [trades][Trade].
@@ -209,20 +209,20 @@ class Position @JvmOverloads constructor(
     fun getGrossProfit(finalPrice: Num): Num {
         var grossProfit: Num
         if (isOpened) {
-            grossProfit = entry!!.amount.multipliedBy(finalPrice).minus(entry!!.value)
+            grossProfit = entry!!.amount * finalPrice - entry!!.value
         } else {
-            grossProfit = exit!!.value.minus(entry!!.value)
+            grossProfit = exit!!.value - entry!!.value
         }
 
         // Profits of long position are losses of short
         if (entry!!.isSell) {
-            grossProfit = grossProfit.negate()
+            grossProfit = -grossProfit
         }
         return grossProfit
     }
 
 
-    val grossReturn: Num?
+    val grossReturn: Num
         /**
          * Calculates the gross return of the position if it is closed. The gross return
          * excludes any trading costs (and includes the base).
@@ -251,7 +251,7 @@ class Position @JvmOverloads constructor(
      *
      * @see .getGrossReturn
      */
-    fun getGrossReturn(finalPrice: Num): Num? {
+    fun getGrossReturn(finalPrice: Num): Num {
         return getGrossReturn(entry!!.pricePerAsset, finalPrice)
     }
 
@@ -274,12 +274,12 @@ class Position @JvmOverloads constructor(
      * @return the gross return in percent between entryPrice and exitPrice
      * (includes the base)
      */
-    fun getGrossReturn(entryPrice: Num, exitPrice: Num): Num? {
+    fun getGrossReturn(entryPrice: Num, exitPrice: Num): Num {
         return if (entry?.isBuy == true) {
-            exitPrice.dividedBy(entryPrice)
+            exitPrice / entryPrice
         } else {
             val one = entryPrice.numFactory.one()
-            ((exitPrice.dividedBy(entryPrice).minus(one)).negate()).plus(one)
+            (-(exitPrice / entryPrice - one)) + one
         }
     }
 
@@ -391,7 +391,7 @@ class Position @JvmOverloads constructor(
             for (entry in values.entries) {
                 val time = entry.key
                 val value = entry.value
-                val adjustedValue: Num = (if (isLong) value else numFactory.one().dividedBy(value))!!
+                val adjustedValue: Num = if (isLong) value else numFactory.one() / value
 
                 log.debug(
                     "Processing value at {}: raw={}, adjusted={}",
@@ -401,13 +401,13 @@ class Position @JvmOverloads constructor(
                 )
 
                 // Update peak if we have a new high
-                if (adjustedValue.isGreaterThan(maxPeak)) {
+                if (adjustedValue > maxPeak) {
                     log.debug("New peak found: {} -> {}", maxPeak, adjustedValue)
                     maxPeak = adjustedValue
                 }
 
                 // Calculate drawdown from peak
-                val drawdown = maxPeak.minus(adjustedValue).dividedBy(maxPeak)
+                val drawdown = (maxPeak - adjustedValue) / maxPeak
                 log.debug(
                     "Current drawdown: {} (peak={}, value={})",
                     drawdown,
@@ -415,7 +415,7 @@ class Position @JvmOverloads constructor(
                     adjustedValue
                 )
 
-                if (drawdown.isGreaterThan(maximumDrawdown)) {
+                if (drawdown > maximumDrawdown) {
                     log.debug(
                         "New maximum drawdown: {} -> {}",
                         maximumDrawdown,
@@ -452,7 +452,7 @@ class Position @JvmOverloads constructor(
             val adjustedPrice = if (isLongTrade) currentPrice.minus(holdingCost) else currentPrice.plus(holdingCost)
 
             val assetReturn = returnType.calculate(adjustedPrice, previousPrice, numFactory)
-            val strategyReturn = if (isLongTrade) assetReturn else assetReturn.negate()
+            val strategyReturn = if (isLongTrade) assetReturn else -assetReturn
 
             returns.put(bar.endTime, strategyReturn)
             previousPrice = currentPrice
@@ -499,18 +499,18 @@ class Position @JvmOverloads constructor(
                     else
                         currentPrice.plus(holdingCost)
 
-                val ratio = calculatePriceRatio(isLong, this@Position.entry!!.pricePerAsset, adjustedPrice)
+                val ratio = calculatePriceRatio(isLong, entry!!.pricePerAsset, adjustedPrice)
                 PositionValue(bar.endTime, ratio)
             }
 
 
         private fun calculatePriceRatio(isLongTrade: Boolean, entryPrice: Num, currentPrice: Num): Num {
             if (isLongTrade) {
-                return currentPrice.dividedBy(entryPrice)
+                return currentPrice / entryPrice
             }
 
             // For short positions
-            return this@Position.numFactory.one().plus(entryPrice.minus(currentPrice).dividedBy(entryPrice))
+            return numFactory.one() + (entryPrice - currentPrice) / entryPrice
         }
 
 

@@ -35,12 +35,11 @@ class SigmaIndicator(private val ref: NumericIndicator, barCount: Int) : Numeric
 
 
     private fun calculate(): Num {
-        if (sd.value.isZero) {
-            return numFactory.one()
+        return if (sd.value.isZero) {
+            numFactory.one()
+        } else {
+            (ref.value - mean.value) / sd.value
         }
-
-        // z-score = (ref - mean) / sd
-        return ref.value.minus(mean.value).dividedBy(sd.value)
     }
 
 

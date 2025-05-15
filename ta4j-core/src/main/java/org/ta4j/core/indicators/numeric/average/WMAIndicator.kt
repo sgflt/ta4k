@@ -49,11 +49,11 @@ class WMAIndicator(private val indicator: NumericIndicator, private val barCount
         var wmaSum = numFactory.zero()
         var i = barCount
         for (v in values.reversed()) {
-            wmaSum = wmaSum.plus(v.multipliedBy(numFactory.numOf(i--)))
+            wmaSum += v * numFactory.numOf(i--)
         }
 
 
-        return wmaSum.dividedBy(numFactory.numOf((barCount * (barCount + 1)) / 2))
+        return wmaSum / numFactory.numOf((barCount * (barCount + 1)) / 2)
     }
 
 

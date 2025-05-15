@@ -49,8 +49,8 @@ class LossIndicator(private val indicator: NumericIndicator) : NumericIndicator(
 
         val actualValue = indicator.value
         val previousValue = previousValueIndicator.value
-        return if (actualValue.isLessThan(previousValue))
-            previousValue.minus(actualValue)
+        return if (actualValue < previousValue)
+            previousValue - actualValue
         else
             numFactory.zero()
     }

@@ -23,8 +23,6 @@
  */
 package org.ta4j.core.num
 
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 import java.math.BigDecimal
 import java.math.MathContext
 import java.math.RoundingMode
@@ -32,6 +30,8 @@ import java.util.*
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 import kotlin.math.pow
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 /**
  * Representation of arbitrary precision [BigDecimal]. A `Num`
@@ -124,7 +124,7 @@ class DecimalNum : Num {
 
     private constructor(`val`: BigDecimal, mathContext: MathContext) {
         this.mathContext = mathContext
-        delegate = Objects.requireNonNull<BigDecimal?>(`val`).round(mathContext)
+        delegate = `val`.round(mathContext)
     }
 
 
@@ -167,7 +167,7 @@ class DecimalNum : Num {
      *
      * @see BigDecimal.multiply
      */
-    override fun multipliedBy(multiplicand: Num): Num {
+    override fun times(multiplicand: Num): Num {
         if (multiplicand.isNaN) {
             return NaN
         }
@@ -185,7 +185,7 @@ class DecimalNum : Num {
      *
      * @see BigDecimal.divide
      */
-    override fun dividedBy(divisor: Num): Num {
+    override fun div(divisor: Num): Num {
         if (divisor.isNaN || divisor.isZero == true) {
             return NaN
         }
@@ -203,7 +203,7 @@ class DecimalNum : Num {
      *
      * @see BigDecimal.remainder
      */
-    override fun remainder(divisor: Num): Num {
+    override fun rem(divisor: Num): Num {
         if (divisor.isNaN) {
             return NaN
         }
@@ -378,7 +378,7 @@ class DecimalNum : Num {
     }
 
 
-    override fun negate(): Num {
+    override fun unaryMinus(): Num {
         return DecimalNum(delegate.negate(), mathContext)
     }
 
@@ -401,10 +401,6 @@ class DecimalNum : Num {
 
     override val isNegativeOrZero: Boolean
         get() = delegate.signum() <= 0
-
-    override fun isEqual(other: Num): Boolean {
-        return !other.isNaN && compareTo(other) == 0
-    }
 
 
     /**
@@ -430,73 +426,6 @@ class DecimalNum : Num {
     }
 
 
-    /**
-     * Checks if this value matches another within an offset.
-     *
-     * @param other the other value, not null
-     * @param delta the [Num] offset
-     *
-     * @return true if this matches the specified value within an offset, false
-     * otherwise
-     */
-    fun matches(other: Num, delta: Num): Boolean {
-        val result = minus(other)
-        if (!result.isGreaterThan(delta)) {
-            return true
-        }
-        if (log.isDebugEnabled) {
-            log.debug("{} does not match", this)
-            log.debug("{} within offset {}", other, delta)
-        }
-        return false
-    }
-
-
-    override fun isGreaterThan(other: Num): Boolean {
-        return !other.isNaN && compareTo(other) > 0
-    }
-
-
-    override fun isGreaterThanOrEqual(other: Num): Boolean {
-        return !other.isNaN && compareTo(other) > -1
-    }
-
-
-    override fun isLessThan(other: Num): Boolean {
-        return !other.isNaN && compareTo(other) < 0
-    }
-
-
-    override fun isLessThanOrEqual(other: Num): Boolean {
-        return !other.isNaN && delegate.compareTo((other as DecimalNum).delegate) < 1
-    }
-
-
-    override fun compareTo(other: Num): Int {
-        return if (other.isNaN) 0 else delegate.compareTo((other as DecimalNum).delegate)
-    }
-
-
-    /**
-     * @return the `Num` whose value is the smaller of this `Num` and
-     * `other`. If they are equal, as defined by the
-     * [compareTo][.compareTo] method, `this` is returned.
-     */
-    override fun min(other: Num): Num {
-        return if (other.isNaN) NaN else (if (compareTo(other) <= 0) this else other)
-    }
-
-
-    /**
-     * @return the `Num` whose value is the greater of this `Num` and
-     * `other`. If they are equal, as defined by the
-     * [compareTo][.compareTo] method, `this` is returned.
-     */
-    override fun max(other: Num): Num {
-        return if (other.isNaN) NaN else (if (compareTo(other) >= 0) this else other)
-    }
-
-
     override fun hashCode(): Int {
         return Objects.hash(delegate)
     }
@@ -517,6 +446,9 @@ class DecimalNum : Num {
         return delegate.compareTo(other.delegate) == 0
     }
 
+    override fun compareTo(other: Num): Int {
+        return if (other.isNaN) 0 else delegate.compareTo((other as DecimalNum).delegate)
+    }
 
     override fun toString(): String {
         return delegate.toString()

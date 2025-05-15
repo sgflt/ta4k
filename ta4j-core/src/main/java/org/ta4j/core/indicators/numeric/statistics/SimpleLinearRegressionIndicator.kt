@@ -23,10 +23,10 @@
  */
 package org.ta4j.core.indicators.numeric.statistics
 
+import java.util.*
 import org.ta4j.core.api.series.Bar
 import org.ta4j.core.indicators.numeric.NumericIndicator
 import org.ta4j.core.num.Num
-import java.util.*
 
 /**
  * Simple linear regression indicator.
@@ -54,69 +54,61 @@ class SimpleLinearRegressionIndicator @JvmOverloads constructor(
     private var barsPassed = 0
 
     private fun calculate(): Num {
-        calculateRegressionLine()
-
-        if (type == SimpleLinearRegressionType.SLOPE) {
-            return slope
+        return when (type) {
+            SimpleLinearRegressionType.SLOPE -> slope
+            SimpleLinearRegressionType.INTERCEPT -> intercept
+            else -> slope * numFactory.numOf(barCount) + intercept
         }
-
-        if (type == SimpleLinearRegressionType.INTERCEPT) {
-            return intercept
-        }
-
-        return slope.multipliedBy(numFactory.numOf(barCount)).plus(intercept)
     }
-
 
     /**
      * Calculates the regression line.
      */
     private fun calculateRegressionLine() {
         if (window.size == barCount) {
-            val old = window.remove()
-            sumX = sumX.minus(old.x)
-            sumY = sumY.minus(old.y)
-            sumXX = sumXX.minus(old.x.multipliedBy(old.x))
-            sumXY = sumXY.minus(old.x.multipliedBy(old.y))
+            with(window.remove()) {
+                sumX -= x
+                sumY -= y
+                sumXX -= x * x
+                sumXY -= x * y
+            }
         }
 
         val x = numFactory.numOf(barsPassed)
         val y = indicator.value
         window.offer(XY(x, y))
 
-        sumX = sumX.plus(x)
-        sumY = sumY.plus(y)
-        sumXX = sumXX.plus(x.multipliedBy(x))
-        sumXY = sumXY.plus(x.multipliedBy(y))
+        sumX += x
+        sumY += y
+        sumXX += x * x
+        sumXY += x * y
     }
 
 
     private val slope: Num
         get() {
-            val n = window.size
-            if (n < 2) {
+            if (window.size < 2) {
                 return numFactory.zero() // Not enough points for regression
             }
 
-            val nNum = numFactory.numOf(n)
-            val numerator = nNum.multipliedBy(sumXY).minus(sumX.multipliedBy(sumY))
-            val denominator = nNum.multipliedBy(sumXX).minus(sumX.multipliedBy(sumX))
-            return numerator.dividedBy(denominator)
+            val nNum = numFactory.numOf(window.size)
+            val numerator = nNum * sumXY - sumX * sumY
+            val denominator = nNum * sumXX - sumX * sumX
+            return numerator / denominator
         }
 
 
     private val intercept: Num
         get() {
-            val n = window.size
-            if (n < 2) {
+            if (window.size < 2) {
                 return numFactory.zero() // Not enough points for regression
             }
 
-            val nNum = numFactory.numOf(n)
-            val xMean = sumX.dividedBy(nNum)
-            val yMean = sumY.dividedBy(nNum)
+            val nNum = numFactory.numOf(window.size)
+            val xMean = sumX / nNum
+            val yMean = sumY / nNum
 
-            return yMean.minus(slope.multipliedBy(xMean))
+            return yMean - (slope * xMean)
         }
 
 

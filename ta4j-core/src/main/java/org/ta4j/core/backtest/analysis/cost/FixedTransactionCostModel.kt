@@ -55,7 +55,7 @@ open class FixedTransactionCostModel
         if (position.isClosed) {
             multiplier = numFactory.numOf(2)
         }
-        return numFactory.numOf(this.feePerTrade).multipliedBy(multiplier)
+        return numFactory.numOf(this.feePerTrade) * multiplier
     }
 
     /**

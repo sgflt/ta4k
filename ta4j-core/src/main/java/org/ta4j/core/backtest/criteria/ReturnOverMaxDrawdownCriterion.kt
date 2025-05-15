@@ -55,11 +55,11 @@ class ReturnOverMaxDrawdownCriterion(private val numFactory: NumFactory) : Analy
 
     override fun calculate(position: Position): Num {
         if (!position.isOpened) {
-            return this.numFactory.zero()
+            return numFactory.zero()
         }
 
-        val drawdown = this.maxDrawdownCriterion.calculate(position)
-        val totalReturn = this.returnCriterion.calculate(position)
+        val drawdown = maxDrawdownCriterion.calculate(position)
+        val totalReturn = returnCriterion.calculate(position)
 
         log.debug(
             "Position entry: {}, exit: {}",
@@ -69,7 +69,7 @@ class ReturnOverMaxDrawdownCriterion(private val numFactory: NumFactory) : Analy
         log.debug("Is short: {}", position.entry!!.isSell)
         log.debug("Return: {}, Drawdown: {}", totalReturn, drawdown)
 
-        val result = totalReturn.dividedBy(drawdown)
+        val result = totalReturn / drawdown
         log.debug("RoMaD result: {}", result)
         return result
     }
@@ -77,22 +77,17 @@ class ReturnOverMaxDrawdownCriterion(private val numFactory: NumFactory) : Analy
 
     override fun calculate(tradingRecord: TradingRecord): Num {
         if (tradingRecord.isEmpty) {
-            return this.numFactory.zero()
+            return numFactory.zero()
         }
 
-        val drawdown = this.maxDrawdownCriterion.calculate(tradingRecord)
-        val totalReturn = this.returnCriterion.calculate(tradingRecord)
+        val drawdown = maxDrawdownCriterion.calculate(tradingRecord)
+        val totalReturn = returnCriterion.calculate(tradingRecord)
 
         log.debug("Return: {}, Drawdown: {}", totalReturn, drawdown)
 
-        val result = totalReturn.dividedBy(drawdown)
+        val result = totalReturn / drawdown
         log.debug("RoMaD result: {}", result)
         return result
-    }
-
-
-    override fun betterThan(criterionValue1: Num, criterionValue2: Num): Boolean {
-        return criterionValue1.isGreaterThan(criterionValue2)
     }
 
     companion object {

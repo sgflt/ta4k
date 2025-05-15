@@ -79,9 +79,9 @@ class LinearTransactionCostCriterion @JvmOverloads constructor(
             // - Remove the cost of the *first* trade
             // - Multiply by the profit ratio
             // - Remove the cost of the *second* trade
-            tradedAmount = tradedAmount.minus(getTradeCost(position.entry, tradedAmount))
-            tradedAmount = tradedAmount.multipliedBy(this.grossReturn.calculate(position))
-            tradedAmount = tradedAmount.minus(getTradeCost(position.exit, tradedAmount))
+            tradedAmount = tradedAmount - getTradeCost(position.entry, tradedAmount)
+            tradedAmount = tradedAmount * this.grossReturn.calculate(position)
+            tradedAmount = tradedAmount - getTradeCost(position.exit, tradedAmount)
         }
 
         // Special case: if the current position is open
@@ -93,13 +93,6 @@ class LinearTransactionCostCriterion @JvmOverloads constructor(
         return totalCosts
     }
 
-
-    /** The lower the criterion value, the better.  */
-    override fun betterThan(criterionValue1: Num, criterionValue2: Num): Boolean {
-        return criterionValue1.isLessThan(criterionValue2)
-    }
-
-
     /**
      * @param trade the trade
      * @param tradedAmount the amount of the trade
@@ -110,7 +103,7 @@ class LinearTransactionCostCriterion @JvmOverloads constructor(
         val numFactory = tradedAmount.numFactory
         val tradeCost = numFactory.zero()
         if (trade != null) {
-            return numFactory.numOf(this.a).multipliedBy(tradedAmount).plus(numFactory.numOf(this.b))
+            return numFactory.numOf(this.a) * tradedAmount + numFactory.numOf(this.b)
         }
         return tradeCost
     }
@@ -130,9 +123,8 @@ class LinearTransactionCostCriterion @JvmOverloads constructor(
                 // To calculate the new traded amount:
                 // - Remove the cost of the first trade
                 // - Multiply by the profit ratio
-                val newTradedAmount = initialAmount.minus(totalTradeCost)
-                    .multipliedBy(this.grossReturn.calculate(position))
-                totalTradeCost = totalTradeCost.plus(getTradeCost(position.exit, newTradedAmount))
+                val newTradedAmount = (initialAmount - totalTradeCost) * this.grossReturn.calculate(position)
+                totalTradeCost += getTradeCost(position.exit, newTradedAmount)
             }
         }
         return totalTradeCost

@@ -49,8 +49,8 @@ class GainIndicator(private val indicator: NumericIndicator) : NumericIndicator(
 
         val actualValue = indicator.value
         val previousValue = previousValueIndicator.value
-        return if (actualValue.isGreaterThan(previousValue))
-            actualValue.minus(previousValue)
+        return if (actualValue > previousValue)
+            actualValue - previousValue
         else
             numFactory.zero()
     }

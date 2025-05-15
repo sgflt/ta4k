@@ -39,7 +39,7 @@ class SMAIndicator(indicator: NumericIndicator, private val barCount: Int) : Num
 
     private fun calculate(): Num {
         val sum = partialSum()
-        return sum.dividedBy(divisor)
+        return sum / divisor
     }
 
     private fun partialSum() = sum.value

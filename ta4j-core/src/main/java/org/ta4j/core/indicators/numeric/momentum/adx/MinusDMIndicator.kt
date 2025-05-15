@@ -51,7 +51,7 @@ class MinusDMIndicator(numFactory: NumFactory) : NumericIndicator(numFactory) {
             val downMove = prevBar.lowPrice.minus(bar.lowPrice)
             previousBar = bar
 
-            if (downMove.isGreaterThan(upMove) && downMove.isGreaterThan(numFactory.zero())) {
+            if (downMove > upMove && downMove > numFactory.zero()) {
                 downMove
             } else {
                 numFactory.zero()

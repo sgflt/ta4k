@@ -42,7 +42,7 @@ class BollingerBandsLowerIndicator @JvmOverloads constructor(
     private val k: Num = indicator.numFactory.two(),
 ) : NumericIndicator(indicator.numFactory) {
 
-    private fun calculate() = bbm.value.minus(indicator.value.multipliedBy(k))
+    private fun calculate() = bbm.value - (indicator.value * k)
 
     override fun updateState(bar: Bar) {
         bbm.onBar(bar)

@@ -96,7 +96,7 @@ class CashFlowTest {
       final var expectedValue = i < 1 ?
                                 numFactory.one() :
                                 numFactory.one().minus(
-                                    numFactory.numOf(0.05).multipliedBy(numFactory.numOf(i))
+                                    numFactory.numOf(0.05).times(numFactory.numOf(i))
                                 );
       log.debug("expected {}", expectedValue);
       assertNumEquals(expectedValue, cashFlow.getValue(bars.getBar(i).getEndTime()));
@@ -125,7 +125,7 @@ class CashFlowTest {
       final var expectedValue = i < 1 ?
                                 numFactory.one() :
                                 numFactory.one().minus(
-                                    numFactory.numOf(0.1).multipliedBy(numFactory.numOf(i))
+                                    numFactory.numOf(0.1).times(numFactory.numOf(i))
                                 );
       log.debug("expected {}", expectedValue);
       assertNumEquals(expectedValue, cashFlow.getValue(bars.getBar(i).getEndTime()));

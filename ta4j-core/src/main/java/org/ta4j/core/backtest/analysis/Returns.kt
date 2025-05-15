@@ -22,12 +22,12 @@
  */
 package org.ta4j.core.backtest.analysis
 
+import java.time.Instant
+import java.util.*
 import org.ta4j.core.backtest.Position
 import org.ta4j.core.backtest.TradingRecord
 import org.ta4j.core.num.Num
 import org.ta4j.core.num.NumFactory
-import java.time.Instant
-import java.util.*
 
 class Returns(
     private val numFactory: NumFactory,
@@ -96,11 +96,11 @@ class Returns(
     enum class ReturnType {
         LOG {
             override fun calculate(xNew: Num, xOld: Num, numFactory: NumFactory): Num =
-                (xNew.dividedBy(xOld)).log()
+                (xNew / (xOld)).log()
         },
         ARITHMETIC {
             override fun calculate(xNew: Num, xOld: Num, numFactory: NumFactory): Num =
-                xNew.dividedBy(xOld).minus(numFactory.one())
+                xNew / xOld - numFactory.one()
         };
 
         abstract fun calculate(xNew: Num, xOld: Num, numFactory: NumFactory): Num

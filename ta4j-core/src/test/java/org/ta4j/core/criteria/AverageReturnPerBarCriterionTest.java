@@ -65,7 +65,7 @@ class AverageReturnPerBarCriterionTest {
         .enter(1).asap()
         .exit(1).after(2);
 
-    final var expectedReturn = numFactory.numOf(110d).dividedBy(numFactory.numOf(100))
+    final var expectedReturn = numFactory.numOf(110d).div(numFactory.numOf(100))
         .pow(numFactory.numOf(1. / 2));
     tradingContext.assertResults(expectedReturn.doubleValue());
   }

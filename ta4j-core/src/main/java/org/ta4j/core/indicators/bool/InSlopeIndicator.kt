@@ -83,8 +83,8 @@ class InSlopeIndicator(
 
     private fun calculate(): Boolean {
         val difference = diff.value
-        val minSlopeSatisfied = minSlope.isNaN || difference.isGreaterThanOrEqual(minSlope)
-        val maxSlopeSatisfied = maxSlope.isNaN || difference.isLessThanOrEqual(maxSlope)
+        val minSlopeSatisfied = minSlope.isNaN || difference >= minSlope
+        val maxSlopeSatisfied = maxSlope.isNaN || difference <= maxSlope
         val isNaN = minSlope.isNaN && maxSlope.isNaN
 
         return minSlopeSatisfied && maxSlopeSatisfied && !isNaN

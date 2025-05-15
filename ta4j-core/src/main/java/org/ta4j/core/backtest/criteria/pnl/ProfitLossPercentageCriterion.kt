@@ -42,9 +42,7 @@ class ProfitLossPercentageCriterion : AnalysisCriterion {
     override fun calculate(position: Position): Num {
         if (position.isClosed) {
             val entryPrice = position.entry!!.value
-            return position.profit
-                .dividedBy(entryPrice)
-                .multipliedBy(defaultNumFactory.hundred())
+            return position.profit / entryPrice * defaultNumFactory.hundred()
         }
         return defaultNumFactory.zero()
     }
@@ -56,10 +54,4 @@ class ProfitLossPercentageCriterion : AnalysisCriterion {
             .filter { it.isClosed }
             .map { calculate(it) }
             .fold(defaultNumFactory.zero()) { acc, num -> acc.plus(num) }
-
-
-    /** The higher the criterion value, the better.  */
-    override fun betterThan(criterionValue1: Num, criterionValue2: Num): Boolean {
-        return criterionValue1.isGreaterThan(criterionValue2)
-    }
 }

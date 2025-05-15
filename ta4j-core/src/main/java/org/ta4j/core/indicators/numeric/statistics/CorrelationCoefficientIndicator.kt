@@ -44,11 +44,8 @@ class CorrelationCoefficientIndicator(
 
 
     private fun calculate(): Num {
-        val cov = covariance.value
-        val var1 = variance1.value
-        val var2 = variance2.value
-        val multipliedSqrt = var1.multipliedBy(var2).sqrt()
-        return cov.dividedBy(multipliedSqrt)
+        val multipliedSqrt = (variance1.value * variance2.value).sqrt()
+        return covariance.value / multipliedSqrt
     }
 
 

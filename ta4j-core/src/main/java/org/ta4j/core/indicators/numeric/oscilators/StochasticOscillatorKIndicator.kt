@@ -77,10 +77,7 @@ class StochasticOscillatorKIndicator(
             return numFactory.fifty()
         }
 
-        return indicator.value
-            .minus(lowestLowPrice)
-            .dividedBy(fullCandleHeight)
-            .multipliedBy(numFactory.hundred())
+        return ((indicator.value - lowestLowPrice) / fullCandleHeight) * numFactory.hundred()
     }
 
 

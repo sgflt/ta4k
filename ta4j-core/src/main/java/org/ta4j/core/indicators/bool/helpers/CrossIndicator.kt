@@ -41,7 +41,7 @@ class CrossIndicator(
     private val previousUp: PreviousNumericValueIndicator = up.previous(barCount)
     private val previousLow: PreviousNumericValueIndicator = low.previous(barCount)
 
-    private fun calculate() = up.value.isGreaterThan(low.value) && previousUp.value.isLessThanOrEqual(previousLow.value)
+    private fun calculate() = up.value > low.value && previousUp.value <= previousLow.value
 
     override fun updateState(bar: Bar) {
         low.onBar(bar)

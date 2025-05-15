@@ -45,10 +45,7 @@ class BollingerBandWidthIndicator
     private val bbm: BollingerBandsMiddleIndicator,
     private val bbl: BollingerBandsLowerIndicator,
 ) : NumericIndicator(bbm.numFactory) {
-    private fun calculate() = bbu.value
-        .minus(bbl.value)
-        .dividedBy(bbm.value)
-        .multipliedBy(numFactory.hundred())
+    private fun calculate() = (bbu.value - bbl.value) / bbm.value * numFactory.hundred()
 
     override fun updateState(bar: Bar) {
         bbl.onBar(bar)

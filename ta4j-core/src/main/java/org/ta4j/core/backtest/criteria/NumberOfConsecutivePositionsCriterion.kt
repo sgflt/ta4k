@@ -67,23 +67,6 @@ class NumberOfConsecutivePositionsCriterion
         return defaultNumFactory.numOf(maxConsecutive)
     }
 
-
-    /**
-     *
-     *  * For [PositionFilter.PROFIT]: The higher the criterion value, the
-     * better.
-     *  * For [PositionFilter.LOSS]: The lower the criterion value, the
-     * better.
-     *
-     */
-    override fun betterThan(criterionValue1: Num, criterionValue2: Num): Boolean {
-        return if (this.positionFilter == PositionFilter.PROFIT)
-            criterionValue1.isGreaterThan(criterionValue2)
-        else
-            criterionValue1.isLessThan(criterionValue2)
-    }
-
-
     private fun isConsecutive(position: Position): Boolean {
         if (position.isClosed) {
             val pnl = position.profit

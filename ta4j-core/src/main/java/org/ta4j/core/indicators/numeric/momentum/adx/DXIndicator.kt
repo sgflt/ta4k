@@ -49,10 +49,8 @@ class DXIndicator(numFactory: NumFactory, barCount: Int) : NumericIndicator(numF
         if (pdiValue.plus(mdiValue) == numFactory.zero()) {
             return numFactory.zero()
         }
-        return pdiValue.minus(mdiValue)
-            .abs()
-            .dividedBy(pdiValue.plus(mdiValue))
-            .multipliedBy(numFactory.hundred())
+
+        return ((pdiValue - mdiValue).abs() / (pdiValue + mdiValue)) * numFactory.hundred()
     }
 
 

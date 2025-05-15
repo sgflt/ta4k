@@ -49,7 +49,7 @@ class ProfitLossRatioCriterion : AnalysisCriterion {
             // only winning positions means a ratio of 1
             return defaultNumFactory.one()
         }
-        return averageProfit.dividedBy(averageLoss)
+        return averageProfit / averageLoss
     }
 
 
@@ -64,12 +64,6 @@ class ProfitLossRatioCriterion : AnalysisCriterion {
             // only winning positions means a ratio of 1
             return defaultNumFactory.one()
         }
-        return averageProfit.dividedBy(averageLoss).abs()
-    }
-
-
-    /** The higher the criterion value, the better.  */
-    override fun betterThan(criterionValue1: Num, criterionValue2: Num): Boolean {
-        return criterionValue1.isGreaterThan(criterionValue2)
+        return averageProfit / averageLoss.abs()
     }
 }

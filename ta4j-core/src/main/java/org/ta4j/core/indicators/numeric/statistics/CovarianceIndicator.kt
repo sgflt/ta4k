@@ -23,10 +23,10 @@
  */
 package org.ta4j.core.indicators.numeric.statistics
 
+import java.util.*
 import org.ta4j.core.api.series.Bar
 import org.ta4j.core.indicators.numeric.NumericIndicator
 import org.ta4j.core.num.Num
-import java.util.*
 
 /**
  * Covariance indicator.
@@ -76,22 +76,21 @@ class CovarianceIndicator(
 
 
     private fun removeOldPoint(polled: XY) {
-        sumX = sumX.minus(polled.x)
-        sumY = sumY.minus(polled.y)
-        sumXY = sumXY.minus(polled.x.multipliedBy(polled.y))
+        sumX -= polled.x
+        sumY -= polled.y
+        sumXY -= polled.x * polled.y
     }
 
-
     private fun updateMeanAndCovariance(newValue: XY): Num {
-        sumX = sumX.plus(newValue.x)
-        sumY = sumY.plus(newValue.y)
-        sumXY = sumXY.plus(newValue.x.multipliedBy(newValue.y))
+        sumX += newValue.x
+        sumY += newValue.y
+        sumXY += newValue.x * newValue.y
 
         val divisor = numFactory.numOf(window.size)
-        val meanX = sumX.dividedBy(divisor)
-        val meanY = sumY.dividedBy(divisor)
+        val meanX = sumX / divisor
+        val meanY = sumY / divisor
 
-        return sumXY.dividedBy(divisor).minus(meanX.multipliedBy(meanY))
+        return (sumXY / divisor) - (meanX * meanY)
     }
 
 

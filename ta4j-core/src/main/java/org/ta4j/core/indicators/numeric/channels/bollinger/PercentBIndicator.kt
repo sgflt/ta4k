@@ -57,10 +57,7 @@ class PercentBIndicator(private val indicator: NumericIndicator, barCount: Int, 
     }
 
     private fun calculate(): Num {
-        val value = indicator.value
-        val upValue = bbu.value
-        val lowValue = bbl.value
-        return value.minus(lowValue).dividedBy(upValue.minus(lowValue))
+        return (indicator.value - bbl.value) / (bbu.value - bbl.value)
     }
 
     public override fun updateState(bar: Bar) {
