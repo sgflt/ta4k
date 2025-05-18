@@ -22,10 +22,12 @@
  */
 package org.ta4j.core
 
+import java.time.Instant
+import org.ta4j.core.api.callback.BarListener
+import org.ta4j.core.api.series.Bar
 import org.ta4j.core.api.series.BarSeries
 import org.ta4j.core.events.CandleReceived
 import org.ta4j.core.indicators.TimeFrame
-import java.time.Instant
 
 /**
  * After initialization thread safe router for multiple timeframes.
@@ -35,8 +37,8 @@ import java.time.Instant
  *
  * @author Lukáš Kvídera
  */
-class MultiTimeFrameSeries<B : BarSeries> {
-    private val timeFramedSeries: MutableMap<TimeFrame, B> = HashMap<TimeFrame, B>()
+class MultiTimeFrameSeries<B : BarSeries> : BarListener {
+    private val timeFramedSeries = HashMap<TimeFrame, B>()
 
 
     fun add(series: B) {
@@ -55,6 +57,14 @@ class MultiTimeFrameSeries<B : BarSeries> {
     }
 
 
+    /**
+     * Consume bar event and pass it to the series with the same time frame.
+     * Usually Bar is created by the {@link BarAggregator}.
+     */
+    override fun onBar(bar: Bar) {
+        timeFramedSeries[bar.timeFrame]?.addBar(bar)
+    }
+
     val lastEventTimes: TimeFrameState
         get() {
             val timeFrameState = TimeFrameState()
@@ -70,7 +80,7 @@ class MultiTimeFrameSeries<B : BarSeries> {
      * Contains information how much stale data are.
      */
     class TimeFrameState {
-        private val state: MutableMap<TimeFrame, Instant> = HashMap<TimeFrame, Instant>()
+        private val state = HashMap<TimeFrame, Instant>()
 
 
         fun add(timeFrame: TimeFrame, time: Instant) {

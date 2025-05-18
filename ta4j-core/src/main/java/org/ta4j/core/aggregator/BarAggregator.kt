@@ -1,7 +1,7 @@
-/**
+/*
  * The MIT License (MIT)
  *
- * Copyright (c) 2017-2023 Ta4j Organization & respective
+ * Copyright (c) 2017-2025 Ta4j Organization & respective
  * authors (see AUTHORS)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
@@ -23,17 +23,132 @@
  */
 package org.ta4j.core.aggregator
 
+import java.time.Duration
+import java.time.Instant
+import org.ta4j.core.api.callback.BarListener
 import org.ta4j.core.api.series.Bar
+import org.ta4j.core.indicators.TimeFrame
+import org.ta4j.core.num.Num
+import org.ta4j.core.utils.TimeFrameMapping
+
+data class AggregatedBar(
+    override val timeFrame: TimeFrame,
+    override val timePeriod: Duration,
+    override val beginTime: Instant,
+    override val endTime: Instant,
+    override val openPrice: Num,
+    override val highPrice: Num,
+    override val lowPrice: Num,
+    override val closePrice: Num,
+    override val volume: Num,
+) : Bar
 
 /**
  * Aggregates a list of [bars][Bar] into another one.
  */
-interface BarAggregator {
+class BarAggregator(private val timeframes: Set<TimeFrame>) : BarListener {
+
+    private val listeners = mutableListOf<BarListener>()
+    private val currentAggregations = mutableMapOf<TimeFrame, AggregatedBar?>()
+
+    init {
+        timeframes.forEach { timeframe ->
+            currentAggregations[timeframe] = null
+        }
+    }
+
     /**
-     * Aggregates the `bars` into another one.
-     *
-     * @param bars the bars to be aggregated
-     * @return aggregated bars
+     * Adds a listener to be notified when an aggregated bar is produced.
      */
-    fun aggregate(bars: List<Bar>): List<Bar>
+    fun addBarListener(listener: BarListener) {
+        listeners += listener
+    }
+
+    override fun onBar(bar: Bar) {
+        val completedBars = mutableListOf<Bar>()
+
+        // Process each timeframe
+        timeframes.forEach { timeframe ->
+            val timeframeBoundary = calculateTimeframeBoundary(bar.endTime, timeframe)
+            val currentAggregation = currentAggregations[timeframe]
+
+            if (currentAggregation == null) {
+                // First bar for this timeframe
+                currentAggregations[timeframe] = createInitialAggregatedBar(bar, timeframe, timeframeBoundary)
+            } else {
+                // Check if the new bar belongs to the current aggregation or a new one
+                if (bar.isLastInBucket(timeframe)) {
+                    // Complete the current aggregation and start a new one
+                    completedBars += updateAggregatedBar(currentAggregation, bar)
+                    currentAggregations[timeframe] = createInitialAggregatedBar(bar, timeframe, timeframeBoundary)
+                } else {
+                    // Update the current aggregation
+                    currentAggregations[timeframe] = updateAggregatedBar(currentAggregation, bar)
+                }
+            }
+        }
+
+        // Notify listeners of completed bars
+        completedBars.forEach { completedBar ->
+            notifyListeners(completedBar)
+        }
+    }
+
+    /**
+     * Calculates the timeframe boundary (start time) for a given timestamp and duration.
+     */
+    private fun calculateTimeframeBoundary(timestamp: Instant, timeframe: TimeFrame): Instant {
+        val epochMillis = timestamp.toEpochMilli()
+        val timeframeMillis = TimeFrameMapping.getDuration(timeframe).toMillis()
+        val boundaryMillis = epochMillis - (epochMillis % timeframeMillis)
+        return Instant.ofEpochMilli(boundaryMillis)
+    }
+
+    private fun Bar.isLastInBucket(timeFrame: TimeFrame): Boolean {
+        val thisBucket = calculateTimeframeBoundary(beginTime, timeFrame)
+        val nextBucket =
+            calculateTimeframeBoundary(beginTime.plus(TimeFrameMapping.getDuration(TimeFrame.MINUTES_1)), timeFrame)
+        return thisBucket != nextBucket
+    }
+
+    /**
+     * Creates an initial aggregated bar from a single bar.
+     */
+    private fun createInitialAggregatedBar(bar: Bar, timeframe: TimeFrame, beginTime: Instant): AggregatedBar {
+        val period = TimeFrameMapping.getDuration(timeframe)
+        val endTime = beginTime.plus(period)
+
+        return AggregatedBar(
+            timeFrame = timeframe,
+            timePeriod = period,
+            beginTime = beginTime,
+            endTime = endTime,
+            openPrice = bar.openPrice,
+            highPrice = bar.highPrice,
+            lowPrice = bar.lowPrice,
+            closePrice = bar.closePrice,
+            volume = bar.volume
+        )
+    }
+
+    /**
+     * Updates an existing aggregated bar with a new bar.
+     */
+    private fun updateAggregatedBar(aggregatedBar: AggregatedBar, newBar: Bar): AggregatedBar {
+        return aggregatedBar.copy(
+            highPrice = maxOf(aggregatedBar.highPrice, newBar.highPrice),
+            lowPrice = minOf(aggregatedBar.lowPrice, newBar.lowPrice),
+            closePrice = newBar.closePrice,
+            volume = aggregatedBar.volume + newBar.volume
+        )
+    }
+
+    /**
+     * Notifies all listeners of a new aggregated bar.
+     */
+    private fun notifyListeners(bar: Bar) {
+        listeners.forEach { listener ->
+            listener.onBar(bar)
+        }
+    }
 }

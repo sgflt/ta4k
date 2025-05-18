@@ -25,6 +25,7 @@ package org.ta4j.core.live
 
 import org.slf4j.Logger
 import org.ta4j.core.MultiTimeFrameSeries
+import org.ta4j.core.aggregator.BarAggregator
 import org.ta4j.core.api.series.BarBuilderFactory
 import org.ta4j.core.api.series.BarSeries
 import org.ta4j.core.backtest.strategy.runtime.NOOPRuntimeContext
@@ -44,13 +45,13 @@ import org.ta4j.core.trading.LiveBarSeries
  */
 class SignalTradingBuilder {
     private var windowSize: Int? = null
-    private var name: String = UNNAMED_SERIES_NAME
+    private var name = UNNAMED_SERIES_NAME
     private var numFactory = defaultNumFactory
     private var barBuilderFactory: BarBuilderFactory = LightweightBarBuilderFactory()
-    private var strategyFactories: List<StrategyFactory<Strategy>> = mutableListOf()
+    private var strategyFactories = mutableListOf<StrategyFactory<Strategy>>()
     private var runtimeContext: RuntimeContext = NOOPRuntimeContext()
-    private var indicatorContexts: IndicatorContexts = IndicatorContexts.empty()
-    private var configuration: StrategyConfiguration = StrategyConfiguration()
+    private var indicatorContexts = IndicatorContexts.empty()
+    private var configuration = StrategyConfiguration()
 
 
     /**
@@ -58,9 +59,8 @@ class SignalTradingBuilder {
      *
      * @return `this`
      */
-    fun withNumFactory(numFactory: NumFactory): SignalTradingBuilder {
+    fun withNumFactory(numFactory: NumFactory) = apply {
         this.numFactory = numFactory
-        return this
     }
 
 
@@ -69,9 +69,8 @@ class SignalTradingBuilder {
      *
      * @return `this`
      */
-    fun withName(name: String): SignalTradingBuilder {
+    fun withName(name: String) = apply {
         this.name = name
-        return this
     }
 
 
@@ -80,38 +79,32 @@ class SignalTradingBuilder {
      *
      * @return `this`
      */
-    fun withBarBuilderFactory(barBuilderFactory: BarBuilderFactory): SignalTradingBuilder {
+    fun withBarBuilderFactory(barBuilderFactory: BarBuilderFactory) = apply {
         this.barBuilderFactory = barBuilderFactory
-        return this
     }
 
 
-    fun withStrategyFactory(strategy: List<StrategyFactory<Strategy>>): SignalTradingBuilder {
+    fun withStrategyFactory(strategy: List<StrategyFactory<Strategy>>) = apply {
         this.strategyFactories += strategy
-        return this
     }
 
 
-    fun withRuntimeContext(runtimeContext: RuntimeContext): SignalTradingBuilder {
+    fun withRuntimeContext(runtimeContext: RuntimeContext) = apply {
         this.runtimeContext = runtimeContext
-        return this
     }
 
 
-    fun withIndicatorContexts(indicatorContexts: IndicatorContexts): SignalTradingBuilder {
+    fun withIndicatorContexts(indicatorContexts: IndicatorContexts) = apply {
         this.indicatorContexts = indicatorContexts
-        return this
     }
 
 
-    fun withConfiguration(configuration: StrategyConfiguration): SignalTradingBuilder {
+    fun withConfiguration(configuration: StrategyConfiguration) = apply {
         this.configuration = configuration
-        return this
     }
 
-    fun withWindowSize(windowSize: Int): SignalTradingBuilder {
+    fun withWindowSize(windowSize: Int) = apply {
         this.windowSize = windowSize
-        return this
     }
 
     /**
@@ -126,15 +119,22 @@ class SignalTradingBuilder {
             it.createStrategy(configuration, runtimeContext, indicatorContexts)
         }
 
-        val series = MultiTimeFrameSeries<BarSeries>().apply {
-            (indicatorContexts.timeFrames)
-                .distinct()
-                .forEach { add(createSeriesPerTimeFrame(it)) }
+        val timeFrames = indicatorContexts.timeFrames - TimeFrame.MINUTES_1
+        val multiTimeFrameSeries = MultiTimeFrameSeries<BarSeries>().apply {
+            timeFrames.forEach { add(createSeriesPerTimeFrame(it)) }
+        }
+
+        // Minute bar series is essential for each broker
+        createSeriesPerTimeFrame(TimeFrame.MINUTES_1).let {
+            multiTimeFrameSeries.add(it)
+            val barAggregator = BarAggregator(timeFrames)
+            it.addBarListener(barAggregator)
+            barAggregator.addBarListener(multiTimeFrameSeries)
         }
 
         windowSize?.let { indicatorContexts.enableHistory(it) }
 
-        return SignalTrading(series, strategies)
+        return SignalTrading(multiTimeFrameSeries, strategies)
     }
 
 
