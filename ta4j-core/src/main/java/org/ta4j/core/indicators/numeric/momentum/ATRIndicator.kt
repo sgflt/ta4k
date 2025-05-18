@@ -26,39 +26,31 @@ import org.ta4j.core.api.series.Bar
 import org.ta4j.core.indicators.numeric.NumericIndicator
 import org.ta4j.core.indicators.numeric.average.MMAIndicator
 import org.ta4j.core.indicators.numeric.candles.TRIndicator
-import org.ta4j.core.num.Num
 import org.ta4j.core.num.NumFactory
 
 /**
  * Average true range indicator.
  */
-class ATRIndicator(numFactory: NumFactory, tr: NumericIndicator, barCount: Int) : NumericIndicator(numFactory) {
+class ATRIndicator(
+    numFactory: NumFactory,
+    tr: NumericIndicator = TRIndicator(numFactory),
+    barCount: Int,
+) :
+    NumericIndicator(numFactory) {
     private val averageTrueRangeIndicator = MMAIndicator(tr, barCount)
 
     override val lag: Int
         get() = averageTrueRangeIndicator.lag
-
-    /**
-     * Constructor.
-     *
-     * @param numFactory the [Num] provider
-     * @param barCount the time frame
-     */
-    constructor(numFactory: NumFactory, barCount: Int) : this(numFactory, TRIndicator(numFactory), barCount)
-
 
     override fun updateState(bar: Bar) {
         averageTrueRangeIndicator.onBar(bar)
         value = calculate()
     }
 
-
     private fun calculate() = averageTrueRangeIndicator.value
-
 
     override val isStable: Boolean
         get() = averageTrueRangeIndicator.isStable
 
-
-    override fun toString() = "${javaClass.simpleName} $averageTrueRangeIndicator"
+    override fun toString() = "ATR($averageTrueRangeIndicator) => $value"
 }

@@ -26,18 +26,23 @@ import org.ta4j.core.api.series.Bar
 import org.ta4j.core.indicators.helpers.previous.PreviousNumericValueIndicator
 import org.ta4j.core.indicators.numeric.NumericIndicator
 import org.ta4j.core.num.Num
+import org.ta4j.core.num.NumFactory
 
 /**
  * Running Total aka Cumulative Sum indicator
  *
  * @see [https://en.wikipedia.org/wiki/Running_total](https://en.wikipedia.org/wiki/Running_total)
  */
-class RunningTotalIndicator(private val indicator: NumericIndicator, private val barCount: Int) : NumericIndicator(
-    indicator.numFactory
+class RunningTotalIndicator(
+    numFactory: NumFactory,
+    private val indicator: NumericIndicator,
+    private val barCount: Int,
+) : NumericIndicator(
+    numFactory
 ) {
     override val lag = barCount
 
-    private val previousValue = PreviousNumericValueIndicator(indicator, barCount)
+    private val previousValue = PreviousNumericValueIndicator(numFactory, indicator, barCount)
     private var previousSum = numFactory.zero()
     private var processedBars = 0
 

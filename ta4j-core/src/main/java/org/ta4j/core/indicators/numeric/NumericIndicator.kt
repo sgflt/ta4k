@@ -276,7 +276,7 @@ abstract class NumericIndicator protected constructor(
         barCountEffectiveRatio: Int,
         barCountFast: Int,
         barCountSlow: Int,
-    ) = KAMAIndicator(this, barCountEffectiveRatio, barCountFast, barCountSlow)
+    ) = KAMAIndicator(numFactory, this, barCountEffectiveRatio, barCountFast, barCountSlow)
 
 
     /**
@@ -307,7 +307,7 @@ abstract class NumericIndicator protected constructor(
      *
      * @return the [HighestValueIndicator] of `this`
      */
-    fun highest(barCount: Int) = HighestValueIndicator(this, barCount)
+    fun highest(barCount: Int) = HighestValueIndicator(numFactory, this, barCount)
 
 
     /**
@@ -315,7 +315,7 @@ abstract class NumericIndicator protected constructor(
      *
      * @return the [LowestValueIndicator] of `this`
      */
-    fun lowest(barCount: Int) = LowestValueIndicator(this, barCount)
+    fun lowest(barCount: Int) = LowestValueIndicator(numFactory, this, barCount)
 
 
     /**
@@ -323,7 +323,7 @@ abstract class NumericIndicator protected constructor(
      * `barCount=1`
      */
     @JvmOverloads
-    fun previous(barCount: Int = 1) = PreviousNumericValueIndicator(this, barCount)
+    fun previous(barCount: Int = 1) = PreviousNumericValueIndicator(numFactory, this, barCount)
 
 
     /**
@@ -333,7 +333,7 @@ abstract class NumericIndicator protected constructor(
      *
      * @return sum indicator
      */
-    fun runningTotal(barCount: Int) = RunningTotalIndicator(this, barCount)
+    fun runningTotal(barCount: Int) = RunningTotalIndicator(numFactory, this, barCount)
 
 
     /**

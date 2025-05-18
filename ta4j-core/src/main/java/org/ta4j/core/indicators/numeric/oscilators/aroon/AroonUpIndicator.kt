@@ -36,39 +36,16 @@ import org.ta4j.core.num.NumFactory
  *
  * @see [chart_school:technical_indicators:aroon](http://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:aroon)
  */
-class AroonUpIndicator(numFactory: NumFactory, private val highIndicator: NumericIndicator, private val barCount: Int) :
+class AroonUpIndicator(
+    numFactory: NumFactory,
+    private val highIndicator: NumericIndicator = highPrice(),
+    private val barCount: Int,
+) :
     NumericIndicator(numFactory) {
-    private val highestHighValueIndicator: HighestValueIndicator
+    private val highestHighValueIndicator = HighestValueIndicator(numFactory, highIndicator, barCount + 1)
 
     private var index = 0
-    private val previousValues: ArrayList<Num> = ArrayList<Num>(barCount)
-
-
-    /**
-     * Constructor.
-     *
-     * @param highIndicator the indicator for the high price (default
-     * [HighPriceIndicator])
-     * @param barCount the time frame
-     */
-    init {
-        for (i in 0..<barCount) {
-            previousValues.add(NaN)
-        }
-        // + 1 needed for last possible iteration in loop
-        highestHighValueIndicator = HighestValueIndicator(highIndicator, barCount + 1)
-    }
-
-
-    /**
-     * Default Constructor with `highPriceIndicator` =
-     * [HighPriceIndicator].
-     *
-     * @param numFactory the bar numFactory
-     * @param barCount the time frame
-     */
-    constructor(numFactory: NumFactory, barCount: Int) : this(numFactory, highPrice(), barCount)
-
+    private val previousValues: Array<Num> = Array(barCount) { NaN }
 
     private fun calculate(): Num {
         val currentLow = highIndicator.value

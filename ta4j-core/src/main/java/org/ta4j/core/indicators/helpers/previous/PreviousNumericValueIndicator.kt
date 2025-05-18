@@ -26,11 +26,17 @@ package org.ta4j.core.indicators.helpers.previous
 import org.ta4j.core.api.series.Bar
 import org.ta4j.core.indicators.numeric.NumericIndicator
 import org.ta4j.core.num.Num
+import org.ta4j.core.num.NumFactory
 
 /**
  * @author Lukáš Kvídera
  */
-class PreviousNumericValueIndicator(indicator: NumericIndicator, n: Int) : NumericIndicator(indicator.numFactory) {
+class PreviousNumericValueIndicator(
+    numFactory: NumFactory,
+    indicator: NumericIndicator,
+    n: Int,
+) :
+    NumericIndicator(numFactory) {
     private val previousValueHelper = PreviousValueHelper(indicator, n)
 
 

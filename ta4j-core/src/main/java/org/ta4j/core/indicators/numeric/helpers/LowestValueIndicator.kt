@@ -25,7 +25,9 @@ package org.ta4j.core.indicators.numeric.helpers
 import java.util.*
 import org.ta4j.core.api.series.Bar
 import org.ta4j.core.indicators.numeric.NumericIndicator
+import org.ta4j.core.indicators.numeric.candles.price.LowPriceIndicator
 import org.ta4j.core.num.Num
+import org.ta4j.core.num.NumFactory
 
 /**
  * Lowest value indicator.
@@ -34,14 +36,16 @@ import org.ta4j.core.num.Num
  *
  * Returns the lowest indicator value from the bar series within the bar count.
  */
-class LowestValueIndicator(private val indicator: NumericIndicator, private val barCount: Int) : NumericIndicator(
-    indicator.numFactory
-) {
+class LowestValueIndicator(
+    numFactory: NumFactory,
+    private val indicator: NumericIndicator = LowPriceIndicator(numFactory),
+    private val barCount: Int,
+) : NumericIndicator(numFactory) {
     override val lag = barCount
 
     /** circular array  */
     private val window: Array<Num?> // TODO CircularNumArray
-    private val deque: Deque<Int> = LinkedList<Int>()
+    private val deque: Deque<Int> = LinkedList()
     private var barsPassed = 0
 
 

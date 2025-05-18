@@ -27,8 +27,8 @@ import org.ta4j.core.api.series.Bar
 import org.ta4j.core.indicators.helpers.previous.PreviousNumericValueIndicator
 import org.ta4j.core.indicators.numeric.NumericIndicator
 import org.ta4j.core.indicators.numeric.operation.CombineIndicator
-import org.ta4j.core.num.NaN
 import org.ta4j.core.num.Num
+import org.ta4j.core.num.NumFactory
 
 /**
  * A rule that monitors when an [Indicator] shows a specified slope.
@@ -40,6 +40,7 @@ import org.ta4j.core.num.Num
  * or/and `minSlope`. It can test both, positive and negative slope.
  */
 class InSlopeIndicator(
+    numFactory: NumFactory,
     ref: NumericIndicator,
     private val nthPrevious: Int,
     /** The minimum slope between ref and prev.  */
@@ -47,39 +48,7 @@ class InSlopeIndicator(
     /** The maximum slope between ref and prev.  */
     private val maxSlope: Num,
 ) : BooleanIndicator() {
-    private val diff = CombineIndicator.minus(ref, PreviousNumericValueIndicator(ref, nthPrevious))
-
-
-    /**
-     * Constructor.
-     *
-     * @param ref the reference indicator
-     * @param minSlope minumum slope between reference and previous indicator
-     */
-    constructor(ref: NumericIndicator, minSlope: Num) : this(ref, 1, minSlope, NaN)
-
-
-    /**
-     * Constructor.
-     *
-     * @param ref the reference indicator
-     * @param minSlope minumum slope between value of reference and previous
-     * indicator
-     * @param maxSlope maximum slope between value of reference and previous
-     * indicator
-     */
-    constructor(ref: NumericIndicator, minSlope: Num, maxSlope: Num) : this(ref, 1, minSlope, maxSlope)
-
-
-    /**
-     * Constructor.
-     *
-     * @param ref the reference indicator
-     * @param nthPrevious defines the previous n-th indicator
-     * @param maxSlope maximum slope between value of reference and previous
-     * indicator
-     */
-    constructor(ref: NumericIndicator, nthPrevious: Int, maxSlope: Num) : this(ref, nthPrevious, NaN, maxSlope)
+    private val diff = CombineIndicator.minus(ref, PreviousNumericValueIndicator(numFactory, ref, nthPrevious))
 
     private fun calculate(): Boolean {
         val difference = diff.value

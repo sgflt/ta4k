@@ -27,10 +27,19 @@ import org.ta4j.core.indicators.numeric.NumericIndicator
 import org.ta4j.core.indicators.numeric.candles.LowerShadowIndicator
 import org.ta4j.core.indicators.numeric.candles.RealBodyIndicator
 import org.ta4j.core.indicators.numeric.candles.VolumeIndicator
-import org.ta4j.core.indicators.numeric.candles.price.*
+import org.ta4j.core.indicators.numeric.candles.price.ClosePriceIndicator
+import org.ta4j.core.indicators.numeric.candles.price.HighPriceIndicator
+import org.ta4j.core.indicators.numeric.candles.price.LowPriceIndicator
+import org.ta4j.core.indicators.numeric.candles.price.MedianPriceIndicator
+import org.ta4j.core.indicators.numeric.candles.price.OpenPriceIndicator
+import org.ta4j.core.indicators.numeric.candles.price.TypicalPriceIndicator
 import org.ta4j.core.indicators.numeric.channels.bollinger.BollingerBandFacade
 import org.ta4j.core.indicators.numeric.momentum.ATRIndicator
-import org.ta4j.core.indicators.numeric.momentum.adx.*
+import org.ta4j.core.indicators.numeric.momentum.adx.ADXIndicator
+import org.ta4j.core.indicators.numeric.momentum.adx.MinusDIIndicator
+import org.ta4j.core.indicators.numeric.momentum.adx.MinusDMIndicator
+import org.ta4j.core.indicators.numeric.momentum.adx.PlusDIIndicator
+import org.ta4j.core.indicators.numeric.momentum.adx.PlusDMIndicator
 import org.ta4j.core.indicators.numeric.oscilators.AwesomeOscillatorIndicator
 import org.ta4j.core.indicators.numeric.oscilators.StochasticOscillatorDIndicator
 import org.ta4j.core.indicators.numeric.oscilators.StochasticOscillatorKIndicator
@@ -144,11 +153,11 @@ object Indicators {
 
         fun aroonOscillator(barCount: Int) = AroonOscillatorIndicator(numFactory, barCount)
 
-        fun aroonUp(barCount: Int) = AroonUpIndicator(numFactory, barCount)
+        fun aroonUp(barCount: Int) = AroonUpIndicator(numFactory, barCount = barCount)
 
         fun aroonDown(barCount: Int) = AroonDownIndicator(numFactory, barCount)
 
-        fun atr(barCount: Int) = ATRIndicator(numFactory, barCount)
+        fun atr(barCount: Int) = ATRIndicator(numFactory, barCount = barCount)
 
         fun adx(diBarCount: Int, adxBarCount: Int) = ADXIndicator(numFactory, diBarCount, adxBarCount)
 

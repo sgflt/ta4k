@@ -1,5 +1,9 @@
 package org.ta4j.core
 
+import java.time.Duration
+import java.time.Instant
+import java.time.temporal.ChronoUnit
+import java.util.*
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.data.Offset
 import org.slf4j.Logger
@@ -22,10 +26,6 @@ import org.ta4j.core.num.NaN
 import org.ta4j.core.num.Num
 import org.ta4j.core.num.NumFactory
 import org.ta4j.core.utils.TimeFrameMapping
-import java.time.Duration
-import java.time.Instant
-import java.time.temporal.ChronoUnit
-import java.util.*
 
 /**
  * This class simplifies testing by connecting market events and bar series through indicator context.
@@ -144,9 +144,9 @@ class MarketEventTestContext {
     }
 
 
-    fun assertNextNaN(context: MarketEventTestContext, indicator: NumericIndicator): MarketEventTestContext {
-        context.advance()
-        assertNumEquals(NaN, indicator.value)
+    fun assertNextNaN(): MarketEventTestContext {
+        advance()
+        assertNumEquals(NaN, firstNumericIndicator!!.value)
         return this
     }
 

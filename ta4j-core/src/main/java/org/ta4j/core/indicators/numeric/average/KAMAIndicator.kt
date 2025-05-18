@@ -29,6 +29,7 @@ import org.ta4j.core.indicators.numeric.NumericIndicator
 import org.ta4j.core.indicators.numeric.helpers.RunningTotalIndicator
 import org.ta4j.core.indicators.numeric.helpers.TransformIndicator.Companion.abs
 import org.ta4j.core.num.Num
+import org.ta4j.core.num.NumFactory
 
 /**
  * The Kaufman's Adaptive Moving Average (KAMA) Indicator.
@@ -37,6 +38,7 @@ import org.ta4j.core.num.Num
  * http://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:kaufman_s_adaptive_moving_average](http://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:kaufman_s_adaptive_moving_average)
  */
 class KAMAIndicator @JvmOverloads constructor(
+    numFactory: NumFactory,
     private val price: NumericIndicator,
     private val barCountEffectiveRatio: Int = 10,
     barCountFast: Int = 2,
@@ -44,7 +46,8 @@ class KAMAIndicator @JvmOverloads constructor(
 ) : NumericIndicator(price.numFactory) {
     private val fastest: Num
     private val slowest: Num
-    private val previousVolatilities = RunningTotalIndicator(abs(DifferenceIndicator(price)), barCountEffectiveRatio)
+    private val previousVolatilities =
+        RunningTotalIndicator(numFactory, abs(DifferenceIndicator(price)), barCountEffectiveRatio)
     private val priceAtStartOfRange = price.previous(barCountEffectiveRatio)
     private var barsPassed = 0
 

@@ -25,7 +25,9 @@ package org.ta4j.core.indicators.numeric.helpers
 import java.util.*
 import org.ta4j.core.api.series.Bar
 import org.ta4j.core.indicators.numeric.NumericIndicator
+import org.ta4j.core.indicators.numeric.candles.price.HighPriceIndicator
 import org.ta4j.core.num.Num
+import org.ta4j.core.num.NumFactory
 
 /**
  * Highest value indicator.
@@ -34,9 +36,11 @@ import org.ta4j.core.num.Num
  *
  * Returns the highest indicator value from the bar series within the bar count.
  */
-class HighestValueIndicator(private val indicator: NumericIndicator, private val barCount: Int) : NumericIndicator(
-    indicator.numFactory
-) {
+class HighestValueIndicator(
+    numFactory: NumFactory,
+    private val indicator: NumericIndicator = HighPriceIndicator(numFactory),
+    private val barCount: Int,
+) : NumericIndicator(numFactory) {
 
     override val lag = barCount
 

@@ -41,8 +41,8 @@ class StochasticRSIIndicator(
     private val barCount: Int,
     private val rsi: NumericIndicator = RSIIndicator(indicator, barCount),
 ) : NumericIndicator(numFactory) {
-    private val minRsi = LowestValueIndicator(rsi, barCount)
-    private val maxRsi = HighestValueIndicator(rsi, barCount)
+    private val minRsi = LowestValueIndicator(numFactory, rsi, barCount)
+    private val maxRsi = HighestValueIndicator(numFactory, rsi, barCount)
 
     override val lag: Int
         get() = rsi.lag

@@ -32,7 +32,7 @@ import org.ta4j.core.num.NumFactory
  *
  * Returns the low price of a bar.
  */
-class LowPriceIndicator(series: NumFactory) : SeriesRelatedNumericIndicator(series) {
+class LowPriceIndicator(numFactory: NumFactory) : SeriesRelatedNumericIndicator(numFactory) {
     override fun updateState(bar: Bar) {
         value = bar.lowPrice
     }
