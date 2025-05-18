@@ -40,7 +40,7 @@ class MarketEventTestContext {
     var barSeries: BacktestBarSeries =
         BacktestBarSeriesBuilder().withIndicatorContext(indicatorContext).build()
         private set
-    private var candleDuration: Duration = TimeFrameMapping.getDuration(TimeFrame.DAY)!!
+    private var candleDuration: Duration = TimeFrameMapping.getDuration(TimeFrame.DAY)
     private var startTime: Instant = Instant.EPOCH
 
 
@@ -51,7 +51,7 @@ class MarketEventTestContext {
      *
      * @return this
      */
-    fun withCandlePrices(vararg prices: Double): MarketEventTestContext {
+    fun withCandlePrices(vararg prices: Double): MarketEventTestContext = apply {
         marketEvents = LinkedList(
             MockMarketEventBuilder()
                 .withStartTime(startTime)
@@ -59,36 +59,30 @@ class MarketEventTestContext {
                 .withCandlePrices(*prices)
                 .build()
         )
-        return this
     }
 
-    fun withMarketEvents(marketEvents: List<MarketEvent>): MarketEventTestContext {
+    fun withMarketEvents(marketEvents: List<MarketEvent>): MarketEventTestContext = apply {
         this.marketEvents = LinkedList(marketEvents)
-        return this
     }
 
 
-    fun withDefaultMarketEvents(): MarketEventTestContext {
+    fun withDefaultMarketEvents(): MarketEventTestContext = apply {
         marketEvents = LinkedList(MockMarketEventBuilder().withDefaultData().build())
-        return this
     }
 
 
-    fun withIndicator(indicator: Indicator<*>): MarketEventTestContext {
+    fun withIndicator(indicator: Indicator<*>): MarketEventTestContext = apply {
         indicatorContext.add(indicator)
-        return this
     }
 
 
-    fun withIndicator(indicator: Indicator<*>, name: String): MarketEventTestContext {
+    fun withIndicator(indicator: Indicator<*>, name: String): MarketEventTestContext = apply {
         indicatorContext.add(indicator, IndicatorIdentification(name))
-        return this
     }
 
 
-    fun withIndicators(vararg indicator: Indicator<*>): MarketEventTestContext {
+    fun withIndicators(vararg indicator: Indicator<*>): MarketEventTestContext = apply {
         indicator.forEach { withIndicator(it) }
-        return this
     }
 
 
@@ -99,14 +93,13 @@ class MarketEventTestContext {
      *
      * @return this
      */
-    fun withNumFactory(factory: NumFactory): MarketEventTestContext {
+    fun withNumFactory(factory: NumFactory): MarketEventTestContext = apply {
         barSeries =
             BacktestBarSeriesBuilder()
                 .withNumFactory(factory)
                 .withTimeFrame(TimeFrame.DAY)
                 .withIndicatorContext(indicatorContext)
                 .build()
-        return this
     }
 
 
@@ -135,33 +128,32 @@ class MarketEventTestContext {
         get() = indicatorContext.first as BooleanIndicator?
 
 
-    fun fastForwardUntilStable(): MarketEventTestContext {
+    fun fastForwardUntilStable(): MarketEventTestContext = apply {
         while (indicatorContext.isNotEmpty && !indicatorContext.isStable) {
             fastForward(1)
         }
-
-        return this
     }
 
 
-    fun assertNextNaN(): MarketEventTestContext {
+    fun assertNextNaN(): MarketEventTestContext = apply {
         advance()
         assertNumEquals(NaN, firstNumericIndicator!!.value)
-        return this
+    }
+
+    fun assertCurrentNaN(): MarketEventTestContext = apply {
+        assertNumEquals(NaN, firstNumericIndicator!!.value)
     }
 
 
-    fun assertNextFalse(): MarketEventTestContext {
+    fun assertNextFalse(): MarketEventTestContext = apply {
         advance()
         assertThat(fisrtBooleanIndicator!!.value).isFalse()
-        return this
     }
 
 
-    fun assertNextTrue(): MarketEventTestContext {
+    fun assertNextTrue(): MarketEventTestContext = apply {
         advance()
         assertThat(fisrtBooleanIndicator!!.value).isTrue()
-        return this
     }
 
 
@@ -170,24 +162,21 @@ class MarketEventTestContext {
      *
      * @return this
      */
-    fun fastForward(bars: Int): MarketEventTestContext {
+    fun fastForward(bars: Int): MarketEventTestContext = apply {
         log.debug("Fast forward =====> {}", bars)
         for (i in 0..<bars) {
             check(advance()) { "Fast forward failed at index " + i }
         }
-        return this
     }
 
 
-    fun assertCurrent(expected: Double): MarketEventTestContext {
+    fun assertCurrent(expected: Double): MarketEventTestContext = apply {
         assertCurrent(firstNumericIndicator!!, expected)
-        return this
     }
 
 
-    private fun assertCurrent(indicator: NumericIndicator, expected: Double): MarketEventTestContext {
+    private fun assertCurrent(indicator: NumericIndicator, expected: Double): MarketEventTestContext = apply {
         assertNumEquals(expected, indicator.value)
-        return this
     }
 
 
@@ -196,24 +185,22 @@ class MarketEventTestContext {
     }
 
 
-    fun assertNext(expected: Double): MarketEventTestContext {
+    fun assertNext(expected: Double): MarketEventTestContext = apply {
         assertNext(firstNumericIndicator!!, expected)
-        return this
     }
 
 
-    private fun assertNext(indicator: NumericIndicator, expected: Double): MarketEventTestContext {
+    private fun assertNext(indicator: NumericIndicator, expected: Double): MarketEventTestContext = apply {
         check(advance()) { "Next failed" }
 
         assertNumEquals(expected, indicator.value)
-        return this
     }
 
 
     fun assertIndicatorEquals(
         expectedIndicator: Indicator<Num>,
         indicator: Indicator<Num>,
-    ): MarketEventTestContext {
+    ): MarketEventTestContext = apply {
         while (advance()) {
             assertThat(indicator.value.doubleValue())
                 .isCloseTo(
@@ -221,14 +208,10 @@ class MarketEventTestContext {
                     Offset.offset(GENERAL_OFFSET)
                 )
         }
-
-        return this
     }
 
 
-    fun onIndicator(name: String): IndicatorAsserts {
-        return IndicatorAsserts(name)
-    }
+    fun onIndicator(name: String): IndicatorAsserts = IndicatorAsserts(name)
 
 
     /**
@@ -239,9 +222,7 @@ class MarketEventTestContext {
      * Some criteria are not event based, but are retrospective instead. So for them, we have to replay all events
      * and calculate them on historical data.
      */
-    fun toTradingRecordContext(): TradingRecordTestContext {
-        return TradingRecordTestContext(this)
-    }
+    fun toTradingRecordContext(): TradingRecordTestContext = TradingRecordTestContext(this)
 
 
     fun withBarListener(barListener: BarListener) {
@@ -250,15 +231,13 @@ class MarketEventTestContext {
     }
 
 
-    fun withCandleDuration(candleDuration: ChronoUnit): MarketEventTestContext {
+    fun withCandleDuration(candleDuration: ChronoUnit): MarketEventTestContext = apply {
         this.candleDuration = candleDuration.duration
-        return this
     }
 
 
-    fun withStartTime(startTime: Instant): MarketEventTestContext {
+    fun withStartTime(startTime: Instant): MarketEventTestContext = apply {
         this.startTime = startTime
-        return this
     }
 
 
@@ -271,15 +250,13 @@ class MarketEventTestContext {
         }
 
 
-        fun assertNext(expected: Double): IndicatorAsserts {
+        fun assertNext(expected: Double): IndicatorAsserts = apply {
             this@MarketEventTestContext.assertNext(getNumericIndicator(indicatorId)!!, expected)
-            return this
         }
 
 
-        fun assertCurrent(expected: Double): IndicatorAsserts {
+        fun assertCurrent(expected: Double): IndicatorAsserts = apply {
             this@MarketEventTestContext.assertCurrent(getNumericIndicator(indicatorId)!!, expected)
-            return this
         }
     }
 
