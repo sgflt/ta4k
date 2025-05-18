@@ -36,31 +36,31 @@ import org.ta4j.core.num.NumFactory
  * This indicator calculates the maximum relative displacement across multiple timeframes
  * and compares it to what would be expected in a random walk.
  */
-class RWIHighIndicator(
+class RWILowIndicator(
     numFactory: NumFactory,
-    barCount: Int = 14,
+    private val barCount: Int = 14,
 ) : RWIIndicator(numFactory, barCount) {
 
-    private val highPrice = HighPriceIndicator(numFactory)
     private val lowPrice = LowPriceIndicator(numFactory)
+    private val highPrice = HighPriceIndicator(numFactory)
 
     // Cache of previous low values
-    private val previousLows =
-        Array(barCount) { i -> PreviousNumericValueIndicator(numFactory, lowPrice, i + 1) }
+    private val previsouHighs =
+        Array(barCount) { i -> PreviousNumericValueIndicator(numFactory, highPrice, i + 1) }
 
     override fun getHigh(period: Int): Num {
-        return highPrice.value
+        return previsouHighs[period].value
     }
 
     override fun getLow(period: Int): Num {
-        return previousLows[period].value
+        return lowPrice.value
     }
 
     override fun updateState(bar: Bar) {
         super.updateState(bar)
-        highPrice.onBar(bar)
         lowPrice.onBar(bar)
-        previousLows.forEach { it.onBar(bar) }
+        highPrice.onBar(bar)
+        previsouHighs.forEach { it.onBar(bar) }
 
         if (isStable) {
             value = calculate()
@@ -68,6 +68,6 @@ class RWIHighIndicator(
     }
 
     override fun toString(): String {
-        return "RWI High ${super.toString()}"
+        return "RWI Low ${super.toString()}"
     }
 }
