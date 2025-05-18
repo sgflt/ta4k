@@ -45,14 +45,13 @@ package org.ta4j.core.utils
 </T> */
 internal abstract class CircularArray<T> protected constructor(private val capacity: Int, defaultValue: T?) :
     Iterable<T?> {
-    protected val elements: ArrayList<T?>
+    protected val elements: ArrayList<T?> = ArrayList(capacity)
     var currentIndex: Int = -1
         private set
 
 
     init {
-        elements = ArrayList(capacity)
-        for (i in 0..<capacity) {
+        (0 until capacity).forEach { _ ->
             elements.add(defaultValue)
         }
     }
