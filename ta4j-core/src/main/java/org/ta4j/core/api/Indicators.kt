@@ -35,6 +35,8 @@ import org.ta4j.core.indicators.numeric.candles.price.OpenPriceIndicator
 import org.ta4j.core.indicators.numeric.candles.price.TypicalPriceIndicator
 import org.ta4j.core.indicators.numeric.channels.bollinger.BollingerBandFacade
 import org.ta4j.core.indicators.numeric.momentum.ATRIndicator
+import org.ta4j.core.indicators.numeric.momentum.RWIHighIndicator
+import org.ta4j.core.indicators.numeric.momentum.RWILowIndicator
 import org.ta4j.core.indicators.numeric.momentum.adx.ADXIndicator
 import org.ta4j.core.indicators.numeric.momentum.adx.MinusDIIndicator
 import org.ta4j.core.indicators.numeric.momentum.adx.MinusDMIndicator
@@ -127,6 +129,12 @@ object Indicators {
         extended().awesomeOscillator(shortBarCount, longBarCount)
 
     @JvmStatic
+    fun rwiHigh(barCount: Int) = extended().rwiHigh(barCount)
+
+    @JvmStatic
+    fun rwiLow(barCount: Int) = extended().rwiLow(barCount)
+
+    @JvmStatic
     private fun extended() = extended(NumFactoryProvider.defaultNumFactory)
 
     @JvmStatic
@@ -188,5 +196,9 @@ object Indicators {
             awesomeOscillator(medianPrice(), shortBarCount, longBarCount)
 
         fun closeLocationValue() = CloseLocationValueIndicator(numFactory)
+
+        fun rwiHigh(barCount: Int) = RWIHighIndicator(numFactory, barCount)
+
+        fun rwiLow(barCount: Int) = RWILowIndicator(numFactory, barCount)
     }
 }

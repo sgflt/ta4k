@@ -44,6 +44,7 @@ import org.ta4j.core.indicators.numeric.helpers.HighestValueIndicator
 import org.ta4j.core.indicators.numeric.helpers.LossIndicator
 import org.ta4j.core.indicators.numeric.helpers.LowestValueIndicator
 import org.ta4j.core.indicators.numeric.helpers.RunningTotalIndicator
+import org.ta4j.core.indicators.numeric.momentum.ROCIndicator
 import org.ta4j.core.indicators.numeric.momentum.RSIIndicator
 import org.ta4j.core.indicators.numeric.operation.BinaryOperation
 import org.ta4j.core.indicators.numeric.operation.UnaryOperation
@@ -109,6 +110,8 @@ abstract class NumericIndicator protected constructor(
     fun loss() = LossIndicator(this)
 
     fun rsi(barCount: Int) = RSIIndicator(this, barCount)
+
+    fun roc(barCount: Int) = ROCIndicator(numFactory, this, barCount)
 
 
     /**
