@@ -44,6 +44,7 @@ import org.ta4j.core.indicators.numeric.helpers.HighestValueIndicator
 import org.ta4j.core.indicators.numeric.helpers.LossIndicator
 import org.ta4j.core.indicators.numeric.helpers.LowestValueIndicator
 import org.ta4j.core.indicators.numeric.helpers.RunningTotalIndicator
+import org.ta4j.core.indicators.numeric.momentum.CoppockCurveIndicator
 import org.ta4j.core.indicators.numeric.momentum.ROCIndicator
 import org.ta4j.core.indicators.numeric.momentum.RSIIndicator
 import org.ta4j.core.indicators.numeric.operation.BinaryOperation
@@ -112,6 +113,18 @@ abstract class NumericIndicator protected constructor(
     fun rsi(barCount: Int) = RSIIndicator(this, barCount)
 
     fun roc(barCount: Int) = ROCIndicator(numFactory, this, barCount)
+
+    fun coppock(
+        longRoCBarCount: Int = 14,
+        shortRoCBarCount: Int = 11,
+        wmaBarCount: Int = 10,
+    ) = CoppockCurveIndicator(
+        numFactory,
+        this,
+        longRoCBarCount,
+        shortRoCBarCount,
+        wmaBarCount,
+    )
 
 
     /**
