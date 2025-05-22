@@ -21,11 +21,13 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.ta4j.core.live
+package org.ta4j.core.trading.signal
 
 import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.ta4j.core.MultiTimeFrameSeries
 import org.ta4j.core.aggregator.BarAggregator
+import org.ta4j.core.api.callback.MarketEventHandler
 import org.ta4j.core.api.series.BarBuilderFactory
 import org.ta4j.core.api.series.BarSeries
 import org.ta4j.core.backtest.strategy.runtime.NOOPRuntimeContext
@@ -37,6 +39,7 @@ import org.ta4j.core.strategy.RuntimeContext
 import org.ta4j.core.strategy.Strategy
 import org.ta4j.core.strategy.StrategyFactory
 import org.ta4j.core.strategy.configuration.StrategyConfiguration
+import org.ta4j.core.trading.DefaultMarketEventHandler
 import org.ta4j.core.trading.LightweightBarBuilderFactory
 import org.ta4j.core.trading.LiveBarSeries
 
@@ -49,7 +52,7 @@ class SignalTradingBuilder {
     private var numFactory = defaultNumFactory
     private var barBuilderFactory: BarBuilderFactory = LightweightBarBuilderFactory()
     private var strategyFactories = mutableListOf<StrategyFactory<Strategy>>()
-    private var runtimeContext: RuntimeContext = NOOPRuntimeContext()
+    private var runtimeContext: RuntimeContext = NOOPRuntimeContext
     private var indicatorContexts = IndicatorContexts.empty()
     private var configuration = StrategyConfiguration()
 
@@ -112,10 +115,10 @@ class SignalTradingBuilder {
      *
      * @return instance for live trading or live indicator calculation
      */
-    fun build(): SignalTrading {
+    fun build(): MarketEventHandler {
         require(strategyFactories.isNotEmpty()) { "No strategy factory provided" }
 
-        val strategies = strategyFactories.map {
+        strategyFactories.map {
             it.createStrategy(configuration, runtimeContext, indicatorContexts)
         }
 
@@ -134,7 +137,7 @@ class SignalTradingBuilder {
 
         windowSize?.let { indicatorContexts.enableHistory(it) }
 
-        return SignalTrading(multiTimeFrameSeries, strategies)
+        return DefaultMarketEventHandler(multiTimeFrameSeries)
     }
 
 
@@ -152,6 +155,6 @@ class SignalTradingBuilder {
     companion object {
         /** The [.name] for an unnamed bar series.  */
         private const val UNNAMED_SERIES_NAME = "unnamed_series"
-        val log: Logger = org.slf4j.LoggerFactory.getLogger(SignalTradingBuilder::class.java)
+        val log: Logger = LoggerFactory.getLogger(SignalTradingBuilder::class.java)
     }
 }

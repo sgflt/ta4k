@@ -67,7 +67,7 @@ internal class LiveBarSeries(
     override fun barBuilder() = barBuilderFactory.createBarBuilder(this) as LightweightBarBuilder
 
     override fun addBar(bar: Bar) {
-        if (bar.endTime.isBefore(bar.endTime)) {
+        if (bar.endTime.isBefore(currentTime)) {
             throw PastCandleParadoxException(bar.endTime, currentTime)
         }
 

@@ -34,8 +34,8 @@ import org.ta4j.core.strategy.Strategy
  * @author Lukáš Kvídera
  */
 class LiveTrading(private val series: MultiTimeFrameSeries<BarSeries>, private val strategy: Strategy) {
-    fun onCandle(candle: CandleReceived) {
-        this.series.onCandle(candle)
+    fun onCandle(event: CandleReceived) {
+        this.series.onCandle(event)
     }
 
 

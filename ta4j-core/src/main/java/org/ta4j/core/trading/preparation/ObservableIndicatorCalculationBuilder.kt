@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  *
- * Copyright (c) 2017-2024 Ta4j Organization & respective authors (see AUTHORS)
+ * Copyright (c) 2017-2025 Ta4j Organization & respective authors (see AUTHORS)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -20,37 +20,34 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.ta4j.core.trading.live
+package org.ta4j.core.trading.preparation
 
 import org.slf4j.LoggerFactory
 import org.ta4j.core.MultiTimeFrameSeries
+import org.ta4j.core.api.callback.MarketEventHandler
 import org.ta4j.core.api.series.BarBuilderFactory
 import org.ta4j.core.api.series.BarSeries
 import org.ta4j.core.backtest.strategy.runtime.NOOPRuntimeContext
+import org.ta4j.core.indicators.IndicatorChangeListener
+import org.ta4j.core.indicators.IndicatorContextUpdateListener
 import org.ta4j.core.indicators.IndicatorContexts
 import org.ta4j.core.indicators.TimeFrame
 import org.ta4j.core.num.NumFactory
 import org.ta4j.core.num.NumFactoryProvider.defaultNumFactory
-import org.ta4j.core.strategy.NOOPStrategyFactory
-import org.ta4j.core.strategy.RuntimeContext
-import org.ta4j.core.strategy.Strategy
-import org.ta4j.core.strategy.StrategyFactory
-import org.ta4j.core.strategy.configuration.StrategyConfiguration
+import org.ta4j.core.trading.DefaultMarketEventHandler
 import org.ta4j.core.trading.LightweightBarBuilderFactory
 import org.ta4j.core.trading.LiveBarSeries
 
 /**
  * A builder to build a new [BacktestBarSeries].
  */
-class LiveTradingBuilder {
-    private var windowSize: Int? = null
+class ObservableIndicatorCalculationBuilder {
     private var name: String = UNNAMED_SERIES_NAME
     private var numFactory = defaultNumFactory
     private var barBuilderFactory: BarBuilderFactory = LightweightBarBuilderFactory()
-    private var strategyFactory: StrategyFactory<Strategy> = NOOPStrategyFactory()
-    private var runtimeContext: RuntimeContext = NOOPRuntimeContext
     private var indicatorContexts: IndicatorContexts = IndicatorContexts.empty()
-    private var configuration: StrategyConfiguration? = null
+    private val contextUpdateListeners = mutableListOf<IndicatorContextUpdateListener>()
+    private val indicatorChangeListeners = mutableListOf<IndicatorChangeListener>()
 
 
     /**
@@ -83,27 +80,16 @@ class LiveTradingBuilder {
     }
 
 
-    fun withStrategyFactory(strategy: StrategyFactory<Strategy>) = apply {
-        this.strategyFactory = strategy
-    }
-
-
-    fun withRuntimeContext(runtimeContext: RuntimeContext) = apply {
-        this.runtimeContext = runtimeContext
-    }
-
-
     fun withIndicatorContexts(indicatorContexts: IndicatorContexts) = apply {
         this.indicatorContexts = indicatorContexts
     }
 
-
-    fun withConfiguration(configuration: StrategyConfiguration) = apply {
-        this.configuration = configuration
+    fun withIndicatorContextUpdateListener(updateListener: IndicatorContextUpdateListener) = apply {
+        this.contextUpdateListeners += updateListener
     }
 
-    fun enableHistory(windowSize: Int) = apply {
-        this.windowSize = windowSize
+    fun withIndicatorChangeListener(changeListener: IndicatorChangeListener) = apply {
+        this.indicatorChangeListeners += changeListener
     }
 
     /**
@@ -111,21 +97,16 @@ class LiveTradingBuilder {
      *
      * @return instance for live trading or live indicator calculation
      */
-    fun build(): LiveTrading {
-        if (strategyFactory is NOOPStrategyFactory) {
-            log.warn("Using NOOP strategy")
-        }
+    fun build(): MarketEventHandler {
 
-        val strategy = strategyFactory.createStrategy(configuration!!, runtimeContext, indicatorContexts)
         val series = MultiTimeFrameSeries<BarSeries>().apply {
-            (strategy.timeFrames + indicatorContexts.timeFrames)
-                .distinct()
-                .forEach { add(createSeriesPerTimeFrame(it)) }
+            indicatorContexts.timeFrames.forEach { add(createSeriesPerTimeFrame(it)) }
         }
 
-        windowSize?.let { indicatorContexts.enableHistory(it) }
+        contextUpdateListeners.forEach { listener -> indicatorContexts.register(listener) }
+        indicatorChangeListeners.forEach { listener -> indicatorContexts.register(listener) }
 
-        return LiveTrading(series, strategy)
+        return DefaultMarketEventHandler(series)
     }
 
 
@@ -136,13 +117,13 @@ class LiveTradingBuilder {
             numFactory = numFactory,
             barBuilderFactory = barBuilderFactory,
             indicatorContext = indicatorContexts[timeFrame],
-            runtimeContext = runtimeContext,
+            runtimeContext = NOOPRuntimeContext,
         )
     }
 
     companion object {
         /** The [.name] for an unnamed bar series.  */
         private const val UNNAMED_SERIES_NAME = "unnamed_series"
-        val log = LoggerFactory.getLogger(LiveTradingBuilder::class.java)
+        val log = LoggerFactory.getLogger(ObservableIndicatorCalculationBuilder::class.java)
     }
 }

@@ -29,6 +29,6 @@ import org.ta4j.core.strategy.RuntimeContext
  */
 class NOOPRuntimeContextFactory : RuntimeContextFactory {
     override fun createRuntimeContext(): RuntimeContext {
-        return NOOPRuntimeContext()
+        return NOOPRuntimeContext
     }
 }

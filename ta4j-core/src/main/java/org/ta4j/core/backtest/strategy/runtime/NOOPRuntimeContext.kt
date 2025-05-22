@@ -30,7 +30,7 @@ import org.ta4j.core.strategy.RuntimeValueResolver
 /**
  * This context does nothing.
  */
-internal class NOOPRuntimeContext : RuntimeContext {
+internal object NOOPRuntimeContext : RuntimeContext {
     override fun <T> getValue(resolver: RuntimeValueResolver<T?>): T? {
         return null
     }

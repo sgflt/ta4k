@@ -23,7 +23,6 @@
 package org.ta4j.core.indicators
 
 import kotlin.collections.Map.Entry
-import org.ta4j.core.trading.signal.ObservableStrategy
 
 /**
  * Aggregation class that stores indicator contexts related to defined timeframes.
@@ -42,9 +41,12 @@ class IndicatorContexts private constructor() : Iterable<Entry<TimeFrame, Indica
         return timeFramedContexts.computeIfAbsent(timeFrame) { IndicatorContext.empty(it) }
     }
 
+    fun register(changeListener: IndicatorChangeListener) {
+        timeFramedContexts.values.forEach { indicatorContext -> indicatorContext.register(changeListener) }
+    }
 
-    fun register(observableStrategy: ObservableStrategy) {
-        timeFramedContexts.values.forEach { indicatorContext -> indicatorContext.register(observableStrategy) }
+    fun register(contextUpdateListener: IndicatorContextUpdateListener) {
+        timeFramedContexts.values.forEach { indicatorContext -> indicatorContext.register(contextUpdateListener) }
     }
 
     fun enableHistory(windowSize: Int) {
