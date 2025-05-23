@@ -43,6 +43,7 @@ import org.ta4j.core.indicators.numeric.momentum.adx.MinusDMIndicator
 import org.ta4j.core.indicators.numeric.momentum.adx.PlusDIIndicator
 import org.ta4j.core.indicators.numeric.momentum.adx.PlusDMIndicator
 import org.ta4j.core.indicators.numeric.oscilators.AwesomeOscillatorIndicator
+import org.ta4j.core.indicators.numeric.oscilators.PVOIndicator
 import org.ta4j.core.indicators.numeric.oscilators.StochasticOscillatorDIndicator
 import org.ta4j.core.indicators.numeric.oscilators.StochasticOscillatorKIndicator
 import org.ta4j.core.indicators.numeric.oscilators.aroon.AroonDownIndicator
@@ -78,6 +79,13 @@ object Indicators {
 
     @JvmStatic
     fun volume() = extended().volume()
+
+    @JvmStatic
+    fun pvo(
+        volumeBarCount: Int,
+        shortBarCount: Int = 12,
+        longBarCount: Int = 26,
+    ) = extended().pvo(volumeBarCount, shortBarCount, longBarCount)
 
     @JvmStatic
     fun bollingerBands(barCount: Int, k: Number) = extended().bollingerBands(barCount, k)
@@ -154,6 +162,12 @@ object Indicators {
         fun typicalPrice() = TypicalPriceIndicator(numFactory)
 
         fun volume() = VolumeIndicator(numFactory)
+
+        fun pvo(
+            volumeBarCount: Int,
+            shortBarCount: Int = 12,
+            longBarCount: Int = 26,
+        ) = PVOIndicator(numFactory, volumeBarCount, shortBarCount, longBarCount)
 
         fun bollingerBands(barCount: Int, k: Number) = BollingerBandFacade(closePrice(), barCount, k)
 

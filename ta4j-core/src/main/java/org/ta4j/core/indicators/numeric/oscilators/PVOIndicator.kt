@@ -21,47 +21,31 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.ta4j.core.indicators.numeric.average
+package org.ta4j.core.indicators.numeric.oscilators
 
-import org.ta4j.core.api.series.Bar
-import org.ta4j.core.indicators.numeric.NumericIndicator
-import org.ta4j.core.num.Num
+import org.ta4j.core.api.Indicators
+import org.ta4j.core.indicators.numeric.average.PPOIndicator
 import org.ta4j.core.num.NumFactory
 
 /**
- * Percentage price oscillator (PPO) indicator (also called "MACD Percentage
- * Price Oscillator (MACD-PPO)").
+ * Percentage Volume Oscillator (PVO) indicator.
  *
- * @see [https://www.investopedia.com/terms/p/ppo.asp](https://www.investopedia.com/terms/p/ppo.asp)
+ * <pre>
+ * ((12-day EMA of Volume - 26-day EMA of Volume) / 26-day EMA of Volume) x 100
+</pre> *
+ *
+ * @see [
+ * https://school.stockcharts.com/doku.php?id=technical_indicators:percentage_volume_oscillator_pvo
+](https://school.stockcharts.com/doku.php?id=technical_indicators:percentage_volume_oscillator_pvo) *
  */
-open class PPOIndicator(
+class PVOIndicator(
     numFactory: NumFactory,
-    indicator: NumericIndicator,
+    volumeBarCount: Int,
     shortBarCount: Int = 12,
     longBarCount: Int = 26,
-) : NumericIndicator(
-    numFactory = numFactory
-) {
-    private val shortTermEma = EMAIndicator(indicator, shortBarCount)
-    private val longTermEma = EMAIndicator(indicator, longBarCount)
-
-    init {
-        require(shortBarCount <= longBarCount) { "Long term barCount must be greater than short term barCount" }
-    }
-
-    private fun calculate(): Num {
-        return (shortTermEma.value - longTermEma.value) / longTermEma.value * numFactory.hundred()
-    }
-
-    override fun updateState(bar: Bar) {
-        shortTermEma.onBar(bar)
-        longTermEma.onBar(bar)
-        value = calculate()
-    }
-
-    override val lag: Int
-        get() = shortTermEma.lag
-
-    override val isStable: Boolean
-        get() = longTermEma.isStable
-}
+) : PPOIndicator(
+    numFactory = numFactory,
+    indicator = Indicators.extended(numFactory).volume().runningTotal(volumeBarCount),
+    shortBarCount = shortBarCount,
+    longBarCount = longBarCount,
+)

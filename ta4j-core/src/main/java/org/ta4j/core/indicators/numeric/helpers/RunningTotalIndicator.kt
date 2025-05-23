@@ -50,10 +50,10 @@ class RunningTotalIndicator(
     private fun calculate(): Num {
         val indicatorValue = indicator.value
 
-        var sum = previousSum.plus(indicatorValue)
+        var sum = previousSum + indicatorValue
 
         if (previousValue.isStable) {
-            sum = sum.minus(previousValue.value)
+            sum -= previousValue.value
         }
 
         previousSum = sum
