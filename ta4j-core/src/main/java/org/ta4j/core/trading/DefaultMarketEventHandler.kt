@@ -33,7 +33,7 @@ import org.ta4j.core.events.TickReceived
 /**
  * This class handles market events
  */
-internal class DefaultMarketEventHandler(private val series: MultiTimeFrameSeries<BarSeries>) : MarketEventHandler {
+class DefaultMarketEventHandler(private val series: MultiTimeFrameSeries<BarSeries>) : MarketEventHandler {
     override fun onCandle(event: CandleReceived) {
         series.onCandle(event)
     }

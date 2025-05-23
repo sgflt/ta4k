@@ -27,7 +27,6 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.ta4j.core.MultiTimeFrameSeries
 import org.ta4j.core.aggregator.BarAggregator
-import org.ta4j.core.api.callback.MarketEventHandler
 import org.ta4j.core.api.series.BarBuilderFactory
 import org.ta4j.core.api.series.BarSeries
 import org.ta4j.core.backtest.strategy.runtime.NOOPRuntimeContext
@@ -115,7 +114,7 @@ class SignalTradingBuilder {
      *
      * @return instance for live trading or live indicator calculation
      */
-    fun build(): MarketEventHandler {
+    fun build(): DefaultMarketEventHandler {
         require(strategyFactories.isNotEmpty()) { "No strategy factory provided" }
 
         strategyFactories.map {

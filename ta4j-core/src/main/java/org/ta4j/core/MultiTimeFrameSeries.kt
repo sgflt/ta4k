@@ -83,7 +83,7 @@ class MultiTimeFrameSeries<B : BarSeries> : BarListener {
         private val state = HashMap<TimeFrame, Instant>()
 
 
-        fun add(timeFrame: TimeFrame, time: Instant) {
+        internal fun add(timeFrame: TimeFrame, time: Instant) {
             state.put(timeFrame, time)
         }
 
