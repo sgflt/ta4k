@@ -35,6 +35,7 @@ import org.ta4j.core.indicators.numeric.average.HMAIndicator
 import org.ta4j.core.indicators.numeric.average.KAMAIndicator
 import org.ta4j.core.indicators.numeric.average.LWMAIndicator
 import org.ta4j.core.indicators.numeric.average.MMAIndicator
+import org.ta4j.core.indicators.numeric.average.PPOIndicator
 import org.ta4j.core.indicators.numeric.average.SMAIndicator
 import org.ta4j.core.indicators.numeric.average.TripleEMAIndicator
 import org.ta4j.core.indicators.numeric.average.WMAIndicator
@@ -124,6 +125,13 @@ abstract class NumericIndicator protected constructor(
         longRoCBarCount,
         shortRoCBarCount,
         wmaBarCount,
+    )
+
+    fun ppo(shortBarCount: Int, longBarCount: Int) = PPOIndicator(
+        numFactory = numFactory,
+        indicator = this,
+        shortBarCount = shortBarCount,
+        longBarCount = longBarCount
     )
 
 
