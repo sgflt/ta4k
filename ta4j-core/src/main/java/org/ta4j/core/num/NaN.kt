@@ -179,4 +179,6 @@ object NaN : Num {
     override val isNegativeOrZero = false
 
     override val isNaN = true
+
+    override fun toString() = "NaN"
 }
