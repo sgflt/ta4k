@@ -42,8 +42,8 @@ open class PPOIndicator(
 ) : NumericIndicator(
     numFactory = numFactory
 ) {
-    private val shortTermEma = EMAIndicator(indicator, shortBarCount)
-    private val longTermEma = EMAIndicator(indicator, longBarCount)
+    private val shortTermEma = indicator.ema(shortBarCount)
+    private val longTermEma = indicator.ema(longBarCount)
 
     init {
         require(shortBarCount <= longBarCount) { "Long term barCount must be greater than short term barCount" }
