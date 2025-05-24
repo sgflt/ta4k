@@ -49,6 +49,7 @@ import org.ta4j.core.indicators.numeric.oscilators.StochasticOscillatorKIndicato
 import org.ta4j.core.indicators.numeric.oscilators.aroon.AroonDownIndicator
 import org.ta4j.core.indicators.numeric.oscilators.aroon.AroonOscillatorIndicator
 import org.ta4j.core.indicators.numeric.oscilators.aroon.AroonUpIndicator
+import org.ta4j.core.indicators.numeric.volume.AccumulationDistributionIndicator
 import org.ta4j.core.indicators.numeric.volume.MoneyFlowIndexIndicator
 import org.ta4j.core.num.NumFactory
 import org.ta4j.core.num.NumFactoryProvider
@@ -80,6 +81,9 @@ object Indicators {
 
     @JvmStatic
     fun volume() = extended().volume()
+
+    @JvmStatic
+    fun accDist() = extended().accDist()
 
     @JvmStatic
     fun mfi(barCount: Int) = extended().mfi(barCount)
@@ -166,6 +170,8 @@ object Indicators {
         fun typicalPrice() = TypicalPriceIndicator(numFactory)
 
         fun volume() = VolumeIndicator(numFactory)
+
+        fun accDist() = AccumulationDistributionIndicator(numFactory)
 
         fun mfi(barCount: Int) = MoneyFlowIndexIndicator(numFactory, barCount)
 
