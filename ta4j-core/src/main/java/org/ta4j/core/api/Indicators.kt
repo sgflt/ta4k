@@ -51,6 +51,7 @@ import org.ta4j.core.indicators.numeric.oscilators.aroon.AroonOscillatorIndicato
 import org.ta4j.core.indicators.numeric.oscilators.aroon.AroonUpIndicator
 import org.ta4j.core.indicators.numeric.volume.AccumulationDistributionIndicator
 import org.ta4j.core.indicators.numeric.volume.MoneyFlowIndexIndicator
+import org.ta4j.core.indicators.numeric.volume.VWAPIndicator
 import org.ta4j.core.num.NumFactory
 import org.ta4j.core.num.NumFactoryProvider
 
@@ -97,6 +98,9 @@ object Indicators {
         shortBarCount: Int = 12,
         longBarCount: Int = 26,
     ) = extended().pvo(volumeBarCount, shortBarCount, longBarCount)
+
+    @JvmStatic
+    fun vwap(barCount: Int) = extended().vwap(barCount)
 
     @JvmStatic
     fun bollingerBands(barCount: Int, k: Number) = extended().bollingerBands(barCount, k)
@@ -183,6 +187,8 @@ object Indicators {
             shortBarCount: Int = 12,
             longBarCount: Int = 26,
         ) = PVOIndicator(numFactory, volumeBarCount, shortBarCount, longBarCount)
+
+        fun vwap(barCount: Int) = VWAPIndicator(numFactory, barCount)
 
         fun bollingerBands(barCount: Int, k: Number) = BollingerBandFacade(closePrice(), barCount, k)
 

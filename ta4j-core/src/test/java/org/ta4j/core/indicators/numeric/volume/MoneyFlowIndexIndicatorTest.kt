@@ -163,7 +163,7 @@ class MoneyFlowIndexIndicatorTest {
         assertStable(mfi)
 
         // With only positive money flow, MFI should be 100
-        context.assertCurrent(99.98115341123257)
+        context.assertCurrent(99.03846153846153)
     }
 
     @ParameterizedTest
@@ -282,11 +282,11 @@ class MoneyFlowIndexIndicatorTest {
         context.advance()
 
         // Subsequent values should match expected calculations
-        context.assertNext(1.21951219)
-        context.assertNext(99.00990099009901)
-        context.assertNext(99.18032786885246)
-        context.assertNext(99.3103448275862)
-        context.assertNext(0.8196721311475414)
+        context.assertNext(10.0)
+        context.assertNext(90.9090909)
+        context.assertNext(91.66666666666667)
+        context.assertNext(92.3076923076923)
+        context.assertNext(8.333333333333329)
     }
 
     @ParameterizedTest

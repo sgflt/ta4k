@@ -23,15 +23,14 @@
  */
 package org.ta4j.core.mocks
 
+import java.time.Duration
+import java.time.Instant
+import java.util.List
+import java.util.stream.DoubleStream
 import org.ta4j.core.events.CandleReceived
 import org.ta4j.core.events.MarketEvent
 import org.ta4j.core.indicators.TimeFrame
 import org.ta4j.core.utils.TimeFrameMapping.getDuration
-import java.time.Duration
-import java.time.Instant
-import java.util.List
-import java.util.function.Consumer
-import java.util.stream.DoubleStream
 
 /**
  * Generates BacktestBar implementations with mocked time or duration if not set
@@ -57,24 +56,22 @@ class MockMarketEventBuilder {
      *
      * @return this
      */
-    fun withCandlePrices(data: MutableList<Double?>): MockMarketEventBuilder {
-        data.forEach(Consumer { d ->
-            val startTime = startTime.plus(candleDuration!!.multipliedBy(createCandleSerialNumber().toLong()))
+    fun withCandlePrices(data: MutableList<Double?>): MockMarketEventBuilder = apply {
+        data.forEach { d ->
+            val startTime = startTime.plus(candleDuration.multipliedBy(createCandleSerialNumber().toLong()))
             candleEvents.add(
                 CandleReceived(
                     TimeFrame.DAY,
                     startTime,
-                    startTime.plus(candleDuration!!.multipliedBy(candlesProduced.toLong())),
+                    startTime.plus(candleDuration.multipliedBy(candlesProduced.toLong())),
                     d!!,
                     d,
                     d,
                     d,
-                    d
+                    1.0
                 )
             )
-        })
-
-        return this
+        }
     }
 
 
@@ -85,15 +82,13 @@ class MockMarketEventBuilder {
      *
      * @return this
      */
-    fun withCandlePrices(vararg data: Double): MockMarketEventBuilder {
+    fun withCandlePrices(vararg data: Double): MockMarketEventBuilder = apply {
         withCandlePrices(DoubleStream.of(*data).boxed().toList())
-        return this
     }
 
 
-    fun withDefaultData(): MockMarketEventBuilder {
+    fun withDefaultData(): MockMarketEventBuilder = apply {
         defaultData = true
-        return this
     }
 
 
@@ -131,15 +126,13 @@ class MockMarketEventBuilder {
     }
 
 
-    fun withCandleDuration(candleDuration: Duration): MockMarketEventBuilder {
+    fun withCandleDuration(candleDuration: Duration): MockMarketEventBuilder = apply {
         this.candleDuration = candleDuration
-        return this
     }
 
 
-    fun withStartTime(startTime: Instant): MockMarketEventBuilder {
+    fun withStartTime(startTime: Instant): MockMarketEventBuilder = apply {
         this.startTime = startTime
-        return this
     }
 
 
@@ -163,33 +156,28 @@ class MockMarketEventBuilder {
         private var timeFrame = TimeFrame.DAY
 
 
-        fun openPrice(open: Double): MockCandleBuilder {
+        fun openPrice(open: Double): MockCandleBuilder = apply {
             this.open = open
-            return this
         }
 
 
-        fun closePrice(close: Double): MockCandleBuilder {
+        fun closePrice(close: Double): MockCandleBuilder = apply {
             this.close = close
-            return this
         }
 
 
-        fun highPrice(high: Double): MockCandleBuilder {
+        fun highPrice(high: Double): MockCandleBuilder = apply {
             this.high = high
-            return this
         }
 
 
-        fun lowPrice(low: Double): MockCandleBuilder {
+        fun lowPrice(low: Double): MockCandleBuilder = apply {
             this.low = low
-            return this
         }
 
 
-        fun timeFrame(timeFrame: TimeFrame): MockCandleBuilder {
+        fun timeFrame(timeFrame: TimeFrame): MockCandleBuilder = apply {
             this.timeFrame = timeFrame
-            return this
         }
 
 
