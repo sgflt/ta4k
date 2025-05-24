@@ -34,6 +34,7 @@ import org.ta4j.core.indicators.numeric.candles.price.MedianPriceIndicator
 import org.ta4j.core.indicators.numeric.candles.price.OpenPriceIndicator
 import org.ta4j.core.indicators.numeric.candles.price.TypicalPriceIndicator
 import org.ta4j.core.indicators.numeric.channels.bollinger.BollingerBandFacade
+import org.ta4j.core.indicators.numeric.channels.donchian.DonchianChannelFacade
 import org.ta4j.core.indicators.numeric.momentum.ATRIndicator
 import org.ta4j.core.indicators.numeric.momentum.MassIndexIndicator
 import org.ta4j.core.indicators.numeric.momentum.RWIHighIndicator
@@ -108,6 +109,9 @@ object Indicators {
 
     @JvmStatic
     fun bollingerBands(barCount: Int, k: Number) = extended().bollingerBands(barCount, k)
+
+    @JvmStatic
+    fun donchianChannel(barCount: Int) = extended().donchianChannel(barCount)
 
     @JvmStatic
     fun realBody() = extended().realBody()
@@ -197,6 +201,8 @@ object Indicators {
         fun vwap(barCount: Int) = VWAPIndicator(numFactory, barCount)
 
         fun bollingerBands(barCount: Int, k: Number) = BollingerBandFacade(closePrice(), barCount, k)
+
+        fun donchianChannel(barCount: Int) = DonchianChannelFacade(barCount, numFactory)
 
         fun realBody() = RealBodyIndicator(numFactory)
 
