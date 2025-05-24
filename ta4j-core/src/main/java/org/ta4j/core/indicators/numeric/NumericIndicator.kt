@@ -44,6 +44,7 @@ import org.ta4j.core.indicators.numeric.helpers.GainIndicator
 import org.ta4j.core.indicators.numeric.helpers.HighestValueIndicator
 import org.ta4j.core.indicators.numeric.helpers.LossIndicator
 import org.ta4j.core.indicators.numeric.helpers.LowestValueIndicator
+import org.ta4j.core.indicators.numeric.helpers.RatioIndicator
 import org.ta4j.core.indicators.numeric.helpers.RunningTotalIndicator
 import org.ta4j.core.indicators.numeric.momentum.CoppockCurveIndicator
 import org.ta4j.core.indicators.numeric.momentum.ROCIndicator
@@ -355,6 +356,7 @@ abstract class NumericIndicator protected constructor(
     @JvmOverloads
     fun previous(barCount: Int = 1) = PreviousNumericValueIndicator(numFactory, this, barCount)
 
+    fun ratio() = RatioIndicator(this)
 
     /**
      * Returns sum of last barCount values
