@@ -51,6 +51,7 @@ import org.ta4j.core.indicators.numeric.momentum.RSIIndicator
 import org.ta4j.core.indicators.numeric.operation.BinaryOperation
 import org.ta4j.core.indicators.numeric.operation.UnaryOperation
 import org.ta4j.core.indicators.numeric.oscilators.CMOIndicator
+import org.ta4j.core.indicators.numeric.oscilators.MACDIndicator
 import org.ta4j.core.indicators.numeric.oscilators.aroon.AroonDownIndicator
 import org.ta4j.core.indicators.numeric.oscilators.aroon.AroonUpIndicator
 import org.ta4j.core.indicators.numeric.statistics.CovarianceIndicator
@@ -305,6 +306,8 @@ abstract class NumericIndicator protected constructor(
         barCountSlow: Int,
     ) = KAMAIndicator(numFactory, this, barCountEffectiveRatio, barCountFast, barCountSlow)
 
+    fun macd(shortBarCount: Int = 12, longBarCount: Int = 26) =
+        MACDIndicator(numFactory, this, shortBarCount, longBarCount)
 
     /**
      * @param barCount the time frame

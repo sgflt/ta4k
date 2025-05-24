@@ -83,6 +83,9 @@ object Indicators {
     fun volume() = extended().volume()
 
     @JvmStatic
+    fun macd(shortBarCount: Int = 12, longBarCount: Int = 26) = extended().macd(shortBarCount, longBarCount)
+
+    @JvmStatic
     fun accDist() = extended().accDist()
 
     @JvmStatic
@@ -226,5 +229,8 @@ object Indicators {
         fun rwiHigh(barCount: Int) = RWIHighIndicator(numFactory, barCount)
 
         fun rwiLow(barCount: Int) = RWILowIndicator(numFactory, barCount)
+
+        fun macd(shortBarCount: Int = 12, longBarCount: Int = 26) =
+            Indicators.closePrice().macd(shortBarCount, longBarCount)
     }
 }
