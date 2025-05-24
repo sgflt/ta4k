@@ -50,6 +50,7 @@ import org.ta4j.core.indicators.numeric.momentum.ROCIndicator
 import org.ta4j.core.indicators.numeric.momentum.RSIIndicator
 import org.ta4j.core.indicators.numeric.operation.BinaryOperation
 import org.ta4j.core.indicators.numeric.operation.UnaryOperation
+import org.ta4j.core.indicators.numeric.oscilators.CMOIndicator
 import org.ta4j.core.indicators.numeric.oscilators.aroon.AroonDownIndicator
 import org.ta4j.core.indicators.numeric.oscilators.aroon.AroonUpIndicator
 import org.ta4j.core.indicators.numeric.statistics.CovarianceIndicator
@@ -133,6 +134,8 @@ abstract class NumericIndicator protected constructor(
         shortBarCount = shortBarCount,
         longBarCount = longBarCount
     )
+
+    fun cmo(barCount: Int) = CMOIndicator(numFactory, this, barCount)
 
 
     /**
