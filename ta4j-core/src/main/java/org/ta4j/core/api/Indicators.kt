@@ -35,6 +35,7 @@ import org.ta4j.core.indicators.numeric.candles.price.OpenPriceIndicator
 import org.ta4j.core.indicators.numeric.candles.price.TypicalPriceIndicator
 import org.ta4j.core.indicators.numeric.channels.bollinger.BollingerBandFacade
 import org.ta4j.core.indicators.numeric.momentum.ATRIndicator
+import org.ta4j.core.indicators.numeric.momentum.MassIndexIndicator
 import org.ta4j.core.indicators.numeric.momentum.RWIHighIndicator
 import org.ta4j.core.indicators.numeric.momentum.RWILowIndicator
 import org.ta4j.core.indicators.numeric.momentum.adx.ADXIndicator
@@ -82,6 +83,9 @@ object Indicators {
 
     @JvmStatic
     fun volume() = extended().volume()
+
+    @JvmStatic
+    fun massIndex(emaBarCount: Int = 9, barCount: Int = 25) = extended().massIndex(emaBarCount, barCount)
 
     @JvmStatic
     fun macd(shortBarCount: Int = 12, longBarCount: Int = 26) = extended().macd(shortBarCount, longBarCount)
@@ -177,6 +181,8 @@ object Indicators {
         fun typicalPrice() = TypicalPriceIndicator(numFactory)
 
         fun volume() = VolumeIndicator(numFactory)
+
+        fun massIndex(emaBarCount: Int = 9, barCount: Int = 25) = MassIndexIndicator(numFactory, emaBarCount, barCount)
 
         fun accDist() = AccumulationDistributionIndicator(numFactory)
 
