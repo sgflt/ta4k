@@ -78,7 +78,7 @@ internal abstract class CircularArray<T> protected constructor(private val capac
 
 
     val first: T?
-        get() = elements[getIndex(currentIndex - capacity)]
+        get() = elements[getIndex(currentIndex + capacity + 1)]
 
 
     fun addLast(element: T) {
