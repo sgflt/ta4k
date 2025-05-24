@@ -23,11 +23,8 @@
  */
 package org.ta4j.core.indicators.numeric.oscilators
 
-import java.util.*
 import org.ta4j.core.api.series.Bar
 import org.ta4j.core.indicators.numeric.NumericIndicator
-import org.ta4j.core.indicators.numeric.helpers.GainIndicator
-import org.ta4j.core.indicators.numeric.helpers.LossIndicator
 import org.ta4j.core.num.Num
 import org.ta4j.core.num.NumFactory
 
@@ -53,11 +50,11 @@ class CMOIndicator(
     private val barCount: Int,
 ) : NumericIndicator(numFactory) {
 
-    private val gainIndicator = GainIndicator(indicator)
-    private val lossIndicator = LossIndicator(indicator)
+    private val gainIndicator = indicator.gain()
+    private val lossIndicator = indicator.loss()
 
-    private val gainsWindow = ArrayDeque<Num>(barCount)
-    private val lossesWindow = ArrayDeque<Num>(barCount)
+    private val gainsWindow = gainIndicator.previous(barCount)
+    private val lossesWindow = lossIndicator.previous(barCount)
 
     private var sumOfGains = numFactory.zero()
     private var sumOfLosses = numFactory.zero()
@@ -67,20 +64,14 @@ class CMOIndicator(
     }
 
     private fun calculate(): Num {
-        val currentGain = gainIndicator.value
-        val currentLoss = lossIndicator.value
-
         // Remove old values if window is full
-        if (gainsWindow.size == barCount) {
-            sumOfGains -= gainsWindow.removeFirst()
-            sumOfLosses -= lossesWindow.removeFirst()
+        if (gainsWindow.isStable) {
+            sumOfGains -= gainsWindow.value
+            sumOfLosses -= lossesWindow.value
         }
 
-        // Add new values
-        gainsWindow.addLast(currentGain)
-        lossesWindow.addLast(currentLoss)
-        sumOfGains += currentGain
-        sumOfLosses += currentLoss
+        sumOfGains += gainIndicator.value
+        sumOfLosses += lossIndicator.value
 
         // Calculate CMO
         val totalSum = sumOfGains + sumOfLosses
@@ -92,8 +83,8 @@ class CMOIndicator(
     }
 
     override fun updateState(bar: Bar) {
-        gainIndicator.onBar(bar)
-        lossIndicator.onBar(bar)
+        gainsWindow.onBar(bar)
+        lossesWindow.onBar(bar)
 
         value = calculate()
     }
@@ -101,7 +92,7 @@ class CMOIndicator(
     override val lag = barCount
 
     override val isStable: Boolean
-        get() = gainsWindow.size >= barCount
+        get() = gainsWindow.isStable && lossesWindow.isStable
 
     override fun toString(): String {
         return "CMO($barCount) => $value"
