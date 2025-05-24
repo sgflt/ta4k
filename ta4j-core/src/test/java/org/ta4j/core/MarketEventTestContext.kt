@@ -106,7 +106,7 @@ class MarketEventTestContext {
     fun advance(): Boolean {
         log.trace("\t ### advance")
 
-        val marketEvent = marketEvents!!.poll()
+        val marketEvent = marketEvents.poll()
         if (marketEvent == null) {
             return false
         }
