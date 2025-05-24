@@ -22,6 +22,8 @@
  */
 package org.ta4j.core.indicators
 
+import java.util.*
+import kotlin.collections.Map.Entry
 import org.ta4j.core.api.Indicator
 import org.ta4j.core.api.callback.BarListener
 import org.ta4j.core.api.series.Bar
@@ -29,8 +31,6 @@ import org.ta4j.core.indicators.IndicatorContext.IndicatorIdentification
 import org.ta4j.core.indicators.bool.BooleanIndicator
 import org.ta4j.core.indicators.numeric.NumericIndicator
 import org.ta4j.core.num.Num
-import java.util.*
-import kotlin.collections.Map.Entry
 
 class IndicatorContext private constructor(
     internal val timeFrame: TimeFrame,
@@ -49,7 +49,7 @@ class IndicatorContext private constructor(
         }
         private set
 
-    private val _indicators = indicators.associateBy { generatePlaceholderName() }.toMutableMap()
+    private val _indicators = indicators.associateBy { generatePlaceholderName(it) }.toMutableMap()
     val indicators: Map<IndicatorIdentification, Indicator<*>>
         get() = _indicators
 
@@ -66,7 +66,7 @@ class IndicatorContext private constructor(
 
 
     fun add(indicator: Indicator<*>) {
-        _indicators[generatePlaceholderName()] = indicator
+        _indicators[generatePlaceholderName(indicator)] = indicator
     }
 
     fun add(indicator: Indicator<*>, name: IndicatorIdentification) {
@@ -88,7 +88,7 @@ class IndicatorContext private constructor(
         this[indicatorId] as? BooleanIndicator
 
     fun addAll(vararg indicators: Indicator<*>) {
-        indicators.forEach { _indicators[generatePlaceholderName()] = it }
+        indicators.forEach { _indicators[generatePlaceholderName(it)] = it }
     }
 
     fun previousValue(indicatorId: IndicatorIdentification, bars: Int = 1): Num? {
@@ -118,8 +118,8 @@ class IndicatorContext private constructor(
         register(history!!)
     }
 
-    @JvmInline
-    value class IndicatorIdentification(val name: String)
+    @JvmRecord
+    data class IndicatorIdentification(val name: String, val lag: Int = 0)
 
     @JvmRecord
     data class HistoryValue(
@@ -129,7 +129,8 @@ class IndicatorContext private constructor(
 
     companion object {
         @JvmStatic
-        private fun generatePlaceholderName() = IndicatorIdentification(UUID.randomUUID().toString())
+        private fun generatePlaceholderName(indicator: Indicator<*>) =
+            IndicatorIdentification(UUID.randomUUID().toString(), indicator.lag)
 
         fun of(timeFrame: TimeFrame, vararg indicators: Indicator<*>) =
             IndicatorContext(timeFrame, *indicators)
