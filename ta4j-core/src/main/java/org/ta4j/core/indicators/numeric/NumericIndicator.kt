@@ -52,6 +52,7 @@ import org.ta4j.core.indicators.numeric.momentum.RSIIndicator
 import org.ta4j.core.indicators.numeric.operation.BinaryOperation
 import org.ta4j.core.indicators.numeric.operation.UnaryOperation
 import org.ta4j.core.indicators.numeric.oscilators.CMOIndicator
+import org.ta4j.core.indicators.numeric.oscilators.DPOIndicator
 import org.ta4j.core.indicators.numeric.oscilators.MACDIndicator
 import org.ta4j.core.indicators.numeric.oscilators.aroon.AroonDownIndicator
 import org.ta4j.core.indicators.numeric.oscilators.aroon.AroonUpIndicator
@@ -355,6 +356,8 @@ abstract class NumericIndicator protected constructor(
      */
     @JvmOverloads
     fun previous(barCount: Int = 1) = PreviousNumericValueIndicator(numFactory, this, barCount)
+
+    fun dpo(barCount: Int) = DPOIndicator(numFactory, this, barCount)
 
     fun ratio() = RatioIndicator(this)
 
