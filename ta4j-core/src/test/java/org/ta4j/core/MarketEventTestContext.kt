@@ -241,6 +241,12 @@ class MarketEventTestContext {
     }
 
 
+    fun assertIsStable() {
+        val indicator = firstNumericIndicator ?: fisrtBooleanIndicator
+        assertThat(indicator?.isStable).isTrue()
+    }
+
+
     inner class IndicatorAsserts(indicatorName: String) {
         private val indicatorId: IndicatorIdentification = IndicatorIdentification(indicatorName)
 

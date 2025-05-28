@@ -39,6 +39,7 @@ import org.ta4j.core.indicators.numeric.momentum.ATRIndicator
 import org.ta4j.core.indicators.numeric.momentum.MassIndexIndicator
 import org.ta4j.core.indicators.numeric.momentum.RWIHighIndicator
 import org.ta4j.core.indicators.numeric.momentum.RWILowIndicator
+import org.ta4j.core.indicators.numeric.momentum.WilliamsRIndicator
 import org.ta4j.core.indicators.numeric.momentum.adx.ADXIndicator
 import org.ta4j.core.indicators.numeric.momentum.adx.MinusDIIndicator
 import org.ta4j.core.indicators.numeric.momentum.adx.MinusDMIndicator
@@ -84,6 +85,9 @@ object Indicators {
 
     @JvmStatic
     fun volume() = extended().volume()
+
+    @JvmStatic
+    fun williamsR(barCount: Int) = extended().williamsR(barCount)
 
     @JvmStatic
     fun massIndex(emaBarCount: Int = 9, barCount: Int = 25) = extended().massIndex(emaBarCount, barCount)
@@ -185,6 +189,8 @@ object Indicators {
         fun typicalPrice() = TypicalPriceIndicator(numFactory)
 
         fun volume() = VolumeIndicator(numFactory)
+
+        fun williamsR(barCount: Int) = WilliamsRIndicator(numFactory, barCount)
 
         fun massIndex(emaBarCount: Int = 9, barCount: Int = 25) = MassIndexIndicator(numFactory, emaBarCount, barCount)
 
