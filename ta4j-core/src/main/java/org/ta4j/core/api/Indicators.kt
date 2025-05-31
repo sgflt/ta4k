@@ -60,6 +60,7 @@ import org.ta4j.core.indicators.numeric.volume.IIIIndicator
 import org.ta4j.core.indicators.numeric.volume.MVWAPIndicator
 import org.ta4j.core.indicators.numeric.volume.MoneyFlowIndexIndicator
 import org.ta4j.core.indicators.numeric.volume.NVIIndicator
+import org.ta4j.core.indicators.numeric.volume.OnBalanceVolumeIndicator
 import org.ta4j.core.indicators.numeric.volume.VWAPIndicator
 import org.ta4j.core.num.NumFactory
 import org.ta4j.core.num.NumFactoryProvider
@@ -91,6 +92,9 @@ object Indicators {
 
     @JvmStatic
     fun volume() = extended().volume()
+
+    @JvmStatic
+    fun obv() = extended().obv()
 
     @JvmStatic
     fun williamsR(barCount: Int) = extended().williamsR(barCount)
@@ -214,6 +218,8 @@ object Indicators {
         fun typicalPrice() = TypicalPriceIndicator(numFactory)
 
         fun volume() = VolumeIndicator(numFactory)
+
+        fun obv() = OnBalanceVolumeIndicator(numFactory)
 
         fun williamsR(barCount: Int) = WilliamsRIndicator(numFactory, barCount)
 
