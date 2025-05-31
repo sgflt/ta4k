@@ -23,7 +23,6 @@
 package org.ta4j.core.indicators.numeric.helpers
 
 import org.ta4j.core.api.series.Bar
-import org.ta4j.core.indicators.helpers.previous.PreviousNumericValueIndicator
 import org.ta4j.core.indicators.numeric.NumericIndicator
 import org.ta4j.core.num.Num
 import org.ta4j.core.num.NumFactory
@@ -42,13 +41,18 @@ class RunningTotalIndicator(
 ) {
     override val lag = barCount
 
-    private val previousValue = PreviousNumericValueIndicator(numFactory, indicator, barCount)
+    private val previousValue = indicator.previous(barCount)
     private var previousSum = numFactory.zero()
     private var processedBars = 0
 
 
     private fun calculate(): Num {
         val indicatorValue = indicator.value
+        if (indicatorValue.isNaN) {
+            return value
+        } else {
+            ++processedBars
+        }
 
         var sum = previousSum + indicatorValue
 
@@ -67,7 +71,6 @@ class RunningTotalIndicator(
 
 
     public override fun updateState(bar: Bar) {
-        ++processedBars
         previousValue.onBar(bar)
         value = calculate()
     }

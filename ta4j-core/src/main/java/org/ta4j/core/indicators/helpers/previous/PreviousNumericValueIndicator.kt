@@ -25,6 +25,7 @@ package org.ta4j.core.indicators.helpers.previous
 
 import org.ta4j.core.api.series.Bar
 import org.ta4j.core.indicators.numeric.NumericIndicator
+import org.ta4j.core.num.NaN
 import org.ta4j.core.num.Num
 import org.ta4j.core.num.NumFactory
 
@@ -42,7 +43,7 @@ class PreviousNumericValueIndicator(
 
     private fun calculate(): Num {
         val value = previousValueHelper.value
-        return value ?: numFactory.zero()
+        return value ?: NaN
     }
 
 
@@ -56,7 +57,7 @@ class PreviousNumericValueIndicator(
 
 
     override val isStable: Boolean
-        get() = previousValueHelper.isStable
+        get() = previousValueHelper.isStable && !value.isNaN
 
 
     override fun toString(): String {

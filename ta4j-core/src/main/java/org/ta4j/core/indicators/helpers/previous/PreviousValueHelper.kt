@@ -23,9 +23,9 @@
  */
 package org.ta4j.core.indicators.helpers.previous
 
+import java.util.*
 import org.ta4j.core.api.Indicator
 import org.ta4j.core.api.series.Bar
-import java.util.*
 
 /**
  * Returns the (n-th) previous value of an indicator.
