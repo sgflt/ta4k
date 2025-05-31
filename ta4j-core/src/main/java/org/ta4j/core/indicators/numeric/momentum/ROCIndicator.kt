@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  *
- * Copyright (c) 2017-2024 Ta4j Organization & respective authors (see AUTHORS)
+ * Copyright (c) 2017-2025 Ta4j Organization & respective authors (see AUTHORS)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -23,7 +23,6 @@
 package org.ta4j.core.indicators.numeric.momentum
 
 import org.ta4j.core.api.series.Bar
-import org.ta4j.core.indicators.helpers.previous.PreviousNumericValueIndicator
 import org.ta4j.core.indicators.numeric.NumericIndicator
 import org.ta4j.core.num.Num
 import org.ta4j.core.num.NumFactory
@@ -40,7 +39,7 @@ class ROCIndicator(
     private val indicator: NumericIndicator,
     private val barCount: Int,
 ) : NumericIndicator(numFactory) {
-    private val nPeriodsAgo = PreviousNumericValueIndicator(numFactory, indicator, barCount)
+    private val nPeriodsAgo = indicator.previous(barCount)
     private var processedBars = 0
 
     override val lag: Int
