@@ -61,6 +61,7 @@ import org.ta4j.core.indicators.numeric.volume.MVWAPIndicator
 import org.ta4j.core.indicators.numeric.volume.MoneyFlowIndexIndicator
 import org.ta4j.core.indicators.numeric.volume.NVIIndicator
 import org.ta4j.core.indicators.numeric.volume.OnBalanceVolumeIndicator
+import org.ta4j.core.indicators.numeric.volume.PVIIndicator
 import org.ta4j.core.indicators.numeric.volume.VWAPIndicator
 import org.ta4j.core.num.NumFactory
 import org.ta4j.core.num.NumFactoryProvider
@@ -113,6 +114,9 @@ object Indicators {
 
     @JvmStatic
     fun nvi(startingValue: Int) = extended().nvi(startingValue)
+
+    @JvmStatic
+    fun pvi() = extended().pvi()
 
     @JvmStatic
     fun pvo(
@@ -230,6 +234,8 @@ object Indicators {
         fun mfi(barCount: Int) = MoneyFlowIndexIndicator(numFactory, barCount)
 
         fun nvi(startingValue: Int) = NVIIndicator(numFactory, numFactory.numOf(startingValue))
+
+        fun pvi() = PVIIndicator(numFactory)
 
         fun pvo(
             volumeBarCount: Int,
