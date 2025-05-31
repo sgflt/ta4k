@@ -59,6 +59,7 @@ import org.ta4j.core.indicators.numeric.volume.ChaikinOscillatorIndicator
 import org.ta4j.core.indicators.numeric.volume.IIIIndicator
 import org.ta4j.core.indicators.numeric.volume.MVWAPIndicator
 import org.ta4j.core.indicators.numeric.volume.MoneyFlowIndexIndicator
+import org.ta4j.core.indicators.numeric.volume.NVIIndicator
 import org.ta4j.core.indicators.numeric.volume.VWAPIndicator
 import org.ta4j.core.num.NumFactory
 import org.ta4j.core.num.NumFactoryProvider
@@ -105,6 +106,9 @@ object Indicators {
 
     @JvmStatic
     fun mfi(barCount: Int) = extended().mfi(barCount)
+
+    @JvmStatic
+    fun nvi(startingValue: Int) = extended().nvi(startingValue)
 
     @JvmStatic
     fun pvo(
@@ -218,6 +222,8 @@ object Indicators {
         fun accDist() = AccumulationDistributionIndicator(numFactory)
 
         fun mfi(barCount: Int) = MoneyFlowIndexIndicator(numFactory, barCount)
+
+        fun nvi(startingValue: Int) = NVIIndicator(numFactory, numFactory.numOf(startingValue))
 
         fun pvo(
             volumeBarCount: Int,
