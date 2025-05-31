@@ -57,6 +57,7 @@ import org.ta4j.core.indicators.numeric.volume.AccumulationDistributionIndicator
 import org.ta4j.core.indicators.numeric.volume.ChaikinMoneyFlowIndicator
 import org.ta4j.core.indicators.numeric.volume.ChaikinOscillatorIndicator
 import org.ta4j.core.indicators.numeric.volume.IIIIndicator
+import org.ta4j.core.indicators.numeric.volume.MVWAPIndicator
 import org.ta4j.core.indicators.numeric.volume.MoneyFlowIndexIndicator
 import org.ta4j.core.indicators.numeric.volume.VWAPIndicator
 import org.ta4j.core.num.NumFactory
@@ -117,6 +118,9 @@ object Indicators {
 
     @JvmStatic
     fun vwap(barCount: Int) = extended().vwap(barCount)
+
+    @JvmStatic
+    fun mvwap(vwapBarCount: Int, mvwapBarCount: Int) = extended().mvwap(vwapBarCount, mvwapBarCount)
 
     @JvmStatic
     fun bollingerBands(barCount: Int, k: Number) = extended().bollingerBands(barCount, k)
@@ -225,6 +229,8 @@ object Indicators {
             SuperTrendIndicator(numFactory, barCount, multiplier)
 
         fun vwap(barCount: Int) = VWAPIndicator(numFactory, barCount)
+
+        fun mvwap(vwapBarCount: Int, mvwapBarCount: Int) = MVWAPIndicator(numFactory, vwapBarCount, mvwapBarCount)
 
         fun bollingerBands(barCount: Int, k: Number) = BollingerBandFacade(closePrice(), barCount, k)
 
