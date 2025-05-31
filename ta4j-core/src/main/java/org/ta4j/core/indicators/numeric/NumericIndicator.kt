@@ -47,6 +47,7 @@ import org.ta4j.core.indicators.numeric.helpers.LowestValueIndicator
 import org.ta4j.core.indicators.numeric.helpers.RatioIndicator
 import org.ta4j.core.indicators.numeric.helpers.RunningTotalIndicator
 import org.ta4j.core.indicators.numeric.momentum.CoppockCurveIndicator
+import org.ta4j.core.indicators.numeric.momentum.KSTIndicator
 import org.ta4j.core.indicators.numeric.momentum.ROCIndicator
 import org.ta4j.core.indicators.numeric.momentum.RSIIndicator
 import org.ta4j.core.indicators.numeric.operation.BinaryOperation
@@ -310,6 +311,29 @@ abstract class NumericIndicator protected constructor(
 
     fun macd(shortBarCount: Int = 12, longBarCount: Int = 26) =
         MACDIndicator(numFactory, this, shortBarCount, longBarCount)
+
+
+    fun kst(
+        rcma1SMABarCount: Int = 10,
+        rcma1ROCBarCount: Int = 10,
+        rcma2SMABarCount: Int = 10,
+        rcma2ROCBarCount: Int = 15,
+        rcma3SMABarCount: Int = 10,
+        rcma3ROCBarCount: Int = 20,
+        rcma4SMABarCount: Int = 15,
+        rcma4ROCBarCount: Int = 30,
+    ) = KSTIndicator(
+        numFactory,
+        this,
+        rcma1SMABarCount,
+        rcma1ROCBarCount,
+        rcma2SMABarCount,
+        rcma2ROCBarCount,
+        rcma3SMABarCount,
+        rcma3ROCBarCount,
+        rcma4SMABarCount,
+        rcma4ROCBarCount,
+    )
 
     /**
      * @param barCount the time frame

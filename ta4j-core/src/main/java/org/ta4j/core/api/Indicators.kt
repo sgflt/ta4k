@@ -52,7 +52,11 @@ import org.ta4j.core.indicators.numeric.oscilators.StochasticOscillatorKIndicato
 import org.ta4j.core.indicators.numeric.oscilators.aroon.AroonDownIndicator
 import org.ta4j.core.indicators.numeric.oscilators.aroon.AroonOscillatorIndicator
 import org.ta4j.core.indicators.numeric.oscilators.aroon.AroonUpIndicator
+import org.ta4j.core.indicators.numeric.supertrend.SuperTrendIndicator
 import org.ta4j.core.indicators.numeric.volume.AccumulationDistributionIndicator
+import org.ta4j.core.indicators.numeric.volume.ChaikinMoneyFlowIndicator
+import org.ta4j.core.indicators.numeric.volume.ChaikinOscillatorIndicator
+import org.ta4j.core.indicators.numeric.volume.IIIIndicator
 import org.ta4j.core.indicators.numeric.volume.MoneyFlowIndexIndicator
 import org.ta4j.core.indicators.numeric.volume.VWAPIndicator
 import org.ta4j.core.num.NumFactory
@@ -107,6 +111,9 @@ object Indicators {
         shortBarCount: Int = 12,
         longBarCount: Int = 26,
     ) = extended().pvo(volumeBarCount, shortBarCount, longBarCount)
+
+    @JvmStatic
+    fun superTrend(barCount: Int = 10, multiplier: Double = 3.0) = extended().superTrend(barCount, multiplier)
 
     @JvmStatic
     fun vwap(barCount: Int) = extended().vwap(barCount)
@@ -170,6 +177,16 @@ object Indicators {
     fun rwiLow(barCount: Int) = extended().rwiLow(barCount)
 
     @JvmStatic
+    fun chainkinMoneyFlow(barCount: Int) = extended().chaikinMoneyFlow(barCount)
+
+    @JvmStatic
+    fun chainkinMoneyFlow(shortBarCount: Int = 3, longBarCount: Int = 10) =
+        extended().chaikinOscillator(shortBarCount, longBarCount)
+
+    @JvmStatic
+    fun iii() = extended().iii()
+
+    @JvmStatic
     private fun extended() = extended(NumFactoryProvider.defaultNumFactory)
 
     @JvmStatic
@@ -203,6 +220,9 @@ object Indicators {
             shortBarCount: Int = 12,
             longBarCount: Int = 26,
         ) = PVOIndicator(numFactory, volumeBarCount, shortBarCount, longBarCount)
+
+        fun superTrend(barCount: Int = 10, multiplier: Double = 3.0) =
+            SuperTrendIndicator(numFactory, barCount, multiplier)
 
         fun vwap(barCount: Int) = VWAPIndicator(numFactory, barCount)
 
@@ -256,5 +276,13 @@ object Indicators {
 
         fun macd(shortBarCount: Int = 12, longBarCount: Int = 26) =
             Indicators.closePrice().macd(shortBarCount, longBarCount)
+
+        fun chaikinMoneyFlow(barCount: Int) = ChaikinMoneyFlowIndicator(numFactory, barCount)
+
+
+        fun chaikinOscillator(shortBarCount: Int = 3, longBarCount: Int = 10) =
+            ChaikinOscillatorIndicator(numFactory, shortBarCount, longBarCount)
+
+        fun iii() = IIIIndicator(numFactory)
     }
 }
