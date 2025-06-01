@@ -54,6 +54,7 @@ import org.ta4j.core.indicators.numeric.oscillators.aroon.AroonDownIndicator
 import org.ta4j.core.indicators.numeric.oscillators.aroon.AroonOscillatorIndicator
 import org.ta4j.core.indicators.numeric.oscillators.aroon.AroonUpIndicator
 import org.ta4j.core.indicators.numeric.supertrend.SuperTrendIndicator
+import org.ta4j.core.indicators.numeric.trend.ParabolicSARIndicator
 import org.ta4j.core.indicators.numeric.volume.AccumulationDistributionIndicator
 import org.ta4j.core.indicators.numeric.volume.ChaikinMoneyFlowIndicator
 import org.ta4j.core.indicators.numeric.volume.ChaikinOscillatorIndicator
@@ -132,9 +133,16 @@ object Indicators {
 
     @JvmStatic
     fun rocv(barCount: Int) = extended().rocv(barCount)
-    
+
     @JvmStatic
     fun superTrend(barCount: Int = 10, multiplier: Double = 3.0) = extended().superTrend(barCount, multiplier)
+
+    @JvmStatic
+    fun parabolicSAR(
+        accelerationStart: Number = 0.02,
+        maxAcceleration: Number = 0.2,
+        accelerationIncrement: Number = 0.02,
+    ) = extended().parabolicSAR(accelerationStart, maxAcceleration, accelerationIncrement)
 
     @JvmStatic
     fun vwap(barCount: Int) = extended().vwap(barCount)
@@ -257,6 +265,17 @@ object Indicators {
 
         fun superTrend(barCount: Int = 10, multiplier: Double = 3.0) =
             SuperTrendIndicator(numFactory, barCount, multiplier)
+
+        fun parabolicSAR(
+            accelerationStart: Number = 0.02,
+            maxAcceleration: Number = 0.2,
+            accelerationIncrement: Number = 0.02,
+        ) = ParabolicSARIndicator(
+            numFactory,
+            numFactory.numOf(accelerationStart),
+            numFactory.numOf(maxAcceleration),
+            numFactory.numOf(accelerationIncrement)
+        )
 
         fun vwap(barCount: Int) = VWAPIndicator(numFactory, barCount)
 
