@@ -28,7 +28,6 @@ import static org.ta4j.core.TestUtils.assertNumEquals;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.ta4j.core.MarketEventTestContext;
-import org.ta4j.core.indicators.numeric.oscilators.StochasticOscillatorKIndicator;
 import org.ta4j.core.mocks.MockMarketEventBuilder;
 import org.ta4j.core.num.NumFactory;
 

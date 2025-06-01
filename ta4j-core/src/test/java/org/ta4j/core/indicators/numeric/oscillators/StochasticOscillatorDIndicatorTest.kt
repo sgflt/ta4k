@@ -23,16 +23,14 @@
  */
 package org.ta4j.core.indicators.numeric.oscillators
 
+import java.time.Instant
+import java.time.temporal.ChronoUnit
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
 import org.ta4j.core.MarketEventTestContext
 import org.ta4j.core.events.CandleReceived
 import org.ta4j.core.indicators.TimeFrame
-import org.ta4j.core.indicators.numeric.oscilators.StochasticOscillatorDIndicator
-import org.ta4j.core.indicators.numeric.oscilators.StochasticOscillatorKIndicator
 import org.ta4j.core.num.NumFactory
-import java.time.Instant
-import java.time.temporal.ChronoUnit
 
 internal class StochasticOscillatorDIndicatorTest {
     @ParameterizedTest

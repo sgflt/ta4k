@@ -1,8 +1,7 @@
-/**
+/*
  * The MIT License (MIT)
  *
- * Copyright (c) 2017-2023 Ta4j Organization & respective
- * authors (see AUTHORS)
+ * Copyright (c) 2017-2024 Ta4j Organization & respective authors (see AUTHORS)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -21,31 +20,39 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.ta4j.core.indicators.numeric.oscilators
+package org.ta4j.core.indicators.numeric.oscillators
 
-import org.ta4j.core.api.Indicators
-import org.ta4j.core.indicators.numeric.average.PPOIndicator
+import org.ta4j.core.api.Indicators.awesomeOscillator
+import org.ta4j.core.api.series.Bar
+import org.ta4j.core.indicators.numeric.NumericIndicator
+import org.ta4j.core.num.Num
 import org.ta4j.core.num.NumFactory
 
 /**
- * Percentage Volume Oscillator (PVO) indicator.
- *
- * <pre>
- * ((12-day EMA of Volume - 26-day EMA of Volume) / 26-day EMA of Volume) x 100
-</pre> *
- *
- * @see [
- * https://school.stockcharts.com/doku.php?id=technical_indicators:percentage_volume_oscillator_pvo
-](https://school.stockcharts.com/doku.php?id=technical_indicators:percentage_volume_oscillator_pvo) *
+ * Acceleration-deceleration indicator.
  */
-class PVOIndicator(
+class AccelerationDecelerationIndicator @JvmOverloads constructor(
     numFactory: NumFactory,
-    volumeBarCount: Int,
-    shortBarCount: Int = 12,
-    longBarCount: Int = 26,
-) : PPOIndicator(
-    numFactory = numFactory,
-    indicator = Indicators.extended(numFactory).volume().runningTotal(volumeBarCount),
-    shortBarCount = shortBarCount,
-    longBarCount = longBarCount,
-)
+    shortBarCount: Int = 5,
+    longBarCount: Int = 34,
+) : NumericIndicator(numFactory) {
+    private val awesome = awesomeOscillator(shortBarCount, longBarCount)
+    private val sma = awesome.sma(shortBarCount)
+
+
+    private fun calculate(): Num = awesome.value.minus(sma.value)
+
+
+    public override fun updateState(bar: Bar) {
+        awesome.onBar(bar)
+        sma.onBar(bar)
+        value = calculate()
+    }
+
+
+    override val isStable: Boolean
+        get() = awesome.isStable && sma.isStable
+
+    override val lag: Int
+        get() = awesome.lag
+}

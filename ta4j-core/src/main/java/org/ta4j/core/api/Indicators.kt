@@ -45,13 +45,14 @@ import org.ta4j.core.indicators.numeric.momentum.adx.MinusDIIndicator
 import org.ta4j.core.indicators.numeric.momentum.adx.MinusDMIndicator
 import org.ta4j.core.indicators.numeric.momentum.adx.PlusDIIndicator
 import org.ta4j.core.indicators.numeric.momentum.adx.PlusDMIndicator
-import org.ta4j.core.indicators.numeric.oscilators.AwesomeOscillatorIndicator
-import org.ta4j.core.indicators.numeric.oscilators.PVOIndicator
-import org.ta4j.core.indicators.numeric.oscilators.StochasticOscillatorDIndicator
-import org.ta4j.core.indicators.numeric.oscilators.StochasticOscillatorKIndicator
-import org.ta4j.core.indicators.numeric.oscilators.aroon.AroonDownIndicator
-import org.ta4j.core.indicators.numeric.oscilators.aroon.AroonOscillatorIndicator
-import org.ta4j.core.indicators.numeric.oscilators.aroon.AroonUpIndicator
+import org.ta4j.core.indicators.numeric.oscillators.AwesomeOscillatorIndicator
+import org.ta4j.core.indicators.numeric.oscillators.CCIIndicator
+import org.ta4j.core.indicators.numeric.oscillators.PVOIndicator
+import org.ta4j.core.indicators.numeric.oscillators.StochasticOscillatorDIndicator
+import org.ta4j.core.indicators.numeric.oscillators.StochasticOscillatorKIndicator
+import org.ta4j.core.indicators.numeric.oscillators.aroon.AroonDownIndicator
+import org.ta4j.core.indicators.numeric.oscillators.aroon.AroonOscillatorIndicator
+import org.ta4j.core.indicators.numeric.oscillators.aroon.AroonUpIndicator
 import org.ta4j.core.indicators.numeric.supertrend.SuperTrendIndicator
 import org.ta4j.core.indicators.numeric.volume.AccumulationDistributionIndicator
 import org.ta4j.core.indicators.numeric.volume.ChaikinMoneyFlowIndicator
@@ -118,6 +119,9 @@ object Indicators {
 
     @JvmStatic
     fun pvi() = extended().pvi()
+
+    @JvmStatic
+    fun cci(barCount: Int) = extended().cci(barCount)
 
     @JvmStatic
     fun pvo(
@@ -240,6 +244,8 @@ object Indicators {
         fun nvi(startingValue: Int) = NVIIndicator(numFactory, numFactory.numOf(startingValue))
 
         fun pvi() = PVIIndicator(numFactory)
+
+        fun cci(barCount: Int) = CCIIndicator(numFactory, barCount)
 
         fun pvo(
             volumeBarCount: Int,

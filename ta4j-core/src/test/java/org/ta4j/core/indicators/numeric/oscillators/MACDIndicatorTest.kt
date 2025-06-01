@@ -30,7 +30,6 @@ import org.junit.jupiter.params.provider.MethodSource
 import org.ta4j.core.MarketEventTestContext
 import org.ta4j.core.TestUtils.assertNumEquals
 import org.ta4j.core.api.Indicators
-import org.ta4j.core.indicators.numeric.oscilators.MACDIndicator
 import org.ta4j.core.num.DoubleNumFactory
 import org.ta4j.core.num.NumFactory
 

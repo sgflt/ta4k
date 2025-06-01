@@ -21,7 +21,7 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.ta4j.core.indicators.numeric.oscilators.aroon
+package org.ta4j.core.indicators.numeric.oscillators.aroon
 
 import org.ta4j.core.api.Indicators
 import org.ta4j.core.api.series.Bar

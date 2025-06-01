@@ -21,7 +21,7 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.ta4j.core.indicators.numeric.oscilators
+package org.ta4j.core.indicators.numeric.momentum
 
 import java.time.Instant
 import org.assertj.core.api.Assertions.assertThat
@@ -33,7 +33,7 @@ import org.ta4j.core.MarketEventTestContext
 import org.ta4j.core.TestUtils.assertNumEquals
 import org.ta4j.core.events.CandleReceived
 import org.ta4j.core.indicators.TimeFrame
-import org.ta4j.core.indicators.numeric.momentum.WilliamsRIndicator
+import org.ta4j.core.num.DoubleNumFactory
 import org.ta4j.core.num.NumFactory
 
 class WilliamsRIndicatorTest {
@@ -305,12 +305,12 @@ class WilliamsRIndicatorTest {
     @Test
     fun `should throw exception for invalid bar count`() {
         assertThatThrownBy {
-            WilliamsRIndicator(org.ta4j.core.num.DoubleNumFactory, 0)
+            WilliamsRIndicator(DoubleNumFactory, 0)
         }.isInstanceOf(IllegalArgumentException::class.java)
             .hasMessage("Bar count must be positive")
 
         assertThatThrownBy {
-            WilliamsRIndicator(org.ta4j.core.num.DoubleNumFactory, -1)
+            WilliamsRIndicator(DoubleNumFactory, -1)
         }.isInstanceOf(NegativeArraySizeException::class.java)
     }
 
