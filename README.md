@@ -1,5 +1,6 @@
 # ta4j  ![Build Status develop](https://github.com/ta4j/ta4j/workflows/Test/badge.svg?branch=develop) ![Build Status master](https://github.com/ta4j/ta4j/workflows/Test/badge.svg?branch=master) [![Discord](https://img.shields.io/discord/745552125769023488.svg?label=&logo=discord&logoColor=ffffff&color=7389D8&labelColor=6A7EC2)](https://discord.gg/HX9MbWZ) [![License: MIT](https://img.shields.io/badge/License-MIT-brightgreen.svg)](https://opensource.org/licenses/MIT) ![Maven Central](https://img.shields.io/maven-central/v/org.ta4j/ta4j-parent?color=blue&label=Version) ![Sonatype Nexus (Snapshots)](https://img.shields.io/nexus/s/org.ta4j/ta4j-parent?label=Snapshot&server=https%3A%2F%2Foss.sonatype.org%2F)
 
+
 ***Technical Analysis For Kotlin***
 
 ![Ta4j main chart](https://raw.githubusercontent.com/ta4j/ta4j-wiki/master/img/ta4j_main_chart.png)
@@ -12,16 +13,16 @@ provides the basic components for creation, evaluation and execution of trading 
 ### Features
 
 * [x] 100% Pure Kotlin - works on any Java Platform version 21 or later
- * [x] More than 130 technical indicators (Aroon, ATR, moving averages, parabolic SAR, RSI, etc.)
- * [x] A powerful engine for building custom trading strategies
- * [x] Utilities to run and compare strategies
+* [x] More than 130 technical indicators (Aroon, ATR, moving averages, parabolic SAR, RSI, etc.)
+* [x] A powerful engine for building custom trading strategies
+* [x] Utilities to run and compare strategies
 * [x] Live trading mode
 * [x] Observable mode - indicator changes may be propagated to persistent storage
   like [TimescaleDB](https://github.com/timescale/timescaledb)
 * [x] AI Strategy ready
- * [x] Minimal 3rd party dependencies
- * [x] Simple integration
- * [x] One more thing: it's MIT licensed
+* [x] Minimal 3rd party dependencies
+* [x] Simple integration
+* [x] One more thing: it's MIT licensed
 
 ### Maven configuration
 
