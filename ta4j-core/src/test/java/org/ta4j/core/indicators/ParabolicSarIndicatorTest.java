@@ -23,16 +23,13 @@
 // */
 //package org.ta4j.core.indicators;
 //
-//import static org.junit.Assert.assertEquals;
-//import static org.junit.Assert.assertNotEquals;
-//import static org.ta4j.core.TestUtils.assertNumEquals;
-//
 //import java.time.ZonedDateTime;
 //import java.util.List;
 //import java.util.stream.Collectors;
 //import java.util.stream.IntStream;
 //
 //import org.junit.Test;
+//import org.ta4j.core.api.Indicator;
 //import org.ta4j.core.mocks.MockBarSeriesBuilder;
 //import org.ta4j.core.num.NaN;
 //import org.ta4j.core.num.Num;
