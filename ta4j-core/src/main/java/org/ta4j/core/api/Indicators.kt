@@ -62,6 +62,7 @@ import org.ta4j.core.indicators.numeric.volume.MoneyFlowIndexIndicator
 import org.ta4j.core.indicators.numeric.volume.NVIIndicator
 import org.ta4j.core.indicators.numeric.volume.OnBalanceVolumeIndicator
 import org.ta4j.core.indicators.numeric.volume.PVIIndicator
+import org.ta4j.core.indicators.numeric.volume.ROCVIndicator
 import org.ta4j.core.indicators.numeric.volume.VWAPIndicator
 import org.ta4j.core.num.NumFactory
 import org.ta4j.core.num.NumFactoryProvider
@@ -125,6 +126,9 @@ object Indicators {
         longBarCount: Int = 26,
     ) = extended().pvo(volumeBarCount, shortBarCount, longBarCount)
 
+    @JvmStatic
+    fun rocv(barCount: Int) = extended().rocv(barCount)
+    
     @JvmStatic
     fun superTrend(barCount: Int = 10, multiplier: Double = 3.0) = extended().superTrend(barCount, multiplier)
 
@@ -242,6 +246,8 @@ object Indicators {
             shortBarCount: Int = 12,
             longBarCount: Int = 26,
         ) = PVOIndicator(numFactory, volumeBarCount, shortBarCount, longBarCount)
+
+        fun rocv(barCount: Int) = ROCVIndicator(numFactory, barCount)
 
         fun superTrend(barCount: Int = 10, multiplier: Double = 3.0) =
             SuperTrendIndicator(numFactory, barCount, multiplier)
