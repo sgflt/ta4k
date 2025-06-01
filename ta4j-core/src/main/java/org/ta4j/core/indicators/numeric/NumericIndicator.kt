@@ -52,11 +52,11 @@ import org.ta4j.core.indicators.numeric.momentum.ROCIndicator
 import org.ta4j.core.indicators.numeric.momentum.RSIIndicator
 import org.ta4j.core.indicators.numeric.operation.BinaryOperation
 import org.ta4j.core.indicators.numeric.operation.UnaryOperation
-import org.ta4j.core.indicators.numeric.oscilators.CMOIndicator
-import org.ta4j.core.indicators.numeric.oscilators.DPOIndicator
-import org.ta4j.core.indicators.numeric.oscilators.MACDIndicator
-import org.ta4j.core.indicators.numeric.oscilators.aroon.AroonDownIndicator
-import org.ta4j.core.indicators.numeric.oscilators.aroon.AroonUpIndicator
+import org.ta4j.core.indicators.numeric.oscillators.CMOIndicator
+import org.ta4j.core.indicators.numeric.oscillators.DPOIndicator
+import org.ta4j.core.indicators.numeric.oscillators.MACDIndicator
+import org.ta4j.core.indicators.numeric.oscillators.aroon.AroonDownIndicator
+import org.ta4j.core.indicators.numeric.oscillators.aroon.AroonUpIndicator
 import org.ta4j.core.indicators.numeric.statistics.CovarianceIndicator
 import org.ta4j.core.indicators.numeric.statistics.MeanDeviationIndicator
 import org.ta4j.core.indicators.numeric.statistics.SigmaIndicator
