@@ -57,10 +57,10 @@ class VarianceIndicatorTest {
     this.testContext.assertNext(0.0);
     assertFalse(varianceIndicator.isStable());
 
-    this.testContext.assertNext(0.1667);
+    this.testContext.assertNext(0.5);
     assertFalse(varianceIndicator.isStable());
 
-    this.testContext.assertNext(0.6667);
+    this.testContext.assertNext(1.0);
     assertFalse(varianceIndicator.isStable());
 
     // stable date bellow

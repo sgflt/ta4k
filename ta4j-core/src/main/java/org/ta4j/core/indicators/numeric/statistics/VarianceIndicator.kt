@@ -32,59 +32,57 @@ import org.ta4j.core.num.Num
  */
 class VarianceIndicator(private val indicator: NumericIndicator, private val barCount: Int) :
     NumericIndicator(indicator.numFactory) {
-    private val divisor: Num = numFactory.numOf(barCount - 1)
-    private val oldestValue = indicator.previous(barCount)
+    private val values = indicator.previous(barCount)
     private var mean = numFactory.zero()
-    private var currentIndex = 0
-    private var _value = numFactory.zero()
+    private var m2 = numFactory.zero() // Sum of squared differences from mean
+    private var count = 0
 
     init {
         require(barCount > 1) { "barCount must be greater than 1" }
     }
 
     private fun calculate(): Num {
-        if (currentIndex < barCount) {
-            return add(indicator.value)
+        val newValue = indicator.value
+        count++
+
+        // Update mean and M2 using Welford's algorithm
+        val delta = newValue - mean
+        mean += delta / numFactory.numOf(count)
+        val delta2 = newValue - mean
+        m2 += delta * delta2
+
+        // Handle sliding window
+        if (values.isStable) {
+            val oldValue = values.value
+            count--
+
+            // Remove the old value from Welford's state
+            val deltaSide = oldValue - mean
+            mean -= deltaSide / numFactory.numOf(count)
+            val delta2Side = oldValue - mean
+            m2 -= deltaSide * delta2Side
         }
 
-        val oldValue = oldestValue.value
-        return dropOldestAndAddNew(oldValue, indicator.value)
-    }
-
-    fun add(x: Num): Num {
-        currentIndex++
-        val delta = x - mean
-        mean += delta / numFactory.numOf(currentIndex)
-        return _value + delta * (x - mean)
-    }
-
-    private fun dropOldestAndAddNew(x: Num, y: Num): Num {
-        val deltaYX = y - x
-        val deltaX = x - mean
-        val deltaY = y - mean
-        mean += deltaYX / numFactory.numOf(barCount)
-        val deltaYp = y - mean
-        return _value - (numFactory.numOf(barCount) * (deltaX * deltaX - deltaY * deltaYp) / divisor) -
-                (deltaYX * deltaYp / divisor)
-    }
-
-    override var value: Num
-        get() = _value / divisor
-        protected set(value) {
-            _value = value
+        // Calculate sample variance
+        return if (count > 1) {
+            m2 / numFactory.numOf(count - 1)
+        } else {
+            numFactory.zero()
         }
+    }
 
-    public override fun updateState(bar: Bar) {
+    override fun updateState(bar: Bar) {
         indicator.onBar(bar)
-        oldestValue.onBar(bar)
+        values.onBar(bar)
         value = calculate()
     }
 
     override val isStable: Boolean
-        get() = currentIndex >= barCount && indicator.isStable
+        get() = count >= barCount && indicator.isStable
 
     override val lag: Int
         get() = barCount
+
 
     override fun toString() = "VAR($indicator, $barCount) => $value"
 }
