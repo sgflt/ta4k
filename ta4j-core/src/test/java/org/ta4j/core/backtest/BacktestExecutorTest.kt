@@ -22,6 +22,10 @@
  */
 package org.ta4j.core.backtest
 
+import java.time.Duration
+import java.time.Instant
+import java.util.*
+import kotlin.math.max
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
@@ -40,13 +44,13 @@ import org.ta4j.core.indicators.IndicatorContext.IndicatorIdentification
 import org.ta4j.core.indicators.IndicatorContexts
 import org.ta4j.core.indicators.TimeFrame
 import org.ta4j.core.num.NumFactory
-import org.ta4j.core.strategy.*
+import org.ta4j.core.strategy.DefaultStrategy
+import org.ta4j.core.strategy.Rule
+import org.ta4j.core.strategy.RuntimeContext
+import org.ta4j.core.strategy.Strategy
+import org.ta4j.core.strategy.StrategyFactory
 import org.ta4j.core.strategy.configuration.ParameterName
 import org.ta4j.core.strategy.configuration.StrategyConfiguration
-import java.time.Duration
-import java.time.Instant
-import java.util.*
-import kotlin.math.max
 
 internal class BacktestExecutorTest {
     private val time: Instant = Instant.EPOCH
@@ -76,7 +80,7 @@ internal class BacktestExecutorTest {
         assertNumEquals(-4.75019506722970, statement.performanceReport.totalLoss!!)
         assertNumEquals(718.71244689979, statement.performanceReport.totalProfit!!)
         assertNumEquals(713.96225183256, statement.performanceReport.totalProfitLoss!!)
-        assertNumEquals(130.26868530393, statement.performanceReport.totalProfitLossPercentage!!)
+        assertNumEquals(9.572571228801804, statement.performanceReport.totalProfitLossPercentage!!)
     }
 
 

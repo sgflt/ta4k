@@ -50,7 +50,7 @@ class ProfitLossPercentageCriterionTest extends AbstractCriterionTest {
         .exit(1).at(105);
 
     // Total percentage profit should be 10% + 5% = 15%
-    context.assertResults(15);
+    context.assertResults(7.5);
   }
 
 
@@ -70,8 +70,8 @@ class ProfitLossPercentageCriterionTest extends AbstractCriterionTest {
     context.enter(1).at(100)
         .exit(1).at(70);
 
-    // Total percentage loss should be -5% + -30% = -35%
-    context.assertResults(-35);
+    // Total percentage loss should be (-5 - 30) / (100 + 100)
+    context.assertResults(-17.5);
   }
 
 
@@ -91,8 +91,8 @@ class ProfitLossPercentageCriterionTest extends AbstractCriterionTest {
     context.enter(1).at(100)
         .exit(1).at(70);
 
-    // Net percentage should be +95% + -30% = +65%
-    context.assertResults(65);
+    // Net percentage should be (95 - 30) / (100 + 100)
+    context.assertResults(32.5);
   }
 
 
@@ -112,8 +112,8 @@ class ProfitLossPercentageCriterionTest extends AbstractCriterionTest {
     context.enter(1).at(100)
         .exit(1).at(95);
 
-    // Total percentage profit should be 10% + 5% = 15%
-    context.assertResults(15);
+    // Total percentage profit should be (10 + 5) / (100 + 100)
+    context.assertResults(7.5);
   }
 
 
@@ -134,7 +134,7 @@ class ProfitLossPercentageCriterionTest extends AbstractCriterionTest {
         .exit(1).at(105);
 
     // Total percentage loss should be -10% + -5% = -15%
-    context.assertResults(-15);
+    context.assertResults(-7.5);
   }
 
 

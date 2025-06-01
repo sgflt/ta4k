@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  *
- * Copyright (c) 2017-2024 Ta4j Organization & respective authors (see AUTHORS)
+ * Copyright (c) 2017-2025 Ta4j Organization & respective authors (see AUTHORS)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -32,26 +32,52 @@ import org.ta4j.core.num.NumFactoryProvider.defaultNumFactory
  * Net profit and loss in percentage criterion (relative PnL, excludes trading
  * costs), returned in percentage format (e.g. 1 = 1%).
  *
+ * For individual positions: Calculated as (profit / entry_value) * 100
+ * For trading records: Calculated as (total_profit / total_invested) * 100
  *
- *
- * Defined as the position profit over the purchase price. The profit or loss in
- * percentage over the provided [position(s)][Position].
- * https://www.investopedia.com/ask/answers/how-do-you-calculate-percentage-gain-or-loss-investment/
+ * @see <a href="https://www.investopedia.com/ask/answers/how-do-you-calculate-percentage-gain-or-loss-investment/">
+ *      How to Calculate Percentage Gain or Loss on Investment</a>
  */
 class ProfitLossPercentageCriterion : AnalysisCriterion {
+
     override fun calculate(position: Position): Num {
-        if (position.isClosed) {
-            val entryPrice = position.entry!!.value
-            return position.profit / entryPrice * defaultNumFactory.hundred()
+        if (!position.isClosed) {
+            return defaultNumFactory.zero()
         }
-        return defaultNumFactory.zero()
+
+        val entry = position.entry ?: return defaultNumFactory.zero()
+        val entryValue = entry.value * entry.amount
+
+        val profit = position.profit
+
+        return profit / entryValue * defaultNumFactory.hundred()
     }
 
+    override fun calculate(tradingRecord: TradingRecord): Num {
+        val closedPositions = tradingRecord.positions.filter { it.isClosed }
 
-    override fun calculate(tradingRecord: TradingRecord): Num =
-        tradingRecord.positions
-            .asSequence()
-            .filter { it.isClosed }
-            .map { calculate(it) }
-            .fold(defaultNumFactory.zero()) { acc, num -> acc.plus(num) }
+        if (closedPositions.isEmpty()) {
+            return defaultNumFactory.zero()
+        }
+
+        // Calculate total invested capital and total profit
+        var totalInvested = defaultNumFactory.zero()
+        var totalProfit = defaultNumFactory.zero()
+
+        for (position in closedPositions) {
+            val entry = position.entry!!
+            val entryValue = entry.value * entry.amount
+
+            totalInvested += entryValue
+            totalProfit += position.profit
+        }
+
+        // Avoid division by zero
+        if (totalInvested.isZero) {
+            return defaultNumFactory.zero()
+        }
+
+        // Calculate overall percentage: (total_profit / total_invested) * 100
+        return totalProfit / totalInvested * defaultNumFactory.hundred()
+    }
 }
