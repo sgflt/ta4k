@@ -47,6 +47,7 @@ import org.ta4j.core.indicators.numeric.momentum.adx.PlusDIIndicator
 import org.ta4j.core.indicators.numeric.momentum.adx.PlusDMIndicator
 import org.ta4j.core.indicators.numeric.oscillators.AwesomeOscillatorIndicator
 import org.ta4j.core.indicators.numeric.oscillators.CCIIndicator
+import org.ta4j.core.indicators.numeric.oscillators.ChopIndicator
 import org.ta4j.core.indicators.numeric.oscillators.PVOIndicator
 import org.ta4j.core.indicators.numeric.oscillators.StochasticOscillatorDIndicator
 import org.ta4j.core.indicators.numeric.oscillators.StochasticOscillatorKIndicator
@@ -143,6 +144,9 @@ object Indicators {
         maxAcceleration: Number = 0.2,
         accelerationIncrement: Number = 0.02,
     ) = extended().parabolicSAR(accelerationStart, maxAcceleration, accelerationIncrement)
+
+    @JvmStatic
+    fun chop(timeFrame: Int, scaleTo: Int = 100) = extended().chop(timeFrame, scaleTo)
 
     @JvmStatic
     fun vwap(barCount: Int) = extended().vwap(barCount)
@@ -276,6 +280,8 @@ object Indicators {
             numFactory.numOf(maxAcceleration),
             numFactory.numOf(accelerationIncrement)
         )
+
+        fun chop(timeFrame: Int, scaleTo: Int = 100) = ChopIndicator(numFactory, timeFrame, scaleTo)
 
         fun vwap(barCount: Int) = VWAPIndicator(numFactory, barCount)
 
