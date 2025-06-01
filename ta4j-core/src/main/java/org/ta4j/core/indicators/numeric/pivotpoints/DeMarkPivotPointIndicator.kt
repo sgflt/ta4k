@@ -32,40 +32,6 @@ import org.ta4j.core.num.Num
 import org.ta4j.core.num.NumFactory
 
 /**
- * Time levels for pivot point calculation.
- */
-enum class TimeLevel {
-    /**
-     * Use just the last bar data for calculation.
-     */
-    BARBASED,
-
-    /**
-     * Use prior day's high, low, open and close for calculation.
-     * Suitable for 1-, 5-, 10- and 15-minute charts.
-     */
-    DAY,
-
-    /**
-     * Use prior week's high, low, open and close for calculation.
-     * Suitable for 30-, 60- and 120-minute charts.
-     */
-    WEEK,
-
-    /**
-     * Use prior month's high, low, open and close for calculation.
-     * Suitable for daily charts.
-     */
-    MONTH,
-
-    /**
-     * Use prior year's high, low, open and close for calculation.
-     * Suitable for weekly and monthly charts.
-     */
-    YEAR
-}
-
-/**
  * DeMark Pivot Point indicator.
  *
  * The DeMark Pivot Point uses a different calculation than traditional pivot points.
