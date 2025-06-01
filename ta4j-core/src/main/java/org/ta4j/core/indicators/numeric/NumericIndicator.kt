@@ -40,6 +40,7 @@ import org.ta4j.core.indicators.numeric.average.SMAIndicator
 import org.ta4j.core.indicators.numeric.average.TripleEMAIndicator
 import org.ta4j.core.indicators.numeric.average.WMAIndicator
 import org.ta4j.core.indicators.numeric.average.ZLEMAIndicator
+import org.ta4j.core.indicators.numeric.helpers.DistanceFromMAIndicator
 import org.ta4j.core.indicators.numeric.helpers.GainIndicator
 import org.ta4j.core.indicators.numeric.helpers.HighestValueIndicator
 import org.ta4j.core.indicators.numeric.helpers.LossIndicator
@@ -356,6 +357,8 @@ abstract class NumericIndicator protected constructor(
 
 
     fun covariance(indicator: NumericIndicator, barCount: Int) = CovarianceIndicator(this, indicator, barCount)
+
+    fun distance() = DistanceFromMAIndicator(numFactory, this)
 
 
     /**
