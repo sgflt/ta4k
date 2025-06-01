@@ -122,7 +122,7 @@ class SumIndicatorTest {
 
         context
             .withIndicator(sumIndicator)
-            .assertNext(20.0)  // 10 + 10 = 20 (first difference is price itself)
+            .assertNextNaN()
             .assertNext(0.0)   // 5 + (-5) = 0
             .assertNext(25.0)  // 15 + 10 = 25
     }

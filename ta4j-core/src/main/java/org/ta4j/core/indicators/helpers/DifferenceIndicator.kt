@@ -25,7 +25,6 @@ package org.ta4j.core.indicators.helpers
 
 import org.ta4j.core.api.series.Bar
 import org.ta4j.core.indicators.numeric.NumericIndicator
-import org.ta4j.core.num.Num
 
 /**
  * Calculates the difference between the current and the previous indicator value.
@@ -35,20 +34,13 @@ import org.ta4j.core.num.Num
 </pre> *
  */
 class DifferenceIndicator(private val indicator: NumericIndicator) : NumericIndicator(indicator.numFactory) {
-    private var previousValue: Num? = null
+    private var previousValue = indicator.previous()
 
 
     public override fun updateState(bar: Bar) {
-        indicator.onBar(bar)
+        previousValue.onBar(bar)
         value = calculate()
     }
-
-    override val lag = 2
-
-
-    override val isStable
-        get() = previousValue != null
-
 
     /**
      * Calculates the difference between indicator values of the current bar and the
@@ -56,17 +48,12 @@ class DifferenceIndicator(private val indicator: NumericIndicator) : NumericIndi
      *
      * @return the difference between the close prices
      */
-    private fun calculate() = diff()
+    private fun calculate() = indicator.value - previousValue.value
 
-    private fun diff(): Num {
-        if (previousValue == null) {
-            previousValue = indicator.value
-            return previousValue!!
-        }
 
-        val indicatorValue = indicator.value
-        val diff = indicatorValue.minus(previousValue!!)
-        previousValue = indicatorValue
-        return diff
-    }
+    override val lag = 2
+
+
+    override val isStable
+        get() = previousValue.isStable
 }
