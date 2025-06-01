@@ -25,7 +25,6 @@ package org.ta4j.core.mocks
 
 import java.time.Duration
 import java.time.Instant
-import java.util.List
 import java.util.stream.DoubleStream
 import org.ta4j.core.events.CandleReceived
 import org.ta4j.core.events.MarketEvent
@@ -117,12 +116,12 @@ class MockMarketEventBuilder {
     }
 
 
-    fun build(): MutableList<MarketEvent?> {
+    fun build(): List<MarketEvent> {
         if (defaultData) {
             arbitraryBars()
         }
 
-        return List.copyOf<MarketEvent?>(candleEvents)
+        return candleEvents.toList()
     }
 
 
@@ -143,12 +142,12 @@ class MockMarketEventBuilder {
 
     inner class MockCandleBuilder {
         private val startTime: Instant = this@MockMarketEventBuilder.startTime.plus(
-            this@MockMarketEventBuilder.candleDuration!!.multipliedBy(
+            this@MockMarketEventBuilder.candleDuration.multipliedBy(
                 createCandleSerialNumber().toLong()
             )
         )
         private val endTime: Instant =
-            startTime.plus(this@MockMarketEventBuilder.candleDuration!!.multipliedBy(createCandleSerialNumber().toLong()))
+            startTime.plus(this@MockMarketEventBuilder.candleDuration.multipliedBy(createCandleSerialNumber().toLong()))
         private var open = 0.0
         private var close = 0.0
         private var high = 0.0
