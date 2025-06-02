@@ -48,6 +48,7 @@ import org.ta4j.core.indicators.numeric.momentum.adx.PlusDMIndicator
 import org.ta4j.core.indicators.numeric.oscillators.AwesomeOscillatorIndicator
 import org.ta4j.core.indicators.numeric.oscillators.CCIIndicator
 import org.ta4j.core.indicators.numeric.oscillators.ChopIndicator
+import org.ta4j.core.indicators.numeric.oscillators.FisherIndicator
 import org.ta4j.core.indicators.numeric.oscillators.PVOIndicator
 import org.ta4j.core.indicators.numeric.oscillators.StochasticOscillatorDIndicator
 import org.ta4j.core.indicators.numeric.oscillators.StochasticOscillatorKIndicator
@@ -147,6 +148,9 @@ object Indicators {
 
     @JvmStatic
     fun chop(timeFrame: Int, scaleTo: Int = 100) = extended().chop(timeFrame, scaleTo)
+
+    @JvmStatic
+    fun fisher(barCount: Int) = extended().fisher(barCount)
 
     @JvmStatic
     fun vwap(barCount: Int) = extended().vwap(barCount)
@@ -282,6 +286,8 @@ object Indicators {
         )
 
         fun chop(timeFrame: Int, scaleTo: Int = 100) = ChopIndicator(numFactory, timeFrame, scaleTo)
+
+        fun fisher(barCount: Int = 10) = FisherIndicator(numFactory, barCount)
 
         fun vwap(barCount: Int) = VWAPIndicator(numFactory, barCount)
 
