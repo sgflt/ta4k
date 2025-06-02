@@ -203,6 +203,7 @@ class MarketEventTestContext {
     ): MarketEventTestContext = apply {
         while (advance()) {
             assertThat(indicator.value.doubleValue())
+                .describedAs { "Failed at index ${barSeries.currentIndex} and time ${barSeries.currentTime}" }
                 .isCloseTo(
                     expectedIndicator.value.doubleValue(),
                     Offset.offset(GENERAL_OFFSET)

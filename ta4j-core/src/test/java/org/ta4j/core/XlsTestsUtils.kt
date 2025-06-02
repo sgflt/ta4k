@@ -23,6 +23,13 @@
  */
 package org.ta4j.core
 
+import java.io.IOException
+import java.math.BigDecimal
+import java.time.Duration
+import java.time.Instant
+import java.util.*
+import java.util.function.DoubleConsumer
+import java.util.zip.DataFormatException
 import org.apache.poi.hssf.usermodel.HSSFWorkbook
 import org.apache.poi.ss.usermodel.CellValue
 import org.apache.poi.ss.usermodel.DateUtil
@@ -37,13 +44,6 @@ import org.ta4j.core.mocks.MockTradingRecord
 import org.ta4j.core.num.NaN
 import org.ta4j.core.num.Num
 import org.ta4j.core.num.NumFactory
-import java.io.IOException
-import java.math.BigDecimal
-import java.time.Duration
-import java.time.Instant
-import java.util.*
-import java.util.function.DoubleConsumer
-import java.util.zip.DataFormatException
 
 object XlsTestsUtils {
     /**
@@ -126,7 +126,7 @@ object XlsTestsUtils {
     fun getMarketEvents(
         clazz: Class<*>,
         fileName: String,
-    ): MutableList<MarketEvent?> {
+    ): List<MarketEvent> {
         val sheet = getSheet(clazz, fileName)
         return getMarketEvents(sheet)
     }
@@ -145,8 +145,8 @@ object XlsTestsUtils {
      * data contains empty cells
      */
     @Throws(DataFormatException::class)
-    private fun getMarketEvents(sheet: Sheet): MutableList<MarketEvent?> {
-        val candleEvents = ArrayList<MarketEvent?>()
+    private fun getMarketEvents(sheet: Sheet): List<MarketEvent> {
+        val candleEvents = ArrayList<MarketEvent>()
         val evaluator = sheet.workbook.creationHelper.createFormulaEvaluator()
         val rows = getData(sheet)
         var minInterval = Int.Companion.MAX_VALUE

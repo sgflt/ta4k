@@ -39,6 +39,10 @@ class ATRIndicator(
     NumericIndicator(numFactory) {
     private val averageTrueRangeIndicator = MMAIndicator(tr, barCount)
 
+    init {
+        require(barCount > 0) { "barCount must be positive" }
+    }
+
     override val lag: Int
         get() = averageTrueRangeIndicator.lag
 
