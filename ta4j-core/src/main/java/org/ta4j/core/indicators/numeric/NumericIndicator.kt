@@ -56,6 +56,7 @@ import org.ta4j.core.indicators.numeric.operation.UnaryOperation
 import org.ta4j.core.indicators.numeric.oscillators.CMOIndicator
 import org.ta4j.core.indicators.numeric.oscillators.DPOIndicator
 import org.ta4j.core.indicators.numeric.oscillators.MACDIndicator
+import org.ta4j.core.indicators.numeric.oscillators.RAVIIndicator
 import org.ta4j.core.indicators.numeric.oscillators.aroon.AroonDownIndicator
 import org.ta4j.core.indicators.numeric.oscillators.aroon.AroonUpIndicator
 import org.ta4j.core.indicators.numeric.statistics.CovarianceIndicator
@@ -360,6 +361,8 @@ abstract class NumericIndicator protected constructor(
 
     fun distance() = DistanceFromMAIndicator(numFactory, this)
 
+    fun ravi(shortSmaBarCount: Int, longSmaBarCount: Int) =
+        RAVIIndicator(numFactory, this, shortSmaBarCount, longSmaBarCount)
 
     /**
      * @param barCount the time frame
