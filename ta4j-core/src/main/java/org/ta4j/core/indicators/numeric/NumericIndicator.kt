@@ -59,6 +59,7 @@ import org.ta4j.core.indicators.numeric.oscillators.MACDIndicator
 import org.ta4j.core.indicators.numeric.oscillators.RAVIIndicator
 import org.ta4j.core.indicators.numeric.oscillators.aroon.AroonDownIndicator
 import org.ta4j.core.indicators.numeric.oscillators.aroon.AroonUpIndicator
+import org.ta4j.core.indicators.numeric.risk.UlcerIndexIndicator
 import org.ta4j.core.indicators.numeric.statistics.CovarianceIndicator
 import org.ta4j.core.indicators.numeric.statistics.MeanDeviationIndicator
 import org.ta4j.core.indicators.numeric.statistics.SigmaIndicator
@@ -360,6 +361,8 @@ abstract class NumericIndicator protected constructor(
     fun covariance(indicator: NumericIndicator, barCount: Int) = CovarianceIndicator(this, indicator, barCount)
 
     fun distance() = DistanceFromMAIndicator(numFactory, this)
+
+    fun ulcer(barCount: Int) = UlcerIndexIndicator(numFactory, this, barCount)
 
     fun ravi(shortSmaBarCount: Int, longSmaBarCount: Int) =
         RAVIIndicator(numFactory, this, shortSmaBarCount, longSmaBarCount)
