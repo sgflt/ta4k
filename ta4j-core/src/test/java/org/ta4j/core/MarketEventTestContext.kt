@@ -136,7 +136,7 @@ class MarketEventTestContext {
 
 
     fun assertNextNaN(): MarketEventTestContext = apply {
-        advance()
+        fastForward(1)
         assertNumEquals(NaN, firstNumericIndicator!!.value)
     }
 
@@ -146,13 +146,13 @@ class MarketEventTestContext {
 
 
     fun assertNextFalse(): MarketEventTestContext = apply {
-        advance()
+        fastForward(1)
         assertThat(fisrtBooleanIndicator!!.value).isFalse()
     }
 
 
     fun assertNextTrue(): MarketEventTestContext = apply {
-        advance()
+        fastForward(1)
         assertThat(fisrtBooleanIndicator!!.value).isTrue()
     }
 
