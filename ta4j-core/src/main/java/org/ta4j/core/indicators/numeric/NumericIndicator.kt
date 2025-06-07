@@ -27,6 +27,7 @@ import java.time.Instant
 import org.ta4j.core.api.Indicator
 import org.ta4j.core.api.series.Bar
 import org.ta4j.core.indicators.bool.IsHighestIndicator
+import org.ta4j.core.indicators.bool.IsLowestIndicator
 import org.ta4j.core.indicators.bool.helpers.CrossIndicator
 import org.ta4j.core.indicators.helpers.DifferenceIndicator
 import org.ta4j.core.indicators.helpers.previous.PreviousNumericValueIndicator
@@ -481,6 +482,8 @@ abstract class NumericIndicator protected constructor(
      * @return the [UnderIndicatorRule] of `this` and `n`
      */
     fun isLessThan(n: Number) = isLessThan(createConstant(n))
+
+    fun isLowest(barCount: Int) = IsLowestIndicator(this, barCount)
 
     fun isHighest(barCount: Int) = IsHighestIndicator(this, barCount)
 
