@@ -1,8 +1,7 @@
-/**
+/*
  * The MIT License (MIT)
  *
- * Copyright (c) 2017-2023 Ta4j Organization & respective
- * authors (see AUTHORS)
+ * Copyright (c) 2017-2024 Ta4j Organization & respective authors (see AUTHORS)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -22,6 +21,13 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 /**
- * Indicators for the realization of the 'Ichimoku cloud trading strategy'.
+ * Trading rules for trading strategies.
+ *
+ *
+ *
+ * A [rule][org.ta4j.core.strategy.Rule] can be combined and set as entry/exit
+ * signals for a [trading strategy][org.ta4j.core.strategy.Strategy]. A trading
+ * strategy is designed to achieve a profitable return by going long or short
+ * over a [series][org.ta4j.core.api.series.BarSeries].
  */
-package org.ta4j.core.indicators.ichimoku;
+package org.ta4j.core.strategy.rules

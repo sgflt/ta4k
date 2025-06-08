@@ -1,8 +1,7 @@
-/**
+/*
  * The MIT License (MIT)
  *
- * Copyright (c) 2017-2023 Ta4j Organization & respective
- * authors (see AUTHORS)
+ * Copyright (c) 2017-2025 Ta4j Organization & respective authors (see AUTHORS)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -22,6 +21,6 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 /**
- * Indicators that can be helpful (for other indicators).
+ * Indicators for the realization of volume based analysis.
  */
-package org.ta4j.core.indicators.helpers;
+package org.ta4j.core.indicators.numeric.volume

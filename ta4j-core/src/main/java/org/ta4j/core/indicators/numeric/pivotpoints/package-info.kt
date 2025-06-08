@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  *
- * Copyright (c) 2017-2024 Ta4j Organization & respective authors (see AUTHORS)
+ * Copyright (c) 2017-2025 Ta4j Organization & respective authors (see AUTHORS)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -21,12 +21,6 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 /**
- * Trading rules for trading strategies.
- *
- * <p>
- * A {@link org.ta4j.core.strategy.Rule rule} can be combined and set as entry/exit
- * signals for a {@link org.ta4j.core.strategy.Strategy trading strategy}. A trading
- * strategy is designed to achieve a profitable return by going long or short
- * over a {@link org.ta4j.core.api.series.BarSeries series}.
+ * Indicators for the realization of different 'Pivot Points'.
  */
-package org.ta4j.core.strategy.rules;
+package org.ta4j.core.indicators.numeric.pivotpoints
