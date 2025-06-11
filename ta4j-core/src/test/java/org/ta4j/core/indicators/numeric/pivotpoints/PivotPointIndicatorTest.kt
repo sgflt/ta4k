@@ -210,11 +210,11 @@ class PivotPointIndicatorTest {
 
         // Initially not stable
         context.advance()
-        Assertions.assertThat(context.firstNumericIndicator!!.isStable).isFalse()
+        context.assertIsUnStable()
 
         // After second bar, should be stable
         context.advance()
-        Assertions.assertThat(context.firstNumericIndicator!!.isStable).isTrue()
+        context.assertIsStable()
     }
 
     @Test
