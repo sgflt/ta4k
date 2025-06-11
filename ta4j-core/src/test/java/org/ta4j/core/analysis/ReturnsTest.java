@@ -55,11 +55,11 @@ class ReturnsTest {
       );
 
       // Then
-      assertNumEquals(0.00, returns.getValue(ReturnsTest.this.startTime.plus(1, ChronoUnit.MINUTES)));
-      assertNumEquals(0.10, returns.getValue(ReturnsTest.this.startTime.plus(2, ChronoUnit.MINUTES)));
-      assertNumEquals(-0.0455, returns.getValue(ReturnsTest.this.startTime.plus(3, ChronoUnit.MINUTES)));
-      assertNumEquals(0.0952, returns.getValue(ReturnsTest.this.startTime.plus(4, ChronoUnit.MINUTES)));
-      assertNumEquals(0.0435, returns.getValue(ReturnsTest.this.startTime.plus(5, ChronoUnit.MINUTES)));
+      assertNumEquals(0.00, returns.getValue(ReturnsTest.this.startTime.plus(2, ChronoUnit.MINUTES)));
+      assertNumEquals(0.10, returns.getValue(ReturnsTest.this.startTime.plus(3, ChronoUnit.MINUTES)));
+      assertNumEquals(-0.0455, returns.getValue(ReturnsTest.this.startTime.plus(4, ChronoUnit.MINUTES)));
+      assertNumEquals(0.0952, returns.getValue(ReturnsTest.this.startTime.plus(5, ChronoUnit.MINUTES)));
+      assertNumEquals(0.0435, returns.getValue(ReturnsTest.this.startTime.plus(6, ChronoUnit.MINUTES)));
     }
 
 
@@ -79,11 +79,11 @@ class ReturnsTest {
       );
 
       // Then
-      assertNumEquals(0.00, returns.getValue(ReturnsTest.this.startTime.plus(1, ChronoUnit.MINUTES)));
-      assertNumEquals(-0.10, returns.getValue(ReturnsTest.this.startTime.plus(2, ChronoUnit.MINUTES)));
-      assertNumEquals(0.0455, returns.getValue(ReturnsTest.this.startTime.plus(3, ChronoUnit.MINUTES)));
-      assertNumEquals(-0.0952, returns.getValue(ReturnsTest.this.startTime.plus(4, ChronoUnit.MINUTES)));
-      assertNumEquals(-0.0435, returns.getValue(ReturnsTest.this.startTime.plus(5, ChronoUnit.MINUTES)));
+      assertNumEquals(0.00, returns.getValue(ReturnsTest.this.startTime.plus(2, ChronoUnit.MINUTES)));
+      assertNumEquals(-0.10, returns.getValue(ReturnsTest.this.startTime.plus(3, ChronoUnit.MINUTES)));
+      assertNumEquals(0.0455, returns.getValue(ReturnsTest.this.startTime.plus(4, ChronoUnit.MINUTES)));
+      assertNumEquals(-0.0952, returns.getValue(ReturnsTest.this.startTime.plus(5, ChronoUnit.MINUTES)));
+      assertNumEquals(-0.0435, returns.getValue(ReturnsTest.this.startTime.plus(6, ChronoUnit.MINUTES)));
     }
   }
 
@@ -106,11 +106,11 @@ class ReturnsTest {
       );
 
       // Then
-      assertNumEquals(0.00, returns.getValue(ReturnsTest.this.startTime.plus(1, ChronoUnit.MINUTES)));
-      assertNumEquals(0.0953, returns.getValue(ReturnsTest.this.startTime.plus(2, ChronoUnit.MINUTES)));
-      assertNumEquals(-0.0465, returns.getValue(ReturnsTest.this.startTime.plus(3, ChronoUnit.MINUTES)));
-      assertNumEquals(0.0909, returns.getValue(ReturnsTest.this.startTime.plus(4, ChronoUnit.MINUTES)));
-      assertNumEquals(0.0426, returns.getValue(ReturnsTest.this.startTime.plus(5, ChronoUnit.MINUTES)));
+      assertNumEquals(0.00, returns.getValue(ReturnsTest.this.startTime.plus(2, ChronoUnit.MINUTES)));
+      assertNumEquals(0.0953, returns.getValue(ReturnsTest.this.startTime.plus(3, ChronoUnit.MINUTES)));
+      assertNumEquals(-0.0465, returns.getValue(ReturnsTest.this.startTime.plus(4, ChronoUnit.MINUTES)));
+      assertNumEquals(0.0909, returns.getValue(ReturnsTest.this.startTime.plus(5, ChronoUnit.MINUTES)));
+      assertNumEquals(0.0426, returns.getValue(ReturnsTest.this.startTime.plus(6, ChronoUnit.MINUTES)));
     }
 
 
@@ -130,11 +130,11 @@ class ReturnsTest {
       );
 
       // Then
-      assertNumEquals(0.00, returns.getValue(ReturnsTest.this.startTime.plus(1, ChronoUnit.MINUTES)));
-      assertNumEquals(-0.0953, returns.getValue(ReturnsTest.this.startTime.plus(2, ChronoUnit.MINUTES)));
-      assertNumEquals(0.0465, returns.getValue(ReturnsTest.this.startTime.plus(3, ChronoUnit.MINUTES)));
-      assertNumEquals(-0.0909, returns.getValue(ReturnsTest.this.startTime.plus(4, ChronoUnit.MINUTES)));
-      assertNumEquals(-0.0426, returns.getValue(ReturnsTest.this.startTime.plus(5, ChronoUnit.MINUTES)));
+      assertNumEquals(0.00, returns.getValue(ReturnsTest.this.startTime.plus(2, ChronoUnit.MINUTES)));
+      assertNumEquals(-0.0953, returns.getValue(ReturnsTest.this.startTime.plus(3, ChronoUnit.MINUTES)));
+      assertNumEquals(0.0465, returns.getValue(ReturnsTest.this.startTime.plus(4, ChronoUnit.MINUTES)));
+      assertNumEquals(-0.0909, returns.getValue(ReturnsTest.this.startTime.plus(5, ChronoUnit.MINUTES)));
+      assertNumEquals(-0.0426, returns.getValue(ReturnsTest.this.startTime.plus(6, ChronoUnit.MINUTES)));
     }
   }
 
@@ -169,21 +169,21 @@ class ReturnsTest {
 
       // Then
       // First position returns
-      assertNumEquals(0.10, returns.getValue(ReturnsTest.this.startTime.plus(2, ChronoUnit.MINUTES)));
-      assertNumEquals(-0.0455, returns.getValue(ReturnsTest.this.startTime.plus(3, ChronoUnit.MINUTES)));
+      assertNumEquals(0.10, returns.getValue(ReturnsTest.this.startTime.plus(3, ChronoUnit.MINUTES)));
+      assertNumEquals(-0.0455, returns.getValue(ReturnsTest.this.startTime.plus(4, ChronoUnit.MINUTES)));
 
       // Gap period
-      assertNumEquals(0.0, returns.getValue(ReturnsTest.this.startTime.plus(4, ChronoUnit.MINUTES)));
       assertNumEquals(0.0, returns.getValue(ReturnsTest.this.startTime.plus(5, ChronoUnit.MINUTES)));
       assertNumEquals(0.0, returns.getValue(ReturnsTest.this.startTime.plus(6, ChronoUnit.MINUTES)));
+      assertNumEquals(0.0, returns.getValue(ReturnsTest.this.startTime.plus(7, ChronoUnit.MINUTES)));
 
       // Second position returns
-      assertNumEquals(0.0593, returns.getValue(ReturnsTest.this.startTime.plus(7, ChronoUnit.MINUTES)));
-      assertNumEquals(-0.024, returns.getValue(ReturnsTest.this.startTime.plus(8, ChronoUnit.MINUTES)));
+      assertNumEquals(0.0593, returns.getValue(ReturnsTest.this.startTime.plus(8, ChronoUnit.MINUTES)));
+      assertNumEquals(-0.024, returns.getValue(ReturnsTest.this.startTime.plus(9, ChronoUnit.MINUTES)));
 
       // After last trade
-      assertNumEquals(0.0, returns.getValue(ReturnsTest.this.startTime.plus(9, ChronoUnit.MINUTES)));
       assertNumEquals(0.0, returns.getValue(ReturnsTest.this.startTime.plus(10, ChronoUnit.MINUTES)));
+      assertNumEquals(0.0, returns.getValue(ReturnsTest.this.startTime.plus(11, ChronoUnit.MINUTES)));
     }
 
 

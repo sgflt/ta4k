@@ -23,16 +23,20 @@
  */
 package org.ta4j.core.backtest
 
-import org.ta4j.core.api.callback.BarListener
-import org.ta4j.core.api.series.*
-import org.ta4j.core.events.CandleReceived
-import org.ta4j.core.indicators.TimeFrame
-import org.ta4j.core.num.Num
-import org.ta4j.core.num.NumFactory
 import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.*
+import org.ta4j.core.api.callback.BarListener
+import org.ta4j.core.api.series.Bar
+import org.ta4j.core.api.series.BarBuilderFactory
+import org.ta4j.core.api.series.BarSeries
+import org.ta4j.core.api.series.PastCandleParadoxException
+import org.ta4j.core.api.series.WrongTimeFrameException
+import org.ta4j.core.events.CandleReceived
+import org.ta4j.core.indicators.TimeFrame
+import org.ta4j.core.num.Num
+import org.ta4j.core.num.NumFactory
 
 /**
  * Base implementation of a [BarSeries].
@@ -118,7 +122,7 @@ class BacktestBarSeries internal constructor(
 
         barBuilder().apply {
             startTime(event.beginTime)
-            endTime(event.beginTime)
+            endTime(event.endTime)
             event.openPrice.takeIf { !it.isNaN() }?.let { openPrice(it) }
             event.highPrice.takeIf { !it.isNaN() }?.let { highPrice(it) }
             event.lowPrice.takeIf { !it.isNaN() }?.let { lowPrice(it) }

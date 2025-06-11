@@ -192,7 +192,7 @@ class RealizedCashFlowTest {
   @ParameterizedTest
   @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
   void cashFlowWithMultipleBuyPositions(final NumFactory numFactory) {
-    final var startTime = Instant.parse("1970-01-01T00:00:59.999Z");
+    final var startTime = Instant.parse("1970-01-01T00:00:00.000Z");
 
     final var context = new MarketEventTestContext()
         .withNumFactory(numFactory)
@@ -226,29 +226,31 @@ class RealizedCashFlowTest {
     final var tradingRecord = context.getTradingRecord();
     final var cashFlow = new RealizedCashFlow(numFactory, tradingRecord);
 
+    final var endTime = startTime.plus(Duration.ofMinutes(1));
+
     // Initial value at the first trade time
-    assertNumEquals(numFactory.one(), cashFlow.getValue(startTime.plus(Duration.ofMinutes(1))));
+    assertNumEquals(numFactory.one(), cashFlow.getValue(endTime.plus(Duration.ofMinutes(1))));
 
     // After Position 1 close: 1.0 * 1.20 = 1.20
-    assertNumEquals(numFactory.numOf(1.20), cashFlow.getValue(startTime.plus(Duration.ofMinutes(2))));
+    assertNumEquals(numFactory.numOf(1.20), cashFlow.getValue(endTime.plus(Duration.ofMinutes(2))));
 
     // After Position 2 close: 1.20 * 0.90 = 1.08
-    assertNumEquals(numFactory.numOf(1.08), cashFlow.getValue(startTime.plus(Duration.ofMinutes(4))));
+    assertNumEquals(numFactory.numOf(1.08), cashFlow.getValue(endTime.plus(Duration.ofMinutes(4))));
 
     // After Position 3 close: 1.08 * 1.00 = 1.08
-    assertNumEquals(numFactory.numOf(1.08), cashFlow.getValue(startTime.plus(Duration.ofMinutes(6))));
+    assertNumEquals(numFactory.numOf(1.08), cashFlow.getValue(endTime.plus(Duration.ofMinutes(6))));
 
     // After Position 4 close: 1.08 * 2.00 = 2.16
-    assertNumEquals(numFactory.numOf(2.16), cashFlow.getValue(startTime.plus(Duration.ofMinutes(8))));
+    assertNumEquals(numFactory.numOf(2.16), cashFlow.getValue(endTime.plus(Duration.ofMinutes(8))));
 
     // After Position 5 close: 2.16 * 0.80 = 1.728
-    assertNumEquals(numFactory.numOf(1.728), cashFlow.getValue(startTime.plus(Duration.ofMinutes(10))));
+    assertNumEquals(numFactory.numOf(1.728), cashFlow.getValue(endTime.plus(Duration.ofMinutes(10))));
 
     // Test interpolation points
-    assertNumEquals(numFactory.numOf(1.10), cashFlow.getValue(startTime.plus(Duration.ofMinutes(1).plusSeconds(30))));
-    assertNumEquals(numFactory.numOf(1.14), cashFlow.getValue(startTime.plus(Duration.ofMinutes(3))));
-    assertNumEquals(numFactory.numOf(1.08), cashFlow.getValue(startTime.plus(Duration.ofMinutes(5))));
-    assertNumEquals(numFactory.numOf(1.62), cashFlow.getValue(startTime.plus(Duration.ofMinutes(7))));
-    assertNumEquals(numFactory.numOf(1.944), cashFlow.getValue(startTime.plus(Duration.ofMinutes(9))));
+    assertNumEquals(numFactory.numOf(1.10), cashFlow.getValue(endTime.plus(Duration.ofMinutes(1).plusSeconds(30))));
+    assertNumEquals(numFactory.numOf(1.14), cashFlow.getValue(endTime.plus(Duration.ofMinutes(3))));
+    assertNumEquals(numFactory.numOf(1.08), cashFlow.getValue(endTime.plus(Duration.ofMinutes(5))));
+    assertNumEquals(numFactory.numOf(1.62), cashFlow.getValue(endTime.plus(Duration.ofMinutes(7))));
+    assertNumEquals(numFactory.numOf(1.944), cashFlow.getValue(endTime.plus(Duration.ofMinutes(9))));
   }
 }

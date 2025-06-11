@@ -62,7 +62,7 @@ class MockMarketEventBuilder {
                 CandleReceived(
                     TimeFrame.DAY,
                     startTime,
-                    startTime.plus(candleDuration.multipliedBy(candlesProduced.toLong())),
+                    startTime.plus(candleDuration),
                     d!!,
                     d,
                     d,
@@ -141,13 +141,12 @@ class MockMarketEventBuilder {
 
 
     inner class MockCandleBuilder {
-        private val startTime: Instant = this@MockMarketEventBuilder.startTime.plus(
+        private val startTime = this@MockMarketEventBuilder.startTime.plus(
             this@MockMarketEventBuilder.candleDuration.multipliedBy(
                 createCandleSerialNumber().toLong()
             )
         )
-        private val endTime: Instant =
-            startTime.plus(this@MockMarketEventBuilder.candleDuration.multipliedBy(createCandleSerialNumber().toLong()))
+        private val endTime = startTime.plus(this@MockMarketEventBuilder.candleDuration)
         private var open = 0.0
         private var close = 0.0
         private var high = 0.0
