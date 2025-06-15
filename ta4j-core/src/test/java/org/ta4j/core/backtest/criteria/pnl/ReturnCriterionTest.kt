@@ -1,8 +1,7 @@
 /*
  * The MIT License (MIT)
  *
- * Copyright (c) 2017-2024 Ta4j Organization & respective
- * authors (see AUTHORS)
+ * Copyright (c) 2017-2024 Ta4j Organization & respective authors (see AUTHORS)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -21,7 +20,7 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.ta4j.core.criteria.pnl
+package org.ta4j.core.backtest.criteria.pnl
 
 import java.time.Clock
 import java.time.Instant
@@ -32,12 +31,10 @@ import org.ta4j.core.TestUtils.assertNumEquals
 import org.ta4j.core.TradeType
 import org.ta4j.core.TradingRecordTestContext
 import org.ta4j.core.backtest.Position
-import org.ta4j.core.backtest.criteria.pnl.ReturnCriterion
 import org.ta4j.core.backtest.strategy.BackTestTradingRecord
-import org.ta4j.core.criteria.AbstractCriterionTest
 import org.ta4j.core.num.NumFactory
 
-internal class ReturnCriterionTest : AbstractCriterionTest() {
+internal class ReturnCriterionTest {
     private val clock: Clock = Clock.fixed(Instant.now(), ZoneId.systemDefault())
 
 
