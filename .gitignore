@@ -1,6 +1,7 @@
 .claude
 .kotlin
 .gradle
+build
 .classpath
 .project
 .settings/
