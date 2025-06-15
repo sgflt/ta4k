@@ -20,19 +20,31 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.ta4j.core;
+package org.ta4j.core.strategy.rules
 
-import java.util.stream.Stream;
+import kotlin.test.assertFalse
+import kotlin.test.assertTrue
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.ta4j.core.strategy.Rule
 
-import org.ta4j.core.num.DecimalNumFactory;
-import org.ta4j.core.num.DoubleNumFactory;
-import org.ta4j.core.num.NumFactory;
+class NotRuleTest {
 
-/**
- * @author Lukáš Kvídera
- */
-public class NumFactoryTestSource {
-  public static Stream<NumFactory> numFactories() {
-    return Stream.of(DoubleNumFactory.INSTANCE, DecimalNumFactory.getInstance());
-  }
+    private lateinit var satisfiedRule: Rule
+    private lateinit var unsatisfiedRule: Rule
+
+    @BeforeEach
+    fun setUp() {
+        satisfiedRule = BooleanRule.TRUE
+        unsatisfiedRule = BooleanRule.FALSE
+    }
+
+    @Test
+    fun isSatisfied() {
+        assertFalse(satisfiedRule.negation().isSatisfied)
+        assertTrue(unsatisfiedRule.negation().isSatisfied)
+
+        assertFalse(satisfiedRule.negation().isSatisfied)
+        assertTrue(unsatisfiedRule.negation().isSatisfied)
+    }
 }
