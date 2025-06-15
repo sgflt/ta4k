@@ -20,35 +20,31 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.ta4j.core.strategy.rules;
+package org.ta4j.core.strategy.rules
 
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.ta4j.core.MarketEventTestContext
+import org.ta4j.core.indicators.helpers.FixedBooleanIndicator
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+internal class BooleanIndicatorRuleTest {
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.ta4j.core.strategy.Rule;
+    private lateinit var context: MarketEventTestContext
 
-public class NotRuleTest {
+    @BeforeEach
+    fun setUp() {
+        context = MarketEventTestContext()
+            .withCandlePrices(1.0, 2.0, 3.0, 4.0, 5.0)
+            .withIndicator(FixedBooleanIndicator(true, true, false, false, true))
+    }
 
-  private Rule satisfiedRule;
-  private Rule unsatisfiedRule;
-
-
-  @BeforeEach
-  public void setUp() {
-    this.satisfiedRule = BooleanRule.TRUE;
-    this.unsatisfiedRule = BooleanRule.FALSE;
-  }
-
-
-  @Test
-  public void isSatisfied() {
-    assertFalse(this.satisfiedRule.negation().isSatisfied());
-    assertTrue(this.unsatisfiedRule.negation().isSatisfied());
-
-    assertFalse(this.satisfiedRule.negation().isSatisfied());
-    assertTrue(this.unsatisfiedRule.negation().isSatisfied());
-  }
+    @Test
+    fun isSatisfied() {
+        context
+            .assertNextTrue()
+            .assertNextTrue()
+            .assertNextFalse()
+            .assertNextFalse()
+            .assertNextTrue()
+    }
 }

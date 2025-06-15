@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  *
- * Copyright (c) 2017-2023 Ta4j Organization & respective
+ * Copyright (c) 2017-2024 Ta4j Organization & respective
  * authors (see AUTHORS)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
@@ -21,21 +21,21 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.ta4j.core;
+package org.ta4j.core
 
-import org.ta4j.core.api.Indicator;
-import org.ta4j.core.backtest.BacktestBarSeries;
+import org.ta4j.core.api.Indicator
+import org.ta4j.core.backtest.BacktestBarSeries
 
-@FunctionalInterface
-public interface IndicatorFactory<I> {
-
+/**
+ * Functional interface for creating Indicator instances with parameters.
+ */
+fun interface IndicatorFactory<I> {
     /**
      * Applies parameters and data to an IndicatorFactory and returns the Indicator.
      *
-     * @param data   source data for building the indicator
+     * @param data source data for building the indicator
      * @param params indicator parameters
      * @return Indicator<I> with the indicator parameters applied
      */
-    Indicator<I> getIndicator(BacktestBarSeries data, Object... params);
-
+    fun getIndicator(data: BacktestBarSeries, vararg params: Any): Indicator<I>
 }

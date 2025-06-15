@@ -1,7 +1,8 @@
 /*
  * The MIT License (MIT)
  *
- * Copyright (c) 2017-2024 Ta4j Organization & respective authors (see AUTHORS)
+ * Copyright (c) 2017-2024 Ta4j Organization & respective
+ * authors (see AUTHORS)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -20,35 +21,30 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.ta4j.core.strategy.rules;
+package org.ta4j.core
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.ta4j.core.MarketEventTestContext;
-import org.ta4j.core.indicators.helpers.FixedBooleanIndicator;
+import org.ta4j.core.api.Indicator
+import org.ta4j.core.api.series.Bar
+import org.ta4j.core.backtest.BacktestBarSeries
 
-class BooleanIndicatorRuleTest {
+/**
+ * Test wrapper for indicators that provides access to the underlying bar series.
+ */
+class TestIndicator<T>(
+    val barSeries: BacktestBarSeries,
+    private val indicator: Indicator<T>,
+) : Indicator<T> {
 
-  private MarketEventTestContext context;
+    override val value: T
+        get() = indicator.value
 
+    override fun onBar(bar: Bar) {
+        indicator.onBar(bar)
+    }
 
-  @BeforeEach
-  void setUp() {
-    this.context = new MarketEventTestContext()
-        .withCandlePrices(1, 2, 3, 4, 5)
-        .withIndicator(new FixedBooleanIndicator(true, true, false, false, true))
-    ;
-  }
+    override val isStable: Boolean
+        get() = indicator.isStable
 
-
-  @Test
-  void isSatisfied() {
-    this.context
-        .assertNextTrue()
-        .assertNextTrue()
-        .assertNextFalse()
-        .assertNextFalse()
-        .assertNextTrue()
-    ;
-  }
+    override val lag: Int
+        get() = 0
 }
