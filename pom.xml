@@ -207,6 +207,68 @@
  </profiles>
 
  <build>
+  <pluginManagement>
+   <plugins>
+    <!-- Test plugins -->
+    <plugin>
+     <groupId>org.apache.maven.plugins</groupId>
+     <artifactId>maven-surefire-plugin</artifactId>
+     <version>3.2.5</version>
+     <configuration>
+      <includes>
+       <include>**/*Test.kt</include>
+       <include>**/*Tests.kt</include>
+      </includes>
+      <useModulePath>false</useModulePath>
+     </configuration>
+    </plugin>
+    <plugin>
+     <groupId>org.apache.maven.plugins</groupId>
+     <artifactId>maven-failsafe-plugin</artifactId>
+     <version>3.2.5</version>
+    </plugin>
+
+    <!-- Compiler plugins -->
+    <plugin>
+     <groupId>org.apache.maven.plugins</groupId>
+     <artifactId>maven-compiler-plugin</artifactId>
+     <version>3.13.0</version>
+    </plugin>
+
+    <!-- Core Maven plugins -->
+    <plugin>
+     <groupId>org.apache.maven.plugins</groupId>
+     <artifactId>maven-resources-plugin</artifactId>
+     <version>3.3.1</version>
+    </plugin>
+    <plugin>
+     <groupId>org.apache.maven.plugins</groupId>
+     <artifactId>maven-jar-plugin</artifactId>
+     <version>3.4.2</version>
+    </plugin>
+    <plugin>
+     <groupId>org.apache.maven.plugins</groupId>
+     <artifactId>maven-install-plugin</artifactId>
+     <version>3.1.2</version>
+    </plugin>
+    <plugin>
+     <groupId>org.apache.maven.plugins</groupId>
+     <artifactId>maven-deploy-plugin</artifactId>
+     <version>3.1.2</version>
+    </plugin>
+    <plugin>
+     <groupId>org.apache.maven.plugins</groupId>
+     <artifactId>maven-site-plugin</artifactId>
+     <version>4.0.0-M13</version>
+    </plugin>
+    <plugin>
+     <groupId>org.apache.maven.plugins</groupId>
+     <artifactId>maven-clean-plugin</artifactId>
+     <version>3.4.0</version>
+    </plugin>
+   </plugins>
+  </pluginManagement>
+
   <plugins>
 
    <!-- Build source and target -->
@@ -252,7 +314,6 @@
     <plugin>
     <groupId>org.apache.maven.plugins</groupId>
     <artifactId>maven-release-plugin</artifactId>
-    <version>3.1.1</version>
     <configuration>
      <tagNameFormat>@{project.version}</tagNameFormat>
     </configuration>
@@ -292,7 +353,6 @@
    <plugin>
     <groupId>org.apache.maven.plugins</groupId>
     <artifactId>maven-compiler-plugin</artifactId>
-    <version>3.13.0</version>
     <executions>
      <execution>
       <id>default-compile</id>
@@ -325,8 +385,6 @@
        <version>1.18.38</version>
       </path>
      </annotationProcessorPaths>
-     <source>21</source>
-     <target>21</target>
      <release>21</release>
      <showDeprecation>true</showDeprecation>
      <showWarnings>true</showWarnings>
