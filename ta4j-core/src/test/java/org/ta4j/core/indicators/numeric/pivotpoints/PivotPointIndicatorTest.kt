@@ -30,6 +30,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
 import org.ta4j.core.MarketEventTestContext
+import org.ta4j.core.indicators.TimeFrame
 import org.ta4j.core.mocks.MockMarketEventBuilder
 import org.ta4j.core.num.NumFactory
 import org.ta4j.core.num.NumFactoryProvider
@@ -119,6 +120,7 @@ class PivotPointIndicatorTest {
         val events = MockMarketEventBuilder()
             .withStartTime(startTime)
             .withCandleDuration(Duration.ofHours(1))
+            .withTimeFrame(TimeFrame.DAY)  // Override to use DAY timeframe despite hourly duration
             // Day 1 - multiple hours
             .candle().openPrice(100.0).highPrice(105.0).lowPrice(99.0).closePrice(103.0).add()
             .candle().openPrice(103.0).highPrice(108.0).lowPrice(102.0).closePrice(106.0).add()

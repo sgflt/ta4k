@@ -97,10 +97,19 @@ class MarketEventTestContext {
         barSeries =
             BacktestBarSeriesBuilder()
                 .withNumFactory(factory)
-                .withTimeFrame(TimeFrame.DAY)
+                .withTimeFrame(barSeries.timeFrame)
                 .withIndicatorContext(indicatorContext)
                 .build()
     }
+
+    /**
+     * Sets a custom barSeries for this context.
+     * This is useful when you need a specific timeframe that differs from the default DAY timeframe.
+     */
+    fun withBarSeries(customBarSeries: BacktestBarSeries): MarketEventTestContext = apply {
+        barSeries = customBarSeries
+    }
+    
 
 
     fun advance(): Boolean {

@@ -26,7 +26,6 @@ import java.util.function.UnaryOperator
 import kotlin.math.ln
 import org.ta4j.core.api.series.Bar
 import org.ta4j.core.indicators.numeric.NumericIndicator
-import org.ta4j.core.num.DecimalNumFactory
 import org.ta4j.core.num.Num
 
 /**
@@ -94,6 +93,6 @@ class TransformIndicator(
 
         @JvmStatic
         fun log(indicator: NumericIndicator) =
-            TransformIndicator(indicator) { DecimalNumFactory.instance.numOf(ln(it.doubleValue())) }
+            TransformIndicator(indicator) { indicator.numFactory.numOf(ln(it.doubleValue())) }
     }
 }

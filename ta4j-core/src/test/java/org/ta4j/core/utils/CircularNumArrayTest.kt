@@ -2,7 +2,7 @@ package org.ta4j.core.utils
 
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
-import org.ta4j.core.num.DecimalNumFactory.Companion.instance
+import org.ta4j.core.num.DecimalNumFactory
 import org.ta4j.core.num.NaN
 
 class CircularNumArrayTest {
@@ -22,27 +22,27 @@ class CircularNumArrayTest {
 
     @Test
     fun set() {
-        array.addLast(instance.one())
-        array.addLast(instance.two())
-        array.addLast(instance.three())
+        array.addLast(DecimalNumFactory.getInstance().one())
+        array.addLast(DecimalNumFactory.getInstance().two())
+        array.addLast(DecimalNumFactory.getInstance().three())
 
-        assertThat(array[0]).isEqualTo(instance.one())
-        assertThat(array[1]).isEqualTo(instance.two())
-        assertThat(array[2]).isEqualTo(instance.three())
+        assertThat(array[0]).isEqualTo(DecimalNumFactory.getInstance().one())
+        assertThat(array[1]).isEqualTo(DecimalNumFactory.getInstance().two())
+        assertThat(array[2]).isEqualTo(DecimalNumFactory.getInstance().three())
 
-        array.addLast(instance.thousand())
-        assertThat(array[0]).isEqualTo(instance.thousand())
-        assertThat(array[1]).isEqualTo(instance.two())
-        assertThat(array[2]).isEqualTo(instance.three())
+        array.addLast(DecimalNumFactory.getInstance().thousand())
+        assertThat(array[0]).isEqualTo(DecimalNumFactory.getInstance().thousand())
+        assertThat(array[1]).isEqualTo(DecimalNumFactory.getInstance().two())
+        assertThat(array[2]).isEqualTo(DecimalNumFactory.getInstance().three())
 
-        array.addLast(instance.minusOne())
-        assertThat(array[0]).isEqualTo(instance.thousand())
-        assertThat(array[1]).isEqualTo(instance.minusOne())
-        assertThat(array[2]).isEqualTo(instance.three())
+        array.addLast(DecimalNumFactory.getInstance().minusOne())
+        assertThat(array[0]).isEqualTo(DecimalNumFactory.getInstance().thousand())
+        assertThat(array[1]).isEqualTo(DecimalNumFactory.getInstance().minusOne())
+        assertThat(array[2]).isEqualTo(DecimalNumFactory.getInstance().three())
 
-        array.addLast(instance.hundred())
-        assertThat(array[0]).isEqualTo(instance.thousand())
-        assertThat(array[1]).isEqualTo(instance.minusOne())
-        assertThat(array[2]).isEqualTo(instance.hundred())
+        array.addLast(DecimalNumFactory.getInstance().hundred())
+        assertThat(array[0]).isEqualTo(DecimalNumFactory.getInstance().thousand())
+        assertThat(array[1]).isEqualTo(DecimalNumFactory.getInstance().minusOne())
+        assertThat(array[2]).isEqualTo(DecimalNumFactory.getInstance().hundred())
     }
 }

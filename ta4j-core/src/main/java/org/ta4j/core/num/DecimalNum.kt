@@ -251,7 +251,7 @@ class DecimalNum : Num {
             return NaN
         }
         if (comparedToZero == 0) {
-            return DecimalNumFactory.instance.zero()
+            return DecimalNumFactory.getInstance().zero()
         }
 
         // Initial estimate calculation

@@ -90,11 +90,9 @@ class DecimalNumFactory private constructor(precision: Int) : NumFactory {
         private val HUNDRED: DecimalNum = DecimalNum.valueOf(100, MathContext(3))
         private val THOUSAND: DecimalNum = DecimalNum.valueOf(1000, MathContext(4))
 
-        @JvmStatic
-        val instance = getInstance(DecimalNum.Companion.DEFAULT_PRECISION)
-
 
         @JvmStatic
-        fun getInstance(precision: Int) = DecimalNumFactory(precision)
+        @JvmOverloads
+        fun getInstance(precision: Int = DecimalNum.Companion.DEFAULT_PRECISION) = DecimalNumFactory(precision)
     }
 }

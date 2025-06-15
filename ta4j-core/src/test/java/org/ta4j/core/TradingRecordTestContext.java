@@ -14,6 +14,7 @@ import org.ta4j.core.backtest.criteria.AnalysisCriterion;
 import org.ta4j.core.backtest.strategy.BackTestTradingRecord;
 import org.ta4j.core.num.NumFactory;
 import org.ta4j.core.num.NumFactoryProvider;
+import org.ta4j.core.strategy.RuntimeContext;
 
 /**
  * @author Lukáš Kvídera
@@ -100,6 +101,11 @@ public class TradingRecordTestContext {
 
 
   public TradingRecord getTradingRecord() {
+    return this.tradingRecord;
+  }
+
+
+  public RuntimeContext getRuntimeContext() {
     return this.tradingRecord;
   }
 

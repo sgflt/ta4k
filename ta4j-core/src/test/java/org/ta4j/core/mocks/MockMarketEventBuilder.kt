@@ -41,6 +41,7 @@ class MockMarketEventBuilder {
     private var candleEvents = ArrayList<CandleReceived>()
     private var candlesProduced = 0
     private var candleDuration = getDuration(TimeFrame.DAY)
+    private var timeFrame = TimeFrame.DAY
 
 
     private fun createCandleSerialNumber(): Int {
@@ -60,7 +61,7 @@ class MockMarketEventBuilder {
             val startTime = startTime.plus(candleDuration.multipliedBy(createCandleSerialNumber().toLong()))
             candleEvents.add(
                 CandleReceived(
-                    TimeFrame.DAY,
+                    timeFrame,
                     startTime,
                     startTime.plus(candleDuration),
                     d!!,
@@ -94,13 +95,13 @@ class MockMarketEventBuilder {
     private fun arbitraryBars() {
         val dataSetSize = 5000
         val candleEvents = ArrayList<CandleReceived>(dataSetSize)
-        val timePeriod = Duration.ofDays(1)
+        val timePeriod = candleDuration
 
         for (i in 0..<dataSetSize) {
             val beginTime = startTime.plus(timePeriod.multipliedBy(createCandleSerialNumber().toLong()))
             candleEvents.add(
                 CandleReceived(
-                    TimeFrame.DAY,
+                    timeFrame,
                     beginTime,
                     beginTime.plus(timePeriod.multipliedBy(candlesProduced.toLong())),
                     (i + 1).toDouble(),
@@ -134,6 +135,10 @@ class MockMarketEventBuilder {
         this.startTime = startTime
     }
 
+    fun withTimeFrame(timeFrame: TimeFrame): MockMarketEventBuilder = apply {
+        this.timeFrame = timeFrame
+    }
+
 
     fun candle(): MockCandleBuilder {
         return MockCandleBuilder()
@@ -151,7 +156,7 @@ class MockMarketEventBuilder {
         private var close = 0.0
         private var high = 0.0
         private var low = 0.0
-        private var timeFrame = TimeFrame.DAY
+        private var timeFrame = this@MockMarketEventBuilder.timeFrame
 
 
         fun openPrice(open: Double): MockCandleBuilder = apply {
