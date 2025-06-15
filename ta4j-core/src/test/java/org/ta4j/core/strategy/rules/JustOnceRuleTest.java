@@ -80,6 +80,30 @@ public class JustOnceRuleTest {
       public boolean isSatisfied() {
         return this.counter++ > 0;
       }
+
+
+      @Override
+      public Rule negation() {
+        return new NotRule(this);
+      }
+
+
+      @Override
+      public Rule xor(final Rule rule) {
+        return new XorRule(this, rule);
+      }
+
+
+      @Override
+      public Rule and(final Rule rule) {
+        return new AndRule(this, rule);
+      }
+
+
+      @Override
+      public Rule or(final Rule rule) {
+        return new OrRule(this, rule);
+      }
     });
     assertFalse(rule.isSatisfied());
     assertTrue(rule.isSatisfied());
