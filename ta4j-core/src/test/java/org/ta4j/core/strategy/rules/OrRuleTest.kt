@@ -20,37 +20,35 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.ta4j.core.strategy.rules;
+package org.ta4j.core.strategy.rules
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import org.junit.jupiter.api.Assertions.assertFalse
+import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.ta4j.core.strategy.Rule
 
-import org.junit.Before;
-import org.junit.Test;
+internal class OrRuleTest {
 
-public class BooleanRuleTest {
+    private lateinit var satisfiedRule: Rule
+    private lateinit var unsatisfiedRule: Rule
 
-  private BooleanRule satisfiedRule;
-  private BooleanRule unsatisfiedRule;
+    @BeforeEach
+    fun setUp() {
+        satisfiedRule = BooleanRule.TRUE
+        unsatisfiedRule = BooleanRule.FALSE
+    }
 
+    @Test
+    fun isSatisfied() {
+        assertTrue(satisfiedRule.or(BooleanRule.FALSE).isSatisfied)
+        assertTrue(BooleanRule.FALSE.or(satisfiedRule).isSatisfied)
+        assertFalse(unsatisfiedRule.or(BooleanRule.FALSE).isSatisfied)
+        assertFalse(BooleanRule.FALSE.or(unsatisfiedRule).isSatisfied)
 
-  @Before
-  public void setUp() {
-    this.satisfiedRule = BooleanRule.TRUE;
-    this.unsatisfiedRule = BooleanRule.FALSE;
-  }
-
-
-  @Test
-  public void isSatisfied() {
-    assertTrue(this.satisfiedRule.isSatisfied());
-    assertTrue(this.satisfiedRule.isSatisfied());
-    assertTrue(this.satisfiedRule.isSatisfied());
-    assertTrue(this.satisfiedRule.isSatisfied());
-
-    assertFalse(this.unsatisfiedRule.isSatisfied());
-    assertFalse(this.unsatisfiedRule.isSatisfied());
-    assertFalse(this.unsatisfiedRule.isSatisfied());
-    assertFalse(this.unsatisfiedRule.isSatisfied());
-  }
+        assertTrue(satisfiedRule.or(BooleanRule.TRUE).isSatisfied)
+        assertTrue(BooleanRule.TRUE.or(satisfiedRule).isSatisfied)
+        assertTrue(unsatisfiedRule.or(BooleanRule.TRUE).isSatisfied)
+        assertTrue(BooleanRule.TRUE.or(unsatisfiedRule).isSatisfied)
+    }
 }
