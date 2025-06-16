@@ -40,7 +40,7 @@ internal class ReturnCriterionTest {
 
     @ParameterizedTest
     @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
-    fun calculateWithWinningLongPositions(numFactory: NumFactory?) {
+    fun calculateWithWinningLongPositions(numFactory: NumFactory) {
         val context = TradingRecordTestContext()
             .withNumFactory(numFactory)
             .withTradeType(TradeType.BUY)
@@ -65,7 +65,7 @@ internal class ReturnCriterionTest {
 
     @ParameterizedTest
     @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
-    fun calculateWithLosingLongPositions(numFactory: NumFactory?) {
+    fun calculateWithLosingLongPositions(numFactory: NumFactory) {
         val context = TradingRecordTestContext()
             .withNumFactory(numFactory)
             .withTradeType(TradeType.BUY)
@@ -90,7 +90,7 @@ internal class ReturnCriterionTest {
 
     @ParameterizedTest
     @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
-    fun calculateReturnWithWinningShortPositions(numFactory: NumFactory?) {
+    fun calculateReturnWithWinningShortPositions(numFactory: NumFactory) {
         val context = TradingRecordTestContext()
             .withNumFactory(numFactory)
             .withTradeType(TradeType.SELL)
@@ -115,7 +115,7 @@ internal class ReturnCriterionTest {
 
     @ParameterizedTest
     @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
-    fun calculateReturnWithLosingShortPositions(numFactory: NumFactory?) {
+    fun calculateReturnWithLosingShortPositions(numFactory: NumFactory) {
         val context = TradingRecordTestContext()
             .withNumFactory(numFactory)
             .withTradeType(TradeType.SELL)

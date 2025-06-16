@@ -1,4 +1,4 @@
-/**
+/*
  * The MIT License (MIT)
  *
  * Copyright (c) 2017-2024 Ta4j Organization & respective
@@ -21,19 +21,15 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.ta4j.core.mocks;
+package org.ta4j.core.mocks
 
-import org.ta4j.core.api.series.BarBuilder;
-import org.ta4j.core.api.series.BarBuilderFactory;
-import org.ta4j.core.api.series.BarSeries;
+import org.ta4j.core.api.series.BarBuilder
+import org.ta4j.core.api.series.BarBuilderFactory
+import org.ta4j.core.api.series.BarSeries
 
-/**
- * @author Lukáš Kvídera
- */
-public class MockBarBuilderFactory implements BarBuilderFactory {
+class MockBarBuilderFactory : BarBuilderFactory {
 
-    @Override
-    public BarBuilder createBarBuilder(final BarSeries series) {
-        return new MockBarBuilder(series);
+    override fun createBarBuilder(series: BarSeries): BarBuilder {
+        return MockBarBuilder(series)
     }
 }
