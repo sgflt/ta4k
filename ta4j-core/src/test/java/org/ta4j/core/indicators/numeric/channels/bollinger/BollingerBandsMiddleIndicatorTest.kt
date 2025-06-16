@@ -21,37 +21,34 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.ta4j.core.indicators.numeric.channels.bollinger;
+package org.ta4j.core.indicators.numeric.channels.bollinger
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.MethodSource;
-import org.ta4j.core.MarketEventTestContext;
-import org.ta4j.core.api.Indicators;
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.MethodSource
+import org.ta4j.core.MarketEventTestContext
+import org.ta4j.core.api.Indicators
 
-class BollingerBandsMiddleIndicatorTest {
+internal class BollingerBandsMiddleIndicatorTest {
 
+    private lateinit var testContext: MarketEventTestContext
 
-  private MarketEventTestContext testContext;
+    @BeforeEach
+    fun setUp() {
+        testContext = MarketEventTestContext()
+        testContext.withCandlePrices(
+            1.0, 2.0, 3.0, 4.0, 3.0, 4.0, 5.0, 4.0, 3.0, 3.0, 4.0, 3.0, 2.0
+        )
+    }
 
+    @ParameterizedTest(name = "Middle bollinger band derived from SMA [{index}] {0}")
+    @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
+    fun bollingerBandsMiddleUsingSMA() {
+        val sma = Indicators.closePrice().sma(3)
+        val bbmSMA = BollingerBandsMiddleIndicator(sma)
 
-  @BeforeEach
-  void setUp() {
-    this.testContext = new MarketEventTestContext();
-    this.testContext.withCandlePrices(
-        1, 2, 3, 4, 3, 4, 5, 4, 3, 3, 4, 3, 2
-    );
-  }
-
-
-  @ParameterizedTest(name = "Middle bollinger band derived from SMA [{index}] {0}")
-  @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
-  void bollingerBandsMiddleUsingSMA() {
-    final var sma = Indicators.closePrice().sma(3);
-    final var bbmSMA = new BollingerBandsMiddleIndicator(sma);
-
-    this.testContext.withIndicators(bbmSMA, sma)
-        .fastForwardUntilStable()
-        .assertIndicatorEquals(sma, bbmSMA);
-  }
+        testContext.withIndicators(bbmSMA, sma)
+            .fastForwardUntilStable()
+            .assertIndicatorEquals(sma, bbmSMA)
+    }
 }
