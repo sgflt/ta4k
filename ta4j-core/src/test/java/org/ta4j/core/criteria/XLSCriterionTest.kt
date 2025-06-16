@@ -1,4 +1,4 @@
-/**
+/*
  * The MIT License (MIT)
  *
  * Copyright (c) 2017-2023 Ta4j Organization & respective
@@ -21,31 +21,43 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.ta4j.core;
+package org.ta4j.core.criteria
 
-import java.util.List;
+import org.ta4j.core.ExternalCriterionTest
+import org.ta4j.core.XlsTestsUtils
+import org.ta4j.core.backtest.TradingRecord
+import org.ta4j.core.events.MarketEvent
+import org.ta4j.core.num.Num
+import org.ta4j.core.num.NumFactory
 
-import org.ta4j.core.events.MarketEvent;
-import org.ta4j.core.mocks.MockIndicator;
+class XLSCriterionTest(
+    private val clazz: Class<*>,
+    private val fileName: String,
+    private val criterionColumn: Int,
+    private val statesColumn: Int,
+    private val numFactory: NumFactory
+) : ExternalCriterionTest {
 
-public interface ExternalIndicatorTest {
+    private var cachedSeries: List<MarketEvent>? = null
 
-    /**
-     * Gets the BarSeries used by an external indicator calculator.
-     *
-     * @return BarSeries from the external indicator calculator
-     * @throws Exception if the external calculator throws an Exception
-     */
-    List<MarketEvent> getMarketEvents() throws Exception;
+    override fun getMarketEvents(): List<MarketEvent> {
+        if (cachedSeries == null) {
+            cachedSeries = XlsTestsUtils.getMarketEvents(clazz, fileName)
+        }
+        return cachedSeries!!
+    }
 
-    /**
-     * Sends indicator parameters to an external indicator calculator and returns
-     * the externally calculated indicator.
-     *
-     * @param params indicator parameters
-     * @return Indicator<Num> from the external indicator calculator
-     * @throws Exception if the external calculator throws an Exception
-     */
-    MockIndicator getIndicator(Object... params) throws Exception;
+    override fun getFinalCriterionValue(vararg params: Any): Num {
+        return XlsTestsUtils.getFinalCriterionValue(
+            clazz,
+            fileName,
+            criterionColumn,
+            numFactory,
+            *params
+        )!!
+    }
 
+    override fun getTradingRecord(): TradingRecord {
+        return XlsTestsUtils.getTradingRecord(clazz, fileName, statesColumn, numFactory)
+    }
 }

@@ -1,4 +1,4 @@
-/**
+/*
  * The MIT License (MIT)
  *
  * Copyright (c) 2017-2023 Ta4j Organization & respective
@@ -21,40 +21,37 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.ta4j.core;
+package org.ta4j.core.indicators
 
-import java.util.List;
+import org.ta4j.core.ExternalIndicatorTest
+import org.ta4j.core.XlsTestsUtils
+import org.ta4j.core.events.MarketEvent
+import org.ta4j.core.mocks.MockIndicator
+import org.ta4j.core.num.NumFactory
 
-import org.ta4j.core.backtest.TradingRecord;
-import org.ta4j.core.events.MarketEvent;
-import org.ta4j.core.num.Num;
+class XLSIndicatorTest(
+    private val clazz: Class<*>,
+    private val fileName: String,
+    private val column: Int,
+    private val numFactory: NumFactory
+) : ExternalIndicatorTest {
 
-public interface ExternalCriterionTest {
+    private var cachedSeries: List<MarketEvent>? = null
 
-    /**
-     * Gets the BarSeries used by an external criterion calculator.
-     *
-     * @return BarSeries from the external criterion calculator
-     * @throws Exception if the external calculator throws an Exception
-     */
-    List<MarketEvent> getMarketEvents() throws Exception;
+    override fun getMarketEvents(): List<MarketEvent> {
+        if (cachedSeries == null) {
+            cachedSeries = XlsTestsUtils.getMarketEvents(clazz, fileName)
+        }
+        return cachedSeries!!
+    }
 
-    /**
-     * Sends criterion parameters to an external criterion calculator and returns
-     * the final value of the externally calculated criterion.
-     *
-     * @param params criterion parameters
-     * @return Num final criterion value
-     * @throws Exception if the external calculator throws an Exception
-     */
-    Num getFinalCriterionValue(Object... params) throws Exception;
-
-    /**
-     * Gets the trading record used by an external criterion calculator.
-     *
-     * @return TradingRecord from the external criterion calculator
-     * @throws Exception if the external calculator throws an Exception
-     */
-    TradingRecord getTradingRecord() throws Exception;
-
+    override fun getIndicator(vararg params: Any): MockIndicator {
+        return XlsTestsUtils.getIndicator(
+            clazz,
+            fileName,
+            column,
+            numFactory,
+            *params
+        )
+    }
 }

@@ -101,7 +101,7 @@ internal class MMAIndicatorTest {
     private fun assertBarCount(barCount: Int, expected: Double, numFactory: NumFactory) {
         val xlsContext = MarketEventTestContext()
         val xls = XLSIndicatorTest(this.javaClass, "MMA.xls", 6, numFactory)
-        xlsContext.withMarketEvents(xls.marketEvents)
+        xlsContext.withMarketEvents(xls.getMarketEvents())
         val actualIndicator = Indicators.closePrice().mma(barCount)
         val expectedIndicator = xls.getIndicator(barCount)
         xlsContext.withIndicators(actualIndicator, expectedIndicator)
