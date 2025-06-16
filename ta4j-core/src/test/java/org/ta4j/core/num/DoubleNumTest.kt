@@ -21,30 +21,27 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.ta4j.core.num;
+package org.ta4j.core.num
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotEquals;
+import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.Assertions.assertNotEquals
+import org.junit.jupiter.api.Test
 
-import org.junit.Test;
+internal class DoubleNumTest {
 
-public class DoubleNumTest {
+    @Test
+    fun testEqualsDoubleNumWithDecimalNum() {
+        val decimalNum = DecimalNum.valueOf(3.0)
+        val doubleNum = DoubleNum.valueOf(3.0)
 
-  @Test
-  public void testEqualsDoubleNumWithDecimalNum() {
-    final DecimalNum decimalNum = DecimalNum.valueOf(3.0);
-    final DoubleNum doubleNum = DoubleNum.valueOf(3.0);
+        assertNotEquals(doubleNum, decimalNum)
+    }
 
-    assertNotEquals(doubleNum, decimalNum);
-  }
+    @Test
+    fun testZeroEquals() {
+        val num1: Num = DoubleNum.valueOf(-0.0)
+        val num2: Num = DoubleNum.valueOf(0.0)
 
-
-  @Test
-  public void testZeroEquals() {
-    final Num num1 = DoubleNum.valueOf(-0.0);
-    final Num num2 = DoubleNum.valueOf(0.0);
-
-    assertThat(num1).isEqualTo(num2);
-  }
+        assertThat(num1).isEqualTo(num2)
+    }
 }
