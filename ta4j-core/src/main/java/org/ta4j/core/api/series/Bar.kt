@@ -26,8 +26,6 @@ import java.time.Duration
 import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
-import org.ta4j.core.api.Indicators.closePrice
-import org.ta4j.core.api.Indicators.openPrice
 import org.ta4j.core.indicators.TimeFrame
 import org.ta4j.core.num.Num
 
@@ -108,19 +106,11 @@ interface Bar {
         /**
          * @return true if this is a bearish bar, false otherwise
          */
-        get() {
-            val openPrice = openPrice()
-            val closePrice = closePrice()
-            return closePrice.isLessThan(openPrice)
-        }
+        get() = closePrice < openPrice
 
     val isBullish: Boolean
         /**
          * @return true if this is a bullish bar, false otherwise
          */
-        get() {
-            val openPrice = openPrice()
-            val closePrice = closePrice()
-            return openPrice.isLessThan(closePrice)
-        }
+        get() = openPrice < closePrice
 }
