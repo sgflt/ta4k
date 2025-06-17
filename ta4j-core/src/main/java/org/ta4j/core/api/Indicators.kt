@@ -26,6 +26,7 @@ import org.ta4j.core.indicators.numeric.CloseLocationValueIndicator
 import org.ta4j.core.indicators.numeric.NumericIndicator
 import org.ta4j.core.indicators.numeric.candles.LowerShadowIndicator
 import org.ta4j.core.indicators.numeric.candles.RealBodyIndicator
+import org.ta4j.core.indicators.numeric.candles.UpperShadowIndicator
 import org.ta4j.core.indicators.numeric.candles.VolumeIndicator
 import org.ta4j.core.indicators.numeric.candles.price.ClosePriceIndicator
 import org.ta4j.core.indicators.numeric.candles.price.HighPriceIndicator
@@ -201,6 +202,9 @@ object Indicators {
     fun lowerShadow() = extended().lowerShadow()
 
     @JvmStatic
+    fun upperShadow() = extended().upperShadow()
+
+    @JvmStatic
     fun stochasticKOscillator(barCount: Int) = extended().stochasticKOscillator(barCount)
 
     @JvmStatic
@@ -320,6 +324,8 @@ object Indicators {
         fun minusDII(barCount: Int) = MinusDIIndicator(numFactory, barCount)
 
         fun lowerShadow() = LowerShadowIndicator(numFactory)
+
+        fun upperShadow() = UpperShadowIndicator(numFactory)
 
         fun stochasticOscillator(barCount: Int) =
             StochasticOscillatorDIndicator(numFactory, stochasticKOscillator(barCount))
