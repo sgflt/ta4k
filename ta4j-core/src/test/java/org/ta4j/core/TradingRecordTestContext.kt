@@ -2,7 +2,6 @@ package org.ta4j.core
 
 import java.time.Instant
 import java.time.temporal.ChronoUnit
-import java.util.function.Function
 import org.ta4j.core.TestUtils.assertNumEquals
 import org.ta4j.core.backtest.BacktestBarSeries
 import org.ta4j.core.backtest.TradingRecord
@@ -14,118 +13,99 @@ import org.ta4j.core.num.NumFactory
 import org.ta4j.core.num.NumFactoryProvider
 import org.ta4j.core.strategy.RuntimeContext
 
-class TradingRecordTestContext {
-
+class TradingRecordTestContext(
+    private var marketEvenTestContext: MarketEventTestContext? = null,
+) {
     private var simulationTime: Int = 0
     private var tradeType: TradeType = TradeType.BUY
     lateinit var tradingRecord: BackTestTradingRecord
         private set
-    private lateinit var criterion: AnalysisCriterion
+    private var criterion: AnalysisCriterion? = null
     private var transactionCostModel: CostModel = ZeroCostModel
     private var holdingCostModel: CostModel = ZeroCostModel
-    private var marketEvenTestContext: MarketEventTestContext? = null
     private var numFactory: NumFactory = NumFactoryProvider.defaultNumFactory
     private var resolution: ChronoUnit = ChronoUnit.DAYS
 
-    constructor() {
+    init {
+        marketEvenTestContext?.let {
+            withNumFactory(it.barSeries.numFactory)
+        }
         reinitalizeTradingRecord()
     }
 
-    constructor(marketEventTestContext: MarketEventTestContext) {
-        this.marketEvenTestContext = marketEventTestContext
-        withNumFactory(marketEventTestContext.barSeries.numFactory)
-        reinitalizeTradingRecord()
-    }
-
-    fun withTradeType(tradeType: TradeType): TradingRecordTestContext {
+    fun withTradeType(tradeType: TradeType): TradingRecordTestContext = apply {
         this.tradeType = tradeType
         reinitalizeTradingRecord()
-        return this
     }
 
-    fun withNumFactory(numFactory: NumFactory): TradingRecordTestContext {
+    fun withNumFactory(numFactory: NumFactory): TradingRecordTestContext = apply {
         this.numFactory = numFactory
         NumFactoryProvider.defaultNumFactory = numFactory
         reinitalizeTradingRecord()
-        return this
     }
 
     private fun reinitalizeTradingRecord() {
-        this.tradingRecord = BackTestTradingRecord(
-            this.tradeType,
+        tradingRecord = BackTestTradingRecord(
+            tradeType,
             "",
-            this.transactionCostModel,
-            this.holdingCostModel,
-            this.numFactory
+            transactionCostModel,
+            holdingCostModel,
+            numFactory
         )
 
-        this.marketEvenTestContext?.withBarListener(this.tradingRecord)
+        marketEvenTestContext?.withBarListener(tradingRecord)
     }
 
-    fun withCriterion(criterion: AnalysisCriterion): TradingRecordTestContext {
+    fun withCriterion(criterion: AnalysisCriterion): TradingRecordTestContext = apply {
         this.criterion = criterion
-        return this
     }
 
-    fun withSeriesRelatedCriterion(criterionFactory: Function<BacktestBarSeries, AnalysisCriterion>): TradingRecordTestContext {
-        this.criterion = criterionFactory.apply(this.marketEvenTestContext!!.barSeries)
-        return this
+    fun withSeriesRelatedCriterion(criterionFactory: (BacktestBarSeries) -> AnalysisCriterion): TradingRecordTestContext =
+        apply {
+            criterion = criterionFactory(requireNotNull(marketEvenTestContext).barSeries)
     }
 
-    fun withTransactionCostModel(transactionCostModel: CostModel): TradingRecordTestContext {
+    fun withTransactionCostModel(transactionCostModel: CostModel): TradingRecordTestContext = apply {
         this.transactionCostModel = transactionCostModel
         reinitalizeTradingRecord()
-        return this
     }
 
-    fun withHoldingCostModel(holdingCostModel: CostModel): TradingRecordTestContext {
+    fun withHoldingCostModel(holdingCostModel: CostModel): TradingRecordTestContext = apply {
         this.holdingCostModel = holdingCostModel
         reinitalizeTradingRecord()
-        return this
     }
 
-    fun getTradingRecord(): TradingRecord {
-        return this.tradingRecord
-    }
+    fun getTradingRecord(): TradingRecord = this.tradingRecord
 
     val runtimeContext: RuntimeContext
         get() = this.tradingRecord
 
     fun assertResults(expected: Double) {
-        assertNumEquals(expected, this.criterion.calculate(this.tradingRecord))
+        requireNotNull(criterion) { "Criterion must be set before asserting results" }
+        assertNumEquals(expected, criterion!!.calculate(this.tradingRecord))
     }
 
-    fun enter(amount: Double): Operation {
-        return EnterOperation(amount)
-    }
+    fun enter(amount: Double): Operation = EnterOperation(amount)
 
-    fun exit(amount: Double): Operation {
-        return ExitOperation(amount)
-    }
+    fun exit(amount: Double): Operation = ExitOperation(amount)
 
-    private fun getNumFactory(): NumFactory {
-        return this.numFactory
-    }
+    private fun getNumFactory(): NumFactory = numFactory
 
     val barSeries: BacktestBarSeries
-        get() = this.marketEvenTestContext!!.barSeries
+        get() = requireNotNull(marketEvenTestContext) { "MarketEventTestContext must be set to access barSeries" }.barSeries
 
-    fun forwardTime(countOfBars: Int): TradingRecordTestContext {
-        if (this.marketEvenTestContext != null) {
-            this.marketEvenTestContext!!.fastForward(countOfBars)
-        } else {
-            this.simulationTime += countOfBars
+    fun forwardTime(countOfBars: Int): TradingRecordTestContext = apply {
+        marketEvenTestContext?.fastForward(countOfBars) ?: run {
+            simulationTime += countOfBars
         }
-        return this
     }
 
     fun fastForwardToTheEnd() = apply {
-        marketEvenTestContext!!.fastForwardToTheEnd()
+        requireNotNull(marketEvenTestContext) { "MarketEventTestContext must be set for fast forward operations" }.fastForwardToTheEnd()
     }
 
-    fun withResolution(resolution: ChronoUnit): TradingRecordTestContext {
+    fun withResolution(resolution: ChronoUnit): TradingRecordTestContext = apply {
         this.resolution = resolution
-        return this
     }
 
     interface Operation {
@@ -163,62 +143,61 @@ class TradingRecordTestContext {
     inner class EnterOperation(private val amount: Double) : Operation {
 
         override fun after(countOfBars: Int): TradingRecordTestContext {
-            this@TradingRecordTestContext.marketEvenTestContext!!.fastForward(countOfBars)
+            requireNotNull(marketEvenTestContext) { "MarketEventTestContext must be set for time-based operations" }
+            marketEvenTestContext!!.fastForward(countOfBars)
 
-            val bar = this@TradingRecordTestContext.marketEvenTestContext!!.barSeries.bar
-            this@TradingRecordTestContext.tradingRecord.enter(
+            val bar = marketEvenTestContext!!.barSeries.bar
+            tradingRecord.enter(
                 bar.endTime,
                 bar.closePrice,
-                getNumFactory().numOf(this.amount)
+                getNumFactory().numOf(amount)
             )
 
-            // ad bar to positions history
-            this@TradingRecordTestContext.tradingRecord.onBar(bar)
+            // add bar to positions history
+            tradingRecord.onBar(bar)
 
             return this@TradingRecordTestContext
         }
 
         override fun at(price: Double): TradingRecordTestContext {
-            this@TradingRecordTestContext.tradingRecord.enter(
+            tradingRecord.enter(
                 getSimulatedTime(),
                 getNumFactory().numOf(price),
-                getNumFactory().numOf(this.amount)
+                getNumFactory().numOf(amount)
             )
-
             return this@TradingRecordTestContext
         }
     }
 
     inner class ExitOperation(private val amount: Double) : Operation {
 
-        override fun after(orderOfReceivedCandle: Int): TradingRecordTestContext {
-            this@TradingRecordTestContext.marketEvenTestContext!!.fastForward(orderOfReceivedCandle)
+        override fun after(countOfBars: Int): TradingRecordTestContext {
+            requireNotNull(marketEvenTestContext) { "MarketEventTestContext must be set for time-based operations" }
+            marketEvenTestContext!!.fastForward(countOfBars)
 
-            val bar = this@TradingRecordTestContext.marketEvenTestContext!!.barSeries.bar
-            this@TradingRecordTestContext.tradingRecord.exit(
+            val bar = marketEvenTestContext!!.barSeries.bar
+            tradingRecord.exit(
                 bar.endTime,
                 bar.closePrice,
-                getNumFactory().numOf(this.amount)
+                getNumFactory().numOf(amount)
             )
 
-            // ad bar to positions history
-            this@TradingRecordTestContext.tradingRecord.onBar(bar)
+            // add bar to positions history
+            tradingRecord.onBar(bar)
 
             return this@TradingRecordTestContext
         }
 
         override fun at(price: Double): TradingRecordTestContext {
-            this@TradingRecordTestContext.tradingRecord.exit(
+            tradingRecord.exit(
                 getSimulatedTime(),
                 getNumFactory().numOf(price),
-                getNumFactory().numOf(this.amount)
+                getNumFactory().numOf(amount)
             )
-
             return this@TradingRecordTestContext
         }
     }
 
-    private fun getSimulatedTime(): Instant {
-        return Instant.MIN.plus(this.resolution.duration.multipliedBy((this.simulationTime++).toLong()))
-    }
+    private fun getSimulatedTime(): Instant =
+        Instant.MIN.plus(resolution.duration.multipliedBy((simulationTime++).toLong()))
 }
