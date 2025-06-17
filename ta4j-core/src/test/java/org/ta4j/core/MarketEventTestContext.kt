@@ -109,7 +109,6 @@ class MarketEventTestContext {
     fun withBarSeries(customBarSeries: BacktestBarSeries): MarketEventTestContext = apply {
         barSeries = customBarSeries
     }
-    
 
 
     fun advance(): Boolean {
@@ -140,6 +139,15 @@ class MarketEventTestContext {
     fun fastForwardUntilStable(): MarketEventTestContext = apply {
         while (indicatorContext.isNotEmpty && !indicatorContext.isStable) {
             fastForward(1)
+        }
+    }
+
+    /**
+     * Replays all market events
+     */
+    fun fastForwardToTheEnd() {
+        while (advance()) {
+            // just advance
         }
     }
 
@@ -262,7 +270,6 @@ class MarketEventTestContext {
     }
 
     private fun getAnyIndicator() = firstNumericIndicator ?: fisrtBooleanIndicator
-
 
     inner class IndicatorAsserts(indicatorName: String) {
         private val indicatorId: IndicatorIdentification = IndicatorIdentification(indicatorName)

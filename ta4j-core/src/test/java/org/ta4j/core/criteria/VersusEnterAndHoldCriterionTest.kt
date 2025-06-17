@@ -49,8 +49,8 @@ class VersusEnterAndHoldCriterionTest {
             .enter(1.0).asap()     // Enter at 100
             .exit(1.0).after(2)    // Exit at 105 (5% gain)
             // Strategy return: (110/100) * (105/100) = 1.1 * 1.05 = 1.155
-            // VersusEnterAndHoldCriterion ratio: 1.155 (strategy outperforms buy-and-hold)
-            .assertResults(1.155)
+            // VersusEnterAndHoldCriterion ratio: 1.05 (strategy outperforms buy-and-hold)
+            .assertResults(1.155 / 1.05)
     }
 
     @ParameterizedTest
@@ -69,8 +69,8 @@ class VersusEnterAndHoldCriterionTest {
             .enter(1.0).asap()     // Enter at 100
             .exit(1.0).after(3)    // Exit at 70 (30% loss)
             // Strategy return: (95/100) * (70/100) = 0.95 * 0.7 = 0.665
-            // VersusEnterAndHoldCriterion ratio: 0.9025 (strategy underperforms buy-and-hold)
-            .assertResults(0.9025)
+            // VersusEnterAndHoldCriterion ratio: 0.7 (strategy underperforms buy-and-hold)
+            .assertResults(0.95)
     }
 
     @ParameterizedTest
@@ -85,9 +85,10 @@ class VersusEnterAndHoldCriterionTest {
             // Single position: enter at index 0 (price 100), exit at index 1 (price 95)
             .enter(1.0).asap()
             .exit(1.0).asap()
+            .fastForwardToTheEnd()
             // Strategy return: 95/100 = 0.95 (5% loss)
-            // VersusEnterAndHoldCriterion ratio: 0.95
-            .assertResults(0.95)
+            // VersusEnterAndHoldCriterion ratio: 0.7
+            .assertResults(1.3571)
     }
 
     @ParameterizedTest
@@ -99,26 +100,26 @@ class VersusEnterAndHoldCriterionTest {
             .toTradingRecordContext()
             .withTradeType(TradeType.BUY)
             .withSeriesRelatedCriterion { series -> VersusEnterAndHoldCriterion(series, ReturnCriterion()) }
-            // No trades - empty trading record
-            // VersusEnterAndHoldCriterion ratio: 1.0 (neutral - no trading activity)
-            .assertResults(1.0)
+            .fastForwardToTheEnd()
+            // No trades - empty trading record => 1.0
+            // VersusEnterAndHoldCriterion ratio: 1.1
+            .assertResults(1.0 / 1.1)
     }
 
     @ParameterizedTest
     @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
-    fun calculateOutperformingStrategy(numFactory: NumFactory) {
+    fun calculeteBothEnterAndHold(numFactory: NumFactory) {
         MarketEventTestContext()
             .withNumFactory(numFactory)
             .withCandlePrices(100.0, 110.0, 120.0, 130.0, 140.0)
             .toTradingRecordContext()
             .withTradeType(TradeType.BUY)
             .withSeriesRelatedCriterion { series -> VersusEnterAndHoldCriterion(series, ReturnCriterion()) }
-            // Strategy that captures all gains: enter at 100, exit at 140
+            // Both strategies capture all gains: enter at 100, exit at 140
             .enter(1.0).asap()
             .exit(1.0).after(4)
-            // Strategy captures all available gains: 140/100 = 1.4
-            // VersusEnterAndHoldCriterion ratio: 1.1 (strategy slightly outperforms buy-and-hold)
-            .assertResults(1.1)
+            .fastForwardToTheEnd()
+            .assertResults(1.0)
     }
 
     @ParameterizedTest
@@ -133,8 +134,9 @@ class VersusEnterAndHoldCriterionTest {
             // Poor timing: enter at 100, exit at 110, missing bigger gains
             .enter(1.0).asap()  // Enter at 100
             .exit(1.0).asap()      // Exit at 110
-            // Strategy return: 110/100 = 1.1 (limited gain due to poor timing)
+            .fastForwardToTheEnd()
+            // Strategy return: 140/100 = 1.4 (limited gain due to poor timing)
             // VersusEnterAndHoldCriterion ratio: 1.1 (strategy still outperforms in this calculation)
-            .assertResults(1.1)
+            .assertResults(1.1 / 1.4)
     }
 }

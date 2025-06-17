@@ -23,6 +23,7 @@
  */
 package org.ta4j.core.backtest.criteria
 
+import java.time.Instant
 import org.ta4j.core.TradeType
 import org.ta4j.core.api.series.BarSeries
 import org.ta4j.core.backtest.BacktestBarSeries
@@ -32,7 +33,6 @@ import org.ta4j.core.backtest.analysis.cost.ZeroCostModel
 import org.ta4j.core.backtest.strategy.BackTestTradingRecord
 import org.ta4j.core.num.Num
 import org.ta4j.core.num.NumFactoryProvider
-import java.time.Instant
 
 /**
  * Versus "enter and hold" criterion, returned in decimal format.
@@ -84,23 +84,23 @@ class VersusEnterAndHoldCriterion : AnalysisCriterion {
 
     override fun calculate(tradingRecord: TradingRecord): Num {
         val positions = tradingRecord.positions
+        val backtestSeries = series as BacktestBarSeries
+        val fakeRecord = createEnterAndHoldTradingRecord(
+            backtestSeries.firstBar.beginTime,
+            backtestSeries.lastBar.endTime
+        )
+
         if (positions.isEmpty()) {
             // No positions case - compare 1 (no change) vs buy-and-hold from start to end
-            val backtestSeries = series as BacktestBarSeries
+
             if (backtestSeries.isEmpty) {
                 // If no bars at all, return 1 (no change)
                 return NumFactoryProvider.defaultNumFactory.one()
             }
-            val fakeRecord = createEnterAndHoldTradingRecord(
-                backtestSeries.firstBar.beginTime,
-                backtestSeries.lastBar.endTime
-            )
+
             return NumFactoryProvider.defaultNumFactory.one() / criterion.calculate(fakeRecord)
         }
-        
-        val beginTime = positions.first().entry!!.whenExecuted
-        val endTime = positions.last().exit!!.whenExecuted
-        val fakeRecord = createEnterAndHoldTradingRecord(beginTime, endTime)
+
         return criterion.calculate(tradingRecord) / criterion.calculate(fakeRecord)
     }
 

@@ -119,6 +119,10 @@ class TradingRecordTestContext {
         return this
     }
 
+    fun fastForwardToTheEnd() = apply {
+        marketEvenTestContext!!.fastForwardToTheEnd()
+    }
+
     fun withResolution(resolution: ChronoUnit): TradingRecordTestContext {
         this.resolution = resolution
         return this

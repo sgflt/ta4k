@@ -49,7 +49,7 @@ class ReturnCriterion : AnalysisCriterion {
      * Constructor with [.addBase] == true.
      */
     constructor() {
-        this.addBase = true
+        addBase = true
     }
 
 
@@ -64,7 +64,7 @@ class ReturnCriterion : AnalysisCriterion {
 
 
     override fun calculate(position: Position): Num {
-        return calculateProfit(position)!!
+        return calculateProfit(position)
     }
 
 
@@ -73,7 +73,7 @@ class ReturnCriterion : AnalysisCriterion {
             .map { calculateProfit(it) }
             .fold(defaultNumFactory.one()) { acc, multiplicand -> acc * multiplicand }
 
-        return product.minus(if (addBase) defaultNumFactory.zero() else defaultNumFactory.one())
+        return product - (if (addBase) defaultNumFactory.zero() else defaultNumFactory.one())
     }
 
 
