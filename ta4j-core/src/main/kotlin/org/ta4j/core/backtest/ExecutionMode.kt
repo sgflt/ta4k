@@ -23,31 +23,20 @@
  */
 package org.ta4j.core.backtest
 
-import org.ta4j.core.num.Num
-import org.ta4j.core.strategy.RuntimeContext
-
 /**
- * An execution model for [BacktestExecutor] objects.
- *
- * Used for backtesting. Instructs [BacktestExecutor] on how to execute
- * trades.
+ * Defines when and how trades should be executed during backtesting.
  */
-interface TradeExecutionModel {
+enum class ExecutionMode {
     /**
-     * Executes a trade in the given `tradingRecord`.
-     *
-     * @param runtimeContext with current time and price data
-     * @param tradingRecord the trading record to place the trade
-     * @param amount the trade amount
+     * Execute trades immediately at the current bar's close price.
+     * This is the default behavior.
      */
-    fun enter(runtimeContext: RuntimeContext, tradingRecord: TradingRecord, amount: Num)
+    CURRENT_CLOSE,
 
     /**
-     * Executes a trade in the given `tradingRecord`.
-     *
-     * @param runtimeContext with current time and price data
-     * @param tradingRecord the trading record to place the trade
-     * @param amount the trade amount
+     * Execute trades at the next bar's open price.
+     * Trades are queued when signals are generated and executed
+     * when the next bar arrives.
      */
-    fun exit(runtimeContext: RuntimeContext, tradingRecord: TradingRecord, amount: Num)
+    NEXT_OPEN
 }

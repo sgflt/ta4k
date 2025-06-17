@@ -16,43 +16,37 @@ class BacktestExecutorBuilder {
     private var transactionCostModel: CostModel = ZeroCostModel
     private var holdingCostModel: CostModel = ZeroCostModel
 
-    /** The trade execution model to use  */
-    private var tradeExecutionModel: TradeExecutionModel = TradeOnCurrentCloseModel()
+    /** The execution mode to use  */
+    private var executionMode: ExecutionMode = ExecutionMode.CURRENT_CLOSE
 
 
-    fun numFactory(numFactory: NumFactory): BacktestExecutorBuilder {
+    fun numFactory(numFactory: NumFactory): BacktestExecutorBuilder = apply {
         this.numFactory = numFactory
         defaultNumFactory = numFactory
-        return this
     }
 
 
-    fun transactionCostModel(transactionCostModel: CostModel): BacktestExecutorBuilder {
+    fun transactionCostModel(transactionCostModel: CostModel): BacktestExecutorBuilder = apply {
         this.transactionCostModel = transactionCostModel
-        return this
     }
 
 
-    fun holdingCostModel(holdingCostModel: CostModel): BacktestExecutorBuilder {
+    fun holdingCostModel(holdingCostModel: CostModel): BacktestExecutorBuilder = apply {
         this.holdingCostModel = holdingCostModel
-        return this
     }
 
 
-    fun tradeExecutionModel(tradeExecutionModel: TradeExecutionModel): BacktestExecutorBuilder {
-        this.tradeExecutionModel = tradeExecutionModel
-        return this
+    fun executionMode(executionMode: ExecutionMode): BacktestExecutorBuilder = apply {
+        this.executionMode = executionMode
     }
 
 
-    fun build(): BacktestExecutor {
-        return BacktestExecutor(
-            BacktestConfiguration(
-                this.numFactory,
-                this.transactionCostModel,
-                this.holdingCostModel,
-                this.tradeExecutionModel
-            )
+    fun build(): BacktestExecutor = BacktestExecutor(
+        BacktestConfiguration(
+            this.numFactory,
+            this.transactionCostModel,
+            this.holdingCostModel,
+            this.executionMode
         )
-    }
+    )
 }

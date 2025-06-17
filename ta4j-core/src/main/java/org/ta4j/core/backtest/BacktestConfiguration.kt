@@ -9,5 +9,5 @@ data class BacktestConfiguration(
     val numFactory: NumFactory,
     val transactionCostModel: CostModel = ZeroCostModel,
     val holdingCostModel: CostModel = ZeroCostModel,
-    val tradeExecutionModel: TradeExecutionModel = TradeOnCurrentCloseModel(),
+    val executionMode: ExecutionMode = ExecutionMode.CURRENT_CLOSE,
 )

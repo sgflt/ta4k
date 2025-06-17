@@ -97,6 +97,7 @@ class BacktestExecutor internal constructor(private val configuration: BacktestC
         private val tickListeners = mutableListOf<TickListener>()
         private val strategy: BacktestStrategy = createStrategy(backtestRun)
         private lateinit var runtimeContext: RuntimeContext
+        private lateinit var pendingOrderManager: PendingOrderManager
 
         private fun createStrategy(backtestRun: BacktestRun): BacktestStrategy {
             val strategyFactory = backtestRun.strategyFactory
@@ -122,6 +123,11 @@ class BacktestExecutor internal constructor(private val configuration: BacktestC
             }
 
             this.runtimeContext = runtimeContext
+            this.pendingOrderManager = PendingOrderManager(
+                strategy.tradeRecord,
+                configuration.executionMode,
+                configuration.numFactory
+            )
             tickListeners.add(strategy)
             tickListeners.add(runtimeContext)
             return strategy
@@ -147,21 +153,28 @@ class BacktestExecutor internal constructor(private val configuration: BacktestC
 
         override fun onCandle(event: CandleReceived) {
             multiTimeFrameSeries.onCandle(event)
-            reevaluate(amount)
+
+            // Process pending orders first (for NEXT_OPEN mode)
+            pendingOrderManager.processPendingOrders(event)
+
+            // Evaluate strategy for new signals
+            evaluateStrategy(event)
+
+            // Process pending orders again (for CURRENT_CLOSE mode - triggers immediately)
+            pendingOrderManager.processPendingOrders(event)
         }
 
-        private fun reevaluate(amount: Num) {
-            val tradeExecutionModel = configuration.tradeExecutionModel
+        private fun evaluateStrategy(event: MarketEvent) {
             when (strategy.shouldOperate()) {
-                OperationType.ENTER -> tradeExecutionModel.enter(
-                    runtimeContext,
-                    strategy.tradeRecord,
+                OperationType.ENTER -> pendingOrderManager.createOrder(
+                    OperationType.ENTER,
+                    event,
                     amount
                 )
 
-                OperationType.EXIT -> tradeExecutionModel.exit(
-                    runtimeContext,
-                    strategy.tradeRecord,
+                OperationType.EXIT -> pendingOrderManager.createOrder(
+                    OperationType.EXIT,
+                    event,
                     amount
                 )
 
@@ -171,7 +184,15 @@ class BacktestExecutor internal constructor(private val configuration: BacktestC
 
         override fun onTick(event: TickReceived) {
             tickListeners.forEach { it.onTick(event) }
-            reevaluate(amount)
+
+            // Process pending orders first (for NEXT_OPEN mode)
+            pendingOrderManager.processPendingOrders(event)
+
+            // Evaluate strategy for new signals
+            evaluateStrategy(event)
+
+            // Process pending orders again (for CURRENT_CLOSE mode - triggers immediately)
+            pendingOrderManager.processPendingOrders(event)
         }
 
 
