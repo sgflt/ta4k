@@ -71,12 +71,20 @@ class JdbcBarsLoaderTest {
               """.formatted(timestamp));
     }
 
-    final var series = JdbcBarsLoader.load(JdbcContext.builder()
-        .connection(this.connection)
-        .tableName("OHLC")
-        .asset("GOLD")
-        .resolution("1m")
-        .build());
+    final var series = JdbcBarsLoader.INSTANCE.load(new JdbcContext(
+        this.connection,
+        "OHLC",
+        "TIMESTAMP",
+        "GOLD",
+        "ASSET",
+        "1m",
+        "RESOLUTION",
+        "OPEN",
+        "HIGH",
+        "LOW",
+        "CLOSE",
+        "VOLUME",
+        "TIMESTAMP"));
 
     assertThat(series.getBarCount()).isEqualTo(1);
   }
