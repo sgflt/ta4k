@@ -44,7 +44,7 @@ import org.ta4j.core.num.Num
 class SimpleLinearRegressionIndicator @JvmOverloads constructor(
     private val indicator: NumericIndicator,
     private val barCount: Int,
-    private val type: SimpleLinearRegressionType? = SimpleLinearRegressionType.Y,
+    private val type: SimpleLinearRegressionType = SimpleLinearRegressionType.Y,
 ) : NumericIndicator(indicator.numFactory) {
     private val window = ArrayDeque<XY>(barCount)
     private var sumX = numFactory.zero()
@@ -54,6 +54,7 @@ class SimpleLinearRegressionIndicator @JvmOverloads constructor(
     private var barsPassed = 0
 
     private fun calculate(): Num {
+        calculateRegressionLine()
         return when (type) {
             SimpleLinearRegressionType.SLOPE -> slope
             SimpleLinearRegressionType.INTERCEPT -> intercept
