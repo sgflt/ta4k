@@ -23,67 +23,48 @@
  */
 package org.ta4j.csv
 
-import com.opencsv.CSVParserBuilder
-import com.opencsv.CSVReaderBuilder
-import com.opencsv.exceptions.CsvValidationException
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
-import org.ta4j.core.events.CandleReceived
-import org.ta4j.core.indicators.TimeFrame
-import org.ta4j.core.utils.TimeFrameMapping
-import java.io.IOException
 import java.io.Reader
 import java.nio.file.Files
 import java.nio.file.Path
 import java.time.Instant
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
+import com.opencsv.CSVParserBuilder
+import com.opencsv.CSVReaderBuilder
+import org.ta4j.core.events.CandleReceived
+import org.ta4j.core.indicators.TimeFrame
+import org.ta4j.core.utils.TimeFrameMapping
 
 /**
  * This class build a Ta4j bar series from a CSV file containing bars.
  */
-object CsvBarsLoader {
-    private val LOG: Logger = LoggerFactory.getLogger(CsvBarsLoader::class.java)
-
+object MarketEventsLoader {
     private val DATE_FORMAT: DateTimeFormatter = DateTimeFormatter.ISO_DATE_TIME
 
 
-    fun load(filename: Path): MutableList<CandleReceived?> {
-        val candles = ArrayList<CandleReceived?>()
-
-        try {
-            Files.newBufferedReader(filename).use { stream ->
-                readCsv(stream, candles)
-            }
-        } catch (ioe: IOException) {
-            LOG.error("Unable to load bars from CSV", ioe)
-        } catch (nfe: NumberFormatException) {
-            LOG.error("Error while parsing value", nfe)
+    fun load(filename: Path): List<CandleReceived> {
+        Files.newBufferedReader(filename).use { stream ->
+            return readCsv(stream)
         }
-        return candles
     }
 
 
-    private fun readCsv(reader: Reader, candleEvents: MutableList<CandleReceived?>) {
-        try {
-            CSVReaderBuilder(reader)
-                .withCSVParser(CSVParserBuilder().withSeparator(',').build())
-                .withSkipLines(1)
-                .build().use { csvReader ->
-                    csvReader.forEach { line ->
-                        val date = ZonedDateTime.parse(line[0], DATE_FORMAT).toInstant()
-                        val open = line[1].toDouble()
-                        val high = line[2].toDouble()
-                        val low = line[3].toDouble()
-                        val close = line[4].toDouble()
-                        val volume = line[5].toDouble()
+    private fun readCsv(reader: Reader): List<CandleReceived> {
+        return CSVReaderBuilder(reader)
+            .withCSVParser(CSVParserBuilder().withSeparator(',').build())
+            .withSkipLines(1)
+            .build().use { csvReader ->
+                csvReader.map { line ->
+                    val date = ZonedDateTime.parse(line[0], DATE_FORMAT).toInstant()
+                    val open = line[1].toDouble()
+                    val high = line[2].toDouble()
+                    val low = line[3].toDouble()
+                    val close = line[4].toDouble()
+                    val volume = line[5].toDouble()
 
-                        candleEvents.add(createCandle(date, open, high, low, close, volume))
-                    }
-                }
-        } catch (e: CsvValidationException) {
-            LOG.error("Unable to load bars from CSV. File is not valid csv.", e)
-        }
+                    createCandle(date, open, high, low, close, volume)
+                }.toList()
+            }
     }
 
 
