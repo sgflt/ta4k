@@ -259,12 +259,12 @@ class MarketEventTestContext {
     }
 
 
-    fun assertIsStable() {
+    fun assertIsStable() = also {
         val indicator = getAnyIndicator()
         assertThat(indicator?.isStable).isTrue()
     }
 
-    fun assertIsUnStable() {
+    fun assertIsUnStable() = also {
         val indicator = getAnyIndicator()
         assertThat(indicator?.isStable).isFalse()
     }
