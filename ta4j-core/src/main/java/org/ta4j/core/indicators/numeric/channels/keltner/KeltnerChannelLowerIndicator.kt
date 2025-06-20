@@ -25,10 +25,10 @@ package org.ta4j.core.indicators.numeric.channels.keltner
 
 import org.ta4j.core.api.Indicators.atr
 import org.ta4j.core.api.series.Bar
-import org.ta4j.core.api.series.BarSeries
 import org.ta4j.core.indicators.numeric.NumericIndicator
 import org.ta4j.core.indicators.numeric.momentum.ATRIndicator
 import org.ta4j.core.num.Num
+import org.ta4j.core.num.NumFactory
 
 /**
  * Keltner Channel (lower line) indicator.
@@ -36,12 +36,12 @@ import org.ta4j.core.num.Num
  * @see [
  * http://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:keltner_channels](http://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:keltner_channels)
  */
-class KeltnerChannelLowerIndicator(
-    series: BarSeries,
+class KeltnerChannelLowerIndicator private constructor(
+    numFactory: NumFactory,
     private val keltnerMiddleIndicator: KeltnerChannelMiddleIndicator,
     private val averageTrueRangeIndicator: ATRIndicator,
     ratio: Double,
-) : NumericIndicator(series.numFactory) {
+) : NumericIndicator(numFactory) {
     private val ratio = numFactory.numOf(ratio)
 
 
@@ -53,11 +53,11 @@ class KeltnerChannelLowerIndicator(
      * @param barCountATR the bar count for the [ATRIndicator]
      */
     constructor(
-        series: BarSeries,
+        numFactory: NumFactory,
         middle: KeltnerChannelMiddleIndicator,
         ratio: Double,
         barCountATR: Int,
-    ) : this(series, middle, atr(barCountATR), ratio)
+    ) : this(numFactory, middle, atr(barCountATR), ratio)
 
 
     private fun calculate(): Num {
