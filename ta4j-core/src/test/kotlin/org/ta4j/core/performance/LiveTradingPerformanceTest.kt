@@ -37,39 +37,12 @@ import org.openjdk.jmh.annotations.Setup
 import org.openjdk.jmh.annotations.State
 import org.openjdk.jmh.annotations.Warmup
 import org.ta4j.core.MarketEventTestContext
+import org.ta4j.core.api.Indicators
 import org.ta4j.core.events.CandleReceived
 import org.ta4j.core.indicators.IndicatorContext
 import org.ta4j.core.indicators.IndicatorContexts
 import org.ta4j.core.indicators.TimeFrame
 import org.ta4j.core.indicators.numeric.NumericIndicator
-import org.ta4j.core.indicators.numeric.average.DoubleEMAIndicator
-import org.ta4j.core.indicators.numeric.average.EMAIndicator
-import org.ta4j.core.indicators.numeric.average.HMAIndicator
-import org.ta4j.core.indicators.numeric.average.LWMAIndicator
-import org.ta4j.core.indicators.numeric.average.MMAIndicator
-import org.ta4j.core.indicators.numeric.average.SMAIndicator
-import org.ta4j.core.indicators.numeric.average.TripleEMAIndicator
-import org.ta4j.core.indicators.numeric.average.WMAIndicator
-import org.ta4j.core.indicators.numeric.average.ZLEMAIndicator
-import org.ta4j.core.indicators.numeric.candles.price.ClosePriceIndicator
-import org.ta4j.core.indicators.numeric.candles.price.HighPriceIndicator
-import org.ta4j.core.indicators.numeric.candles.price.LowPriceIndicator
-import org.ta4j.core.indicators.numeric.candles.price.MedianPriceIndicator
-import org.ta4j.core.indicators.numeric.candles.price.OpenPriceIndicator
-import org.ta4j.core.indicators.numeric.candles.price.TypicalPriceIndicator
-import org.ta4j.core.indicators.numeric.momentum.ROCIndicator
-import org.ta4j.core.indicators.numeric.momentum.RSIIndicator
-import org.ta4j.core.indicators.numeric.oscillators.CMOIndicator
-import org.ta4j.core.indicators.numeric.oscillators.DPOIndicator
-import org.ta4j.core.indicators.numeric.oscillators.MACDIndicator
-import org.ta4j.core.indicators.numeric.statistics.CorrelationCoefficientIndicator
-import org.ta4j.core.indicators.numeric.statistics.CovarianceIndicator
-import org.ta4j.core.indicators.numeric.statistics.MeanDeviationIndicator
-import org.ta4j.core.indicators.numeric.statistics.SigmaIndicator
-import org.ta4j.core.indicators.numeric.statistics.SimpleLinearRegressionIndicator
-import org.ta4j.core.indicators.numeric.statistics.StandardDeviationIndicator
-import org.ta4j.core.indicators.numeric.statistics.StandardErrorIndicator
-import org.ta4j.core.indicators.numeric.statistics.VarianceIndicator
 import org.ta4j.core.num.DoubleNumFactory
 import org.ta4j.core.strategy.configuration.StrategyConfiguration
 import org.ta4j.core.trading.live.LiveTrading
@@ -151,17 +124,19 @@ open class LiveTradingPerformanceTest {
             .withNumFactory(numFactory)
             .withDefaultMarketEvents()
         
-        val series = context.barSeries
+        // Create indicators using Indicators factory and fluent API
+        val factory = Indicators.extended(numFactory)
         
-        // Create basic price indicators - using correct constructors
-        val closePrice = ClosePriceIndicator(numFactory)
-        val highPrice = HighPriceIndicator(numFactory)
-        val lowPrice = LowPriceIndicator(numFactory)
-        val openPrice = OpenPriceIndicator(numFactory)
-        val typicalPrice = TypicalPriceIndicator(numFactory)
-        val medianPrice = MedianPriceIndicator(numFactory)
+        // Basic price indicators using factory methods
+        val closePrice = factory.closePrice()
+        val highPrice = factory.highPrice()
+        val lowPrice = factory.lowPrice()
+        val openPrice = factory.openPrice()
+        val typicalPrice = factory.typicalPrice()
+        val medianPrice = factory.medianPrice()
+        val volume = factory.volume()
         
-        // Create a selection of working indicators with barLength 200
+        // Create comprehensive indicator set using fluent API and factory methods
         indicators = listOf(
             // Price indicators
             closePrice,
@@ -170,36 +145,96 @@ open class LiveTradingPerformanceTest {
             openPrice,
             typicalPrice,
             medianPrice,
+            volume,
             
-            // Moving averages - these are known to work
-            SMAIndicator(closePrice, barLength),
-            EMAIndicator(closePrice, barLength),
-            WMAIndicator(closePrice, barLength),
-            LWMAIndicator(closePrice, barLength),
-            HMAIndicator(closePrice, barLength),
-            MMAIndicator(closePrice, barLength),
-            DoubleEMAIndicator(closePrice, barLength),
-            TripleEMAIndicator(closePrice, barLength),
-            ZLEMAIndicator(closePrice, barLength),
+            // Moving averages using fluent API
+            closePrice.sma(barLength),
+            closePrice.ema(barLength),
+            closePrice.wma(barLength),
+            closePrice.lwma(barLength),
+            closePrice.hma(barLength),
+            closePrice.mma(barLength),
+            closePrice.doubleEMA(barLength),
+            closePrice.tripleEma(barLength),
+            closePrice.zlema(barLength),
             
-            // Momentum indicators
-            RSIIndicator(closePrice, barLength),
-            ROCIndicator(numFactory, closePrice, barLength),
+            // Momentum indicators using fluent API
+            closePrice.rsi(barLength),
+            closePrice.roc(barLength),
             
-            // Oscillators
-            MACDIndicator(numFactory, closePrice, 12, 26),
-            CMOIndicator(numFactory, closePrice, barLength),
-            DPOIndicator(numFactory, closePrice, barLength),
+            // Oscillators using factory and fluent API
+            closePrice.macd(12, 26),
+            closePrice.cmo(barLength),
+            closePrice.dpo(barLength),
             
-            // Statistics
-            StandardDeviationIndicator(closePrice, barLength),
-            VarianceIndicator(closePrice, barLength),
-            StandardErrorIndicator(closePrice, barLength),
-            MeanDeviationIndicator(closePrice, barLength),
-            SigmaIndicator(closePrice, barLength),
-            CovarianceIndicator(closePrice, highPrice, barLength),
-            CorrelationCoefficientIndicator(closePrice, highPrice, barLength),
-            SimpleLinearRegressionIndicator(closePrice, barLength)
+            // Statistics using fluent API
+            closePrice.stddev(barLength),
+            closePrice.variance(barLength),
+            closePrice.stderr(barLength),
+            closePrice.meanDeviation(barLength),
+            closePrice.sigma(barLength),
+            closePrice.covariance(highPrice, barLength),
+            closePrice.simpleLinearRegression(barLength),
+            
+            // Volume indicators using factory methods
+            factory.obv(),
+            factory.accDist(),
+            factory.mfi(barLength),
+            factory.pvi(),
+            factory.vwap(barLength),
+            factory.mvwap(barLength, barLength),
+            factory.chaikinMoneyFlow(barLength),
+            factory.chaikinOscillator(3, 10),
+            factory.iii(),
+            factory.pvo(barLength, 12, 26),
+            factory.rocv(barLength),
+            
+            // Technical indicators using factory methods
+            factory.williamsR(barLength),
+            factory.massIndex(25, barLength),
+            factory.cci(barLength),
+            factory.superTrend(barLength, 3.0),
+            factory.parabolicSAR(),
+            factory.chop(barLength),
+            factory.fisher(barLength),
+            factory.atr(barLength),
+            factory.adx(barLength),
+            factory.plusDMI(),
+            factory.minusDMI(),
+            factory.plusDII(barLength),
+            factory.minusDII(barLength),
+            factory.aroonUp(barLength),
+            factory.aroonDown(barLength),
+            factory.aroonOscillator(barLength),
+            factory.stochasticKOscillator(barLength),
+            factory.stochasticOscillator(barLength),
+            factory.awesomeOscillator(5, 34),
+            factory.rwiHigh(barLength),
+            factory.rwiLow(barLength),
+            
+            // Candle indicators
+            factory.realBody(),
+            factory.lowerShadow(),
+            factory.upperShadow(),
+            factory.closeLocationValue(),
+            
+            // Helper indicators using fluent API
+            closePrice.highest(barLength),
+            closePrice.lowest(barLength),
+            closePrice.runningTotal(barLength),
+            closePrice.gain(),
+            closePrice.loss(),
+            closePrice.distance(),
+            closePrice.ulcer(barLength),
+            closePrice.ravi(7, 65),
+            
+            // Channel indicators using factory methods
+            factory.bollingerBands(barLength, 2.0).upper,
+            factory.bollingerBands(barLength, 2.0).middle,
+            factory.bollingerBands(barLength, 2.0).lower,
+            factory.donchianChannel(barLength).upper,
+            factory.donchianChannel(barLength).middle,
+            factory.donchianChannel(barLength).lower
         )
         
         // Add indicators to test context for proper initialization
@@ -207,8 +242,8 @@ open class LiveTradingPerformanceTest {
             context.withIndicator(indicator)
         }
         
-        // Fast forward to populate some initial data
-        context.fastForward(50)
+        // Fast forward to populate initial data
+        context.fastForwardUntilStable()
     }
     
 
