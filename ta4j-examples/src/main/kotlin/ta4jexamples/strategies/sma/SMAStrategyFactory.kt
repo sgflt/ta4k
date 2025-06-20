@@ -34,7 +34,7 @@ import org.ta4j.core.strategy.configuration.StrategyConfiguration
 import org.ta4j.core.strategy.rules.OverIndicatorRule
 import org.ta4j.core.strategy.rules.UnderIndicatorRule
 
-class SMAtrategyFactory(private val timeFrame: TimeFrame) : StrategyFactory<Strategy> {
+class SMAStrategyFactory(private val timeFrame: TimeFrame) : StrategyFactory<Strategy> {
 
     override val tradeType: TradeType = TradeType.BUY
 

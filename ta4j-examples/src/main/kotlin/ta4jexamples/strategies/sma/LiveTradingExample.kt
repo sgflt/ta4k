@@ -47,7 +47,7 @@ object LiveTradingExample {
 
         val liveTrading = LiveTradingBuilder()
             .withName("Live Trading Example")
-            .withStrategyFactory(SMAtrategyFactory(timeFrame))
+            .withStrategyFactory(SMAStrategyFactory(timeFrame))
             .withConfiguration(StrategyConfiguration())
             .build()
 
