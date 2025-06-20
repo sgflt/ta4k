@@ -25,9 +25,8 @@ package org.ta4j.core.indicators.numeric.channels.keltner
 
 import org.ta4j.core.api.Indicators.typicalPrice
 import org.ta4j.core.api.series.Bar
-import org.ta4j.core.api.series.BarSeries
 import org.ta4j.core.indicators.numeric.NumericIndicator
-import org.ta4j.core.indicators.numeric.average.EMAIndicator
+import org.ta4j.core.num.NumFactory
 
 /**
  * Keltner Channel (middle line) indicator.
@@ -35,19 +34,13 @@ import org.ta4j.core.indicators.numeric.average.EMAIndicator
  * @see [
  * http://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:keltner_channels](http://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:keltner_channels)
  */
-class KeltnerChannelMiddleIndicator(indicator: NumericIndicator, barCountEMA: Int) :
-    NumericIndicator(indicator.numFactory) {
-    private val emaIndicator = EMAIndicator(indicator, barCountEMA)
-
-
-    /**
-     * Constructor.
-     *
-     * @param series the bar series
-     * @param barCountEMA the bar count for the [EMAIndicator]
-     */
-    constructor(series: BarSeries?, barCountEMA: Int) : this(typicalPrice(), barCountEMA)
-
+class KeltnerChannelMiddleIndicator(
+    numFactory: NumFactory,
+    indicator: NumericIndicator = typicalPrice(),
+    barCountEMA: Int,
+) :
+    NumericIndicator(numFactory) {
+    private val emaIndicator = indicator.ema(barCountEMA)
 
     private fun calculate() = emaIndicator.value
 

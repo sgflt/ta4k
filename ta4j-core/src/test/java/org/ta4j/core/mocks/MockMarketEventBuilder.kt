@@ -156,6 +156,7 @@ class MockMarketEventBuilder {
         private var close = 0.0
         private var high = 0.0
         private var low = 0.0
+        private var volume = 0.0
         private var timeFrame = this@MockMarketEventBuilder.timeFrame
 
 
@@ -184,6 +185,11 @@ class MockMarketEventBuilder {
         }
 
 
+        fun volume(volume: Double): MockCandleBuilder = apply {
+            this.volume = volume
+        }
+
+
         fun add(): MockMarketEventBuilder {
             this@MockMarketEventBuilder.candleEvents.add(
                 CandleReceived(
@@ -194,7 +200,7 @@ class MockMarketEventBuilder {
                     closePrice = close,
                     highPrice = high,
                     lowPrice = low,
-                    volume = 0.0
+                    volume = volume
                 )
             )
             return this@MockMarketEventBuilder
