@@ -1,8 +1,7 @@
 /*
  * The MIT License (MIT)
  *
- * Copyright (c) 2017-2023 Ta4j Organization & respective
- * authors (see AUTHORS)
+ * Copyright (c) 2017-2025 Ta4j Organization & respective authors (see AUTHORS)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -21,7 +20,7 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.ta4j.core.indicators.numeric.adx
+package org.ta4j.core.indicators.numeric.momentum.adx
 
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.data.Offset
@@ -30,7 +29,6 @@ import org.junit.jupiter.params.provider.MethodSource
 import org.ta4j.core.MarketEventTestContext
 import org.ta4j.core.TestUtils.GENERAL_OFFSET
 import org.ta4j.core.XlsTestsUtils
-import org.ta4j.core.indicators.numeric.momentum.adx.PlusDIIndicator
 import org.ta4j.core.num.NumFactory
 
 class PlusDIIndicatorTest {
