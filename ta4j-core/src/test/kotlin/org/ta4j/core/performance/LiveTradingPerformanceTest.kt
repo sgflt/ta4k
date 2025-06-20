@@ -83,7 +83,7 @@ open class LiveTradingPerformanceTest {
             .build()
         
         // Generate candle events for simulation
-        candleEvents = generateCandleEvents(1000, timeFrame)
+        candleEvents = generateCandleEvents(100000, timeFrame)
         
         // Setup indicators using MarketEventTestContext for proper initialization
         setupIndicators(barLength, numFactory)
