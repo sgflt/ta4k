@@ -23,10 +23,7 @@
 package org.ta4j.core.indicators.numeric.average
 
 import org.ta4j.core.api.series.Bar
-import org.ta4j.core.indicators.helpers.DifferenceIndicator
 import org.ta4j.core.indicators.numeric.NumericIndicator
-import org.ta4j.core.indicators.numeric.helpers.RunningTotalIndicator
-import org.ta4j.core.indicators.numeric.helpers.TransformIndicator.Companion.abs
 import org.ta4j.core.num.Num
 import org.ta4j.core.num.NumFactory
 
@@ -45,8 +42,7 @@ class KAMAIndicator @JvmOverloads constructor(
 ) : NumericIndicator(price.numFactory) {
     private val fastest: Num
     private val slowest: Num
-    private val previousVolatilities =
-        RunningTotalIndicator(numFactory, abs(DifferenceIndicator(price)), barCountEffectiveRatio)
+    private val previousVolatilities = price.difference().abs().runningTotal(barCountEffectiveRatio)
     private val priceAtStartOfRange = price.previous(barCountEffectiveRatio)
     private var barsPassed = 0
 

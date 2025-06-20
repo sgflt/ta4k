@@ -26,7 +26,6 @@ import org.ta4j.core.api.Indicator
 import org.ta4j.core.api.series.Bar
 import org.ta4j.core.indicators.helpers.previous.PreviousNumericValueIndicator
 import org.ta4j.core.indicators.numeric.NumericIndicator
-import org.ta4j.core.indicators.numeric.operation.CombineIndicator
 import org.ta4j.core.num.Num
 import org.ta4j.core.num.NumFactory
 
@@ -48,7 +47,7 @@ class InSlopeIndicator(
     /** The maximum slope between ref and prev.  */
     private val maxSlope: Num,
 ) : BooleanIndicator() {
-    private val diff = CombineIndicator.minus(ref, PreviousNumericValueIndicator(numFactory, ref, nthPrevious))
+    private val diff = ref.minus(PreviousNumericValueIndicator(numFactory, ref, nthPrevious))
 
     private fun calculate(): Boolean {
         val difference = diff.value

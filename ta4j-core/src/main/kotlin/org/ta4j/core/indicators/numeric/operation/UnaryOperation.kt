@@ -70,7 +70,7 @@ class UnaryOperation private constructor(
          * @see Num.sqrt
          */
         @JvmStatic
-        fun sqrt(operand: NumericIndicator) = UnaryOperation(UnaryOperator { it.sqrt() }, operand)
+        fun sqrt(operand: NumericIndicator) = UnaryOperation({ it.sqrt() }, operand)
 
 
         /**
@@ -84,6 +84,37 @@ class UnaryOperation private constructor(
          * @see Num.abs
          */
         @JvmStatic
-        fun abs(operand: NumericIndicator) = UnaryOperation(UnaryOperator { it.abs() }, operand)
+        fun abs(operand: NumericIndicator) = UnaryOperation({ it.abs() }, operand)
+
+        /**
+         * Returns an `Indicator` whose value is `operand^coefficient`.
+         *
+         * @param operand the operand indicator
+         * @param coefficient the power coefficient
+         *
+         * @return `operand^coefficient`
+         *
+         * @see Num.pow
+         */
+        @JvmStatic
+        fun pow(operand: NumericIndicator, coefficient: Number): UnaryOperation {
+            val numCoefficient = operand.numFactory.numOf(coefficient)
+            return UnaryOperation({ it.pow(numCoefficient) }, operand)
+        }
+
+        /**
+         * Returns an `Indicator` whose value is `log(operand)`.
+         *
+         * @param operand the operand indicator
+         *
+         * @return `log(operand)`
+         *
+         * @apiNote precision may be lost, because this implementation is using the
+         * underlying doubleValue method
+         */
+        @JvmStatic
+        fun log(operand: NumericIndicator): UnaryOperation {
+            return UnaryOperation({ operand.numFactory.numOf(kotlin.math.ln(it.doubleValue())) }, operand)
+        }
     }
 }

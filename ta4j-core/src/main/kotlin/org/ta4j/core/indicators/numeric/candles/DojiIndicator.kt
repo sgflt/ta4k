@@ -25,7 +25,6 @@ package org.ta4j.core.indicators.numeric.candles
 import org.ta4j.core.api.Indicators.realBody
 import org.ta4j.core.api.series.Bar
 import org.ta4j.core.indicators.bool.BooleanIndicator
-import org.ta4j.core.indicators.numeric.helpers.TransformIndicator.Companion.abs
 import org.ta4j.core.num.NumFactory
 
 /**
@@ -41,7 +40,7 @@ import org.ta4j.core.num.NumFactory
  */
 class DojiIndicator(numFactory: NumFactory, barCount: Int, bodyFactor: Double) : BooleanIndicator() {
     /** Body height.  */
-    private val bodyHeightInd = abs(realBody())
+    private val bodyHeightInd = realBody().abs()
 
     /** Average body height.  */
     private val averageBodyHeightInd = bodyHeightInd.sma(barCount).previous()

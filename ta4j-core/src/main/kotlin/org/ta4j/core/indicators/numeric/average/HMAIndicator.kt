@@ -24,8 +24,6 @@ package org.ta4j.core.indicators.numeric.average
 
 import org.ta4j.core.api.series.Bar
 import org.ta4j.core.indicators.numeric.NumericIndicator
-import org.ta4j.core.indicators.numeric.helpers.TransformIndicator.Companion.multiply
-import org.ta4j.core.indicators.numeric.operation.CombineIndicator
 import org.ta4j.core.num.Num
 
 /**
@@ -48,7 +46,7 @@ class HMAIndicator(indicator: NumericIndicator, private val barCount: Int) : Num
         val halfWma = indicator.wma(barCount / 2)
         val origWma = indicator.wma(barCount)
 
-        val indicatorForSqrtWma = CombineIndicator.minus(multiply(halfWma, 2), origWma)
+        val indicatorForSqrtWma = halfWma.multipliedBy(2).minus(origWma)
         sqrtWma = indicatorForSqrtWma.wma(numFactory.numOf(barCount).sqrt().intValue())
     }
 
