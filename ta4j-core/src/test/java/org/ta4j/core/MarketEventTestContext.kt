@@ -201,6 +201,10 @@ class MarketEventTestContext {
         return indicatorContext.getNumericIndicator(indicatorName)
     }
 
+    private fun getBooleanIndicator(indicatorName: IndicatorIdentification): BooleanIndicator? {
+        return indicatorContext.getBooleanIndicator(indicatorName)
+    }
+
 
     fun assertNext(expected: Double): MarketEventTestContext = apply {
         assertNext(firstNumericIndicator!!, expected)
@@ -288,6 +292,18 @@ class MarketEventTestContext {
         fun assertCurrent(expected: Double): IndicatorAsserts = apply {
             this@MarketEventTestContext.assertCurrent(getNumericIndicator(indicatorId)!!, expected)
         }
+
+
+        fun assertCurrentTrue() = apply {
+            val indicator = getBooleanIndicator(indicatorId)
+            assertThat(indicator?.value).isTrue()
+        }
+
+        fun assertCurrentFalse() = apply {
+            val indicator = getBooleanIndicator(indicatorId)
+            assertThat(indicator?.value).isFalse()
+        }
+
     }
 
     companion object {
