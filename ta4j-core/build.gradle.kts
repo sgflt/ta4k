@@ -1,5 +1,4 @@
 plugins {
-    `java-library`
 }
 
 description = "ta4j is a Java library providing a simple API for technical analysis."
@@ -32,26 +31,6 @@ dependencies {
     testImplementation(libs.poi)
 }
 
-// Configure source sets for mixed Java/Kotlin sources
-sourceSets {
-    main {
-        java {
-            srcDirs("src/main/java")
-        }
-        kotlin {
-            srcDirs("src/main/java")
-        }
-    }
-    test {
-        java {
-            srcDirs("src/test/java")
-        }
-        kotlin {
-            srcDirs("src/test/java")
-        }
-    }
-}
-
 tasks.jar {
     manifest {
         attributes(
@@ -65,7 +44,7 @@ tasks.jar {
 // Configure test logging
 tasks.test {
     useJUnitPlatform {
-        includeEngines("junit-jupiter", "junit-vintage")
+        includeEngines("junit-jupiter")
     }
 
     testLogging {
