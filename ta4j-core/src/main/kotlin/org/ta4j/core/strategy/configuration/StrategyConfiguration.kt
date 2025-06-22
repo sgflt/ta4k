@@ -23,56 +23,41 @@
 package org.ta4j.core.strategy.configuration
 
 import java.math.BigDecimal
-import java.util.*
-import lombok.ToString
-import org.ta4j.core.num.Num
 
-@ToString
 class StrategyConfiguration : Iterable<Parameter> {
-    private val parameters: MutableMap<ParameterName, Number> = HashMap<ParameterName, Number>()
+    private val parameters = HashMap<ParameterName, Number>()
 
 
-    fun getInt(parameterName: ParameterName): OptionalInt {
+    fun getInt(parameterName: ParameterName): Int? {
         val value = this.parameters[parameterName]
 
-        if (value is Int) {
-            return OptionalInt.of(value)
+        if (value is Number) {
+            return value.toInt()
         }
 
-        return OptionalInt.empty()
+        error("Parameter $parameterName is not an instance of Number")
     }
 
 
-    fun getDouble(parameterName: ParameterName): OptionalDouble {
+    fun getDouble(parameterName: ParameterName): Double? {
         val value = this.parameters[parameterName]
 
-        if (value is Double) {
-            return OptionalDouble.of(value)
+        if (value is Number) {
+            return value.toDouble()
         }
 
-        return OptionalDouble.empty()
+        error("Parameter $parameterName is not an instance of Number")
     }
 
 
-    fun getBigDecimal(parameterName: ParameterName): Optional<BigDecimal> {
+    fun getBigDecimal(parameterName: ParameterName): BigDecimal? {
         val value = this.parameters[parameterName]
 
         if (value is BigDecimal) {
-            return Optional.of<BigDecimal>(value)
+            return value
         }
 
-        return Optional.empty<BigDecimal>()
-    }
-
-
-    fun getNum(parameterName: ParameterName): Optional<Num> {
-        val value = this.parameters[parameterName]
-
-        if (value is Num) {
-            return Optional.of<Num>(value)
-        }
-
-        return Optional.empty<Num>()
+        error("Parameter $parameterName is not an instance of BigDecimal")
     }
 
 

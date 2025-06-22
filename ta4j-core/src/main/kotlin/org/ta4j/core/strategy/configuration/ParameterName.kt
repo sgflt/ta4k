@@ -22,5 +22,5 @@
  */
 package org.ta4j.core.strategy.configuration
 
-@JvmRecord
-data class ParameterName(val name: String?)
+@JvmInline
+value class ParameterName(val name: String)

@@ -144,11 +144,11 @@ internal class BacktestExecutorTest {
             val closePrice = closePrice()
             val indicatorContext = indicatorContexts.get(TimeFrame.DAY)
             indicatorContext.add(
-                closePrice.sma(configuration.getInt(ParameterName("smaFastBars")).orElse(11)),
+                closePrice.sma(configuration.getInt(ParameterName("smaFastBars")) ?: 11),
                 SMA_FAST
             )
             indicatorContext.add(
-                closePrice.sma(configuration.getInt(ParameterName("smaSlowBars")).orElse(200)),
+                closePrice.sma(configuration.getInt(ParameterName("smaSlowBars")) ?: 200),
                 SMA_SLOW
             )
 
