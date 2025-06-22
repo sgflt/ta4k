@@ -33,7 +33,8 @@ import org.ta4j.core.utils.TimeFrameMapping
  * Events are replayed to bar series that refreshes indicator context by created bar.
  */
 class MarketEventTestContext {
-    private lateinit var marketEvents: Queue<MarketEvent>
+    lateinit var marketEvents: Queue<MarketEvent>
+        private set
     private val indicatorContext: IndicatorContext = IndicatorContext.empty(TimeFrame.DAY)
 
 

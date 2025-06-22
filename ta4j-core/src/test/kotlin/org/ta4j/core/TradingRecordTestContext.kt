@@ -9,6 +9,7 @@ import org.ta4j.core.backtest.analysis.cost.CostModel
 import org.ta4j.core.backtest.analysis.cost.ZeroCostModel
 import org.ta4j.core.backtest.criteria.AnalysisCriterion
 import org.ta4j.core.backtest.strategy.BackTestTradingRecord
+import org.ta4j.core.events.MarketEvent
 import org.ta4j.core.num.NumFactory
 import org.ta4j.core.num.NumFactoryProvider
 import org.ta4j.core.strategy.RuntimeContext
@@ -60,9 +61,9 @@ class TradingRecordTestContext(
         this.criterion = criterion
     }
 
-    fun withSeriesRelatedCriterion(criterionFactory: (BacktestBarSeries) -> AnalysisCriterion): TradingRecordTestContext =
+    fun withMarketDataDependentCriterion(criterionFactory: (List<MarketEvent>) -> AnalysisCriterion): TradingRecordTestContext =
         apply {
-            criterion = criterionFactory(requireNotNull(marketEvenTestContext).barSeries)
+            criterion = criterionFactory(requireNotNull(marketEvenTestContext).marketEvents.toList())
         }
 
     fun withTransactionCostModel(transactionCostModel: CostModel): TradingRecordTestContext = apply {
