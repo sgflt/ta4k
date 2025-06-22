@@ -11,6 +11,9 @@ dependencies {
     // JSON serialization for examples
     implementation(libs.gson)
     
+    // Chart visualization
+    implementation(libs.jfreechart)
+    
     // Test dependencies
     testImplementation(libs.junit.jupiter)
     testImplementation(libs.assertj.core)
