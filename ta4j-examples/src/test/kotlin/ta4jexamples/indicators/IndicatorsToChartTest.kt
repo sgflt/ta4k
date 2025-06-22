@@ -1,7 +1,8 @@
 /*
  * The MIT License (MIT)
  *
- * Copyright (c) 2017-2025 Ta4j Organization & respective authors (see AUTHORS)
+ * Copyright (c) 2017-2025 Ta4j Organization & respective
+ * authors (see AUTHORS)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -20,7 +21,29 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.ta4j.core.strategy.configuration
+package ta4jexamples.indicators
 
-@JvmInline
-value class ParameterName(val name: String)
+import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.Test
+import ta4jexamples.loaders.MockMarketEventsLoader
+
+class IndicatorsToChartTest {
+
+    @Test
+    fun testIndicatorsToChartMain() {
+        // Test chart creation without displaying GUI (avoid headless issues)
+        val chartGenerator = IndicatorsToChart()
+        val marketEvents = MockMarketEventsLoader.loadMarketEvents()
+
+        chartGenerator.use { generator ->
+            marketEvents.forEach { event ->
+                generator.processMarketEvent(event)
+            }
+            
+            // Test chart creation instead of display
+            val chart = generator.createChart()
+            assertThat(chart).isNotNull()
+            assertThat(chart.title.text).contains("Technical Analysis")
+        }
+    }
+}

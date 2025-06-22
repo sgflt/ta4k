@@ -11,6 +11,7 @@ commonscsv = "1.10.0"
 gson = "2.11.0"
 commonsMath3 = "3.6.1"
 poi = "5.3.0"
+jfreechart = "1.5.3"
 
 [libraries]
 slf4j-api = { module = "org.slf4j:slf4j-api", version.ref = "slf4j" }
@@ -25,6 +26,7 @@ commons-csv = { module = "org.apache.commons:commons-csv", version.ref = "common
 gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
 commons-math3 = { module = "org.apache.commons:commons-math3", version.ref = "commonsMath3" }
 poi = { module = "org.apache.poi:poi", version.ref = "poi" }
+jfreechart = { module = "org.jfree:jfreechart", version.ref = "jfreechart" }
 
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }

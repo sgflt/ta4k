@@ -32,10 +32,7 @@ import org.ta4j.core.num.NumFactoryProvider.defaultNumFactory
  * Return (in percentage) criterion (includes trading costs), returned in
  * decimal format.
  *
- *
- *
- * The return of the provided [position(s)][Position] over the provided
- * [series][BarSeries].
+ * The return of the provided [position(s)][Position]
  */
 class ReturnCriterion : AnalysisCriterion {
     /**

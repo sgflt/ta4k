@@ -140,7 +140,7 @@ class BacktestExecutor internal constructor(private val configuration: BacktestC
                 startingType = strategyFactory.tradeType,
                 transactionCostModel = configuration.transactionCostModel,
                 holdingCostModel = configuration.holdingCostModel,
-                numFactory = configuration.numFactory
+                numFactory = configuration.numFactory,
             )
 
             return CompoundRuntimeContext.of(

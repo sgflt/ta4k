@@ -49,8 +49,8 @@ class LiveTradingBuilder {
     private var barBuilderFactory: BarBuilderFactory = LightweightBarBuilderFactory()
     private var strategyFactory: StrategyFactory<Strategy> = NOOPStrategyFactory()
     private var runtimeContext: RuntimeContext = NOOPRuntimeContext
-    private var indicatorContexts: IndicatorContexts = IndicatorContexts.empty()
-    private var configuration: StrategyConfiguration? = null
+    private var indicatorContexts = IndicatorContexts.empty()
+    private var configuration = StrategyConfiguration()
 
 
     /**
@@ -116,7 +116,7 @@ class LiveTradingBuilder {
             log.warn("Using NOOP strategy")
         }
 
-        val strategy = strategyFactory.createStrategy(configuration!!, runtimeContext, indicatorContexts)
+        val strategy = strategyFactory.createStrategy(configuration, runtimeContext, indicatorContexts)
         val series = MultiTimeFrameSeries<BarSeries>().apply {
             (strategy.timeFrames + indicatorContexts.timeFrames)
                 .distinct()

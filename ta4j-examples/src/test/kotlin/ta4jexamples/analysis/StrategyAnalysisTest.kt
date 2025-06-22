@@ -1,7 +1,8 @@
 /*
  * The MIT License (MIT)
  *
- * Copyright (c) 2017-2025 Ta4j Organization & respective authors (see AUTHORS)
+ * Copyright (c) 2017-2025 Ta4j Organization & respective
+ * authors (see AUTHORS)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -20,7 +21,19 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.ta4j.core.strategy.configuration
+package ta4jexamples.analysis
 
-@JvmInline
-value class ParameterName(val name: String)
+import org.junit.jupiter.api.Test
+
+/**
+ * Test for the migrated StrategyAnalysis from Java to Kotlin.
+ */
+class StrategyAnalysisTest {
+
+    @Test
+    fun testStrategyAnalysis() {
+        // Simply verify that the main method runs without exceptions
+        StrategyAnalysis.main(emptyArray())
+    }
+    
+}

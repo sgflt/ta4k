@@ -42,7 +42,7 @@ import org.ta4j.core.strategy.RuntimeValueResolver
 /**
  * Base implementation of a [TradingRecord].
  */
-open class BackTestTradingRecord @JvmOverloads constructor(
+open class BackTestTradingRecord(
     override val startingType: TradeType,
     override var name: String = "",
     /** The cost model for transactions of the asset.  */
@@ -228,3 +228,4 @@ open class BackTestTradingRecord @JvmOverloads constructor(
         }
     }
 }
+

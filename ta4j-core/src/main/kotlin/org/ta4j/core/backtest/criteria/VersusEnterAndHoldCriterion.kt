@@ -22,14 +22,12 @@
  */
 package org.ta4j.core.backtest.criteria
 
-import java.time.Instant
 import org.ta4j.core.TradeType
-import org.ta4j.core.api.series.BarSeries
-import org.ta4j.core.backtest.BacktestBarSeries
 import org.ta4j.core.backtest.Position
 import org.ta4j.core.backtest.TradingRecord
-import org.ta4j.core.backtest.analysis.cost.ZeroCostModel
 import org.ta4j.core.backtest.strategy.BackTestTradingRecord
+import org.ta4j.core.events.CandleReceived
+import org.ta4j.core.events.MarketEvent
 import org.ta4j.core.num.Num
 import org.ta4j.core.num.NumFactoryProvider
 
@@ -40,93 +38,51 @@ import org.ta4j.core.num.NumFactoryProvider
  * value of an "enter and hold". The "enter and hold"-strategy is done as
  * follows:
  *
- * 
+ *
  * - For [tradeType] = [TradeType.BUY]: Buy with the close price
  * of the first bar and sell with the close price of the last bar.
  * - For [tradeType] = [TradeType.SELL]: Sell with the close
  * price of the first bar and buy with the close price of the last bar.
- * 
+ *
  */
-class VersusEnterAndHoldCriterion : AnalysisCriterion {
-
-    private val tradeType: TradeType
-    private val criterion: AnalysisCriterion
-    private val series: BarSeries
-
-    /**
-     * Constructor for buy-and-hold strategy.
-     *
-     * @param series the bar series
-     * @param criterion the criterion to be compared
-     */
-    constructor(series: BarSeries, criterion: AnalysisCriterion) : this(series, TradeType.BUY, criterion)
-
-    /**
-     * Constructor.
-     *
-     * @param series the bar series
-     * @param tradeType the [TradeType] used to open the position
-     * @param criterion the criterion to be compared
-     */
-    constructor(series: BarSeries, tradeType: TradeType, criterion: AnalysisCriterion) {
-        this.series = series
-        this.tradeType = tradeType
-        this.criterion = criterion
-    }
+class VersusEnterAndHoldCriterion(
+    private val marketEvents: List<MarketEvent>,
+    private val tradeType: TradeType,
+    private val criterion: AnalysisCriterion,
+) :
+    AnalysisCriterion {
 
     override fun calculate(position: Position): Num {
-        val beginTime = position.entry!!.whenExecuted
-        val endTime = position.exit!!.whenExecuted
-        val fakeRecord = createEnterAndHoldTradingRecord(beginTime, endTime)
+        val fakeRecord = createEnterAndHoldTradingRecord()
         return criterion.calculate(position) / criterion.calculate(fakeRecord)
     }
 
     override fun calculate(tradingRecord: TradingRecord): Num {
         val positions = tradingRecord.positions
-        val backtestSeries = series as BacktestBarSeries
         val fakeRecord = createEnterAndHoldTradingRecord(
-            backtestSeries.firstBar.beginTime,
-            backtestSeries.lastBar.endTime
         )
 
         if (positions.isEmpty()) {
             // No positions case - compare 1 (no change) vs buy-and-hold from start to end
-
-            if (backtestSeries.isEmpty) {
-                // If no bars at all, return 1 (no change)
-                return NumFactoryProvider.defaultNumFactory.one()
-            }
-
             return NumFactoryProvider.defaultNumFactory.one() / criterion.calculate(fakeRecord)
         }
 
         return criterion.calculate(tradingRecord) / criterion.calculate(fakeRecord)
     }
 
-    private fun createEnterAndHoldTradingRecord(beginTime: Instant, endTime: Instant): TradingRecord {
+    private fun createEnterAndHoldTradingRecord(): TradingRecord {
         val numFactory = NumFactoryProvider.defaultNumFactory
         val fakeRecord = BackTestTradingRecord(
-            tradeType,
-            "enter-and-hold",
-            ZeroCostModel,
-            ZeroCostModel,
-            numFactory
+            startingType = tradeType,
+            numFactory = numFactory,
+            name = "enter-and-hold",
         )
-        
-        val backtestSeries = series as BacktestBarSeries
-        // Find bars closest to the begin and end times
-        val beginBar = backtestSeries.barData.minByOrNull { 
-            kotlin.math.abs(it.beginTime.toEpochMilli() - beginTime.toEpochMilli()) 
-        }
-        val endBar = backtestSeries.barData.minByOrNull { 
-            kotlin.math.abs(it.endTime.toEpochMilli() - endTime.toEpochMilli()) 
-        }
-        
-        if (beginBar != null && endBar != null) {
-            fakeRecord.enter(beginTime, beginBar.closePrice, numFactory.one())
-            fakeRecord.exit(endTime, endBar.closePrice, numFactory.one())
-        }
-        
+
+        val entry = marketEvents.first { it is CandleReceived } as CandleReceived
+        val exit = marketEvents.last { it is CandleReceived } as CandleReceived
+        fakeRecord.enter(entry.beginTime, numFactory.numOf(entry.closePrice), numFactory.one())
+        fakeRecord.exit(exit.beginTime, numFactory.numOf(exit.closePrice), numFactory.one())
+
         return fakeRecord
     }
 }

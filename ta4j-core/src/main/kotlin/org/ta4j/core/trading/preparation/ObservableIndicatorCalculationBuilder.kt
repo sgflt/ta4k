@@ -39,7 +39,7 @@ import org.ta4j.core.trading.LightweightBarBuilderFactory
 import org.ta4j.core.trading.LiveBarSeries
 
 /**
- * A builder to build a new [BacktestBarSeries].
+ * This class is usable for persistence of calculated indicators.
  */
 class ObservableIndicatorCalculationBuilder {
     private var name: String = UNNAMED_SERIES_NAME

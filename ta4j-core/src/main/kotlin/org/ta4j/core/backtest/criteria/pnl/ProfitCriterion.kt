@@ -34,8 +34,7 @@ import org.ta4j.core.num.NumFactoryProvider.defaultNumFactory
  *
  *
  *
- * The profit of the provided [position(s)][Position] over the provided
- * [series][BarSeries].
+ * The profit of the provided [position(s)][Position]
  */
 class ProfitCriterion
 /**

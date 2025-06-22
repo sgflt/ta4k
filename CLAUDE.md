@@ -78,15 +78,18 @@ Common test utilities:
 - `MockStrategy.java` - Predefined strategies for testing
 - `CriterionFactory.java` - Factory for analysis criteria testing
 
-## Code Conventions
-
-### Kotlin Migration
+## Kotlin Migration Steps
 
 The project is actively migrating from Java to Kotlin. When working on files:
 
-- New features should be implemented in Kotlin
-- Existing Java files being modified should be considered for conversion to Kotlin
-- Maintain API compatibility during migration
+- Create list of classes for migration
+- Choose first class and correspoinding test
+- Migrate them to Koltin using Kotlin idioms and best practices
+- After conversion run tests
+- Fix tests
+- Ask for permission to continue with next clas
+
+## Code Conventions
 
 ### Build System
 

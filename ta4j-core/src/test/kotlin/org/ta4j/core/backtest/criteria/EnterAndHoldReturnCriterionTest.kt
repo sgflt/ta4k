@@ -38,10 +38,10 @@ class EnterAndHoldReturnCriterionTest {
             .withCandlePrices()
 
         val buyContext = marketContext.toTradingRecordContext()
-            .withCriterion(EnterAndHoldReturnCriterion.buy(marketContext.barSeries))
+            .withCriterion(EnterAndHoldReturnCriterion.buy(marketContext.marketEvents.toList()))
 
         val sellContext = marketContext.toTradingRecordContext()
-            .withCriterion(EnterAndHoldReturnCriterion.sell(marketContext.barSeries))
+            .withCriterion(EnterAndHoldReturnCriterion.sell(marketContext.marketEvents.toList()))
 
         buyContext.assertResults(1.0)
         sellContext.assertResults(1.0)
@@ -54,13 +54,8 @@ class EnterAndHoldReturnCriterionTest {
             .withNumFactory(numFactory)
             .withCandlePrices(100.0, 105.0, 110.0, 100.0, 95.0, 105.0)
 
-        // Process all market events to populate the bar series
-        while (marketContext.advance()) {
-            // Process all events
-        }
-
         marketContext.toTradingRecordContext()
-            .withCriterion(EnterAndHoldReturnCriterion.buy(marketContext.barSeries))
+            .withCriterion(EnterAndHoldReturnCriterion.buy(marketContext.marketEvents.toList()))
             .enter(1.0).at(100.0)
             .exit(1.0).at(110.0)
             .enter(1.0).at(100.0)
@@ -68,7 +63,7 @@ class EnterAndHoldReturnCriterionTest {
             .assertResults(1.05)
 
         marketContext.toTradingRecordContext()
-            .withCriterion(EnterAndHoldReturnCriterion.sell(marketContext.barSeries))
+            .withCriterion(EnterAndHoldReturnCriterion.sell(marketContext.marketEvents.toList()))
             .enter(1.0).at(100.0)
             .exit(1.0).at(110.0)
             .enter(1.0).at(100.0)
@@ -83,13 +78,8 @@ class EnterAndHoldReturnCriterionTest {
             .withNumFactory(numFactory)
             .withCandlePrices(100.0, 95.0, 100.0, 80.0, 85.0, 70.0)
 
-        // Process all market events to populate the bar series
-        while (marketContext.advance()) {
-            // Process all events
-        }
-
         marketContext.toTradingRecordContext()
-            .withCriterion(EnterAndHoldReturnCriterion.buy(marketContext.barSeries))
+            .withCriterion(EnterAndHoldReturnCriterion.buy(marketContext.marketEvents.toList()))
             .enter(1.0).at(100.0)
             .exit(1.0).at(95.0)
             .enter(1.0).at(100.0)
@@ -97,7 +87,7 @@ class EnterAndHoldReturnCriterionTest {
             .assertResults(0.7)
 
         marketContext.toTradingRecordContext()
-            .withCriterion(EnterAndHoldReturnCriterion.sell(marketContext.barSeries))
+            .withCriterion(EnterAndHoldReturnCriterion.sell(marketContext.marketEvents.toList()))
             .enter(1.0).at(100.0)
             .exit(1.0).at(95.0)
             .enter(1.0).at(100.0)
@@ -112,18 +102,13 @@ class EnterAndHoldReturnCriterionTest {
             .withNumFactory(numFactory)
             .withCandlePrices(100.0, 95.0, 100.0, 80.0, 85.0, 70.0)
 
-        // Advance market context to populate all bars
-        while (marketContext.advance()) {
-            // Process all market events
-        }
-
         val buyContext = marketContext.toTradingRecordContext()
-            .withCriterion(EnterAndHoldReturnCriterion.buy(marketContext.barSeries))
+            .withCriterion(EnterAndHoldReturnCriterion.buy(marketContext.marketEvents.toList()))
 
         buyContext.assertResults(0.7)
 
         val sellContext = marketContext.toTradingRecordContext()
-            .withCriterion(EnterAndHoldReturnCriterion.sell(marketContext.barSeries))
+            .withCriterion(EnterAndHoldReturnCriterion.sell(marketContext.marketEvents.toList()))
 
         sellContext.assertResults(1.3)
     }
@@ -135,19 +120,14 @@ class EnterAndHoldReturnCriterionTest {
             .withNumFactory(numFactory)
             .withCandlePrices(100.0, 105.0, 95.0)
 
-        // Process all market events to populate the bar series
-        while (marketContext.advance()) {
-            // Process all events
-        }
-
         marketContext.toTradingRecordContext()
-            .withCriterion(EnterAndHoldReturnCriterion.buy(marketContext.barSeries))
+            .withCriterion(EnterAndHoldReturnCriterion.buy(marketContext.marketEvents.toList()))
             .enter(1.0).at(105.0)
             .exit(1.0).at(95.0)
             .assertResults(0.95)
 
         marketContext.toTradingRecordContext()
-            .withCriterion(EnterAndHoldReturnCriterion.sell(marketContext.barSeries))
+            .withCriterion(EnterAndHoldReturnCriterion.sell(marketContext.marketEvents.toList()))
             .enter(1.0).at(105.0)
             .exit(1.0).at(95.0)
             .assertResults(1.05)

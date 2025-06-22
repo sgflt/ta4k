@@ -37,7 +37,7 @@ class ValueAtRiskCriterionTest {
             .withNumFactory(numFactory)
             .withCandlePrices(100.0, 105.0, 106.0, 107.0, 108.0, 115.0)
             .toTradingRecordContext()
-            .withSeriesRelatedCriterion { series -> ValueAtRiskCriterion(numFactory, 0.95) }
+            .withCriterion(ValueAtRiskCriterion(numFactory, 0.95))
             .enter(1.0).after(1)
             .exit(1.0).after(2)
             .enter(1.0).after(1)
@@ -52,7 +52,7 @@ class ValueAtRiskCriterionTest {
             .withNumFactory(numFactory)
             .withCandlePrices(100.0, 104.0, 90.0, 100.0, 95.0, 105.0)
             .toTradingRecordContext()
-            .withSeriesRelatedCriterion { series -> ValueAtRiskCriterion(numFactory, 0.95) }
+            .withCriterion(ValueAtRiskCriterion(numFactory, 0.95))
             .enter(1.0).after(2)
             .exit(1.0).after(1)
             .assertResults(90.0 / 104.0 - 1.0)
@@ -65,7 +65,7 @@ class ValueAtRiskCriterionTest {
             .withNumFactory(numFactory)
             .withCandlePrices(0.0, 100.0, 95.0, 100.0, 80.0, 85.0, 70.0)
             .toTradingRecordContext()
-            .withSeriesRelatedCriterion { series -> ValueAtRiskCriterion(numFactory, 0.95) }
+            .withCriterion(ValueAtRiskCriterion(numFactory, 0.95) )
             .enter(1.0).after(2)
             .exit(1.0).after(1)
             .enter(1.0).after(1)
@@ -80,7 +80,7 @@ class ValueAtRiskCriterionTest {
             .withNumFactory(numFactory)
             .withCandlePrices(0.0, 100.0, 95.0, 100.0, 80.0, 85.0, 70.0)
             .toTradingRecordContext()
-            .withSeriesRelatedCriterion { series -> ValueAtRiskCriterion(numFactory, 0.95) }
+            .withCriterion(ValueAtRiskCriterion(numFactory, 0.95))
 
         context.assertResults(0.0)
     }
