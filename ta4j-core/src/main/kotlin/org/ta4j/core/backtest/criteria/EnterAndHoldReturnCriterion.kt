@@ -23,11 +23,12 @@
 package org.ta4j.core.backtest.criteria
 
 import org.ta4j.core.TradeType
-import org.ta4j.core.api.series.BarSeries
-import org.ta4j.core.backtest.BacktestBarSeries
 import org.ta4j.core.backtest.Position
 import org.ta4j.core.backtest.TradingRecord
+import org.ta4j.core.events.CandleReceived
+import org.ta4j.core.events.MarketEvent
 import org.ta4j.core.num.Num
+import org.ta4j.core.num.NumFactory
 import org.ta4j.core.num.NumFactoryProvider.defaultNumFactory
 
 /**
@@ -43,53 +44,46 @@ import org.ta4j.core.num.NumFactoryProvider.defaultNumFactory
  * @see [Buy and hold](http://en.wikipedia.org/wiki/Buy_and_hold)
  */
 class EnterAndHoldReturnCriterion(
-    private val series: BarSeries,
-    private val tradeType: TradeType
+    private val marketEvents: List<MarketEvent>,
+    private val tradeType: TradeType,
+    private val numFactory: NumFactory = defaultNumFactory,
 ) : AnalysisCriterion {
 
     companion object {
-        fun buy(series: BarSeries): EnterAndHoldReturnCriterion {
-            return EnterAndHoldReturnCriterion(series, TradeType.BUY)
-        }
+        fun buy(marketEvents: List<MarketEvent>): EnterAndHoldReturnCriterion =
+            EnterAndHoldReturnCriterion(marketEvents, TradeType.BUY)
 
-        fun sell(series: BarSeries): EnterAndHoldReturnCriterion {
-            return EnterAndHoldReturnCriterion(series, TradeType.SELL)
-        }
+        fun sell(marketEvents: List<MarketEvent>): EnterAndHoldReturnCriterion =
+            EnterAndHoldReturnCriterion(marketEvents, TradeType.SELL)
     }
 
     override fun calculate(position: Position): Num {
-        val backtestSeries = series as BacktestBarSeries
-        if (backtestSeries.isEmpty || !position.isClosed) {
+        if (marketEvents.isEmpty()) {
             return defaultNumFactory.one()
         }
-        
-        val firstPrice = backtestSeries.getBar(backtestSeries.beginIndex).closePrice
-        val lastPrice = backtestSeries.getBar(backtestSeries.endIndex).closePrice
-        
-        return when (tradeType) {
-            TradeType.BUY -> lastPrice / firstPrice
-            TradeType.SELL -> {
-                val two = firstPrice.numFactory.two()
-                two - (lastPrice / firstPrice)
-            }
-        }
+
+        return calculate()
     }
 
     override fun calculate(tradingRecord: TradingRecord): Num {
-        val backtestSeries = series as BacktestBarSeries
-        if (backtestSeries.isEmpty) {
+        if (marketEvents.isEmpty()) {
             return defaultNumFactory.one()
         }
-        
-        val firstPrice = backtestSeries.getBar(backtestSeries.beginIndex).closePrice
-        val lastPrice = backtestSeries.getBar(backtestSeries.endIndex).closePrice
-        
-        return when (tradeType) {
-            TradeType.BUY -> lastPrice / firstPrice
-            TradeType.SELL -> {
-                val two = firstPrice.numFactory.two()
-                two - (lastPrice / firstPrice)
+
+        return calculate()
+    }
+
+    private fun calculate(): Num {
+        val firstPrice = (marketEvents.first { it is CandleReceived } as CandleReceived).closePrice
+        val lastPrice = (marketEvents.last { it is CandleReceived } as CandleReceived).closePrice
+
+        return numFactory.numOf(
+            when (tradeType) {
+                TradeType.BUY -> lastPrice / firstPrice
+                TradeType.SELL -> {
+                    2.0 - (lastPrice / firstPrice)
+                }
             }
-        }
+        )
     }
 }
