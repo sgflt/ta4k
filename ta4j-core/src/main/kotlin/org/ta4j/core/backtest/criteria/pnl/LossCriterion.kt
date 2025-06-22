@@ -33,8 +33,7 @@ import org.ta4j.core.num.NumFactoryProvider.defaultNumFactory
  *
  *
  *
- * The loss of the provided [position(s)][Position] over the provided
- * [series][BarSeries].
+ * The loss of the provided [position(s)][Position]
  */
 class LossCriterion
 /**
