@@ -47,17 +47,17 @@ import ta4jexamples.loaders.MockMarketEventsLoader
 
 /**
  * Moving Momentum Strategy (migrated from Java to Kotlin).
- * 
+ *
  * This strategy uses three technical indicators to identify momentum-based entry and exit points:
  * - EMA (Exponential Moving Average) for trend identification
- * - MACD (Moving Average Convergence Divergence) for momentum confirmation  
+ * - MACD (Moving Average Convergence Divergence) for momentum confirmation
  * - Stochastic Oscillator for overbought/oversold levels
- * 
+ *
  * Entry Rules (ALL must be true):
  * - Trend: Short EMA > Long EMA (bullish bias)
  * - Signal 1: Stochastic crosses down below 20 (oversold momentum)
  * - Signal 2: MACD > EMA(MACD) (positive momentum confirmation)
- * 
+ *
  * Exit Rules (ALL must be true):
  * - Trend: Short EMA < Long EMA (bearish bias)
  * - Signal 1: Stochastic crosses up above 80 (overbought momentum)
@@ -70,22 +70,22 @@ object MovingMomentumStrategy {
 
     @JvmStatic
     fun main(args: Array<String>) {
-        
+
         // Getting the market data
         val marketEvents = MockMarketEventsLoader.loadMarketEvents()
-        
+
         // Building the trading strategy
         val strategyRun = MovingMomentumStrategyRun()
-        
+
         // Running the strategy
         val backtestExecutor = BacktestExecutorBuilder().build()
-            
+
         val statement = backtestExecutor.execute(strategyRun, marketEvents, 1000.0)
         val tradingRecord = statement.strategy.tradeRecord
-        
+
         // Analysis (equivalent to original Java output)
         println("Number of positions for the strategy: ${tradingRecord.positionCount}")
-        
+
         val totalReturn = ReturnCriterion()
         println("Total profit for the strategy: ${totalReturn.calculate(tradingRecord)}")
     }
@@ -96,29 +96,29 @@ object MovingMomentumStrategy {
  */
 data class MovingMomentumStrategyRun(
     override val runtimeContextFactory: RuntimeContextFactory = NOOPRuntimeContextFactory(),
-    override val strategyFactory: StrategyFactory<BacktestStrategy> = 
+    override val strategyFactory: StrategyFactory<BacktestStrategy> =
         StrategyFactoryConverter.convert(MovingMomentumStrategyFactory()),
     override val configuration: StrategyConfiguration = StrategyConfiguration().apply {
         // EMA periods
         put(ParameterName("shortEma"), 9)
         put(ParameterName("longEma"), 26)
-        
+
         // MACD periods
         put(ParameterName("macdFast"), 9)
         put(ParameterName("macdSlow"), 26)
         put(ParameterName("macdSignal"), 18)
-        
+
         // Stochastic period and thresholds
         put(ParameterName("stochasticPeriod"), 14)
         put(ParameterName("stochasticLowThreshold"), 20)
         put(ParameterName("stochasticHighThreshold"), 80)
-    }
+    },
 ) : BacktestRun
 
 /**
  * Moving Momentum Strategy Factory using EMA, MACD, and Stochastic indicators.
  * Migrated from original Java MovingMomentumStrategy.buildStrategy() to modern Kotlin APIs.
- * 
+ *
  * Strategy logic:
  * - Entry: Short EMA > Long EMA AND Stochastic crosses down below 20 AND MACD > MACD signal
  * - Exit: Short EMA < Long EMA AND Stochastic crosses up above 80 AND MACD < MACD signal
@@ -129,11 +129,11 @@ private class MovingMomentumStrategyFactory : StrategyFactory<Strategy> {
     override fun createStrategy(
         configuration: StrategyConfiguration,
         runtimeContext: RuntimeContext,
-        indicatorContexts: IndicatorContexts
+        indicatorContexts: IndicatorContexts,
     ): Strategy {
         val indicatorContext = indicatorContexts[TimeFrame.DAY]
         val closePrice = Indicators.closePrice()
-        
+
         // Configuration parameters
         val shortEmaPeriod = configuration.getInt(ParameterName("shortEma")) ?: 9
         val longEmaPeriod = configuration.getInt(ParameterName("longEma")) ?: 26
@@ -143,14 +143,14 @@ private class MovingMomentumStrategyFactory : StrategyFactory<Strategy> {
         val stochasticPeriod = configuration.getInt(ParameterName("stochasticPeriod")) ?: 14
         val stochasticLow = configuration.getInt(ParameterName("stochasticLowThreshold")) ?: 20
         val stochasticHigh = configuration.getInt(ParameterName("stochasticHighThreshold")) ?: 80
-        
+
         // Create indicators (migrated from Java MovingMomentumStrategy)
         val shortEma = closePrice.ema(shortEmaPeriod)
         val longEma = closePrice.ema(longEmaPeriod)
         val macd = closePrice.macd(macdFast, macdSlow)
         val emaMacd = macd.ema(macdSignal)
         val stochasticK = Indicators.stochasticKOscillator(stochasticPeriod)
-        
+
         // Register indicators
         indicatorContext.add(closePrice, CLOSE_PRICE)
         indicatorContext.add(shortEma, SHORT_EMA)
@@ -174,13 +174,17 @@ private class MovingMomentumStrategyFactory : StrategyFactory<Strategy> {
         val macd = indicatorContext.getNumericIndicator(MACD)!!
         val emaMacd = indicatorContext.getNumericIndicator(EMA_MACD)!!
         val stochasticK = indicatorContext.getNumericIndicator(STOCHASTIC_K)!!
-        
+
+
         // Entry rule (migrated from Java original):
         // Trend: Short EMA > Long EMA (bullish bias)
         // Signal 1: Stochastic crosses down below 20 (oversold momentum)
         // Signal 2: MACD > EMA(MACD) (positive momentum confirmation)
+        val crossIndicator = stochasticK.crossedUnder(stochasticLow)
+        indicatorContext.add(crossIndicator)
+
         return shortEma.isGreaterThanRule(longEma)
-            .and(stochasticK.crossedUnder(stochasticLow).toRule())
+            .and(crossIndicator.toRule())
             .and(macd.isGreaterThanRule(emaMacd))
     }
 
@@ -190,13 +194,16 @@ private class MovingMomentumStrategyFactory : StrategyFactory<Strategy> {
         val macd = indicatorContext.getNumericIndicator(MACD)!!
         val emaMacd = indicatorContext.getNumericIndicator(EMA_MACD)!!
         val stochasticK = indicatorContext.getNumericIndicator(STOCHASTIC_K)!!
-        
+
         // Exit rule (migrated from Java original):
         // Trend: Short EMA < Long EMA (bearish bias)
         // Signal 1: Stochastic crosses up above 80 (overbought momentum)
         // Signal 2: MACD < EMA(MACD) (negative momentum confirmation)
+        val crossIndicator = stochasticK.crossedOver(stochasticHigh)
+        indicatorContext.add(crossIndicator)
+
         return shortEma.isLessThanRule(longEma)
-            .and(stochasticK.crossedOver(stochasticHigh).toRule())
+            .and(crossIndicator.toRule())
             .and(macd.isLessThanRule(emaMacd))
     }
 
