@@ -6,13 +6,13 @@ description = "Examples for ta4j"
 
 dependencies {
     implementation(project(":ta4j-core"))
-    implementation(project(":ta4j-csv"))
 
     // JSON serialization for examples
     implementation(libs.gson)
     
     // Chart visualization
     implementation(libs.jfreechart)
+    implementation(libs.opencsv)
     
     // Test dependencies
     testImplementation(libs.junit.jupiter)

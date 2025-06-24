@@ -1,8 +1,7 @@
 /*
  * The MIT License (MIT)
  *
- * Copyright (c) 2017-2024 Ta4j Organization & respective
- * authors (see AUTHORS)
+ * Copyright (c) 2017-2025 Ta4j Organization & respective authors (see AUTHORS)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -21,7 +20,8 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.ta4j.csv
+
+package ta4jexamples.loaders
 
 import java.io.Reader
 import java.nio.file.Files
@@ -77,9 +77,9 @@ object MarketEventsLoader {
         volume: Double,
     ): CandleReceived {
         return CandleReceived(
-            timeFrame = TimeFrame.DAY,
+            timeFrame = TimeFrame.Companion.DAY,
             beginTime = start,
-            endTime = start.plus(TimeFrameMapping.getDuration(TimeFrame.DAY)),
+            endTime = start.plus(TimeFrameMapping.getDuration(TimeFrame.Companion.DAY)),
             openPrice = open,
             highPrice = high,
             lowPrice = low,
