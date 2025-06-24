@@ -30,6 +30,7 @@ import org.ta4j.core.indicators.bool.IsLowestIndicator
 import org.ta4j.core.indicators.bool.helpers.CrossIndicator
 import org.ta4j.core.indicators.helpers.DifferenceIndicator
 import org.ta4j.core.indicators.helpers.previous.PreviousNumericValueIndicator
+import org.ta4j.core.indicators.numeric.average.ATMAIndicator
 import org.ta4j.core.indicators.numeric.average.DoubleEMAIndicator
 import org.ta4j.core.indicators.numeric.average.EMAIndicator
 import org.ta4j.core.indicators.numeric.average.HMAIndicator
@@ -276,6 +277,14 @@ abstract class NumericIndicator protected constructor(
      * @return the [SMAIndicator] of `this`
      */
     fun sma(barCount: Int) = SMAIndicator(this, barCount)
+
+
+    /**
+     * @param barCount the time frame
+     *
+     * @return the [ATMAIndicator] of `this`
+     */
+    fun atma(barCount: Int) = ATMAIndicator(this, barCount)
 
 
     /**
