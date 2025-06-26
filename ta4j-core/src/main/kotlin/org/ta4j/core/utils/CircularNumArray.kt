@@ -27,6 +27,10 @@ import org.ta4j.core.num.Num
 
 internal class CircularNumArray(capacity: Int) : CircularArray<Num>(capacity, NaN) {
 
+    override operator fun get(index: Int): Num {
+        return elements[getIndex(index)]!!
+    }
+
     override fun reversed(): Iterable<Num> {
         return Iterable {
             object : Iterator<Num> {
@@ -35,13 +39,13 @@ internal class CircularNumArray(capacity: Int) : CircularArray<Num>(capacity, Na
 
                 override fun hasNext(): Boolean {
                     val index = startIndex - processed
-                    return processed < capacity() && index >= 0 && !get(index)!!.isNaN
+                    return processed < capacity() && index >= 0 && !get(index).isNaN
                 }
 
                 override fun next(): Num {
                     val index = startIndex - processed
                     processed++
-                    return get(index)!!
+                    return get(index)
                 }
             }
         }
@@ -55,14 +59,14 @@ internal class CircularNumArray(capacity: Int) : CircularArray<Num>(capacity, Na
 
             override fun hasNext(): Boolean {
                 val nextIndex = (currentIndex + 1) % capacity()
-                return processed < capacity() && !get(nextIndex)!!.isNaN
+                return processed < capacity() && !get(nextIndex).isNaN
             }
 
 
             override fun next(): Num {
                 currentIndex = (currentIndex + 1) % capacity()
                 processed++
-                return get(currentIndex)!!
+                return get(currentIndex)
             }
         }
     }

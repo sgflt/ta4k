@@ -66,12 +66,12 @@ internal abstract class CircularArray<T> protected constructor(private val capac
     }
 
 
-    operator fun get(index: Int): T? {
+    open operator fun get(index: Int): T? {
         return elements[getIndex(index)]
     }
 
 
-    private fun getIndex(index: Int): Int {
+    protected fun getIndex(index: Int): Int {
         return index % capacity()
     }
 
