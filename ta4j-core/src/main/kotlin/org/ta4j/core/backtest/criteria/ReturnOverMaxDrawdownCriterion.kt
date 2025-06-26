@@ -22,7 +22,6 @@
  */
 package org.ta4j.core.backtest.criteria
 
-import lombok.extern.slf4j.Slf4j
 import org.ta4j.core.backtest.Position
 import org.ta4j.core.backtest.TradingRecord
 import org.ta4j.core.backtest.criteria.pnl.ReturnCriterion
@@ -30,67 +29,43 @@ import org.ta4j.core.num.Num
 import org.ta4j.core.num.NumFactory
 
 /**
- * Return over maximum drawdown criterion (RoMaD).
+ * Reward risk ratio criterion (also known as "RoMaD"), returned in decimal
+ * format.
  *
- * Measures strategy's risk-adjusted returns by dividing total return by maximum drawdown.
- * Higher values indicate better risk-adjusted performance.
- *
- * RoMaD = Total Return / Maximum Drawdown
- *
- * Interpretation:
- * - RoMaD > 1: Strategy generates more returns than its worst loss
- * - RoMaD < 1: Strategy's worst loss exceeds its returns
- * - RoMad = 0: No return
- * - RoMaD = NaN: no drawdown
- * - Negative RoMaD: Strategy lost money overall
+ * <pre>
+ * RoMaD = net return (without base) / maximum drawdown
+ * </pre>
  */
-/**
- * Return over maximum drawdown criterion (RoMaD).
- */
-@Slf4j
 class ReturnOverMaxDrawdownCriterion(private val numFactory: NumFactory) : AnalysisCriterion {
-    private val returnCriterion = ReturnCriterion(false)
+    private val netReturnCriterion = ReturnCriterion(false)
     private val maxDrawdownCriterion = MaximumDrawdownCriterion(numFactory)
 
 
     override fun calculate(position: Position): Num {
-        if (!position.isOpened) {
+        if (position.isOpened) {
             return numFactory.zero()
         }
 
-        val drawdown = maxDrawdownCriterion.calculate(position)
-        val totalReturn = returnCriterion.calculate(position)
-
-        log.debug(
-            "Position entry: {}, exit: {}",
-            position.entry!!.pricePerAsset,
-            position.exit!!.pricePerAsset
-        )
-        log.debug("Is short: {}", position.entry!!.isSell)
-        log.debug("Return: {}, Drawdown: {}", totalReturn, drawdown)
-
-        val result = totalReturn / drawdown
-        log.debug("RoMaD result: {}", result)
-        return result
+        val maxDrawdown = maxDrawdownCriterion.calculate(position)
+        val netReturn = netReturnCriterion.calculate(position)
+        return if (maxDrawdown.isZero) {
+            netReturn
+        } else {
+            netReturn / maxDrawdown
+        }
     }
-
 
     override fun calculate(tradingRecord: TradingRecord): Num {
-        if (tradingRecord.isEmpty) {
-            return numFactory.zero()
+        if (tradingRecord.positions.isEmpty()) {
+            return numFactory.zero() // penalise no-trade strategies
         }
 
-        val drawdown = maxDrawdownCriterion.calculate(tradingRecord)
-        val totalReturn = returnCriterion.calculate(tradingRecord)
-
-        log.debug("Return: {}, Drawdown: {}", totalReturn, drawdown)
-
-        val result = totalReturn / drawdown
-        log.debug("RoMaD result: {}", result)
-        return result
-    }
-
-    companion object {
-        private val log = org.slf4j.LoggerFactory.getLogger(ReturnOverMaxDrawdownCriterion::class.java)
+        val maxDrawdown = maxDrawdownCriterion.calculate(tradingRecord)
+        val netReturn = netReturnCriterion.calculate(tradingRecord)
+        return if (maxDrawdown.isZero) {
+            netReturn // perfect equity curve
+        } else {
+            netReturn / maxDrawdown // regular RoMaD
+        }
     }
 }

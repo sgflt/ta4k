@@ -56,12 +56,13 @@ class ReturnOverMaxDrawdownCriterionTest {
             .withNumFactory(numFactory)
             .withCandlePrices(1.0, 2.0, 3.0, 6.0, 8.0, 20.0)
 
-        // Only gains, no drawdown should result in NaN as we can't divide by zero drawdown
+        // Only gains, no drawdown should return the net profit value
+        // Net return: (8/1) - 1 = 7 (or 700%)
         marketContext.toTradingRecordContext()
             .withCriterion(ReturnOverMaxDrawdownCriterion(numFactory))
             .enter(100.0).asap()
             .exit(100.0).after(4)
-            .assertResults(Double.NaN)
+            .assertResults(7.0)
     }
 
     @ParameterizedTest
@@ -120,12 +121,28 @@ class ReturnOverMaxDrawdownCriterionTest {
             .withNumFactory(numFactory)
             .withCandlePrices(100.0, 105.0, 95.0, 100.0)
 
+        // No drawdown means return the net profit value
+        // Return: (105/100) * (100/95) - 1 = 0.105263...
         marketContext.toTradingRecordContext()
             .withCriterion(ReturnOverMaxDrawdownCriterion(numFactory))
             .enter(1.0).asap()
             .exit(1.0).asap()
             .enter(1.0).asap()
             .exit(1.0).asap()
-            .assertResults(Double.NaN)
+            .assertResults(0.105263)
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
+    fun testOpenPositionReturnsZero(numFactory: NumFactory) {
+        val marketContext = MarketEventTestContext()
+            .withNumFactory(numFactory)
+            .withCandlePrices(100.0, 105.0, 95.0, 100.0)
+
+        // Open positions should return 0
+        marketContext.toTradingRecordContext()
+            .withCriterion(ReturnOverMaxDrawdownCriterion(numFactory))
+            .enter(100.0).asap()
+            .assertResults(0.0)
     }
 }
