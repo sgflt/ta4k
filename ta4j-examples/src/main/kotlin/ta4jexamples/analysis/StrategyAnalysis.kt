@@ -37,7 +37,7 @@ import org.ta4j.core.backtest.criteria.PositionsRatioCriterion
 import org.ta4j.core.backtest.criteria.ReturnOverMaxDrawdownCriterion
 import org.ta4j.core.backtest.criteria.TimeInTradeCriterion
 import org.ta4j.core.backtest.criteria.VersusEnterAndHoldCriterion
-import org.ta4j.core.backtest.criteria.pnl.ReturnCriterion
+import org.ta4j.core.backtest.criteria.pnl.GrossReturnCriterion
 import org.ta4j.core.backtest.strategy.BacktestRun
 import org.ta4j.core.backtest.strategy.BacktestStrategy
 import org.ta4j.core.backtest.strategy.StrategyFactoryConverter
@@ -91,7 +91,7 @@ object StrategyAnalysis {
          */
 
         // Total profit
-        val totalReturn = ReturnCriterion()
+        val totalReturn = GrossReturnCriterion()
         println("Total return: ${totalReturn.calculate(tradingRecord)}")
         
         // Number of bars (migrated to Time in Trade)

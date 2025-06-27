@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  *
- * Copyright (c) 2017-2024 Ta4j Organization & respective authors (see AUTHORS)
+ * Copyright (c) 2017-2025 Ta4j Organization & respective authors (see AUTHORS)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -24,36 +24,30 @@ package org.ta4j.core.backtest.criteria.pnl
 
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
+import org.ta4j.core.TestUtils.assertNumEquals
 import org.ta4j.core.TradeType
 import org.ta4j.core.TradingRecordTestContext
-import org.ta4j.core.backtest.analysis.cost.LinearTransactionCostModel
 import org.ta4j.core.num.NumFactory
 
-class LossCriterionTest {
+internal class NetLossCriterionTest {
 
     @ParameterizedTest
     @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
-    fun calculateComparingIncludingVsExcludingCosts(numFactory: NumFactory) {
+    fun calculateOnlyWithLossPositions(numFactory: NumFactory) {
         val context = TradingRecordTestContext()
             .withNumFactory(numFactory)
             .withTradeType(TradeType.BUY)
-            .withTransactionCostModel(LinearTransactionCostModel(0.01))
 
-        // First trade: buy at 100, sell at 95
+        // First trade: buy at 100, sell at 90 (loss of 10)
         context.enter(1.0).at(100.0)
-            .exit(1.0).at(95.0)
+            .exit(1.0).at(90.0)
 
-        // Second trade: buy at 100, sell at 70
-        context.enter(1.0).at(100.0)
-            .exit(1.0).at(70.0)
+        // Second trade: buy at 200, sell at 180 (loss of 20)
+        context.enter(1.0).at(200.0)
+            .exit(1.0).at(180.0)
 
-        // Calculate with costs included
         context.withCriterion(NetLossCriterion())
-            .assertResults(-38.65)
-
-        // Calculate with costs excluded
-        context.withCriterion(GrossLossCriterion())
-            .assertResults(-35.0)
+            .assertResults(-30.0) // -10 + -20 = -30 (net loss)
     }
 
     @ParameterizedTest
@@ -62,55 +56,36 @@ class LossCriterionTest {
         val context = TradingRecordTestContext()
             .withNumFactory(numFactory)
             .withTradeType(TradeType.BUY)
-            .withCriterion(GrossLossCriterion())
 
-        // First trade: buy at 100, sell at 110
+        // First trade: buy at 100, sell at 110 (profit)
         context.enter(1.0).at(100.0)
             .exit(1.0).at(110.0)
 
-        // Second trade: buy at 100, sell at 105
-        context.enter(1.0).at(100.0)
-            .exit(1.0).at(105.0)
+        // Second trade: buy at 200, sell at 220 (profit)
+        context.enter(1.0).at(200.0)
+            .exit(1.0).at(220.0)
 
-        context.assertResults(0.0)
+        context.withCriterion(NetLossCriterion())
+            .assertResults(0.0) // No losses, only profits
     }
 
     @ParameterizedTest
     @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
-    fun calculateOnlyWithLossPositions(numFactory: NumFactory) {
+    fun calculateWithMixedProfitAndLoss(numFactory: NumFactory) {
         val context = TradingRecordTestContext()
             .withNumFactory(numFactory)
             .withTradeType(TradeType.BUY)
-            .withCriterion(GrossLossCriterion())
 
-        // First trade: buy at 100, sell at 95
+        // Profitable trade: buy at 100, sell at 120
         context.enter(1.0).at(100.0)
-            .exit(1.0).at(95.0)
+            .exit(1.0).at(120.0)
 
-        // Second trade: buy at 100, sell at 70
-        context.enter(1.0).at(100.0)
-            .exit(1.0).at(70.0)
+        // Loss trade: buy at 200, sell at 180 (loss of 20)
+        context.enter(1.0).at(200.0)
+            .exit(1.0).at(180.0)
 
-        context.assertResults(-35.0)
-    }
-
-    @ParameterizedTest
-    @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
-    fun calculateProfitWithShortPositions(numFactory: NumFactory) {
-        val context = TradingRecordTestContext()
-            .withNumFactory(numFactory)
-            .withTradeType(TradeType.SELL)
-            .withCriterion(GrossLossCriterion())
-
-        // First trade: sell at 95, buy at 100
-        context.enter(1.0).at(95.0)
-            .exit(1.0).at(100.0)
-
-        // Second trade: sell at 70, buy at 100
-        context.enter(1.0).at(70.0)
-            .exit(1.0).at(100.0)
-
-        context.assertResults(-35.0)
+        context.withCriterion(NetLossCriterion())
+            .assertResults(-20.0) // Only the loss (-20), profit is ignored
     }
 
     @ParameterizedTest
@@ -119,11 +94,11 @@ class LossCriterionTest {
         val context = TradingRecordTestContext()
             .withNumFactory(numFactory)
             .withTradeType(TradeType.BUY)
-            .withCriterion(GrossLossCriterion())
 
-        // Open position without closing it
+        // Open position
         context.enter(1.0).at(100.0)
 
-        context.assertResults(0.0)
+        context.withCriterion(NetLossCriterion())
+            .assertResults(0.0) // Open position contributes 0
     }
 }

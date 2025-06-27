@@ -32,7 +32,7 @@ import org.ta4j.core.MarketEventTestContext
 import org.ta4j.core.TradeType
 import org.ta4j.core.TradingRecordTestContext
 import org.ta4j.core.api.Indicators
-import org.ta4j.core.backtest.criteria.pnl.ReturnCriterion
+import org.ta4j.core.backtest.criteria.pnl.GrossReturnCriterion
 import org.ta4j.core.num.NumFactory
 import org.ta4j.core.strategy.RuntimeContext
 import org.ta4j.core.strategy.RuntimeValueResolver
@@ -265,7 +265,7 @@ class TakeProfitRuleTest {
     fun `should work correctly with TradingRecordTestContext integration`(numFactory: NumFactory) {
         val context = TradingRecordTestContext()
             .withNumFactory(numFactory)
-            .withCriterion(ReturnCriterion())
+            .withCriterion(GrossReturnCriterion())
             .withTradeType(TradeType.BUY)
 
         // Using traditional test context pattern for real scenario

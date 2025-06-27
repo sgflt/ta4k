@@ -54,11 +54,11 @@ internal class ReturnCriterionTest {
             .exit(1.0).at(105.0)
 
         // Total return with base percentage: 1.10 * 1.05
-        context.withCriterion(ReturnCriterion())
+        context.withCriterion(GrossReturnCriterion())
             .assertResults(1.10 * 1.05)
 
         // Total return without base percentage: (1.10 * 1.05) - 1
-        context.withCriterion(ReturnCriterion(false))
+        context.withCriterion(GrossReturnCriterion(false))
             .assertResults(1.10 * 1.05 - 1)
     }
 
@@ -79,11 +79,11 @@ internal class ReturnCriterionTest {
             .exit(1.0).at(70.0)
 
         // Total return with base percentage: 0.95 * 0.70
-        context.withCriterion(ReturnCriterion())
+        context.withCriterion(GrossReturnCriterion())
             .assertResults(0.95 * 0.70)
 
         // Total return without base percentage: (0.95 * 0.70) - 1
-        context.withCriterion(ReturnCriterion(false))
+        context.withCriterion(GrossReturnCriterion(false))
             .assertResults(0.95 * 0.70 - 1)
     }
 
@@ -104,11 +104,11 @@ internal class ReturnCriterionTest {
             .exit(1.0).at(70.0)
 
         // Total return with base percentage: 1.05 * 1.30
-        context.withCriterion(ReturnCriterion())
+        context.withCriterion(GrossReturnCriterion())
             .assertResults(1.05 * 1.30)
 
         // Total return without base percentage: (1.05 * 1.30) - 1
-        context.withCriterion(ReturnCriterion(false))
+        context.withCriterion(GrossReturnCriterion(false))
             .assertResults(1.05 * 1.30 - 1)
     }
 
@@ -129,11 +129,11 @@ internal class ReturnCriterionTest {
             .exit(1.0).at(130.0)
 
         // Total return with base percentage: 0.95 * 0.70
-        context.withCriterion(ReturnCriterion())
+        context.withCriterion(GrossReturnCriterion())
             .assertResults(0.95 * 0.70)
 
         // Total return without base percentage: (0.95 * 0.70) - 1
-        context.withCriterion(ReturnCriterion(false))
+        context.withCriterion(GrossReturnCriterion(false))
             .assertResults(0.95 * 0.70 - 1)
     }
 
@@ -143,10 +143,10 @@ internal class ReturnCriterionTest {
     fun calculateWithNoPositions(numFactory: NumFactory) {
         val tradingRecord = BackTestTradingRecord(startingType = TradeType.BUY, numFactory = numFactory)
 
-        val withBase = ReturnCriterion()
+        val withBase = GrossReturnCriterion()
         assertNumEquals(1.0, withBase.calculate(tradingRecord))
 
-        val withoutBase = ReturnCriterion(false)
+        val withoutBase = GrossReturnCriterion(false)
         assertNumEquals(0.0, withoutBase.calculate(tradingRecord))
     }
 
@@ -157,7 +157,7 @@ internal class ReturnCriterionTest {
         var position = Position(TradeType.BUY, numFactory = numFactory)
 
         // Test with base percentage
-        val withBase = ReturnCriterion()
+        val withBase = GrossReturnCriterion()
         assertNumEquals(1.0, withBase.calculate(position))
 
         // Add entry operation
@@ -167,7 +167,7 @@ internal class ReturnCriterionTest {
 
         // Test without base percentage
         position = Position(TradeType.BUY, numFactory = numFactory)
-        val withoutBase = ReturnCriterion(false)
+        val withoutBase = GrossReturnCriterion(false)
         assertNumEquals(0.0, withoutBase.calculate(position))
 
         // Add entry operation

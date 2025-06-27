@@ -36,7 +36,7 @@ class ProfitLossPercentageCriterionTest {
         val context = TradingRecordTestContext()
             .withNumFactory(numFactory)
             .withTradeType(TradeType.BUY)
-            .withCriterion(ProfitLossPercentageCriterion())
+            .withCriterion(NetProfitLossPercentageCriterion())
 
         // First trade: buy at 100, sell at 110 (profit: +10%)
         context.enter(1.0).at(100.0)
@@ -56,7 +56,7 @@ class ProfitLossPercentageCriterionTest {
         val context = TradingRecordTestContext()
             .withNumFactory(numFactory)
             .withTradeType(TradeType.BUY)
-            .withCriterion(ProfitLossPercentageCriterion())
+            .withCriterion(NetProfitLossPercentageCriterion())
 
         // First trade: buy at 100, sell at 95 (loss: -5%)
         context.enter(1.0).at(100.0)
@@ -76,7 +76,7 @@ class ProfitLossPercentageCriterionTest {
         val context = TradingRecordTestContext()
             .withNumFactory(numFactory)
             .withTradeType(TradeType.BUY)
-            .withCriterion(ProfitLossPercentageCriterion())
+            .withCriterion(NetProfitLossPercentageCriterion())
 
         // First trade: buy at 100, sell at 195 (profit: +95%)
         context.enter(1.0).at(100.0)
@@ -96,7 +96,7 @@ class ProfitLossPercentageCriterionTest {
         val context = TradingRecordTestContext()
             .withNumFactory(numFactory)
             .withTradeType(TradeType.SELL)
-            .withCriterion(ProfitLossPercentageCriterion())
+            .withCriterion(NetProfitLossPercentageCriterion())
 
         // First trade: sell at 100, buy at 90 (profit: +10%)
         context.enter(1.0).at(100.0)
@@ -116,7 +116,7 @@ class ProfitLossPercentageCriterionTest {
         val context = TradingRecordTestContext()
             .withNumFactory(numFactory)
             .withTradeType(TradeType.SELL)
-            .withCriterion(ProfitLossPercentageCriterion())
+            .withCriterion(NetProfitLossPercentageCriterion())
 
         // First trade: sell at 100, buy at 110 (loss: -10%)
         context.enter(1.0).at(100.0)
@@ -136,7 +136,7 @@ class ProfitLossPercentageCriterionTest {
         val context = TradingRecordTestContext()
             .withNumFactory(numFactory)
             .withTradeType(TradeType.BUY)
-            .withCriterion(ProfitLossPercentageCriterion())
+            .withCriterion(NetProfitLossPercentageCriterion())
 
         // Open position without closing it
         context.enter(1.0).at(100.0)

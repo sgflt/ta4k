@@ -30,38 +30,33 @@ import org.ta4j.core.num.Num
 import org.ta4j.core.num.NumFactoryProvider.defaultNumFactory
 
 /**
- * Average net profit criterion (includes trading costs).
- * 
- * Note: Despite the class name suggesting it's for any profit, this specifically
- * calculates NET profit (after deducting trading costs).
+ * Average gross profit criterion (excludes trading costs).
  */
-class AverageProfitCriterion : AnalysisCriterion {
-    private val netProfitCriterion = NetProfitCriterion()
+class GrossAverageProfitCriterion : AnalysisCriterion {
+    private val grossProfitCriterion = GrossProfitCriterion()
     private val numberOfWinningPositionsCriterion = NumberOfWinningPositionsCriterion()
-
 
     override fun calculate(position: Position): Num {
         val numberOfWinningPositions = numberOfWinningPositionsCriterion.calculate(position)
         if (numberOfWinningPositions.isZero) {
             return defaultNumFactory.zero()
         }
-        val netProfit = netProfitCriterion.calculate(position)
-        if (netProfit.isZero) {
+        val grossProfit = grossProfitCriterion.calculate(position)
+        if (grossProfit.isZero) {
             return defaultNumFactory.zero()
         }
-        return netProfit / numberOfWinningPositions
+        return grossProfit / numberOfWinningPositions
     }
-
 
     override fun calculate(tradingRecord: TradingRecord): Num {
         val numberOfWinningPositions = numberOfWinningPositionsCriterion.calculate(tradingRecord)
         if (numberOfWinningPositions.isZero) {
             return defaultNumFactory.zero()
         }
-        val netProfit = netProfitCriterion.calculate(tradingRecord)
-        if (netProfit.isZero) {
+        val grossProfit = grossProfitCriterion.calculate(tradingRecord)
+        if (grossProfit.isZero) {
             return defaultNumFactory.zero()
         }
-        return netProfit / numberOfWinningPositions
+        return grossProfit / numberOfWinningPositions
     }
 }

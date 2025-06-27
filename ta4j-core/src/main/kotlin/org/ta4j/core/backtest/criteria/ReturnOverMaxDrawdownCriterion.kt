@@ -24,7 +24,7 @@ package org.ta4j.core.backtest.criteria
 
 import org.ta4j.core.backtest.Position
 import org.ta4j.core.backtest.TradingRecord
-import org.ta4j.core.backtest.criteria.pnl.ReturnCriterion
+import org.ta4j.core.backtest.criteria.pnl.NetReturnCriterion
 import org.ta4j.core.num.Num
 import org.ta4j.core.num.NumFactory
 
@@ -37,7 +37,7 @@ import org.ta4j.core.num.NumFactory
  * </pre>
  */
 class ReturnOverMaxDrawdownCriterion(private val numFactory: NumFactory) : AnalysisCriterion {
-    private val netReturnCriterion = ReturnCriterion(false)
+    private val netReturnCriterion = NetReturnCriterion(false)
     private val maxDrawdownCriterion = MaximumDrawdownCriterion(numFactory)
 
 

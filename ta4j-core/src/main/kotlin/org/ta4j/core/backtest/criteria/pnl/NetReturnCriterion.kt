@@ -23,43 +23,31 @@
 package org.ta4j.core.backtest.criteria.pnl
 
 import org.ta4j.core.backtest.Position
-import org.ta4j.core.backtest.TradingRecord
-import org.ta4j.core.backtest.criteria.AnalysisCriterion
 import org.ta4j.core.num.Num
-import org.ta4j.core.num.NumFactoryProvider.defaultNumFactory
 
 /**
- * Loss criterion with trading costs (= Gross loss) or without ( = Net loss).
+ * Return (in percentage) criterion, returned in decimal format.
  *
+ * This criterion uses the net return of the positions; trading costs are
+ * deducted from the calculation. It represents the percentage change including
+ * the base value.
  *
- *
- * The loss of the provided [position(s)][Position]
+ * The return of the provided [Position] position(s).
  */
-class LossCriterion
-/**
- * Constructor for GrossLoss (includes trading costs).
- */ @JvmOverloads constructor(private val excludeCosts: Boolean = false) : AnalysisCriterion {
-    /**
-     * Constructor.
-     *
-     * @param excludeCosts set to true to exclude trading costs
-     */
+class NetReturnCriterion(addBase: Boolean = true) : AbstractReturnCriterion(addBase) {
 
-
-    override fun calculate(position: Position): Num {
-        if (position.isClosed) {
-            val loss = if (this.excludeCosts) position.grossProfit else position.profit
-            return if (loss.isNegative) loss else defaultNumFactory.zero()
+    override fun calculateReturn(position: Position): Num {
+        val entry = position.entry!!
+        val amount = entry.amount
+        val netPrice = entry.netPrice
+        val entryValue = netPrice * amount
+        val one = position.numFactory.one()
+        
+        if (entryValue.isZero) {
+            return one
         }
-        return defaultNumFactory.zero()
-    }
-
-
-    override fun calculate(tradingRecord: TradingRecord): Num {
-        return tradingRecord.positions
-            .stream()
-            .filter(Position::isClosed)
-            .map(this::calculate)
-            .reduce(defaultNumFactory.zero(), { obj: Num, augend: Num -> obj.plus(augend) })
+        
+        val profit = position.profit
+        return profit / entryValue + one
     }
 }

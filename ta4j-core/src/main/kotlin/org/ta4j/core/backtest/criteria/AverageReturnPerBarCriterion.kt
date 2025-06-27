@@ -25,7 +25,8 @@ package org.ta4j.core.backtest.criteria
 import java.time.temporal.ChronoUnit
 import org.ta4j.core.backtest.Position
 import org.ta4j.core.backtest.TradingRecord
-import org.ta4j.core.backtest.criteria.pnl.ReturnCriterion
+import org.ta4j.core.backtest.criteria.pnl.GrossReturnCriterion
+import org.ta4j.core.backtest.criteria.pnl.NetReturnCriterion
 import org.ta4j.core.num.Num
 import org.ta4j.core.num.NumFactory
 import org.ta4j.core.num.NumFactoryProvider.defaultNumFactory
@@ -39,11 +40,11 @@ import org.ta4j.core.num.NumFactoryProvider.defaultNumFactory
  * returns over the specified number of bars:
  *
  * <pre>
- * AverageReturnPerBar = pow([gross return][ReturnCriterion], 1/ [number of time units][TimeInTradeCriterion])
+ * AverageReturnPerBar = pow([gross return][GrossReturnCriterion], 1/ [number of time units][TimeInTradeCriterion])
 </pre> *
  */
 class AverageReturnPerBarCriterion(private val numFactory: NumFactory, averagingUnit: ChronoUnit) : AnalysisCriterion {
-    private val grossReturn = ReturnCriterion()
+    private val grossReturn = NetReturnCriterion()
     private val timeInTradeCriterion = TimeInTradeCriterion(averagingUnit)
 
 

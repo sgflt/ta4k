@@ -29,41 +29,26 @@ import org.ta4j.core.num.Num
 import org.ta4j.core.num.NumFactoryProvider.defaultNumFactory
 
 /**
- * Ratio gross profit and loss criterion = Average gross profit (includes
- * trading costs) / Average gross loss (includes trading costs), returned in
- * decimal format.
+ * Gross loss criterion (excludes trading costs).
+ *
+ * The gross loss of the provided [position(s)][Position]
  */
-class ProfitLossRatioCriterion : AnalysisCriterion {
-    private val averageProfitCriterion = AverageProfitCriterion()
-    private val averageLossCriterion = AverageLossCriterion()
-
+class GrossLossCriterion : AnalysisCriterion {
 
     override fun calculate(position: Position): Num {
-        val averageProfit = this.averageProfitCriterion.calculate(position!!)
-        if (averageProfit.isZero) {
-            // only loosing positions means a ratio of 0
-            return defaultNumFactory.zero()
+        if (position.isClosed) {
+            val loss = position.grossProfit // Gross profit/loss (excludes costs)
+            return if (loss.isNegative) loss else defaultNumFactory.zero()
         }
-        val averageLoss = this.averageLossCriterion.calculate(position)
-        if (averageLoss.isZero) {
-            // only winning positions means a ratio of 1
-            return defaultNumFactory.one()
-        }
-        return averageProfit / averageLoss
+        return defaultNumFactory.zero()
     }
-
 
     override fun calculate(tradingRecord: TradingRecord): Num {
-        val averageProfit = this.averageProfitCriterion.calculate(tradingRecord)
-        if (averageProfit.isZero) {
-            // only loosing positions means a ratio of 0
-            return defaultNumFactory.zero()
-        }
-        val averageLoss = this.averageLossCriterion.calculate(tradingRecord)
-        if (averageLoss.isZero) {
-            // only winning positions means a ratio of 1
-            return defaultNumFactory.one()
-        }
-        return averageProfit / averageLoss.abs()
+        return tradingRecord.positions
+            .filter { it.isClosed }
+            .sumOf { calculate(it) }
     }
+
+    private fun Iterable<Position>.sumOf(selector: (Position) -> Num): Num =
+        fold(defaultNumFactory.zero()) { sum, element -> sum + selector(element) }
 }

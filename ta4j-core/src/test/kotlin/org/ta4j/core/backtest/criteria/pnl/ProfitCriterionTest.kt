@@ -36,7 +36,7 @@ class ProfitCriterionTest {
     fun calculateComparingIncExcludingCosts(numFactory: NumFactory) {
         val context = TradingRecordTestContext()
             .withNumFactory(numFactory)
-            .withCriterion(ProfitCriterion(true))
+            .withCriterion(GrossProfitCriterion())
 
         context.enter(1.0).at(100.0)
             .exit(1.0).at(105.0)
@@ -53,7 +53,7 @@ class ProfitCriterionTest {
         val context = TradingRecordTestContext()
             .withNumFactory(numFactory)
             .withTransactionCostModel(FixedTransactionCostModel(1.0))
-            .withCriterion(ProfitCriterion(false))
+            .withCriterion(NetProfitCriterion())
 
         context.enter(1.0).at(100.0)
             .exit(1.0).at(105.0)
@@ -71,7 +71,7 @@ class ProfitCriterionTest {
         val context = TradingRecordTestContext()
             .withNumFactory(numFactory)
             .withTradeType(TradeType.SELL)
-            .withCriterion(ProfitCriterion(false))
+            .withCriterion(NetProfitCriterion())
 
         // Simulating short positions:
         context.enter(1.0).at(95.0)   // sell short
@@ -91,7 +91,7 @@ class ProfitCriterionTest {
             .withNumFactory(numFactory)
             .withTradeType(TradeType.SELL)
             .withTransactionCostModel(FixedTransactionCostModel(1.0))
-            .withCriterion(ProfitCriterion(false))
+            .withCriterion(NetProfitCriterion())
 
         context.enter(1.0).at(100.0)   // sell short
             .exit(1.0).at(95.0)        // buy to cover
@@ -108,7 +108,7 @@ class ProfitCriterionTest {
     fun calculateWithMixedProfitAndLoss(numFactory: NumFactory) {
         val context = TradingRecordTestContext()
             .withNumFactory(numFactory)
-            .withCriterion(ProfitCriterion(false))
+            .withCriterion(NetProfitCriterion())
 
         context.enter(1.0).at(100.0)
             .exit(1.0).at(105.0)      // +5 profit

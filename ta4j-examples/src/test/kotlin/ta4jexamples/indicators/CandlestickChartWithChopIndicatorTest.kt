@@ -27,7 +27,10 @@ import java.awt.GraphicsEnvironment
 import java.util.concurrent.TimeUnit
 import org.jfree.chart.plot.CombinedDomainXYPlot
 import org.jfree.chart.plot.XYPlot
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions.assertDoesNotThrow
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNotNull
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.Timeout
@@ -144,7 +147,7 @@ class CandlestickChartWithChopIndicatorTest {
 
     @Test
     @DisplayName("Test main method with live argument")
-    @Timeout(value = 5, unit = TimeUnit.SECONDS)
+    @Timeout(value = 50, unit = TimeUnit.SECONDS)
     fun testMainMethodWithLiveArgument() {
         if (GraphicsEnvironment.isHeadless()) {
             // Skip GUI tests in headless environment

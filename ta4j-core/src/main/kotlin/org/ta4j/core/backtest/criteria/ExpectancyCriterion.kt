@@ -24,7 +24,7 @@ package org.ta4j.core.backtest.criteria
 
 import org.ta4j.core.backtest.Position
 import org.ta4j.core.backtest.TradingRecord
-import org.ta4j.core.backtest.criteria.pnl.ProfitLossRatioCriterion
+import org.ta4j.core.backtest.criteria.pnl.NetProfitLossRatioCriterion
 import org.ta4j.core.num.Num
 import org.ta4j.core.num.NumFactoryProvider.defaultNumFactory
 
@@ -40,7 +40,7 @@ import org.ta4j.core.num.NumFactoryProvider.defaultNumFactory
  * @see [https://www.straightforex.com/advanced-forex-course/money-management/two-important-things-to-be-considered/](https://www.straightforex.com/advanced-forex-course/money-management/two-important-things-to-be-considered/)
  */
 class ExpectancyCriterion : AnalysisCriterion {
-    private val profitLossRatioCriterion = ProfitLossRatioCriterion()
+    private val profitLossRatioCriterion = NetProfitLossRatioCriterion()
     private val numberOfPositionsCriterion = NumberOfPositionsCriterion()
     private val numberOfWinningPositionsCriterion = NumberOfWinningPositionsCriterion()
 

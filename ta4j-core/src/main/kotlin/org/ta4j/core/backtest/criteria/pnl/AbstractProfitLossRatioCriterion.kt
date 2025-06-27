@@ -25,43 +25,45 @@ package org.ta4j.core.backtest.criteria.pnl
 import org.ta4j.core.backtest.Position
 import org.ta4j.core.backtest.TradingRecord
 import org.ta4j.core.backtest.criteria.AnalysisCriterion
-import org.ta4j.core.backtest.criteria.NumberOfWinningPositionsCriterion
 import org.ta4j.core.num.Num
 import org.ta4j.core.num.NumFactoryProvider.defaultNumFactory
 
 /**
- * Average net profit criterion (includes trading costs).
+ * Base class for profit and loss ratio criteria.
  * 
- * Note: Despite the class name suggesting it's for any profit, this specifically
- * calculates NET profit (after deducting trading costs).
+ * Ratio profit and loss criterion = Average profit / Average loss,
+ * returned in decimal format.
  */
-class AverageProfitCriterion : AnalysisCriterion {
-    private val netProfitCriterion = NetProfitCriterion()
-    private val numberOfWinningPositionsCriterion = NumberOfWinningPositionsCriterion()
-
+abstract class AbstractProfitLossRatioCriterion(
+    private val averageProfitCriterion: AnalysisCriterion,
+    private val averageLossCriterion: AnalysisCriterion
+) : AnalysisCriterion {
 
     override fun calculate(position: Position): Num {
-        val numberOfWinningPositions = numberOfWinningPositionsCriterion.calculate(position)
-        if (numberOfWinningPositions.isZero) {
+        val averageProfit = averageProfitCriterion.calculate(position)
+        if (averageProfit.isZero) {
+            // only losing positions means a ratio of 0
             return defaultNumFactory.zero()
         }
-        val netProfit = netProfitCriterion.calculate(position)
-        if (netProfit.isZero) {
-            return defaultNumFactory.zero()
+        val averageLoss = averageLossCriterion.calculate(position)
+        if (averageLoss.isZero) {
+            // only winning positions means a ratio of 1
+            return defaultNumFactory.one()
         }
-        return netProfit / numberOfWinningPositions
+        return averageProfit / averageLoss
     }
 
-
     override fun calculate(tradingRecord: TradingRecord): Num {
-        val numberOfWinningPositions = numberOfWinningPositionsCriterion.calculate(tradingRecord)
-        if (numberOfWinningPositions.isZero) {
+        val averageProfit = averageProfitCriterion.calculate(tradingRecord)
+        if (averageProfit.isZero) {
+            // only losing positions means a ratio of 0
             return defaultNumFactory.zero()
         }
-        val netProfit = netProfitCriterion.calculate(tradingRecord)
-        if (netProfit.isZero) {
-            return defaultNumFactory.zero()
+        val averageLoss = averageLossCriterion.calculate(tradingRecord)
+        if (averageLoss.isZero) {
+            // only winning positions means a ratio of 1
+            return defaultNumFactory.one()
         }
-        return netProfit / numberOfWinningPositions
+        return averageProfit / averageLoss.abs()
     }
 }

@@ -29,7 +29,7 @@ import org.ta4j.core.backtest.criteria.MaximumDrawdownCriterion
 import org.ta4j.core.backtest.criteria.NumberOfLosingPositionsCriterion
 import org.ta4j.core.backtest.criteria.NumberOfPositionsCriterion
 import org.ta4j.core.backtest.criteria.NumberOfWinningPositionsCriterion
-import org.ta4j.core.backtest.criteria.pnl.ReturnCriterion
+import org.ta4j.core.backtest.criteria.pnl.GrossReturnCriterion
 import org.ta4j.core.backtest.strategy.BackTestTradingRecord
 import org.ta4j.core.indicators.IndicatorContext
 import org.ta4j.core.indicators.IndicatorContexts
@@ -201,7 +201,7 @@ object AILiveTradingExample {
         val totalPositions = NumberOfPositionsCriterion().calculate(tradingRecord).intValue()
         val winningPositions = NumberOfWinningPositionsCriterion().calculate(tradingRecord).intValue()
         val losingPositions = NumberOfLosingPositionsCriterion().calculate(tradingRecord).intValue()
-        val totalReturn = ReturnCriterion().calculate(tradingRecord).doubleValue()
+        val totalReturn = GrossReturnCriterion().calculate(tradingRecord).doubleValue()
         val maxDrawdown = MaximumDrawdownCriterion(numFactory).calculate(tradingRecord).doubleValue()
         
         println("   Total Trades: $totalPositions")

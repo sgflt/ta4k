@@ -26,7 +26,7 @@ package ta4jexamples.strategies
 import org.ta4j.core.TradeType
 import org.ta4j.core.api.Indicators
 import org.ta4j.core.backtest.BacktestExecutorBuilder
-import org.ta4j.core.backtest.criteria.pnl.ReturnCriterion
+import org.ta4j.core.backtest.criteria.pnl.GrossReturnCriterion
 import org.ta4j.core.backtest.strategy.BacktestRun
 import org.ta4j.core.backtest.strategy.BacktestStrategy
 import org.ta4j.core.backtest.strategy.StrategyFactoryConverter
@@ -83,7 +83,7 @@ object CCICorrectionStrategy {
         // Analysis (equivalent to original Java output)
         println("Number of positions for the strategy: ${tradingRecord.positionCount}")
         
-        val totalReturn = ReturnCriterion()
+        val totalReturn = GrossReturnCriterion()
         println("Total return for the strategy: ${totalReturn.calculate(tradingRecord)}")
     }
 }

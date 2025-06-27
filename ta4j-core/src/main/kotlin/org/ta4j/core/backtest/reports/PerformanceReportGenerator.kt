@@ -30,10 +30,10 @@ import org.ta4j.core.backtest.criteria.TimeInTradeCriterion
 import org.ta4j.core.backtest.criteria.ValueAtRiskCriterion
 import org.ta4j.core.backtest.criteria.pnl.AverageLossCriterion
 import org.ta4j.core.backtest.criteria.pnl.AverageProfitCriterion
-import org.ta4j.core.backtest.criteria.pnl.LossCriterion
-import org.ta4j.core.backtest.criteria.pnl.ProfitCriterion
+import org.ta4j.core.backtest.criteria.pnl.NetLossCriterion
+import org.ta4j.core.backtest.criteria.pnl.NetProfitCriterion
+import org.ta4j.core.backtest.criteria.pnl.NetProfitLossRatioCriterion
 import org.ta4j.core.backtest.criteria.pnl.ProfitLossCriterion
-import org.ta4j.core.backtest.criteria.pnl.ProfitLossPercentageCriterion
 import org.ta4j.core.num.NumFactoryProvider.defaultNumFactory
 
 /**
@@ -43,11 +43,11 @@ import org.ta4j.core.num.NumFactoryProvider.defaultNumFactory
 class PerformanceReportGenerator : ReportGenerator<PerformanceReport> {
     override fun generate(tradingRecord: TradingRecord): PerformanceReport {
         val pnl = ProfitLossCriterion().calculate(tradingRecord)
-        val pnlPercentage = ProfitLossPercentageCriterion().calculate(tradingRecord)
-        val netProfit = ProfitCriterion(false).calculate(tradingRecord)
+        val pnlPercentage = NetProfitLossRatioCriterion().calculate(tradingRecord)
+        val netProfit = NetProfitCriterion().calculate(tradingRecord)
         val averageProfit = AverageProfitCriterion().calculate(tradingRecord)
         val averageLoss = AverageLossCriterion().calculate(tradingRecord)
-        val netLoss = LossCriterion(false).calculate(tradingRecord)
+        val netLoss = NetLossCriterion().calculate(tradingRecord)
         val numberOfPositions = NumberOfPositionsCriterion().calculate(tradingRecord)
         val valueAtRisk =
             ValueAtRiskCriterion(defaultNumFactory, 0.95).calculate(tradingRecord)

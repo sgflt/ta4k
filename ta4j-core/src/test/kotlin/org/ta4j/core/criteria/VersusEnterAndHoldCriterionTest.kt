@@ -28,7 +28,7 @@ import org.junit.jupiter.params.provider.MethodSource
 import org.ta4j.core.MarketEventTestContext
 import org.ta4j.core.TradeType
 import org.ta4j.core.backtest.criteria.VersusEnterAndHoldCriterion
-import org.ta4j.core.backtest.criteria.pnl.ReturnCriterion
+import org.ta4j.core.backtest.criteria.pnl.GrossReturnCriterion
 import org.ta4j.core.num.NumFactory
 
 class VersusEnterAndHoldCriterionTest {
@@ -41,7 +41,7 @@ class VersusEnterAndHoldCriterionTest {
             .withCandlePrices(100.0, 105.0, 110.0, 100.0, 95.0, 105.0)
             .toTradingRecordContext()
             .withTradeType(TradeType.BUY)
-            .withMarketDataDependentCriterion { marketEvents -> VersusEnterAndHoldCriterion(marketEvents, TradeType.BUY, ReturnCriterion()) }
+            .withMarketDataDependentCriterion { marketEvents -> VersusEnterAndHoldCriterion(marketEvents, TradeType.BUY, GrossReturnCriterion()) }
             // Enter at index 0 (price 100), exit at index 2 (price 110)
             // Enter at index 3 (price 100), exit at index 5 (price 105)
             .enter(1.0).asap()  // Enter at 100
@@ -61,7 +61,7 @@ class VersusEnterAndHoldCriterionTest {
             .withCandlePrices(100.0, 95.0, 100.0, 80.0, 85.0, 70.0)
             .toTradingRecordContext()
             .withTradeType(TradeType.BUY)
-            .withMarketDataDependentCriterion { marketEvents -> VersusEnterAndHoldCriterion(marketEvents, TradeType.BUY, ReturnCriterion()) }
+            .withMarketDataDependentCriterion { marketEvents -> VersusEnterAndHoldCriterion(marketEvents, TradeType.BUY, GrossReturnCriterion()) }
             // Enter at index 0 (price 100), exit at index 1 (price 95) - 5% loss
             // Enter at index 2 (price 100), exit at index 5 (price 70) - 30% loss
             .enter(1.0).asap()  // Enter at 100
@@ -81,7 +81,7 @@ class VersusEnterAndHoldCriterionTest {
             .withCandlePrices(100.0, 95.0, 100.0, 80.0, 85.0, 70.0)
             .toTradingRecordContext()
             .withTradeType(TradeType.BUY)
-            .withMarketDataDependentCriterion { marketEvents -> VersusEnterAndHoldCriterion(marketEvents, TradeType.BUY, ReturnCriterion()) }
+            .withMarketDataDependentCriterion { marketEvents -> VersusEnterAndHoldCriterion(marketEvents, TradeType.BUY, GrossReturnCriterion()) }
             // Single position: enter at index 0 (price 100), exit at index 1 (price 95)
             .enter(1.0).asap()
             .exit(1.0).asap()
@@ -99,7 +99,7 @@ class VersusEnterAndHoldCriterionTest {
             .withCandlePrices(100.0, 95.0, 110.0)
             .toTradingRecordContext()
             .withTradeType(TradeType.BUY)
-            .withMarketDataDependentCriterion { marketEvents -> VersusEnterAndHoldCriterion(marketEvents, TradeType.BUY, ReturnCriterion()) }
+            .withMarketDataDependentCriterion { marketEvents -> VersusEnterAndHoldCriterion(marketEvents, TradeType.BUY, GrossReturnCriterion()) }
             .fastForwardToTheEnd()
             // No trades - empty trading record => 1.0
             // VersusEnterAndHoldCriterion ratio: 1.1
@@ -114,7 +114,7 @@ class VersusEnterAndHoldCriterionTest {
             .withCandlePrices(100.0, 110.0, 120.0, 130.0, 140.0)
             .toTradingRecordContext()
             .withTradeType(TradeType.BUY)
-            .withMarketDataDependentCriterion { marketEvents -> VersusEnterAndHoldCriterion(marketEvents, TradeType.BUY, ReturnCriterion()) }
+            .withMarketDataDependentCriterion { marketEvents -> VersusEnterAndHoldCriterion(marketEvents, TradeType.BUY, GrossReturnCriterion()) }
             // Both strategies capture all gains: enter at 100, exit at 140
             .enter(1.0).asap()
             .exit(1.0).after(4)
@@ -130,7 +130,7 @@ class VersusEnterAndHoldCriterionTest {
             .withCandlePrices(100.0, 110.0, 120.0, 130.0, 140.0)
             .toTradingRecordContext()
             .withTradeType(TradeType.BUY)
-            .withMarketDataDependentCriterion { marketEvents -> VersusEnterAndHoldCriterion(marketEvents, TradeType.BUY, ReturnCriterion()) }
+            .withMarketDataDependentCriterion { marketEvents -> VersusEnterAndHoldCriterion(marketEvents, TradeType.BUY, GrossReturnCriterion()) }
             // Poor timing: enter at 100, exit at 110, missing bigger gains
             .enter(1.0).asap()  // Enter at 100
             .exit(1.0).asap()      // Exit at 110

@@ -25,7 +25,7 @@ package org.ta4j.core.backtest.criteria
 import org.ta4j.core.backtest.Position
 import org.ta4j.core.backtest.Trade
 import org.ta4j.core.backtest.TradingRecord
-import org.ta4j.core.backtest.criteria.pnl.ReturnCriterion
+import org.ta4j.core.backtest.criteria.pnl.GrossReturnCriterion
 import org.ta4j.core.num.Num
 import org.ta4j.core.num.NumFactoryProvider.defaultNumFactory
 
@@ -42,26 +42,7 @@ class LinearTransactionCostCriterion @JvmOverloads constructor(
     private val a: Double,
     private val b: Double = 0.0,
 ) : AnalysisCriterion {
-    private val grossReturn: ReturnCriterion
-
-
-    /**
-     * Constructor. (a * x + b)
-     *
-     * @param initialAmount the initially traded amount
-     * @param a the a coefficient (e.g. 0.005 for 0.5% per [     trade][Trade])
-     * @param b the b constant (e.g. 0.2 for $0.2 per [     trade][Trade])
-     */
-    /**
-     * Constructor. (a * x)
-     *
-     * @param initialAmount the initially traded amount
-     * @param a the a coefficient (e.g. 0.005 for 0.5% per [     trade][Trade])
-     */
-    init {
-        this.grossReturn = ReturnCriterion()
-    }
-
+    private val grossReturn: GrossReturnCriterion = GrossReturnCriterion()
 
     override fun calculate(position: Position): Num {
         return getTradeCost(position, defaultNumFactory.numOf(this.initialAmount))

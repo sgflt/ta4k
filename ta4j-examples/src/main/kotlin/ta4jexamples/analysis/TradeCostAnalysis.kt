@@ -29,7 +29,7 @@ import org.ta4j.core.api.Indicators
 import org.ta4j.core.backtest.BacktestExecutorBuilder
 import org.ta4j.core.backtest.analysis.cost.LinearBorrowingCostModel
 import org.ta4j.core.backtest.analysis.cost.LinearTransactionCostModel
-import org.ta4j.core.backtest.criteria.pnl.ReturnCriterion
+import org.ta4j.core.backtest.criteria.pnl.GrossReturnCriterion
 import org.ta4j.core.backtest.strategy.BacktestRun
 import org.ta4j.core.backtest.strategy.BacktestStrategy
 import org.ta4j.core.backtest.strategy.StrategyFactoryConverter
@@ -104,7 +104,7 @@ object TradeCostAnalysis {
         println("Total transaction costs: ${df.format(totalTransactionCost)}")
         println("Total costs: ${df.format(totalBorrowingCost + totalTransactionCost)}")
         
-        val totalReturn = ReturnCriterion()
+        val totalReturn = GrossReturnCriterion()
         println("\n------------ Performance ------------")
         println("Total return: ${df.format(totalReturn.calculate(tradingRecord).doubleValue() * 100)}%")
     }

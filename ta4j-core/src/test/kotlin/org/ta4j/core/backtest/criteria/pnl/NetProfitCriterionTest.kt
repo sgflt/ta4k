@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  *
- * Copyright (c) 2017-2024 Ta4j Organization & respective authors (see AUTHORS)
+ * Copyright (c) 2017-2025 Ta4j Organization & respective authors (see AUTHORS)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -24,11 +24,12 @@ package org.ta4j.core.backtest.criteria.pnl
 
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
+import org.ta4j.core.TestUtils.assertNumEquals
 import org.ta4j.core.TradeType
 import org.ta4j.core.TradingRecordTestContext
 import org.ta4j.core.num.NumFactory
 
-class ProfitLossRatioCriterionTest {
+internal class NetProfitCriterionTest {
 
     @ParameterizedTest
     @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
@@ -36,18 +37,17 @@ class ProfitLossRatioCriterionTest {
         val context = TradingRecordTestContext()
             .withNumFactory(numFactory)
             .withTradeType(TradeType.BUY)
-            .withCriterion(NetProfitLossRatioCriterion())
 
-        // First trade: buy at 100, sell at 120 (profit: 20)
+        // First trade: buy at 100, sell at 110
         context.enter(1.0).at(100.0)
-            .exit(1.0).at(120.0)
+            .exit(1.0).at(110.0)
 
-        // Second trade: buy at 120, sell at 130 (profit: 10)
-        context.enter(1.0).at(120.0)
-            .exit(1.0).at(130.0)
+        // Second trade: buy at 200, sell at 220
+        context.enter(1.0).at(200.0)
+            .exit(1.0).at(220.0)
 
-        // Only profits, no losses, so ratio should be 1
-        context.assertResults(1.0)
+        context.withCriterion(NetProfitCriterion())
+            .assertResults(30.0) // 10 + 20 = 30 (net profit)
     }
 
     @ParameterizedTest
@@ -56,68 +56,36 @@ class ProfitLossRatioCriterionTest {
         val context = TradingRecordTestContext()
             .withNumFactory(numFactory)
             .withTradeType(TradeType.BUY)
-            .withCriterion(NetProfitLossRatioCriterion())
 
-        // First trade: buy at 100, sell at 95 (loss: -5)
-        context.enter(1.0).at(100.0)
-            .exit(1.0).at(95.0)
-
-        // Second trade: buy at 100, sell at 70 (loss: -30)
-        context.enter(1.0).at(100.0)
-            .exit(1.0).at(70.0)
-
-        // Only losses, no profits, so ratio should be 0
-        context.assertResults(0.0)
-    }
-
-    @ParameterizedTest
-    @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
-    fun calculateProfitWithShortPositions(numFactory: NumFactory) {
-        val context = TradingRecordTestContext()
-            .withNumFactory(numFactory)
-            .withTradeType(TradeType.SELL)
-            .withCriterion(NetProfitLossRatioCriterion())
-
-        // First trade: sell at 100, buy at 85 (profit: +15)
-        context.enter(1.0).at(100.0)
-            .exit(1.0).at(85.0)
-
-        // Second trade: sell at 80, buy at 95 (loss: -15)
-        context.enter(1.0).at(80.0)
-            .exit(1.0).at(95.0)
-
-        // Profit/Loss ratio = Total Profit / Total Loss = 15/15 = 1
-        context.assertResults(1.0)
-    }
-
-    @ParameterizedTest
-    @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
-    fun calculateMixedProfitsAndLosses(numFactory: NumFactory) {
-        val context = TradingRecordTestContext()
-            .withNumFactory(numFactory)
-            .withTradeType(TradeType.BUY)
-            .withCriterion(NetProfitLossRatioCriterion())
-
-        // First trade: buy at 100, sell at 150 (profit: +50)
-        context.enter(1.0).at(100.0)
-            .exit(1.0).at(150.0)
-
-        // Second trade: buy at 100, sell at 80 (loss: -20)
-        context.enter(1.0).at(100.0)
-            .exit(1.0).at(80.0)
-
-        // Third trade: buy at 100, sell at 120 (profit: +20)
-        context.enter(1.0).at(100.0)
-            .exit(1.0).at(120.0)
-
-        // Fourth trade: buy at 100, sell at 90 (loss: -10)
+        // First trade: buy at 100, sell at 90 (loss)
         context.enter(1.0).at(100.0)
             .exit(1.0).at(90.0)
 
-        // Total profits = 50 + 20 = 70
-        // Total losses = 20 + 10 = 30
-        // Profit/Loss ratio = 70/30 = 2.333...
-        context.assertResults(2.333333333333333)
+        // Second trade: buy at 200, sell at 180 (loss)
+        context.enter(1.0).at(200.0)
+            .exit(1.0).at(180.0)
+
+        context.withCriterion(NetProfitCriterion())
+            .assertResults(0.0) // No profit, only losses
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
+    fun calculateWithMixedProfitAndLoss(numFactory: NumFactory) {
+        val context = TradingRecordTestContext()
+            .withNumFactory(numFactory)
+            .withTradeType(TradeType.BUY)
+
+        // Profitable trade: buy at 100, sell at 120
+        context.enter(1.0).at(100.0)
+            .exit(1.0).at(120.0)
+
+        // Loss trade: buy at 200, sell at 180
+        context.enter(1.0).at(200.0)
+            .exit(1.0).at(180.0)
+
+        context.withCriterion(NetProfitCriterion())
+            .assertResults(20.0) // Only the profit (20), loss is ignored
     }
 
     @ParameterizedTest
@@ -126,12 +94,11 @@ class ProfitLossRatioCriterionTest {
         val context = TradingRecordTestContext()
             .withNumFactory(numFactory)
             .withTradeType(TradeType.BUY)
-            .withCriterion(NetProfitLossRatioCriterion())
 
-        // Open position without closing it
+        // Open position
         context.enter(1.0).at(100.0)
 
-        // Open position should return 0
-        context.assertResults(0.0)
+        context.withCriterion(NetProfitCriterion())
+            .assertResults(0.0) // Open position contributes 0
     }
 }

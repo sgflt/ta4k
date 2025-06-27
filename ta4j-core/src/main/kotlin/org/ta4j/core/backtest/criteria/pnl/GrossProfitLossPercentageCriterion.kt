@@ -23,46 +23,26 @@
 package org.ta4j.core.backtest.criteria.pnl
 
 import org.ta4j.core.backtest.Position
-import org.ta4j.core.backtest.TradingRecord
-import org.ta4j.core.backtest.criteria.AnalysisCriterion
+import org.ta4j.core.backtest.Trade
 import org.ta4j.core.num.Num
-import org.ta4j.core.num.NumFactoryProvider.defaultNumFactory
 
 /**
- * Profit criterion with trading costs (= Gross profit) or without ( = Net
- * profit).
+ * Gross profit and loss in percentage criterion (relative PnL, includes trading
+ * costs), returned in percentage format (e.g. 1 = 1%).
  *
+ * For individual positions: Calculated as (gross_profit / entry_net_value) * 100
+ * For trading records: Calculated as (total_gross_profit / total_invested) * 100
  *
- *
- * The profit of the provided [position(s)][Position]
+ * @see <a href="https://www.investopedia.com/ask/answers/how-do-you-calculate-percentage-gain-or-loss-investment/">
+ *      How to Calculate Percentage Gain or Loss on Investment</a>
  */
-class ProfitCriterion
-/**
- * Constructor for GrossProfit (includes trading costs).
- */ @JvmOverloads constructor(private val excludeCosts: Boolean = false) : AnalysisCriterion {
-    /**
-     * Constructor.
-     *
-     * @param excludeCosts set to true to exclude trading costs
-     */
+class GrossProfitLossPercentageCriterion : AbstractProfitLossPercentageCriterion() {
 
-
-    override fun calculate(position: Position): Num {
-        if (position.isClosed) {
-            val profit = if (this.excludeCosts) position.grossProfit else position.profit
-            return if (profit.isPositive) profit else defaultNumFactory.zero()
-        }
-        return defaultNumFactory.zero()
+    override fun calculateProfit(position: Position): Num {
+        return position.grossProfit
     }
 
-
-    override fun calculate(tradingRecord: TradingRecord): Num {
-        return tradingRecord.positions
-            .filter { it.isClosed }
-            .sumOf { calculate(it) }
+    override fun calculateEntryValue(position: Position, entry: Trade): Num {
+        return entry.netPrice * entry.amount
     }
-
-    private fun Iterable<Position>.sumOf(selector: (Position) -> Num): Num =
-        fold(defaultNumFactory.zero()) { sum, element -> sum + selector(element) }
 }
-

@@ -25,43 +25,51 @@ package org.ta4j.core.backtest.criteria.pnl
 import org.ta4j.core.backtest.Position
 import org.ta4j.core.backtest.TradingRecord
 import org.ta4j.core.backtest.criteria.AnalysisCriterion
-import org.ta4j.core.backtest.criteria.NumberOfWinningPositionsCriterion
 import org.ta4j.core.num.Num
-import org.ta4j.core.num.NumFactoryProvider.defaultNumFactory
 
 /**
- * Average net profit criterion (includes trading costs).
+ * Base class for return based criteria.
  * 
- * Note: Despite the class name suggesting it's for any profit, this specifically
- * calculates NET profit (after deducting trading costs).
+ * Handles calculation of the aggregated return across positions and the
+ * optional inclusion of the base percentage.
  */
-class AverageProfitCriterion : AnalysisCriterion {
-    private val netProfitCriterion = NetProfitCriterion()
-    private val numberOfWinningPositionsCriterion = NumberOfWinningPositionsCriterion()
-
+abstract class AbstractReturnCriterion(
+    /**
+     * If `true` the base percentage of `1` (equivalent to 100%) is
+     * included in the returned value.
+     */
+    protected val addBase: Boolean = true
+) : AnalysisCriterion {
 
     override fun calculate(position: Position): Num {
-        val numberOfWinningPositions = numberOfWinningPositionsCriterion.calculate(position)
-        if (numberOfWinningPositions.isZero) {
-            return defaultNumFactory.zero()
+        if (position.isClosed) {
+            return calculateReturn(position)
         }
-        val netProfit = netProfitCriterion.calculate(position)
-        if (netProfit.isZero) {
-            return defaultNumFactory.zero()
+        return if (addBase) {
+            position.numFactory.one()
+        } else {
+            position.numFactory.zero()
         }
-        return netProfit / numberOfWinningPositions
     }
-
 
     override fun calculate(tradingRecord: TradingRecord): Num {
-        val numberOfWinningPositions = numberOfWinningPositionsCriterion.calculate(tradingRecord)
-        if (numberOfWinningPositions.isZero) {
-            return defaultNumFactory.zero()
+        val one = tradingRecord.currentPosition.numFactory.one()
+        val result = tradingRecord.positions
+            .map { calculate(it) }
+            .fold(one) { acc, value -> acc * value }
+        
+        return if (addBase) {
+            result
+        } else {
+            result - one
         }
-        val netProfit = netProfitCriterion.calculate(tradingRecord)
-        if (netProfit.isZero) {
-            return defaultNumFactory.zero()
-        }
-        return netProfit / numberOfWinningPositions
     }
+
+    /**
+     * Calculates the return of the given closed position including the base.
+     *
+     * @param position the closed position
+     * @return the return of the position including the base
+     */
+    protected abstract fun calculateReturn(position: Position): Num
 }

@@ -29,65 +29,26 @@ import org.ta4j.core.num.Num
 import org.ta4j.core.num.NumFactoryProvider.defaultNumFactory
 
 /**
- * Return (in percentage) criterion (includes trading costs), returned in
- * decimal format.
+ * Net loss criterion (includes trading costs).
  *
- * The return of the provided [position(s)][Position]
+ * The net loss of the provided [position(s)][Position]
  */
-class ReturnCriterion : AnalysisCriterion {
-    /**
-     * If true, then the base percentage of `1` (equivalent to 100%) is added
-     * to the criterion value.
-     */
-    private val addBase: Boolean
-
-
-    /**
-     * Constructor with [.addBase] == true.
-     */
-    constructor() {
-        addBase = true
-    }
-
-
-    /**
-     * Constructor.
-     *
-     * @param addBase the [.addBase]
-     */
-    constructor(addBase: Boolean) {
-        this.addBase = addBase
-    }
-
+class NetLossCriterion : AnalysisCriterion {
 
     override fun calculate(position: Position): Num {
-        return calculateProfit(position)
+        if (position.isClosed) {
+            val loss = position.profit // Net profit/loss (includes costs)
+            return if (loss.isNegative) loss else defaultNumFactory.zero()
+        }
+        return defaultNumFactory.zero()
     }
-
 
     override fun calculate(tradingRecord: TradingRecord): Num {
-        val product = tradingRecord.positions
-            .map { calculateProfit(it) }
-            .fold(defaultNumFactory.one()) { acc, multiplicand -> acc * multiplicand }
-
-        return product - (if (addBase) defaultNumFactory.zero() else defaultNumFactory.one())
+        return tradingRecord.positions
+            .filter { it.isClosed }
+            .sumOf { calculate(it) }
     }
 
-
-    /**
-     * Calculates the gross return of a position (Buy and sell).
-     *
-     * @param position a position
-     *
-     * @return the gross return of the position
-     */
-    private fun calculateProfit(position: Position): Num {
-        if (position.isClosed) {
-            return position.grossReturn
-        }
-        return if (this.addBase)
-            defaultNumFactory.one()
-        else
-            defaultNumFactory.zero()
-    }
+    private fun Iterable<Position>.sumOf(selector: (Position) -> Num): Num =
+        fold(defaultNumFactory.zero()) { sum, element -> sum + selector(element) }
 }

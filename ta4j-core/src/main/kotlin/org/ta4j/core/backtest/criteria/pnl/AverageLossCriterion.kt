@@ -30,10 +30,13 @@ import org.ta4j.core.num.Num
 import org.ta4j.core.num.NumFactoryProvider.defaultNumFactory
 
 /**
- * Average gross loss criterion (includes trading costs).
+ * Average net loss criterion (includes trading costs).
+ * 
+ * Note: Despite the class name suggesting it's for any loss, this specifically
+ * calculates NET loss (after deducting trading costs).
  */
 class AverageLossCriterion : AnalysisCriterion {
-    private val grossLossCriterion = LossCriterion(false)
+    private val netLossCriterion = NetLossCriterion()
     private val numberOfLosingPositionsCriterion = NumberOfLosingPositionsCriterion()
 
 
@@ -42,11 +45,11 @@ class AverageLossCriterion : AnalysisCriterion {
         if (numberOfLosingPositions.isZero) {
             return defaultNumFactory.zero()
         }
-        val grossLoss = this.grossLossCriterion.calculate(position)
-        if (grossLoss.isZero) {
+        val netLoss = this.netLossCriterion.calculate(position)
+        if (netLoss.isZero) {
             return defaultNumFactory.zero()
         }
-        return grossLoss / numberOfLosingPositions
+        return netLoss / numberOfLosingPositions
     }
 
 
@@ -55,10 +58,10 @@ class AverageLossCriterion : AnalysisCriterion {
         if (numberOfLosingPositions.isZero) {
             return defaultNumFactory.zero()
         }
-        val grossLoss = this.grossLossCriterion.calculate(tradingRecord)
-        if (grossLoss.isZero) {
+        val netLoss = this.netLossCriterion.calculate(tradingRecord)
+        if (netLoss.isZero) {
             return defaultNumFactory.zero()
         }
-        return grossLoss / numberOfLosingPositions
+        return netLoss / numberOfLosingPositions
     }
 }
