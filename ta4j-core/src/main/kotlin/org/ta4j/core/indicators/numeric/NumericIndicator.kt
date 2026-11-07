@@ -50,7 +50,11 @@ import org.ta4j.core.indicators.numeric.oscillators.RAVIIndicator
 import org.ta4j.core.indicators.bool.renko.RenkoDownIndicator
 import org.ta4j.core.indicators.bool.renko.RenkoUpIndicator
 import org.ta4j.core.indicators.bool.renko.RenkoXIndicator
+import org.ta4j.core.indicators.numeric.oscillators.ConnorsRSIIndicator
+import org.ta4j.core.indicators.numeric.oscillators.SchaffTrendCycleIndicator
+import org.ta4j.core.indicators.numeric.oscillators.StochasticIndicator
 import org.ta4j.core.indicators.numeric.oscillators.TrueStrengthIndexIndicator
+import org.ta4j.core.indicators.numeric.statistics.PercentRankIndicator
 import org.ta4j.core.indicators.numeric.oscillators.aroon.AroonDownIndicator
 import org.ta4j.core.indicators.numeric.oscillators.aroon.AroonUpIndicator
 import org.ta4j.core.indicators.numeric.risk.UlcerIndexIndicator
@@ -158,6 +162,23 @@ abstract class NumericIndicator protected constructor(
     )
 
     fun cmo(barCount: Int) = CMOIndicator(numFactory, this, barCount)
+
+    /** Stochastic of this indicator over [barCount] bars, 0 to 100. */
+    fun stochastic(barCount: Int) = StochasticIndicator(this, barCount)
+
+    /** Connors RSI. */
+    fun connorsRsi(rsiPeriod: Int = 3, streakRsiPeriod: Int = 2, percentRankPeriod: Int = 100) =
+        ConnorsRSIIndicator(this, rsiPeriod, streakRsiPeriod, percentRankPeriod)
+
+    /** Schaff Trend Cycle. */
+    fun schaffTrendCycle(fastPeriod: Int = 23, slowPeriod: Int = 50, cycleLength: Int = 10, smoothingPeriod: Int = 3) =
+        SchaffTrendCycleIndicator(this, fastPeriod, slowPeriod, cycleLength, smoothingPeriod)
+
+    /** Kairi Relative Index: percent distance from the SMA of [barCount] bars. */
+    fun kri(barCount: Int): NumericIndicator {
+        val sma = sma(barCount)
+        return minus(sma).dividedBy(sma).multipliedBy(100)
+    }
 
     /** True Strength Index of this indicator. */
     fun tsi(firstSmoothingPeriod: Int = 25, secondSmoothingPeriod: Int = 13) =
@@ -399,6 +420,9 @@ abstract class NumericIndicator protected constructor(
     /**
      * @return z-score of `this` against its simple moving average and sample standard deviation over [barCount] bars
      */
+    /** Percent of the previous [period] values below the current one, 0 to 100. */
+    fun percentRank(period: Int) = PercentRankIndicator(this, period)
+
     fun zScore(barCount: Int) = ZScoreIndicator(minus(sma(barCount)), stddev(barCount))
 
 
