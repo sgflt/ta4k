@@ -52,6 +52,7 @@ import org.ta4j.core.indicators.numeric.statistics.SimpleLinearRegressionIndicat
 import org.ta4j.core.indicators.numeric.statistics.StandardDeviationIndicator
 import org.ta4j.core.indicators.numeric.statistics.StandardErrorIndicator
 import org.ta4j.core.indicators.numeric.statistics.VarianceIndicator
+import org.ta4j.core.indicators.numeric.statistics.ZScoreIndicator
 import org.ta4j.core.num.NaN
 import org.ta4j.core.num.Num
 import org.ta4j.core.num.NumFactory
@@ -366,6 +367,11 @@ abstract class NumericIndicator protected constructor(
 
 
     fun variance(barCount: Int) = VarianceIndicator(this, barCount)
+
+    /**
+     * @return z-score of `this` against its simple moving average and sample standard deviation over [barCount] bars
+     */
+    fun zScore(barCount: Int) = ZScoreIndicator(minus(sma(barCount)), stddev(barCount))
 
 
     fun sigma(barCount: Int) = SigmaIndicator(this, barCount)
