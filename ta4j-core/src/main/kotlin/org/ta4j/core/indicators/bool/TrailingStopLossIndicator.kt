@@ -22,6 +22,10 @@ import org.ta4j.core.strategy.RuntimeValueResolver
  * @param barCount the maximum number of bars to look back (default: unlimited)
  * @param runtimeContext the runtime context to access position information
  */
+@Deprecated(
+    "Reads position data under a key no runtime context provides, so it never fires, and trails over a " +
+        "fixed window instead of since entry. Use TrailingStopLossRule (NumericIndicator.trailingStopLossRule).",
+)
 class TrailingStopLossIndicator(
     private val priceIndicator: NumericIndicator,
     private val lossPercentage: Num,
