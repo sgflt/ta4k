@@ -50,6 +50,9 @@ import org.ta4j.core.indicators.numeric.oscillators.vortex.VortexFacade
 import org.ta4j.core.indicators.numeric.volume.ForceIndexIndicator
 import org.ta4j.core.indicators.numeric.volume.IIIIndicator
 import org.ta4j.core.indicators.numeric.volume.AnchoredVWAPIndicator
+import org.ta4j.core.indicators.numeric.volume.EaseOfMovementIndicator
+import org.ta4j.core.indicators.numeric.volume.KlingerVolumeForceIndicator
+import org.ta4j.core.indicators.numeric.volume.KlingerVolumeOscillatorIndicator
 import org.ta4j.core.indicators.numeric.volume.MVWAPIndicator
 import org.ta4j.core.indicators.numeric.volume.MoneyFlowIndexIndicator
 import org.ta4j.core.indicators.numeric.volume.NVIIndicator
@@ -239,6 +242,14 @@ object Indicators {
     fun forceIndex(barCount: Int = 13) = extended().forceIndex(barCount)
 
     @JvmStatic
+    fun easeOfMovement(barCount: Int = 14, volumeDivisor: Number = 100_000_000L) =
+        extended().easeOfMovement(barCount, volumeDivisor)
+
+    @JvmStatic
+    fun klingerVolumeOscillator(shortPeriod: Int = 34, longPeriod: Int = 55) =
+        extended().klingerVolumeOscillator(shortPeriod, longPeriod)
+
+    @JvmStatic
     private fun extended() = extended(NumFactoryProvider.defaultNumFactory)
 
     @JvmStatic
@@ -373,6 +384,15 @@ object Indicators {
         fun iii() = IIIIndicator(numFactory)
 
         fun forceIndex(barCount: Int = 13) = ForceIndexIndicator(closePrice(), volume(), barCount)
+
+        fun easeOfMovement(barCount: Int = 14, volumeDivisor: Number = 100_000_000L) =
+            EaseOfMovementIndicator(highPrice(), lowPrice(), volume(), barCount, volumeDivisor)
+
+        fun klingerVolumeForce(scaleMultiplier: Number = 100) =
+            KlingerVolumeForceIndicator(highPrice(), lowPrice(), closePrice(), volume(), scaleMultiplier)
+
+        fun klingerVolumeOscillator(shortPeriod: Int = 34, longPeriod: Int = 55) =
+            KlingerVolumeOscillatorIndicator(klingerVolumeForce(), shortPeriod, longPeriod)
 
         fun ultimateOscillator(shortPeriod: Int = 7, middlePeriod: Int = 14, longPeriod: Int = 28) =
             UltimateOscillatorIndicator(numFactory, shortPeriod, middlePeriod, longPeriod)
