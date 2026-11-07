@@ -32,6 +32,20 @@ internal class EMAIndicatorTest {
             .assertNext(64.75)
     }
 
+    @ParameterizedTest(name = "Recovers after NaN input [{index}] {0}")
+    @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
+    fun recoversAfterNaNInput(factory: NumFactory) {
+        // difference is NaN on the first bar, then 2, -1, 4; multiplier = 2 / (3 + 1)
+        MarketEventTestContext()
+            .withCandlePrices(10.0, 12.0, 11.0, 15.0)
+            .withNumFactory(factory)
+            .withIndicator(Indicators.closePrice().difference().ema(3))
+            .assertNextNaN()
+            .assertNext(2.0)
+            .assertNext(0.5)
+            .assertNext(2.25)
+    }
+
     @ParameterizedTest(name = "EMA with barCount 10 [{index}] {0}")
     @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
     fun testEmaWithBarCount10(factory: NumFactory) {
