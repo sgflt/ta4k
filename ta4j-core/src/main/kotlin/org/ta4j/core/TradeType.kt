@@ -42,5 +42,5 @@ enum class TradeType {
     /**
      * @return the complementary trade type
      */
-    abstract fun complementType(): TradeType?
+    abstract fun complementType(): TradeType
 }

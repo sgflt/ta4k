@@ -22,93 +22,32 @@
  */
 package org.ta4j.core.strategy.rules
 
-import org.ta4j.core.TradeType
 import org.ta4j.core.indicators.numeric.NumericIndicator
 import org.ta4j.core.num.Num
 import org.ta4j.core.strategy.RuntimeContext
-import org.ta4j.core.strategy.RuntimeValueResolver
 
 /**
  * A stop-loss rule.
  *
- * Satisfied when indicator reaches the loss threshold relative to the entry price.
+ * Satisfied when the indicator reaches the loss threshold relative to the entry price.
  * For BUY positions: triggers when current price <= entry price * (1 - loss%)
  * For SELL positions: triggers when current price >= entry price * (1 + loss%)
  *
- * @param indicator the indicator
- * @param lossPercentage the loss percentage (e.g., 5.0 for 5% loss)
- * @param runtimeContext the runtime context to access current position information
+ * @param indicator the price indicator
+ * @param lossPercentage the loss percentage (e.g., 5 for 5% loss)
+ * @param runtimeContext the runtime context providing the open position
  */
 class StopLossRule(
-    private val indicator: NumericIndicator,
-    lossPercentage: Double,
-    private val runtimeContext: RuntimeContext,
-) : AbstractRule() {
+    indicator: NumericIndicator,
+    val lossPercentage: Num,
+    runtimeContext: RuntimeContext,
+) : AbstractStopRule(indicator, runtimeContext, StopType.LOSS, StopDistance.percentage(lossPercentage)) {
 
-    private val lossPercentage: Num = indicator.numFactory.numOf(lossPercentage)
-    private val hundred = indicator.numFactory.hundred()
-
-    /**
-     * Constructor with Num loss percentage.
-     */
     constructor(
         indicator: NumericIndicator,
-        lossPercentage: Num,
+        lossPercentage: Double,
         runtimeContext: RuntimeContext,
-    ) : this(indicator, lossPercentage.doubleValue(), runtimeContext)
-
-
-    init {
-        require(lossPercentage > 0.0) { "lossPercentage must be non-negative" }
-    }
-
-    /**
-     * Resolver to get the current entry price from runtime context.
-     */
-    private val entryPriceResolver = RuntimeValueResolver<Num?> { context ->
-        context.getValue("currentEntryPrice") as? Num
-    }
-
-    /**
-     * Resolver to get the current trade type from runtime context.
-     */
-    private val tradeTypeResolver = RuntimeValueResolver<TradeType?> { context ->
-        context.getValue("currentTradeType") as? TradeType
-    }
-
-    override val isSatisfied: Boolean
-        get() {
-            val entryPrice = runtimeContext.getValue(entryPriceResolver)
-            val tradeType = runtimeContext.getValue(tradeTypeResolver)
-
-            if (entryPrice == null || tradeType == null) {
-                val satisfied = false
-                traceIsSatisfied(satisfied)
-                return satisfied
-            }
-
-            val currentPrice = indicator.value
-
-            val satisfied = when (tradeType) {
-                TradeType.BUY -> isBuyStopSatisfied(entryPrice, currentPrice)
-                TradeType.SELL -> isSellStopSatisfied(entryPrice, currentPrice)
-            }
-
-            traceIsSatisfied(satisfied)
-            return satisfied
-        }
-
-    private fun isBuyStopSatisfied(entryPrice: Num, currentPrice: Num): Boolean {
-        val lossMultiplier = (hundred - lossPercentage) / hundred
-        val threshold = entryPrice * lossMultiplier
-        return currentPrice <= threshold
-    }
-
-    private fun isSellStopSatisfied(entryPrice: Num, currentPrice: Num): Boolean {
-        val lossMultiplier = (hundred + lossPercentage) / hundred
-        val threshold = entryPrice * lossMultiplier
-        return currentPrice >= threshold
-    }
+    ) : this(indicator, indicator.numFactory.numOf(lossPercentage), runtimeContext)
 
     override fun toString(): String {
         return "StopLossRule[${lossPercentage.doubleValue()}%] => $isSatisfied"

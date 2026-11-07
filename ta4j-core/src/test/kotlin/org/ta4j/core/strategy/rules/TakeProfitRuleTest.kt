@@ -23,8 +23,6 @@
  */
 package org.ta4j.core.strategy.rules
 
-import io.mockk.every
-import io.mockk.mockk
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
@@ -34,8 +32,6 @@ import org.ta4j.core.TradingRecordTestContext
 import org.ta4j.core.api.Indicators
 import org.ta4j.core.backtest.criteria.pnl.ReturnCriterion
 import org.ta4j.core.num.NumFactory
-import org.ta4j.core.strategy.RuntimeContext
-import org.ta4j.core.strategy.RuntimeValueResolver
 
 class TakeProfitRuleTest {
 
@@ -48,7 +44,7 @@ class TakeProfitRuleTest {
             .withCandlePrices(100.0, 105.0, 109.0, 110.000001, 115.0)
             .withIndicator(closePrice)
 
-        val runtimeContext = createMockRuntimeContext(numFactory, 100.0, TradeType.BUY)
+        val runtimeContext = PositionRuntimeContext.withOpenPosition(numFactory, 100.0, TradeType.BUY)
         val takeProfitRule = TakeProfitRule(closePrice, 10.0, runtimeContext) // 10% gain
 
         // Entry at price 100
@@ -81,7 +77,7 @@ class TakeProfitRuleTest {
             .withCandlePrices(100.0, 85.0, 86.0)
             .withIndicator(closePrice)
 
-        val runtimeContext = createMockRuntimeContext(numFactory, 100.0, TradeType.SELL)
+        val runtimeContext = PositionRuntimeContext.withOpenPosition(numFactory, 100.0, TradeType.SELL)
         val takeProfitRule = TakeProfitRule(closePrice, 15.0, runtimeContext) // 15% gain
 
         marketContext.advance()
@@ -104,7 +100,7 @@ class TakeProfitRuleTest {
             .withCandlePrices(100.0, 150.0)
             .withIndicator(Indicators.extended(numFactory).closePrice())
 
-        val runtimeContext = createMockRuntimeContext(numFactory, null, null)
+        val runtimeContext = PositionRuntimeContext.withOpenPosition(numFactory, null)
         val takeProfitRule = TakeProfitRule(closePrice, 10.0, runtimeContext)
 
         // No position context
@@ -124,7 +120,7 @@ class TakeProfitRuleTest {
             .withCandlePrices(100.0, 104.9, 105.0, 124.9, 125.0)
             .withIndicator(closePrice)
 
-        val runtimeContext = createMockRuntimeContext(numFactory, 100.0, TradeType.BUY)
+        val runtimeContext = PositionRuntimeContext.withOpenPosition(numFactory, 100.0, TradeType.BUY)
 
         // Test with 5% gain
         val rule5Percent = TakeProfitRule(closePrice, 5.0, runtimeContext)
@@ -157,7 +153,7 @@ class TakeProfitRuleTest {
             .withCandlePrices(100.0, 112.4, 112.5)
             .withIndicator(closePrice)
 
-        val runtimeContext = createMockRuntimeContext(numFactory, 100.0, TradeType.BUY)
+        val runtimeContext = PositionRuntimeContext.withOpenPosition(numFactory, 100.0, TradeType.BUY)
         val gainPercentage = numFactory.numOf(12.5)
         val takeProfitRule = TakeProfitRule(closePrice, gainPercentage, runtimeContext)
 
@@ -181,7 +177,7 @@ class TakeProfitRuleTest {
             .withCandlePrices(100.0)
             .withIndicator(closePrice)
 
-        val runtimeContext = createMockRuntimeContext(numFactory, 100.0, TradeType.BUY)
+        val runtimeContext = PositionRuntimeContext.withOpenPosition(numFactory, 100.0, TradeType.BUY)
         val takeProfitRule = TakeProfitRule(closePrice, 15.5, runtimeContext)
 
         assertThat(takeProfitRule.toString()).contains("TakeProfitRule")
@@ -197,7 +193,7 @@ class TakeProfitRuleTest {
             .withCandlePrices(100.0, 107.24, 107.25)
             .withIndicator(closePrice)
 
-        val runtimeContext = createMockRuntimeContext(numFactory, 100.0, TradeType.BUY)
+        val runtimeContext = PositionRuntimeContext.withOpenPosition(numFactory, 100.0, TradeType.BUY)
         val takeProfitRule = TakeProfitRule(closePrice, 7.25, runtimeContext) // 7.25% gain
 
         // Entry price
@@ -221,7 +217,7 @@ class TakeProfitRuleTest {
             .withCandlePrices(100.0, 149.99, 150.0)
             .withIndicator(closePrice)
 
-        val runtimeContext = createMockRuntimeContext(numFactory, 100.0, TradeType.BUY)
+        val runtimeContext = PositionRuntimeContext.withOpenPosition(numFactory, 100.0, TradeType.BUY)
         val takeProfitRule = TakeProfitRule(closePrice, 50.0, runtimeContext) // 50% gain
 
         // Entry price
@@ -245,7 +241,7 @@ class TakeProfitRuleTest {
             .withCandlePrices(100.0, 100.09, 100.1)
             .withIndicator(closePrice)
 
-        val runtimeContext = createMockRuntimeContext(numFactory, 100.0, TradeType.BUY)
+        val runtimeContext = PositionRuntimeContext.withOpenPosition(numFactory, 100.0, TradeType.BUY)
         val takeProfitRule = TakeProfitRule(closePrice, 0.1, runtimeContext) // 0.1% gain
 
         // Entry price
@@ -276,23 +272,5 @@ class TakeProfitRuleTest {
         context.exit(1.0).at(115.0) // 15% profit
 
         context.assertResults(1.15) // 15% return
-    }
-
-    private fun createMockRuntimeContext(
-        numFactory: NumFactory,
-        entryPrice: Double?,
-        tradeType: TradeType?,
-    ): RuntimeContext {
-        val mockContext = mockk<RuntimeContext>()
-
-        every { mockContext.getValue("currentEntryPrice") } returns entryPrice?.let { numFactory.numOf(it) }
-        every { mockContext.getValue("currentTradeType") } returns tradeType
-
-        every { mockContext.getValue(any<RuntimeValueResolver<Any?>>()) } answers {
-            val resolver = firstArg<RuntimeValueResolver<*>>()
-            resolver.resolve(mockContext)
-        }
-
-        return mockContext
     }
 }

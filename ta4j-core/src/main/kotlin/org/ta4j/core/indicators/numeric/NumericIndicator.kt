@@ -72,7 +72,10 @@ import org.ta4j.core.indicators.numeric.statistics.VarianceIndicator
 import org.ta4j.core.num.NaN
 import org.ta4j.core.num.Num
 import org.ta4j.core.num.NumFactory
+import org.ta4j.core.strategy.RuntimeContext
 import org.ta4j.core.strategy.rules.OverIndicatorRule
+import org.ta4j.core.strategy.rules.StopLossRule
+import org.ta4j.core.strategy.rules.TakeProfitRule
 import org.ta4j.core.strategy.rules.UnderIndicatorRule
 
 /**
@@ -490,6 +493,24 @@ abstract class NumericIndicator protected constructor(
      * @return the [UnderIndicatorRule] of `this` and `n`
      */
     fun isLessThan(n: Number) = isLessThan(createConstant(n))
+
+    /**
+     * @param lossPercentage loss from the entry price that closes the position (e.g. 5 for 5 %)
+     * @param runtimeContext context providing the open position
+     *
+     * @return [StopLossRule] watching `this` price
+     */
+    fun stopLossRule(lossPercentage: Number, runtimeContext: RuntimeContext) =
+        StopLossRule(this, numFactory.numOf(lossPercentage), runtimeContext)
+
+    /**
+     * @param gainPercentage gain from the entry price that closes the position (e.g. 10 for 10 %)
+     * @param runtimeContext context providing the open position
+     *
+     * @return [TakeProfitRule] watching `this` price
+     */
+    fun takeProfitRule(gainPercentage: Number, runtimeContext: RuntimeContext) =
+        TakeProfitRule(this, numFactory.numOf(gainPercentage), runtimeContext)
 
     fun isLowest(barCount: Int) = IsLowestIndicator(this, barCount)
 

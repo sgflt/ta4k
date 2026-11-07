@@ -23,8 +23,6 @@
  */
 package org.ta4j.core.strategy.rules
 
-import io.mockk.every
-import io.mockk.mockk
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Test
@@ -33,47 +31,14 @@ import org.junit.jupiter.params.provider.MethodSource
 import org.ta4j.core.MarketEventTestContext
 import org.ta4j.core.TradeType
 import org.ta4j.core.api.Indicators
-import org.ta4j.core.num.Num
 import org.ta4j.core.num.NumFactory
-import org.ta4j.core.strategy.RuntimeContext
-import org.ta4j.core.strategy.RuntimeValueResolver
 
 class StopLossRuleTest {
-
-    companion object {
-        /**
-         * Creates a mocked RuntimeContext with specified entry price and trade type.
-         */
-        fun createRuntimeContextMock(
-            entryPrice: Num? = null,
-            tradeType: TradeType = TradeType.BUY,
-        ): RuntimeContext = mockk<RuntimeContext>().apply {
-            every { getValue("currentEntryPrice") } returns entryPrice
-            every { getValue("currentTradeType") } returns tradeType
-
-            every { getValue(any<RuntimeValueResolver<Any?>>()) } answers {
-                val resolver = firstArg<RuntimeValueResolver<*>>()
-                resolver.resolve(this@apply)
-            }
-        }
-
-        /**
-         * Creates a mocked RuntimeContext with entry price as Double.
-         */
-        fun createRuntimeContextMock(
-            numFactory: NumFactory,
-            entryPrice: Double? = null,
-            tradeType: TradeType = TradeType.BUY,
-        ): RuntimeContext = createRuntimeContextMock(
-            entryPrice = entryPrice?.let { numFactory.numOf(it) },
-            tradeType = tradeType
-        )
-    }
 
     @ParameterizedTest
     @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
     fun `should trigger stop loss for BUY position when price drops below threshold`(numFactory: NumFactory) {
-        val runtimeContext = createRuntimeContextMock(numFactory, 100.0, TradeType.BUY)
+        val runtimeContext = PositionRuntimeContext.withOpenPosition(numFactory, 100.0, TradeType.BUY)
 
         val context = MarketEventTestContext()
             .withNumFactory(numFactory)
@@ -100,7 +65,7 @@ class StopLossRuleTest {
     @ParameterizedTest
     @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
     fun `should not trigger stop loss for BUY position when price stays above threshold`(numFactory: NumFactory) {
-        val runtimeContext = createRuntimeContextMock(numFactory, 100.0, TradeType.BUY)
+        val runtimeContext = PositionRuntimeContext.withOpenPosition(numFactory, 100.0, TradeType.BUY)
 
         val context = MarketEventTestContext()
             .withNumFactory(numFactory)
@@ -119,7 +84,7 @@ class StopLossRuleTest {
     @ParameterizedTest
     @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
     fun `should trigger stop loss for SELL position when price rises above threshold`(numFactory: NumFactory) {
-        val runtimeContext = createRuntimeContextMock(numFactory, 100.0, TradeType.SELL)
+        val runtimeContext = PositionRuntimeContext.withOpenPosition(numFactory, 100.0, TradeType.SELL)
 
         val context = MarketEventTestContext()
             .withNumFactory(numFactory)
@@ -146,7 +111,7 @@ class StopLossRuleTest {
     @ParameterizedTest
     @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
     fun `should not trigger stop loss for SELL position when price stays below threshold`(numFactory: NumFactory) {
-        val runtimeContext = createRuntimeContextMock(numFactory, 100.0, TradeType.SELL)
+        val runtimeContext = PositionRuntimeContext.withOpenPosition(numFactory, 100.0, TradeType.SELL)
 
         val context = MarketEventTestContext()
             .withNumFactory(numFactory)
@@ -165,7 +130,7 @@ class StopLossRuleTest {
     @ParameterizedTest
     @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
     fun `should not be satisfied when entry price is not available`(numFactory: NumFactory) {
-        val runtimeContext = createRuntimeContextMock(numFactory, null, TradeType.BUY)
+        val runtimeContext = PositionRuntimeContext.withOpenPosition(numFactory, null, TradeType.BUY)
 
         val context = MarketEventTestContext()
             .withNumFactory(numFactory)
@@ -184,7 +149,7 @@ class StopLossRuleTest {
     @ParameterizedTest
     @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
     fun `should handle high loss percentage`(numFactory: NumFactory) {
-        val runtimeContext = createRuntimeContextMock(numFactory, 100.0)
+        val runtimeContext = PositionRuntimeContext.withOpenPosition(numFactory, 100.0)
 
         val context = MarketEventTestContext()
             .withNumFactory(numFactory)
@@ -211,7 +176,7 @@ class StopLossRuleTest {
     @ParameterizedTest
     @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
     fun `should work with Num constructor`(numFactory: NumFactory) {
-        val runtimeContext = createRuntimeContextMock(numFactory, 100.0)
+        val runtimeContext = PositionRuntimeContext.withOpenPosition(numFactory, 100.0)
 
         val context = MarketEventTestContext()
             .withNumFactory(numFactory)
@@ -232,7 +197,7 @@ class StopLossRuleTest {
 
     @Test
     fun `should throw exception for negative loss percentage`() {
-        val runtimeContext = mockk<RuntimeContext>()
+        val runtimeContext = PositionRuntimeContext(null)
         val context = MarketEventTestContext()
             .withCandlePrices(100.0)
 
@@ -242,13 +207,13 @@ class StopLossRuleTest {
         assertThatThrownBy {
             StopLossRule(closePrice, -5.0, runtimeContext)
         }.isInstanceOf(IllegalArgumentException::class.java)
-            .hasMessageContaining("lossPercentage must be non-negative")
+            .hasMessageContaining("must be positive")
     }
 
     @ParameterizedTest
     @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
     fun `should have meaningful string representation`(numFactory: NumFactory) {
-        val runtimeContext = createRuntimeContextMock(numFactory, 100.0, TradeType.BUY)
+        val runtimeContext = PositionRuntimeContext.withOpenPosition(numFactory, 100.0, TradeType.BUY)
         val context = MarketEventTestContext()
             .withNumFactory(numFactory)
             .withCandlePrices(100.0)
@@ -265,7 +230,7 @@ class StopLossRuleTest {
     @ParameterizedTest
     @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
     fun `should handle price exactly at threshold for BUY position`(numFactory: NumFactory) {
-        val runtimeContext = createRuntimeContextMock(numFactory, 100.0)
+        val runtimeContext = PositionRuntimeContext.withOpenPosition(numFactory, 100.0)
 
         val context = MarketEventTestContext()
             .withNumFactory(numFactory)
@@ -286,7 +251,7 @@ class StopLossRuleTest {
     @ParameterizedTest
     @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
     fun `should handle price exactly at threshold for SELL position`(numFactory: NumFactory) {
-        val runtimeContext = createRuntimeContextMock(numFactory, 100.0, TradeType.SELL)
+        val runtimeContext = PositionRuntimeContext.withOpenPosition(numFactory, 100.0, TradeType.SELL)
 
         val context = MarketEventTestContext()
             .withNumFactory(numFactory)
@@ -307,7 +272,7 @@ class StopLossRuleTest {
     @ParameterizedTest
     @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
     fun `should handle fractional loss percentages`(numFactory: NumFactory) {
-        val runtimeContext = createRuntimeContextMock(numFactory, 100.0)
+        val runtimeContext = PositionRuntimeContext.withOpenPosition(numFactory, 100.0)
 
         val context = MarketEventTestContext()
             .withNumFactory(numFactory)
@@ -331,7 +296,7 @@ class StopLossRuleTest {
     @ParameterizedTest
     @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
     fun `should work with different indicator types`(numFactory: NumFactory) {
-        val runtimeContext = createRuntimeContextMock(numFactory, 100.0)
+        val runtimeContext = PositionRuntimeContext.withOpenPosition(numFactory, 100.0)
 
         val context = MarketEventTestContext()
             .withNumFactory(numFactory)
