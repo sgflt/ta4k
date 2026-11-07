@@ -1,3 +1,6 @@
+/*
+ * SPDX-License-Identifier: MIT
+ */
 package org.ta4j.core.utils
 
 import org.assertj.core.api.Assertions.assertThat

@@ -1,3 +1,6 @@
+/*
+ * SPDX-License-Identifier: MIT
+ */
 package org.ta4j.core.criteria
 
 import org.junit.jupiter.api.DisplayName
