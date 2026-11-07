@@ -4,7 +4,6 @@
 package org.ta4j.core.backtest.strategy
 
 import java.time.Instant
-import lombok.ToString
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.ta4j.core.api.callback.BarListener
@@ -27,7 +26,6 @@ import org.ta4j.core.strategy.Strategy
  *
  * Tested strategy is wrapped into this adaptation class.
  */
-@ToString
 class BacktestStrategy(
     private val testedStrategy: Strategy,
     private val runtimeContext: RuntimeContext,

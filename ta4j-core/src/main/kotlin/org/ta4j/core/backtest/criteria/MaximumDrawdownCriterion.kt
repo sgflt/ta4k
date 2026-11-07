@@ -3,7 +3,6 @@
  */
 package org.ta4j.core.backtest.criteria
 
-import lombok.extern.slf4j.Slf4j
 import org.ta4j.core.backtest.Position
 import org.ta4j.core.backtest.TradingRecord
 import org.ta4j.core.num.Num
@@ -24,7 +23,6 @@ import org.ta4j.core.num.NumFactory
 /**
  * Maximum drawdown criterion.
  */
-@Slf4j
 class MaximumDrawdownCriterion(private val numFactory: NumFactory) : AnalysisCriterion {
     override fun calculate(position: Position): Num {
         if (position.entry == null) {

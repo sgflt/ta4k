@@ -6,7 +6,10 @@ package org.ta4j.core
 import java.math.BigDecimal
 import org.assertj.core.api.Assertions
 import org.assertj.core.data.Offset
-import org.junit.Assert
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertFalse
+import org.junit.jupiter.api.Assertions.assertNotEquals
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.ta4j.core.api.Indicator
 import org.ta4j.core.num.Num
 
@@ -30,7 +33,7 @@ object TestUtils {
      */
     @JvmStatic
     fun assertNumEquals(expected: String, actual: Num) {
-        Assert.assertEquals(actual.numFactory.numOf(BigDecimal(expected)), actual)
+        assertEquals(actual.numFactory.numOf(BigDecimal(expected)), actual)
     }
 
 
@@ -46,7 +49,7 @@ object TestUtils {
      */
     @JvmStatic
     fun assertNumEquals(expected: Num?, actual: Num?) {
-        Assert.assertEquals(expected, actual)
+        assertEquals(expected, actual)
     }
 
 
@@ -66,7 +69,7 @@ object TestUtils {
         if (actual.isNaN) {
             throw AssertionError("Expected: " + expected + " Actual: " + actual)
         }
-        Assert.assertEquals(actual.numFactory.numOf(expected), actual)
+        assertEquals(actual.numFactory.numOf(expected), actual)
     }
 
 
@@ -117,67 +120,10 @@ object TestUtils {
      */
     @JvmStatic
     fun assertNumNotEquals(unexpected: Int, actual: Num) {
-        Assert.assertNotEquals(actual.numFactory.numOf(unexpected), actual)
+        assertNotEquals(actual.numFactory.numOf(unexpected), actual)
     }
 
 
-    //  /**
-    //   * Verifies that two indicators have the same size and values to an offset
-    //   *
-    //   * @param expected indicator of expected values
-    //   * @param actual indicator of actual values
-    //   */
-    //  public static void assertIndicatorEquals(
-    //      MarketEventTestContext context,
-    //      final MockIndicator expected,
-    //      final MockIndicator actual
-    //  ) {
-    //    while (context.advance()) {
-    //
-    //      if (actual.isStable()) {
-    //        assertEquals(
-    //            String.format(
-    //                "Failed at index %s: %s",
-    //                expected.getBarSeries().getCurrentIndex(), actual
-    //            ),
-    //            expected.getValue().doubleValue(), actual.getValue().doubleValue(), GENERAL_OFFSET
-    //        );
-    //      }
-    //    }
-    //  }
-    //
-    //
-    //  private static void advanceIfTwoSeries(final TestIndicator<Num> expected, final TestIndicator<Num> actual) {
-    //    if (!expected.getBarSeries().equals(actual.getBarSeries())) {
-    //      actual.getBarSeries().advance();
-    //    }
-    //  }
-    //
-    //
-    //  /**
-    //   * Verifies that two indicators have either different size or different values
-    //   * to an offset
-    //   *
-    //   * @param expected indicator of expected values
-    //   * @param actual indicator of actual values
-    //   */
-    //  public static void assertIndicatorNotEquals(
-    //      final TestIndicator<Num> expected,
-    //      final TestIndicator<Num> actual
-    //  ) {
-    //    if (expected.getBarSeries().getBarCount() != actual.getBarSeries().getBarCount()) {
-    //      return;
-    //    }
-    //
-    //    while (expected.getBarSeries().advance()) {
-    //      advanceIfTwoSeries(expected, actual);
-    //
-    //      if (Math.abs(expected.getValue().doubleValue() - actual.getValue().doubleValue()) > GENERAL_OFFSET) {
-    //        return;
-    //      }
-    //    }
-    //    throw new AssertionError("Indicators match to " + GENERAL_OFFSET);
-    //  }
     /**
      * Verifies that the actual `Num` value is not equal to the given
      * `String` representation.
@@ -191,7 +137,7 @@ object TestUtils {
      */
     @JvmStatic
     fun assertNumNotEquals(expected: String, actual: Num) {
-        Assert.assertNotEquals(actual.numFactory.numOf(BigDecimal(expected)), actual)
+        assertNotEquals(actual.numFactory.numOf(BigDecimal(expected)), actual)
     }
 
 
@@ -208,7 +154,7 @@ object TestUtils {
      */
     @JvmStatic
     fun assertNumNotEquals(expected: Num?, actual: Num?) {
-        Assert.assertNotEquals(expected, actual)
+        assertNotEquals(expected, actual)
     }
 
 
@@ -225,88 +171,17 @@ object TestUtils {
      */
     @JvmStatic
     fun assertNumNotEquals(expected: Double, actual: Num) {
-        Assert.assertNotEquals(expected, actual.doubleValue(), GENERAL_OFFSET)
+        assertNotEquals(expected, actual.doubleValue(), GENERAL_OFFSET)
     }
 
 
-    //
-    //
-    //  /**
-    //   * Verifies that two indicators have the same size and values
-    //   *
-    //   * @param expected indicator of expected values
-    //   * @param actual indicator of actual values
-    //   */
-    //  public static void assertIndicatorEquals(
-    //      final TestIndicator<Num> expected,
-    //      final TestIndicator<Num> actual,
-    //      final Num delta
-    //  ) {
-    //    assertEquals(
-    //        "Size does not match,",
-    //        expected.getBarSeries().getBarCount(),
-    //        actual.getBarSeries().getBarCount()
-    //    );
-    //    while (expected.getBarSeries().advance()) {
-    //      // convert to DecimalNum via String (auto-precision) avoids Cast Class
-    //      // Exception
-    //      final Num exp = DecimalNum.valueOf(expected.getValue().toString());
-    //      final Num act = DecimalNum.valueOf(actual.getValue().toString());
-    //      final Num result = exp.minus(act).abs();
-    //      if (result.isGreaterThan(delta)) {
-    //        log.debug("{} expected does not match", exp);
-    //        log.debug("{} actual", act);
-    //        log.debug("{} offset", delta);
-    //        String expString = exp.toString();
-    //        String actString = act.toString();
-    //        final int minLen = Math.min(expString.length(), actString.length());
-    //        if (expString.length() > minLen) {
-    //          expString = expString.substring(0, minLen) + "..";
-    //        }
-    //        if (actString.length() > minLen) {
-    //          actString = actString.substring(0, minLen) + "..";
-    //        }
-    //        throw new AssertionError(String.format(
-    //            "Failed at index %s: expected %s but actual was %s",
-    //            expected.getBarSeries().getCurrentIndex(), expString, actString
-    //        ));
-    //      }
-    //    }
-    //  }
-    //
-    //  /**
-    //   * Verifies that two indicators have either different size or different values
-    //   * to an offset
-    //   *
-    //   * @param expected indicator of expected values
-    //   * @param actual indicator of actual values
-    //   * @param delta num offset to which the indicators must be different
-    //   */
-    //  public static void assertIndicatorNotEquals(
-    //      final TestIndicator<Num> expected,
-    //      final TestIndicator<Num> actual,
-    //      final Num delta
-    //  ) {
-    //    if (expected.getBarSeries().getBarCount() != actual.getBarSeries().getBarCount()) {
-    //      return;
-    //    }
-    //    while (expected.getBarSeries().advance()) {
-    //      final Num exp = DecimalNum.valueOf(expected.getValue().toString());
-    //      final Num act = DecimalNum.valueOf(actual.getValue().toString());
-    //      final Num result = exp.minus(act).abs();
-    //      if (result.isGreaterThan(delta)) {
-    //        return;
-    //      }
-    //    }
-    //    throw new AssertionError("Indicators match to " + delta);
-    //  }
     @JvmStatic
     fun assertUnstable(indicator: Indicator<*>) {
-        Assert.assertFalse(indicator.isStable)
+        assertFalse(indicator.isStable)
     }
 
     @JvmStatic
     fun assertStable(indicator: Indicator<*>) {
-        Assert.assertTrue(indicator.isStable)
+        assertTrue(indicator.isStable)
     }
 }

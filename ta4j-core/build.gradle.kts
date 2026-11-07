@@ -2,7 +2,7 @@ plugins {
     id("me.champeau.jmh") version "0.7.2"
 }
 
-description = "ta4j is a Java library providing a simple API for technical analysis."
+description = "ta4k is a Kotlin library providing a simple API for technical analysis."
 
 dependencies {
     // Kotlin
@@ -12,20 +12,13 @@ dependencies {
     // Logging
     implementation(libs.slf4j.api)
 
-    // Project lombok (optional)
-    compileOnly(libs.lombok)
-    annotationProcessor(libs.lombok)
-
     // Test dependencies
     testImplementation(libs.junit.jupiter)
-    testImplementation(libs.junit.vintage)
     testImplementation(libs.assertj.core)
     testImplementation(libs.logback.classic)
     testImplementation(libs.mockk)
     testImplementation(kotlin("test"))
     testImplementation(kotlin("test-junit5"))
-    testCompileOnly(libs.lombok)
-    testAnnotationProcessor(libs.lombok)
 
     // Test-only dependencies
     testImplementation(libs.commons.math3)

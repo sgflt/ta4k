@@ -4,10 +4,7 @@
 package org.ta4j.core.events
 
 import java.time.Instant
-import lombok.Builder
 import org.ta4j.core.indicators.TimeFrame
-
-@Builder
 @JvmRecord
 data class CandleReceived(
     val timeFrame: TimeFrame,

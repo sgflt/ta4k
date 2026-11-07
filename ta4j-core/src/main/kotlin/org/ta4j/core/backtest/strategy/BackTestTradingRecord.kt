@@ -4,8 +4,6 @@
 package org.ta4j.core.backtest.strategy
 
 import java.time.Instant
-import java.util.*
-import lombok.experimental.UtilityClass
 import org.ta4j.core.TradeType
 import org.ta4j.core.api.series.Bar
 import org.ta4j.core.backtest.Position
@@ -141,14 +139,10 @@ open class BackTestTradingRecord(
      * Records a trade and the corresponding position (if closed).
      *
      * @param trade the trade to be recorded
-     *
-     * @throws NullPointerException if trade is null
      */
-    private fun recordTrade(trade: Trade?) {
-        Objects.requireNonNull<Trade?>(trade, "Trade should not be null")
-
+    private fun recordTrade(trade: Trade) {
         // Storing the new trade in trades list
-        this.trades.add(trade!!)
+        this.trades.add(trade)
 
         // Storing the position if closed
         if (currentPosition.isClosed == true) {
@@ -196,15 +190,12 @@ open class BackTestTradingRecord(
             TradingRecordContextKeys.BACKTEST_TRADING_RECORD -> this
             TradingRecordContextKeys.TRADING_RECORD -> this
             TradingRecordContextKeys.LAST_CLOSED_POSITION -> this.lastPosition
-            TradingRecordContextKeys.CLOSED_POSITIONS -> Collections.unmodifiableList(this.positions)
+            TradingRecordContextKeys.CLOSED_POSITIONS -> this.positions.toList()
             RuntimeContextKeys.CURRENT_PRICE -> this.currentPrice
             RuntimeContextKeys.CURRENT_TIME -> this.currentTime
             else -> null
         }
     }
-
-
-    @UtilityClass
     object TradingRecordContextKeys {
         const val CURRENT_POSITION: String = "ta4j-currentPosition"
         const val BACKTEST_TRADING_RECORD: String = "ta4j-backtestTradingRecord"
