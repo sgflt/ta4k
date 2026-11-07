@@ -5,6 +5,9 @@ package org.ta4j.core.api
 
 import org.ta4j.core.indicators.bool.BooleanIndicator
 import org.ta4j.core.indicators.bool.fractal.FractalHighIndicator
+import org.ta4j.core.indicators.bool.trend.DownTrendIndicator
+import org.ta4j.core.indicators.bool.trend.UpTrendIndicator
+import org.ta4j.core.indicators.numeric.swing.ZigZagIndicator
 import org.ta4j.core.indicators.bool.fractal.FractalLowIndicator
 import org.ta4j.core.indicators.bool.fractal.RecentFractalSwingIndicator
 import org.ta4j.core.indicators.numeric.oscillators.MACDVIndicator
@@ -15,6 +18,7 @@ import org.ta4j.core.indicators.numeric.oscillators.billwilliams.AlligatorFacade
 import org.ta4j.core.indicators.numeric.oscillators.billwilliams.MarketFacilitationIndexIndicator
 import java.time.Instant
 import org.ta4j.core.indicators.numeric.CloseLocationValueIndicator
+import org.ta4j.core.indicators.numeric.ConstantNumericIndicator
 import org.ta4j.core.indicators.numeric.NumericIndicator
 import org.ta4j.core.indicators.numeric.candles.LowerShadowIndicator
 import org.ta4j.core.indicators.numeric.candles.RealBodyIndicator
@@ -258,6 +262,18 @@ object Indicators {
     fun alligator() = extended().alligator()
 
     @JvmStatic
+    fun zigZag(reversalAmount: Number) = extended().zigZag(reversalAmount)
+
+    @JvmStatic
+    fun zigZag(reversalAmount: NumericIndicator) = extended().zigZag(reversalAmount)
+
+    @JvmStatic
+    fun upTrend(barCount: Int = 5, strengthThreshold: Number = 25) = extended().upTrend(barCount, strengthThreshold)
+
+    @JvmStatic
+    fun downTrend(barCount: Int = 5, strengthThreshold: Number = 25) = extended().downTrend(barCount, strengthThreshold)
+
+    @JvmStatic
     fun squeezePro(barCount: Int = 20) = extended().squeezePro(barCount)
 
     @JvmStatic
@@ -469,6 +485,19 @@ object Indicators {
                 percentileBarCount = percentileBarCount,
             )
         }
+
+        /** ZigZag on high/low confirmed by close, ignoring moves smaller than [reversalAmount] price units. */
+        fun zigZag(reversalAmount: Number) = zigZag(ConstantNumericIndicator(numFactory.numOf(reversalAmount)))
+
+        /** ZigZag with an adaptive reversal amount, e.g. `atr(14).multipliedBy(2)`. */
+        fun zigZag(reversalAmount: NumericIndicator) =
+            ZigZagIndicator(highPrice(), lowPrice(), closePrice(), reversalAmount)
+
+        fun upTrend(barCount: Int = 5, strengthThreshold: Number = 25) =
+            UpTrendIndicator(numFactory, barCount, strengthThreshold)
+
+        fun downTrend(barCount: Int = 5, strengthThreshold: Number = 25) =
+            DownTrendIndicator(numFactory, barCount, strengthThreshold)
 
         /** Bill Williams Alligator on the median price with the classic 13/8, 8/5, 5/3 settings. */
         fun alligator() = AlligatorFacade(medianPrice())
