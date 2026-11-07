@@ -37,4 +37,16 @@ internal class StandardDeviationIndicatorTest {
             .assertNext(2.1602)
             .assertNext(3.7416)
     }
+
+    @ParameterizedTest(name = "Flat window gives zero [{index}] {0}")
+    @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
+    fun flatWindowAfterSwingsGivesZero(numFactory: NumFactory) {
+        // removing the swings from the rolling sums must not leave a negative variance (NaN after sqrt)
+        MarketEventTestContext()
+            .withNumFactory(numFactory)
+            .withCandlePrices(10.0, 14.0, 10.0, 14.0, 12.0, 12.0, 12.0, 12.0)
+            .withIndicator(Indicators.extended(numFactory).closePrice().stddev(3))
+            .fastForward(8)
+            .assertCurrent(0.0)
+    }
 }

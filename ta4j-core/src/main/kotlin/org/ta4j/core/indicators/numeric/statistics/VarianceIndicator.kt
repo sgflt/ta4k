@@ -41,6 +41,8 @@ class VarianceIndicator(private val indicator: NumericIndicator, private val bar
             mean -= deltaSide / numFactory.numOf(count)
             val delta2Side = oldValue - mean
             m2 -= deltaSide * delta2Side
+            // rounding can leave a flat window slightly below zero, which sqrt turns into NaN
+            if (m2.isNegative) m2 = numFactory.zero()
         }
 
         // Calculate sample variance
