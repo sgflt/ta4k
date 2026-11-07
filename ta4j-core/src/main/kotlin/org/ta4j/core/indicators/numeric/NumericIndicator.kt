@@ -15,6 +15,9 @@ import org.ta4j.core.indicators.helpers.previous.PreviousNumericValueIndicator
 import org.ta4j.core.indicators.numeric.average.ATMAIndicator
 import org.ta4j.core.indicators.numeric.average.DoubleEMAIndicator
 import org.ta4j.core.indicators.numeric.average.EMAIndicator
+import org.ta4j.core.indicators.numeric.average.EWMAIndicator
+import org.ta4j.core.indicators.numeric.average.McGinleyMAIndicator
+import org.ta4j.core.indicators.numeric.average.VIDYAIndicator
 import org.ta4j.core.indicators.numeric.average.HMAIndicator
 import org.ta4j.core.indicators.numeric.average.KAMAIndicator
 import org.ta4j.core.indicators.numeric.average.LWMAIndicator
@@ -319,6 +322,21 @@ abstract class NumericIndicator protected constructor(
 
 
     fun mma(barCount: Int) = MMAIndicator(this, barCount)
+
+    /** Exponentially weighted average with explicit [decayFactor] (weight of the previous value). */
+    fun ewma(barCount: Int, decayFactor: Double) = EWMAIndicator(this, barCount, decayFactor)
+
+    /** McGinley Dynamic. */
+    fun mcGinley(barCount: Int) = McGinleyMAIndicator(this, barCount)
+
+    /** Chande's Variable Index Dynamic Average driven by a CMO of [cmoBarCount] bars. */
+    fun vidya(cmoBarCount: Int) = VIDYAIndicator(this, cmoBarCount)
+
+    /** Displaced moving average: the SMA as it was [displacement] bars ago. */
+    fun dma(barCount: Int, displacement: Int) = sma(barCount).previous(displacement)
+
+    /** Exponential displaced moving average: the EMA as it was [displacement] bars ago. */
+    fun edma(barCount: Int, displacement: Int) = ema(barCount).previous(displacement)
 
 
     fun hma(barCount: Int) = HMAIndicator(this, barCount)
