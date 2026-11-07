@@ -4,6 +4,11 @@
 package org.ta4j.core.api
 
 import org.ta4j.core.indicators.bool.BooleanIndicator
+import org.ta4j.core.indicators.bool.fractal.FractalHighIndicator
+import org.ta4j.core.indicators.bool.fractal.FractalLowIndicator
+import org.ta4j.core.indicators.bool.fractal.RecentFractalSwingIndicator
+import org.ta4j.core.indicators.numeric.oscillators.billwilliams.AlligatorFacade
+import org.ta4j.core.indicators.numeric.oscillators.billwilliams.MarketFacilitationIndexIndicator
 import java.time.Instant
 import org.ta4j.core.indicators.numeric.CloseLocationValueIndicator
 import org.ta4j.core.indicators.numeric.NumericIndicator
@@ -238,6 +243,26 @@ object Indicators {
     /** Vortex indicator: +VI, -VI and their difference. */
     fun vortex(barCount: Int = 14) = extended().vortex(barCount)
 
+    @JvmStatic
+    fun alligator() = extended().alligator()
+
+    @JvmStatic
+    fun marketFacilitationIndex() = extended().marketFacilitationIndex()
+
+    @JvmStatic
+    fun fractalHigh(precedingBars: Int = 2, followingBars: Int = 2) = extended().fractalHigh(precedingBars, followingBars)
+
+    @JvmStatic
+    fun fractalLow(precedingBars: Int = 2, followingBars: Int = 2) = extended().fractalLow(precedingBars, followingBars)
+
+    @JvmStatic
+    fun recentSwingHigh(precedingBars: Int = 2, followingBars: Int = 2) =
+        extended().recentSwingHigh(precedingBars, followingBars)
+
+    @JvmStatic
+    fun recentSwingLow(precedingBars: Int = 2, followingBars: Int = 2) =
+        extended().recentSwingLow(precedingBars, followingBars)
+
     /** Elder's Force Index of close price and volume. */
     fun forceIndex(barCount: Int = 13) = extended().forceIndex(barCount)
 
@@ -398,5 +423,24 @@ object Indicators {
             UltimateOscillatorIndicator(numFactory, shortPeriod, middlePeriod, longPeriod)
 
         fun vortex(barCount: Int = 14) = VortexFacade(numFactory, barCount)
+
+        /** Bill Williams Alligator on the median price with the classic 13/8, 8/5, 5/3 settings. */
+        fun alligator() = AlligatorFacade(medianPrice())
+
+        fun marketFacilitationIndex() = MarketFacilitationIndexIndicator(highPrice(), lowPrice(), volume())
+
+        fun fractalHigh(precedingBars: Int = 2, followingBars: Int = 2) =
+            FractalHighIndicator(highPrice(), precedingBars, followingBars)
+
+        fun fractalLow(precedingBars: Int = 2, followingBars: Int = 2) =
+            FractalLowIndicator(lowPrice(), precedingBars, followingBars)
+
+        /** High of the most recently confirmed fractal high. */
+        fun recentSwingHigh(precedingBars: Int = 2, followingBars: Int = 2) =
+            RecentFractalSwingIndicator(numFactory, fractalHigh(precedingBars, followingBars))
+
+        /** Low of the most recently confirmed fractal low. */
+        fun recentSwingLow(precedingBars: Int = 2, followingBars: Int = 2) =
+            RecentFractalSwingIndicator(numFactory, fractalLow(precedingBars, followingBars))
     }
 }
