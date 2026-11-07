@@ -42,6 +42,8 @@ import org.ta4j.core.indicators.numeric.trend.ParabolicSARIndicator
 import org.ta4j.core.indicators.numeric.volume.AccumulationDistributionIndicator
 import org.ta4j.core.indicators.numeric.volume.ChaikinMoneyFlowIndicator
 import org.ta4j.core.indicators.numeric.volume.ChaikinOscillatorIndicator
+import org.ta4j.core.indicators.numeric.oscillators.UltimateOscillatorIndicator
+import org.ta4j.core.indicators.numeric.oscillators.vortex.VortexFacade
 import org.ta4j.core.indicators.numeric.volume.ForceIndexIndicator
 import org.ta4j.core.indicators.numeric.volume.IIIIndicator
 import org.ta4j.core.indicators.numeric.volume.MVWAPIndicator
@@ -212,6 +214,13 @@ object Indicators {
     @JvmStatic
     fun iii() = extended().iii()
 
+    /** Ultimate Oscillator (Larry Williams). */
+    fun ultimateOscillator(shortPeriod: Int = 7, middlePeriod: Int = 14, longPeriod: Int = 28) =
+        extended().ultimateOscillator(shortPeriod, middlePeriod, longPeriod)
+
+    /** Vortex indicator: +VI, -VI and their difference. */
+    fun vortex(barCount: Int = 14) = extended().vortex(barCount)
+
     /** Elder's Force Index of close price and volume. */
     fun forceIndex(barCount: Int = 13) = extended().forceIndex(barCount)
 
@@ -344,5 +353,10 @@ object Indicators {
         fun iii() = IIIIndicator(numFactory)
 
         fun forceIndex(barCount: Int = 13) = ForceIndexIndicator(closePrice(), volume(), barCount)
+
+        fun ultimateOscillator(shortPeriod: Int = 7, middlePeriod: Int = 14, longPeriod: Int = 28) =
+            UltimateOscillatorIndicator(numFactory, shortPeriod, middlePeriod, longPeriod)
+
+        fun vortex(barCount: Int = 14) = VortexFacade(numFactory, barCount)
     }
 }

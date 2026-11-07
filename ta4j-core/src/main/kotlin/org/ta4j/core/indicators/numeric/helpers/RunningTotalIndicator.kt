@@ -37,7 +37,8 @@ class RunningTotalIndicator(
 
         var sum = previousSum + indicatorValue
 
-        if (previousValue.isStable) {
+        // a NaN leaving the window was never added
+        if (previousValue.isStable && !previousValue.value.isNaN) {
             sum -= previousValue.value
         }
 

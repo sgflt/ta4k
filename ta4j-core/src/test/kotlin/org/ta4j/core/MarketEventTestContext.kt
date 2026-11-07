@@ -298,6 +298,10 @@ class MarketEventTestContext {
         }
 
 
+        fun assertCurrentNaN() = apply {
+            assertThat(getNumericIndicator(indicatorId)!!.value.isNaN).isTrue()
+        }
+
         fun assertCurrentTrue() = apply {
             val indicator = getBooleanIndicator(indicatorId)
             assertThat(indicator?.value).isTrue()
