@@ -133,11 +133,11 @@ class MarketEventTestContext {
 
 
     val firstNumericIndicator: NumericIndicator?
-        get() = indicatorContext.first as NumericIndicator?
+        get() = indicatorContext.first as? NumericIndicator
 
 
     val fisrtBooleanIndicator: BooleanIndicator?
-        get() = indicatorContext.first as BooleanIndicator?
+        get() = indicatorContext.first as? BooleanIndicator
 
 
     fun fastForwardUntilStable(): MarketEventTestContext = apply {

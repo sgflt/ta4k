@@ -22,6 +22,15 @@ abstract class BooleanIndicator : Indicator<Boolean> {
 
     fun previous(barCount: Int) = PreviousBooleanValueIndicator(this, barCount)
 
+    /** True when this indicator was true on any of the last [barCount] bars. */
+    fun wasTrueWithin(barCount: Int) = WasTrueWithinIndicator(this, barCount)
+
+    /** True when this and [other] were both true within the last [threshold] bars. */
+    fun andWithin(other: BooleanIndicator, threshold: Int) = AndWithThresholdIndicator(this, other, threshold)
+
+    /** True when this or [other] was true within the last [threshold] bars. */
+    fun orWithin(other: BooleanIndicator, threshold: Int) = OrWithThresholdIndicator(this, other, threshold)
+
     override fun onBar(bar: Bar) {
         if (bar.beginTime.isAfter(currentBeginTime)) {
             updateState(bar)
