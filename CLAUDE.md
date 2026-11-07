@@ -5,7 +5,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Project Overview
 
 Ta4k is a technical analysis library for Kotlin providing tools for creating, evaluating, and executing trading
-strategies. The project is transitioning from Java to Kotlin and uses Gradle for build management.
+strategies. It is written entirely in Kotlin (migrated from ta4j's Java code) and uses Gradle for build management.
 
 ## Build Commands
 
@@ -23,7 +23,8 @@ strategies. The project is transitioning from Java to Kotlin and uses Gradle for
 - **Java Version**: JDK 25 (source and bytecode target)
 - **Kotlin Version**: 2.4.21
 - **Gradle Version**: 9.9.0
-- **Module structure**: Multi-module Gradle project with ta4j-core, ta4j-examples, ta4j-csv, and ta4j-jdbc modules
+- **Module structure**: Multi-module Gradle project with ta4j-core and ta4j-examples
+- **Build JDK**: run Gradle with `JAVA_HOME` pointing at a JDK 25; if a tool can't handle JDK 25, upgrade the tool
 - **Version Catalog**: Dependencies managed via `gradle/libs.versions.toml`
 
 ## Architecture Overview
@@ -66,28 +67,20 @@ performance analysis criteria.
 
 ## Testing
 
-The project uses JUnit 5 with AssertJ for assertions. Test files mirror the source structure:
+The project uses JUnit 5 (Jupiter only, no JUnit 4/vintage) with AssertJ for assertions. Test files mirror the
+source structure:
 
-- Unit tests in `src/test/java/org/ta4j/core/`
-- Mock objects in `core.mocks` package
+- Unit tests in `src/test/kotlin/org/ta4j/core/`
+- Mock objects in the `org.ta4j.core.mocks` package (`MockIndicator`, `MockMarketEventBuilder`, `MockTradingRecord`, ...)
 - Excel-based test data in `src/test/resources/`
 
 Common test utilities:
 
-- `TestUtils.kt` - Helper methods for test data creation
-- `MockStrategy.java` - Predefined strategies for testing
-- `CriterionFactory.java` - Factory for analysis criteria testing
-
-## Kotlin Migration Steps
-
-The project is actively migrating from Java to Kotlin. When working on files:
-
-- Create list of classes for migration
-- Choose first class and correspoinding test
-- Migrate them to Koltin using Kotlin idioms and best practices
-- After conversion run tests
-- Fix tests
-- Ask for permission to continue with next clas
+- `TestUtils.kt` - Assertions for `Num` values and indicators (`assertNumEquals`, `assertStable`, ...)
+- `MarketEventTestContext.kt` - Feeds market events bar by bar into indicators under test
+- `NumFactoryTestSource.kt` - `@MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")` runs a test with
+  both `DoubleNum` and `DecimalNum`
+- `TradingRecordTestContext.kt`, `CriterionFactory.kt` - Helpers for analysis criteria tests
 
 ## Code Conventions
 
@@ -101,9 +94,16 @@ The project is actively migrating from Java to Kotlin. When working on files:
 
 ### Code Style
 
+- All code is Kotlin; don't add Java sources or Lombok
 - Prefer immutable objects and functional programming patterns
 - Use meaningful variable names reflecting financial/trading domain
-- Follow Kotlin coding conventions for new code
+- Follow Kotlin coding conventions: properties instead of `getX()` functions, Kotlin function types instead of
+  `java.util.function`, Kotlin collections (`ArrayDeque`, `mutableListOf`, ...) instead of `java.util` ones, string
+  templates instead of `String.format`, `kotlin.math` instead of `Math`
+- Keep Java interop annotations (`@JvmStatic`, `@JvmOverloads`) on public API
+- Indicators that build inner indicators must use their own `numFactory` (`Indicators.extended(numFactory)`), never
+  the global factory
+- New source files start with the 3-line block comment header `SPDX-License-Identifier: MIT`
 
 ### Testing
 
