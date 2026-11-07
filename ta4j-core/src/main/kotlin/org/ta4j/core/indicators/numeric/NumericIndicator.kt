@@ -32,6 +32,7 @@ import org.ta4j.core.indicators.numeric.helpers.RatioIndicator
 import org.ta4j.core.indicators.numeric.helpers.RunningTotalIndicator
 import org.ta4j.core.indicators.numeric.momentum.CoppockCurveIndicator
 import org.ta4j.core.indicators.numeric.momentum.KSTIndicator
+import org.ta4j.core.indicators.numeric.momentum.ATRIndicator
 import org.ta4j.core.indicators.numeric.momentum.ROCIndicator
 import org.ta4j.core.indicators.numeric.momentum.RSIIndicator
 import org.ta4j.core.indicators.numeric.operation.BinaryOperation
@@ -54,6 +55,10 @@ import org.ta4j.core.num.NaN
 import org.ta4j.core.num.Num
 import org.ta4j.core.num.NumFactory
 import org.ta4j.core.strategy.RuntimeContext
+import org.ta4j.core.strategy.rules.AverageTrueRangeStopGainRule
+import org.ta4j.core.strategy.rules.AverageTrueRangeStopLossRule
+import org.ta4j.core.strategy.rules.AverageTrueRangeTrailingStopGainRule
+import org.ta4j.core.strategy.rules.AverageTrueRangeTrailingStopLossRule
 import org.ta4j.core.strategy.rules.FixedAmountStopGainRule
 import org.ta4j.core.strategy.rules.FixedAmountStopLossRule
 import org.ta4j.core.strategy.rules.OverIndicatorRule
@@ -66,6 +71,10 @@ import org.ta4j.core.strategy.rules.TrailingStopGainRule
 import org.ta4j.core.strategy.rules.TrailingStopLossRule
 import org.ta4j.core.strategy.rules.UnderIndicatorRule
 import org.ta4j.core.strategy.rules.UnderOrEqualIndicatorRule
+import org.ta4j.core.strategy.rules.VolatilityStopGainRule
+import org.ta4j.core.strategy.rules.VolatilityStopLossRule
+import org.ta4j.core.strategy.rules.VolatilityTrailingStopGainRule
+import org.ta4j.core.strategy.rules.VolatilityTrailingStopLossRule
 
 /**
  * NumericIndicator is a fluent class. It provides
@@ -562,6 +571,86 @@ abstract class NumericIndicator protected constructor(
      */
     fun trailingFixedAmountStopGainRule(gainAmount: Number, runtimeContext: RuntimeContext) =
         TrailingFixedAmountStopGainRule(this, numFactory.numOf(gainAmount), runtimeContext)
+
+    /**
+     * @param volatility volatility in price units, registered in the indicator context
+     * @param coefficient multiple of [volatility] used as stop distance
+     * @param runtimeContext context providing the open position
+     *
+     * @return volatility based stop-loss watching `this` price
+     */
+    fun volatilityStopLossRule(volatility: NumericIndicator, coefficient: Number, runtimeContext: RuntimeContext) =
+        VolatilityStopLossRule(this, volatility, numFactory.numOf(coefficient), runtimeContext)
+
+    /**
+     * @param atr average true range, registered in the indicator context
+     * @param coefficient multiple of [atr] used as stop distance
+     * @param runtimeContext context providing the open position
+     *
+     * @return ATR based stop-loss watching `this` price
+     */
+    fun atrStopLossRule(atr: ATRIndicator, coefficient: Number, runtimeContext: RuntimeContext) =
+        AverageTrueRangeStopLossRule(this, atr, numFactory.numOf(coefficient), runtimeContext)
+
+    /**
+     * @param volatility volatility in price units, registered in the indicator context
+     * @param coefficient multiple of [volatility] used as stop distance
+     * @param runtimeContext context providing the open position
+     *
+     * @return volatility based take-profit watching `this` price
+     */
+    fun volatilityStopGainRule(volatility: NumericIndicator, coefficient: Number, runtimeContext: RuntimeContext) =
+        VolatilityStopGainRule(this, volatility, numFactory.numOf(coefficient), runtimeContext)
+
+    /**
+     * @param atr average true range, registered in the indicator context
+     * @param coefficient multiple of [atr] used as stop distance
+     * @param runtimeContext context providing the open position
+     *
+     * @return ATR based take-profit watching `this` price
+     */
+    fun atrStopGainRule(atr: ATRIndicator, coefficient: Number, runtimeContext: RuntimeContext) =
+        AverageTrueRangeStopGainRule(this, atr, numFactory.numOf(coefficient), runtimeContext)
+
+    /**
+     * @param volatility volatility in price units, registered in the indicator context
+     * @param coefficient multiple of [volatility] used as stop distance
+     * @param runtimeContext context providing the open position
+     *
+     * @return volatility based trailing stop-loss watching `this` price
+     */
+    fun volatilityTrailingStopLossRule(volatility: NumericIndicator, coefficient: Number, runtimeContext: RuntimeContext) =
+        VolatilityTrailingStopLossRule(this, volatility, numFactory.numOf(coefficient), runtimeContext)
+
+    /**
+     * @param atr average true range, registered in the indicator context
+     * @param coefficient multiple of [atr] used as stop distance
+     * @param runtimeContext context providing the open position
+     *
+     * @return ATR based trailing stop-loss watching `this` price
+     */
+    fun atrTrailingStopLossRule(atr: ATRIndicator, coefficient: Number, runtimeContext: RuntimeContext) =
+        AverageTrueRangeTrailingStopLossRule(this, atr, numFactory.numOf(coefficient), runtimeContext)
+
+    /**
+     * @param volatility volatility in price units, registered in the indicator context
+     * @param coefficient multiple of [volatility] used as stop distance
+     * @param runtimeContext context providing the open position
+     *
+     * @return volatility based trailing stop-gain watching `this` price
+     */
+    fun volatilityTrailingStopGainRule(volatility: NumericIndicator, coefficient: Number, runtimeContext: RuntimeContext) =
+        VolatilityTrailingStopGainRule(this, volatility, numFactory.numOf(coefficient), runtimeContext)
+
+    /**
+     * @param atr average true range, registered in the indicator context
+     * @param coefficient multiple of [atr] used as stop distance
+     * @param runtimeContext context providing the open position
+     *
+     * @return ATR based trailing stop-gain watching `this` price
+     */
+    fun atrTrailingStopGainRule(atr: ATRIndicator, coefficient: Number, runtimeContext: RuntimeContext) =
+        AverageTrueRangeTrailingStopGainRule(this, atr, numFactory.numOf(coefficient), runtimeContext)
 
     fun isLowest(barCount: Int) = IsLowestIndicator(this, barCount)
 

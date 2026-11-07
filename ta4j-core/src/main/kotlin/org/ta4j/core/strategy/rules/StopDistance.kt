@@ -3,6 +3,8 @@
  */
 package org.ta4j.core.strategy.rules
 
+import org.ta4j.core.indicators.numeric.NumericIndicator
+import org.ta4j.core.num.NaN
 import org.ta4j.core.num.Num
 
 /**
@@ -31,6 +33,19 @@ fun interface StopDistance {
             return StopDistance { referencePrice ->
                 referencePrice * percentage / referencePrice.numFactory.hundred()
             }
+        }
+
+        /**
+         * @param volatility indicator with the current volatility in price units (e.g. ATR);
+         * it must be registered in the indicator context so it updates on every bar.
+         * While it is not stable the distance is NaN, so the stop stays inactive.
+         * @param coefficient multiple of [volatility] used as distance
+         */
+        fun volatility(volatility: NumericIndicator, coefficient: Num): StopDistance {
+            require(!coefficient.isNaN && coefficient.isPositive) {
+                "Volatility coefficient must be positive, but was: $coefficient"
+            }
+            return StopDistance { if (volatility.isStable) volatility.value * coefficient else NaN }
         }
 
         /**

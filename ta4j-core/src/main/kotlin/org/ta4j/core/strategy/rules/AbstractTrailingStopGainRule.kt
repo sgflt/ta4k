@@ -22,7 +22,11 @@ abstract class AbstractTrailingStopGainRule(
 ) : AbstractTrailingStopRule(priceIndicator, runtimeContext, distance) {
 
     final override fun isArmed(entry: Trade, referencePrice: Num): Boolean {
-        val activationPrice = StopType.GAIN.stopPrice(entry.type, entry.netPrice, distanceFrom(entry.netPrice))
+        val activationDistance = distanceFrom(entry.netPrice)
+        if (activationDistance.isNaN) {
+            return false
+        }
+        val activationPrice = StopType.GAIN.stopPrice(entry.type, entry.netPrice, activationDistance)
         return StopType.GAIN.isTriggered(entry.type, activationPrice, referencePrice)
     }
 }
