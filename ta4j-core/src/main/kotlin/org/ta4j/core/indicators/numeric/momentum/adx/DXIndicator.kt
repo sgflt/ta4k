@@ -3,8 +3,6 @@
  */
 package org.ta4j.core.indicators.numeric.momentum.adx
 
-import org.ta4j.core.api.Indicators.minusDII
-import org.ta4j.core.api.Indicators.plusDII
 import org.ta4j.core.api.series.Bar
 import org.ta4j.core.indicators.numeric.NumericIndicator
 import org.ta4j.core.num.Num
@@ -18,8 +16,8 @@ import org.ta4j.core.num.NumFactory
  * Part of the Directional Movement System.
  */
 class DXIndicator(numFactory: NumFactory, barCount: Int) : NumericIndicator(numFactory) {
-    private val plusDIIndicator = plusDII(barCount)
-    private val minusDIIndicator = minusDII(barCount)
+    private val plusDIIndicator = PlusDIIndicator(numFactory, barCount)
+    private val minusDIIndicator = MinusDIIndicator(numFactory, barCount)
 
     override val lag: Int
         get() = plusDIIndicator.lag

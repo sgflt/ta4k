@@ -3,8 +3,7 @@
  */
 package org.ta4j.core.indicators.numeric.momentum.adx
 
-import org.ta4j.core.api.Indicators.atr
-import org.ta4j.core.api.Indicators.minusDMI
+import org.ta4j.core.api.Indicators
 import org.ta4j.core.api.series.Bar
 import org.ta4j.core.indicators.numeric.NumericIndicator
 import org.ta4j.core.num.NumFactory
@@ -22,8 +21,8 @@ import org.ta4j.core.num.NumFactory
  * @see [https://www.investopedia.com/terms/a/adx.asp](https://www.investopedia.com/terms/a/adx.asp)
  */
 class MinusDIIndicator(numFactory: NumFactory, private val barCount: Int) : NumericIndicator(numFactory) {
-    private val atrIndicator = atr(barCount)
-    private val avgMinusDMIndicator = minusDMI().mma(barCount)
+    private val atrIndicator = Indicators.extended(numFactory).atr(barCount)
+    private val avgMinusDMIndicator = Indicators.extended(numFactory).minusDMI().mma(barCount)
 
 
     private fun calculate() = (avgMinusDMIndicator.value / atrIndicator.value) * numFactory.hundred()

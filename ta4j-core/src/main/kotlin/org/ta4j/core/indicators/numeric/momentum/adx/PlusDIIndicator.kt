@@ -3,8 +3,7 @@
  */
 package org.ta4j.core.indicators.numeric.momentum.adx
 
-import org.ta4j.core.api.Indicators.atr
-import org.ta4j.core.api.Indicators.plusDMI
+import org.ta4j.core.api.Indicators
 import org.ta4j.core.api.series.Bar
 import org.ta4j.core.indicators.numeric.NumericIndicator
 import org.ta4j.core.num.Num
@@ -21,8 +20,8 @@ import org.ta4j.core.num.NumFactory
  * @see [https://www.investopedia.com/terms/a/adx.asp](https://www.investopedia.com/terms/a/adx.asp)
  */
 class PlusDIIndicator(numFactory: NumFactory, private val barCount: Int) : NumericIndicator(numFactory) {
-    private val atrIndicator = atr(barCount)
-    private val avgPlusDMIndicator = plusDMI().mma(barCount)
+    private val atrIndicator = Indicators.extended(numFactory).atr(barCount)
+    private val avgPlusDMIndicator = Indicators.extended(numFactory).plusDMI().mma(barCount)
     private var barsPassed = 0
 
     private fun calculate(): Num =
