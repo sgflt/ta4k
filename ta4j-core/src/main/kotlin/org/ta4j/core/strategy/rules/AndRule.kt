@@ -40,6 +40,6 @@ class AndRule
 
 
     override fun toString(): String {
-        return String.format("UnderRule[%s, %s] => %s", this.rule1, this.rule2, isSatisfied)
+        return String.format("AndRule[%s, %s] => %s", this.rule1, this.rule2, isSatisfied)
     }
 }
