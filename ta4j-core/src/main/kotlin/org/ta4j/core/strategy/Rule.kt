@@ -8,6 +8,7 @@ import org.ta4j.core.strategy.rules.AndRule
 import org.ta4j.core.strategy.rules.BooleanRule
 import org.ta4j.core.strategy.rules.NotRule
 import org.ta4j.core.strategy.rules.OrRule
+import org.ta4j.core.strategy.rules.VoteRule
 import org.ta4j.core.strategy.rules.XorRule
 
 /**
@@ -58,6 +59,11 @@ interface Rule {
 
     companion object {
         val NOOP: Rule = BooleanRule.FALSE
+
+        /**
+         * @return rule satisfied when at least [requiredVotes] of [rules] are satisfied
+         */
+        fun vote(requiredVotes: Int, vararg rules: Rule): Rule = VoteRule(requiredVotes, *rules)
 
         fun of(rule: BooleanSupplier): Rule {
             return object : Rule {
