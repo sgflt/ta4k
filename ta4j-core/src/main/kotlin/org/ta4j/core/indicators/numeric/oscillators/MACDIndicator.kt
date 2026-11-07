@@ -25,7 +25,7 @@ class MACDIndicator @JvmOverloads constructor(
     private val indicator: NumericIndicator,
     private val shortBarCount: Int = 12,
     private val longBarCount: Int = 26,
-) : NumericIndicator(numFactory) {
+) : AbstractMACDIndicator(numFactory) {
 
     val shortTermEma = indicator.ema(shortBarCount)
     val longTermEma = indicator.ema(longBarCount)

@@ -7,6 +7,8 @@ import org.ta4j.core.indicators.bool.BooleanIndicator
 import org.ta4j.core.indicators.bool.fractal.FractalHighIndicator
 import org.ta4j.core.indicators.bool.fractal.FractalLowIndicator
 import org.ta4j.core.indicators.bool.fractal.RecentFractalSwingIndicator
+import org.ta4j.core.indicators.numeric.oscillators.MACDVIndicator
+import org.ta4j.core.indicators.numeric.oscillators.VolatilityNormalizedMACDIndicator
 import org.ta4j.core.indicators.numeric.oscillators.billwilliams.AlligatorFacade
 import org.ta4j.core.indicators.numeric.oscillators.billwilliams.MarketFacilitationIndexIndicator
 import java.time.Instant
@@ -107,6 +109,13 @@ object Indicators {
 
     @JvmStatic
     fun macd(shortBarCount: Int = 12, longBarCount: Int = 26) = extended().macd(shortBarCount, longBarCount)
+
+    @JvmStatic
+    fun macdV(shortBarCount: Int = 12, longBarCount: Int = 26) = extended().macdV(shortBarCount, longBarCount)
+
+    @JvmStatic
+    fun volatilityNormalizedMacd(fastBarCount: Int = 12, slowBarCount: Int = 26, atrBarCount: Int = 26) =
+        extended().volatilityNormalizedMacd(fastBarCount, slowBarCount, atrBarCount)
 
     @JvmStatic
     fun accDist() = extended().accDist()
@@ -398,7 +407,7 @@ object Indicators {
         fun rwiLow(barCount: Int) = RWILowIndicator(numFactory, barCount)
 
         fun macd(shortBarCount: Int = 12, longBarCount: Int = 26) =
-            Indicators.closePrice().macd(shortBarCount, longBarCount)
+            closePrice().macd(shortBarCount, longBarCount)
 
         fun chaikinMoneyFlow(barCount: Int) = ChaikinMoneyFlowIndicator(numFactory, barCount)
 
@@ -423,6 +432,14 @@ object Indicators {
             UltimateOscillatorIndicator(numFactory, shortPeriod, middlePeriod, longPeriod)
 
         fun vortex(barCount: Int = 14) = VortexFacade(numFactory, barCount)
+
+        /** Close-price MACD of variable-weighted EMAs with weight `volume / ATR`. */
+        fun macdV(shortBarCount: Int = 12, longBarCount: Int = 26) =
+            MACDVIndicator(closePrice(), volume(), shortBarCount, longBarCount)
+
+        /** Close-price MACD divided by ATR and scaled by 100 (Spiroglou's MACD-V). */
+        fun volatilityNormalizedMacd(fastBarCount: Int = 12, slowBarCount: Int = 26, atrBarCount: Int = 26) =
+            VolatilityNormalizedMACDIndicator(closePrice(), atr(atrBarCount), fastBarCount, slowBarCount)
 
         /** Bill Williams Alligator on the median price with the classic 13/8, 8/5, 5/3 settings. */
         fun alligator() = AlligatorFacade(medianPrice())
