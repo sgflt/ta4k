@@ -210,7 +210,7 @@ class TradingRecordTest {
         // Should be closed
         assertThat(context.tradingRecord.currentPosition.isNew).isTrue()
         assertThat(context.tradingRecord.positionCount).isEqualTo(2)
-        // All trades use the same starting type, so exit trades are also BUY for BUY starting type
-        assertThat(context.tradingRecord.lastTrade?.type).isEqualTo(TradeType.BUY)
+        // the exit trade of a long position is a sell
+        assertThat(context.tradingRecord.lastTrade?.type).isEqualTo(TradeType.SELL)
     }
 }

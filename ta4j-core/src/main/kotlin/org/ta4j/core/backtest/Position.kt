@@ -71,7 +71,7 @@ class Position @JvmOverloads constructor(
         val trade = Trade(
             whenExecuted = whenExecuted,
             pricePerAsset = pricePerAsset,
-            type = startingType,
+            type = if (isNew) startingType else startingType.complementType(),
             amount = amount,
             transactionCostModel = transactionCostModel,
             orderType = if (isNew) Trade.OrderType.OPEN else Trade.OrderType.CLOSE

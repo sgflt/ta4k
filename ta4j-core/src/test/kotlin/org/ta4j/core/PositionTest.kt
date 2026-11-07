@@ -96,6 +96,44 @@ internal class PositionTest {
 
     @ParameterizedTest
     @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
+    @DisplayName("Exit trade of a long position is a sell with costs subtracted")
+    fun exitTradeOfLongPositionIsSell(numFactory: NumFactory) {
+        val context = TradingRecordTestContext()
+            .withNumFactory(numFactory)
+            .withTradeType(TradeType.BUY)
+            .withTransactionCostModel(LinearTransactionCostModel(0.01))
+
+        context.enter(1.0).at(100.0)
+            .exit(1.0).at(110.0)
+
+        val position = context.tradingRecord.lastPosition!!
+        assertThat(position.entry!!.type).isEqualTo(TradeType.BUY)
+        assertThat(position.exit!!.type).isEqualTo(TradeType.SELL)
+        assertNumEquals(numFactory.numOf(101), position.entry!!.netPrice)
+        assertNumEquals(numFactory.numOf(108.9), position.exit!!.netPrice)
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
+    @DisplayName("Exit trade of a short position is a buy with costs added")
+    fun exitTradeOfShortPositionIsBuy(numFactory: NumFactory) {
+        val context = TradingRecordTestContext()
+            .withNumFactory(numFactory)
+            .withTradeType(TradeType.SELL)
+            .withTransactionCostModel(LinearTransactionCostModel(0.01))
+
+        context.enter(1.0).at(100.0)
+            .exit(1.0).at(110.0)
+
+        val position = context.tradingRecord.lastPosition!!
+        assertThat(position.entry!!.type).isEqualTo(TradeType.SELL)
+        assertThat(position.exit!!.type).isEqualTo(TradeType.BUY)
+        assertNumEquals(numFactory.numOf(99), position.entry!!.netPrice)
+        assertNumEquals(numFactory.numOf(111.1), position.exit!!.netPrice)
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
     @DisplayName("Should handle zero prices")
     fun shouldHandleZeroPrices(numFactory: NumFactory) {
         val context = TradingRecordTestContext()
