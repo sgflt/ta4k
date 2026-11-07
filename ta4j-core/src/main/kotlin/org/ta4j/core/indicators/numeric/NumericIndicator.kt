@@ -44,6 +44,7 @@ import org.ta4j.core.indicators.numeric.oscillators.CMOIndicator
 import org.ta4j.core.indicators.numeric.oscillators.DPOIndicator
 import org.ta4j.core.indicators.numeric.oscillators.MACDIndicator
 import org.ta4j.core.indicators.numeric.oscillators.RAVIIndicator
+import org.ta4j.core.indicators.numeric.oscillators.TrueStrengthIndexIndicator
 import org.ta4j.core.indicators.numeric.oscillators.aroon.AroonDownIndicator
 import org.ta4j.core.indicators.numeric.oscillators.aroon.AroonUpIndicator
 import org.ta4j.core.indicators.numeric.risk.UlcerIndexIndicator
@@ -151,6 +152,10 @@ abstract class NumericIndicator protected constructor(
     )
 
     fun cmo(barCount: Int) = CMOIndicator(numFactory, this, barCount)
+
+    /** True Strength Index of this indicator. */
+    fun tsi(firstSmoothingPeriod: Int = 25, secondSmoothingPeriod: Int = 13) =
+        TrueStrengthIndexIndicator(this, firstSmoothingPeriod, secondSmoothingPeriod)
 
 
     /**

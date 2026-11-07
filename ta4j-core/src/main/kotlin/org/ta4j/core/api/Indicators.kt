@@ -42,6 +42,7 @@ import org.ta4j.core.indicators.numeric.trend.ParabolicSARIndicator
 import org.ta4j.core.indicators.numeric.volume.AccumulationDistributionIndicator
 import org.ta4j.core.indicators.numeric.volume.ChaikinMoneyFlowIndicator
 import org.ta4j.core.indicators.numeric.volume.ChaikinOscillatorIndicator
+import org.ta4j.core.indicators.numeric.volume.ForceIndexIndicator
 import org.ta4j.core.indicators.numeric.volume.IIIIndicator
 import org.ta4j.core.indicators.numeric.volume.MVWAPIndicator
 import org.ta4j.core.indicators.numeric.volume.MoneyFlowIndexIndicator
@@ -211,6 +212,9 @@ object Indicators {
     @JvmStatic
     fun iii() = extended().iii()
 
+    /** Elder's Force Index of close price and volume. */
+    fun forceIndex(barCount: Int = 13) = extended().forceIndex(barCount)
+
     @JvmStatic
     private fun extended() = extended(NumFactoryProvider.defaultNumFactory)
 
@@ -338,5 +342,7 @@ object Indicators {
             ChaikinOscillatorIndicator(numFactory, shortBarCount, longBarCount)
 
         fun iii() = IIIIndicator(numFactory)
+
+        fun forceIndex(barCount: Int = 13) = ForceIndexIndicator(closePrice(), volume(), barCount)
     }
 }
