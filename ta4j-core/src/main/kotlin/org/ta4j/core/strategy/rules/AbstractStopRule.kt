@@ -36,7 +36,7 @@ import org.ta4j.core.strategy.RuntimeContext
  * The rule is never satisfied when there is no open position or when a price is NaN.
  *
  * Subclasses customise behaviour by choosing a [StopType], a [StopDistance]
- * and, for trailing stops, by overriding [referencePrice].
+ * and, for trailing stops, by overriding [referencePrice] and [isArmed].
  */
 abstract class AbstractStopRule(
     protected val priceIndicator: NumericIndicator,
@@ -69,6 +69,19 @@ abstract class AbstractStopRule(
      */
     protected open fun referencePrice(entry: Trade): Num = entry.netPrice
 
+    /**
+     * Whether the stop is active. Inactive stops have no [stopPrice] and never fire.
+     *
+     * @param entry entry trade of the open position
+     * @param referencePrice current [referencePrice]
+     */
+    protected open fun isArmed(entry: Trade, referencePrice: Num): Boolean = true
+
+    /**
+     * @return distance of the stop from [referencePrice], as configured for this rule
+     */
+    protected fun distanceFrom(referencePrice: Num): Num = distance.distanceFrom(referencePrice)
+
     private fun isTriggered(): Boolean {
         val entry = openEntry() ?: return false
         val stopPrice = stopPrice(entry) ?: return false
@@ -86,10 +99,10 @@ abstract class AbstractStopRule(
 
     private fun stopPrice(entry: Trade): Num? {
         val referencePrice = referencePrice(entry)
-        if (referencePrice.isNaN) {
+        if (referencePrice.isNaN || !isArmed(entry, referencePrice)) {
             return null
         }
-        val distance = distance.distanceFrom(referencePrice)
+        val distance = distanceFrom(referencePrice)
         if (distance.isNaN) {
             return null
         }

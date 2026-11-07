@@ -76,6 +76,8 @@ import org.ta4j.core.strategy.RuntimeContext
 import org.ta4j.core.strategy.rules.OverIndicatorRule
 import org.ta4j.core.strategy.rules.StopLossRule
 import org.ta4j.core.strategy.rules.TakeProfitRule
+import org.ta4j.core.strategy.rules.TrailingStopGainRule
+import org.ta4j.core.strategy.rules.TrailingStopLossRule
 import org.ta4j.core.strategy.rules.UnderIndicatorRule
 
 /**
@@ -511,6 +513,24 @@ abstract class NumericIndicator protected constructor(
      */
     fun takeProfitRule(gainPercentage: Number, runtimeContext: RuntimeContext) =
         TakeProfitRule(this, numFactory.numOf(gainPercentage), runtimeContext)
+
+    /**
+     * @param lossPercentage retracement from the best price since entry that closes the position
+     * @param runtimeContext context providing the open position
+     *
+     * @return [TrailingStopLossRule] watching `this` price
+     */
+    fun trailingStopLossRule(lossPercentage: Number, runtimeContext: RuntimeContext) =
+        TrailingStopLossRule(this, numFactory.numOf(lossPercentage), runtimeContext)
+
+    /**
+     * @param gainPercentage gain that arms the stop and retracement that then closes the position
+     * @param runtimeContext context providing the open position
+     *
+     * @return [TrailingStopGainRule] watching `this` price
+     */
+    fun trailingStopGainRule(gainPercentage: Number, runtimeContext: RuntimeContext) =
+        TrailingStopGainRule(this, numFactory.numOf(gainPercentage), runtimeContext)
 
     fun isLowest(barCount: Int) = IsLowestIndicator(this, barCount)
 

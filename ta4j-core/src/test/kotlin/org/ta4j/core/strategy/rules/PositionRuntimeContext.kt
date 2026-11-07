@@ -36,7 +36,32 @@ import org.ta4j.core.strategy.RuntimeValueResolver
 /**
  * Runtime context publishing a single position the same way the backtest does.
  */
-class PositionRuntimeContext(private val position: Position?) : RuntimeContext {
+class PositionRuntimeContext(var position: Position?) : RuntimeContext {
+
+    private var tradeTime = Instant.EPOCH
+
+    /**
+     * Opens a new position at [price], replacing the current one.
+     */
+    fun enter(numFactory: NumFactory, price: Double, tradeType: TradeType = TradeType.BUY) {
+        position = Position(startingType = tradeType, numFactory = numFactory).apply {
+            operate(nextTradeTime(), numFactory.numOf(price), numFactory.one())
+        }
+    }
+
+    /**
+     * Closes the current position at [price].
+     */
+    fun exit(price: Double) {
+        val current = checkNotNull(position) { "No position to exit" }
+        val numFactory = current.entry!!.pricePerAsset.numFactory
+        current.operate(nextTradeTime(), numFactory.numOf(price), numFactory.one())
+    }
+
+    private fun nextTradeTime(): Instant {
+        tradeTime = tradeTime.plusSeconds(60)
+        return tradeTime
+    }
 
     override fun <T> getValue(resolver: RuntimeValueResolver<T?>): T? = resolver.resolve(this)
 
