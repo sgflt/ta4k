@@ -8,7 +8,10 @@ import org.ta4j.core.MultiTimeFrameSeries
 import org.ta4j.core.api.series.BarBuilderFactory
 import org.ta4j.core.api.series.BarSeries
 import org.ta4j.core.api.series.Symbol
-import org.ta4j.core.backtest.strategy.runtime.NOOPRuntimeContext
+import org.ta4j.core.TradeType
+import org.ta4j.core.backtest.TradingRecord
+import org.ta4j.core.backtest.analysis.cost.CostModel
+import org.ta4j.core.backtest.analysis.cost.ZeroCostModel
 import org.ta4j.core.indicators.IndicatorContexts
 import org.ta4j.core.indicators.TimeFrame
 import org.ta4j.core.num.NumFactory
@@ -30,7 +33,10 @@ class LiveTradingBuilder {
     private var numFactory = defaultNumFactory
     private var barBuilderFactory: BarBuilderFactory = LightweightBarBuilderFactory()
     private var strategyFactory: StrategyFactory<Strategy> = NOOPStrategyFactory()
-    private var runtimeContext: RuntimeContext = NOOPRuntimeContext
+    private var runtimeContext: RuntimeContext? = null
+    private var tradeType = TradeType.BUY
+    private var transactionCostModel: CostModel = ZeroCostModel
+    private var holdingCostModel: CostModel = ZeroCostModel
     private var indicatorContexts = IndicatorContexts.empty()
     private var configuration = StrategyConfiguration()
 
@@ -58,8 +64,28 @@ class LiveTradingBuilder {
     }
 
 
+    /**
+     * Replaces the default [LiveTradingRecord]. Fills can be reported through [LiveTrading] only
+     * if the given context is a [TradingRecord] itself.
+     */
     fun withRuntimeContext(runtimeContext: RuntimeContext) = apply {
         this.runtimeContext = runtimeContext
+    }
+
+
+    /** Trade type of entries in the default [LiveTradingRecord]. */
+    fun withTradeType(tradeType: TradeType) = apply {
+        this.tradeType = tradeType
+    }
+
+
+    fun withTransactionCostModel(transactionCostModel: CostModel) = apply {
+        this.transactionCostModel = transactionCostModel
+    }
+
+
+    fun withHoldingCostModel(holdingCostModel: CostModel) = apply {
+        this.holdingCostModel = holdingCostModel
     }
 
 
@@ -87,20 +113,22 @@ class LiveTradingBuilder {
             log.warn("Using NOOP strategy")
         }
 
+        val runtimeContext = this.runtimeContext
+            ?: LiveTradingRecord(tradeType, numFactory, transactionCostModel, holdingCostModel, symbol.name)
         val strategy = strategyFactory.createStrategy(configuration, runtimeContext, indicatorContexts)
         val series = MultiTimeFrameSeries<BarSeries>().apply {
             (strategy.timeFrames + indicatorContexts.timeFrames)
                 .distinct()
-                .forEach { add(createSeriesPerTimeFrame(it)) }
+                .forEach { add(createSeriesPerTimeFrame(it, runtimeContext)) }
         }
 
         windowSize?.let { indicatorContexts.enableHistory(it) }
 
-        return LiveTrading(series, strategy)
+        return LiveTrading(series, strategy, runtimeContext as? TradingRecord)
     }
 
 
-    private fun createSeriesPerTimeFrame(timeFrame: TimeFrame): LiveBarSeries {
+    private fun createSeriesPerTimeFrame(timeFrame: TimeFrame, runtimeContext: RuntimeContext): LiveBarSeries {
         return LiveBarSeries(
             symbol = symbol,
             timeFrame = timeFrame,

@@ -4,8 +4,11 @@
 package org.ta4j.core.strategy
 
 import java.util.function.BooleanSupplier
+import org.ta4j.core.TradeType
+import org.ta4j.core.indicators.TimeFrame
 import org.ta4j.core.strategy.rules.AndRule
 import org.ta4j.core.strategy.rules.BooleanRule
+import org.ta4j.core.strategy.rules.LossTriggeredCooldownRule
 import org.ta4j.core.strategy.rules.NotRule
 import org.ta4j.core.strategy.rules.OrRule
 import org.ta4j.core.strategy.rules.VoteRule
@@ -64,6 +67,17 @@ interface Rule {
          * @return rule satisfied when at least [requiredVotes] of [rules] are satisfied
          */
         fun vote(requiredVotes: Int, vararg rules: Rule): Rule = VoteRule(requiredVotes, *rules)
+
+        /**
+         * @return rule blocking entries for [cooldownBars] bars of [timeFrame] after a losing position
+         */
+        fun cooldownAfterLoss(
+            cooldownBars: Int,
+            timeFrame: TimeFrame,
+            runtimeContext: RuntimeContext,
+            resetRule: Rule? = null,
+            tradeType: TradeType? = null,
+        ): Rule = LossTriggeredCooldownRule(cooldownBars, timeFrame, runtimeContext, resetRule, tradeType)
 
         fun of(rule: BooleanSupplier): Rule {
             return object : Rule {

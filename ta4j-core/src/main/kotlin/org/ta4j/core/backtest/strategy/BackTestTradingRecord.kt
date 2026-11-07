@@ -183,6 +183,9 @@ open class BackTestTradingRecord(
         return when (key) {
             TradingRecordContextKeys.CURRENT_POSITION -> this.currentPosition
             TradingRecordContextKeys.BACKTEST_TRADING_RECORD -> this
+            TradingRecordContextKeys.TRADING_RECORD -> this
+            TradingRecordContextKeys.LAST_CLOSED_POSITION -> this.lastPosition
+            TradingRecordContextKeys.CLOSED_POSITIONS -> Collections.unmodifiableList(this.positions)
             RuntimeContextKeys.CURRENT_PRICE -> this.currentPrice
             RuntimeContextKeys.CURRENT_TIME -> this.currentTime
             else -> null
@@ -194,12 +197,37 @@ open class BackTestTradingRecord(
     object TradingRecordContextKeys {
         const val CURRENT_POSITION: String = "ta4j-currentPosition"
         const val BACKTEST_TRADING_RECORD: String = "ta4j-backtestTradingRecord"
+        const val TRADING_RECORD: String = "ta4j-tradingRecord"
+        const val LAST_CLOSED_POSITION: String = "ta4j-lastClosedPosition"
+        const val CLOSED_POSITIONS: String = "ta4j-closedPositions"
     }
 
 
     class CurrentPositionResolver : RuntimeValueResolver<Position?> {
         override fun resolve(context: RuntimeContext): Position? {
             return context.getValue(TradingRecordContextKeys.CURRENT_POSITION) as Position?
+        }
+    }
+
+    /** The most recently closed position, or null if none was closed yet. */
+    class LastClosedPositionResolver : RuntimeValueResolver<Position?> {
+        override fun resolve(context: RuntimeContext): Position? {
+            return context.getValue(TradingRecordContextKeys.LAST_CLOSED_POSITION) as Position?
+        }
+    }
+
+    /** All closed positions, oldest first; null when the context keeps no record. */
+    class ClosedPositionsResolver : RuntimeValueResolver<List<Position>?> {
+        @Suppress("UNCHECKED_CAST")
+        override fun resolve(context: RuntimeContext): List<Position>? {
+            return context.getValue(TradingRecordContextKeys.CLOSED_POSITIONS) as List<Position>?
+        }
+    }
+
+    /** The trading record behind the context, in backtests and live trading alike. */
+    class TradingRecordResolver : RuntimeValueResolver<TradingRecord?> {
+        override fun resolve(context: RuntimeContext): TradingRecord? {
+            return context.getValue(TradingRecordContextKeys.TRADING_RECORD) as TradingRecord?
         }
     }
 

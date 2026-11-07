@@ -101,6 +101,63 @@ class LiveTradingTest {
         assertThat(liveTrading.shouldExit()).isFalse()
     }
 
+    @ParameterizedTest
+    @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
+    fun reportedFillsDriveStopRules(numFactory: NumFactory) {
+        val liveTrading = LiveTradingBuilder()
+            .withNumFactory(numFactory)
+            .withSymbol(Symbol("BTC/USD"))
+            .withStrategyFactory(StopLossStrategyFactory(numFactory))
+            .withIndicatorContexts(IndicatorContexts.empty())
+            .build()
+        val baseTime = Instant.parse("2026-11-02T00:00:00Z")
+        fun candle(day: Long, close: Double) = CandleReceived(
+            timeFrame = TimeFrame.DAY,
+            beginTime = baseTime.plus(Duration.ofDays(day)),
+            endTime = baseTime.plus(Duration.ofDays(day + 1)),
+            openPrice = close,
+            closePrice = close,
+            highPrice = close,
+            lowPrice = close,
+            volume = 100.0
+        )
+
+        assertThat(liveTrading.tradingRecord).isInstanceOf(LiveTradingRecord::class.java)
+
+        liveTrading.onCandle(candle(0, 100.0))
+        assertThat(liveTrading.shouldExit()).isFalse() // no position yet
+        assertThat(liveTrading.enter(baseTime, numFactory.numOf(100), numFactory.one())).isTrue()
+
+        liveTrading.onCandle(candle(1, 97.0))
+        assertThat(liveTrading.shouldExit()).isFalse()
+        liveTrading.onCandle(candle(2, 94.0))
+        assertThat(liveTrading.shouldExit()).isTrue() // 5 % stop loss hit
+
+        assertThat(liveTrading.exit(baseTime, numFactory.numOf(94), numFactory.one())).isTrue()
+        assertThat(liveTrading.tradingRecord!!.positionCount).isEqualTo(1)
+        assertThat(liveTrading.shouldExit()).isFalse()
+    }
+
+    private class StopLossStrategyFactory(private val numFactory: NumFactory) : StrategyFactory<Strategy> {
+        override val tradeType: TradeType = TradeType.BUY
+
+        override fun createStrategy(
+            configuration: StrategyConfiguration,
+            runtimeContext: RuntimeContext,
+            indicatorContexts: IndicatorContexts,
+        ): Strategy {
+            val closePrice = org.ta4j.core.api.Indicators.extended(numFactory).closePrice()
+            indicatorContexts[TimeFrame.DAY].add(closePrice)
+            return DefaultStrategy(
+                name = "LiveStopLoss",
+                timeFrames = setOf(TimeFrame.DAY),
+                entryRule = closePrice.isGreaterThanRule(0),
+                exitRule = closePrice.stopLossRule(5, runtimeContext),
+                indicatorContexts = indicatorContexts
+            )
+        }
+    }
+
     /**
      * Test strategy factory that creates a simple SMA-based strategy
      * Entry rule: SMA(5) > 5
