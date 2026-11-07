@@ -6,13 +6,14 @@ package org.ta4j.core.indicators.numeric.volume
 import org.ta4j.core.api.Indicators
 import org.ta4j.core.api.series.Bar
 import org.ta4j.core.indicators.numeric.NumericIndicator
+import org.ta4j.core.num.Num
 import org.ta4j.core.num.NumFactory
 
 /**
- * The volume-weighted average price (VWAP) Indicator.
+ * The volume-weighted average price (VWAP) over the last [barCount] bars.
  *
- * @param numFactory the number factory
- * @param barCount the time frame (lookback period)
+ * @param price the price to weight, typical price by default
+ * @param volume the weights, bar volume by default
  *
  * @see <a href=
  *      "http://www.investopedia.com/articles/trading/11/trading-with-vwap-mvwap.asp">
@@ -24,40 +25,36 @@ import org.ta4j.core.num.NumFactory
  *      https://en.wikipedia.org/wiki/Volume-weighted_average_price</a>
  */
 class VWAPIndicator(
-    numFactory: NumFactory,
     private val barCount: Int,
-) : NumericIndicator(numFactory) {
+    price: NumericIndicator,
+    volume: NumericIndicator,
+) : AbstractVWAPIndicator(price, volume) {
 
-    private val typicalPrice = Indicators.extended(numFactory).typicalPrice()
-    private val volume = Indicators.extended(numFactory).volume()
+    constructor(numFactory: NumFactory, barCount: Int) : this(
+        barCount,
+        Indicators.extended(numFactory).typicalPrice(),
+        Indicators.extended(numFactory).volume(),
+    )
 
-    private val typicalPriceVolume = typicalPrice.multipliedBy(volume)
-    private val cumulativeTPV = typicalPriceVolume.runningTotal(barCount)
-    private val cumulativeVolume = volume.runningTotal(barCount)
+    private val window = ArrayDeque<Pair<Num, Num>>(barCount)
 
     init {
         require(barCount > 0) { "Bar count must be positive" }
     }
 
-    private fun calculate() = if (cumulativeVolume.value.isZero) {
-        typicalPrice.value
-    } else {
-        cumulativeTPV.value / cumulativeVolume.value
-    }
-
-    override fun updateState(bar: Bar) {
-        cumulativeTPV.onBar(bar)
-        cumulativeVolume.onBar(bar)
-
-        value = calculate()
+    override fun updateWindow(bar: Bar, price: Num, volume: Num) {
+        if (window.size == barCount) {
+            val (oldPrice, oldVolume) = window.removeFirst()
+            remove(oldPrice, oldVolume)
+        }
+        window.addLast(price to volume)
+        add(price, volume)
     }
 
     override val lag = barCount
 
     override val isStable: Boolean
-        get() = cumulativeTPV.isStable && cumulativeVolume.isStable
+        get() = window.size >= barCount && price.isStable && volume.isStable
 
-    override fun toString(): String {
-        return "VWAP($barCount) => $value"
-    }
+    override fun toString() = "VWAP($barCount) => $value"
 }

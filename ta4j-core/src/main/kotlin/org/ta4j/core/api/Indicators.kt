@@ -3,6 +3,8 @@
  */
 package org.ta4j.core.api
 
+import org.ta4j.core.indicators.bool.BooleanIndicator
+import java.time.Instant
 import org.ta4j.core.indicators.numeric.CloseLocationValueIndicator
 import org.ta4j.core.indicators.numeric.NumericIndicator
 import org.ta4j.core.indicators.numeric.candles.LowerShadowIndicator
@@ -47,6 +49,7 @@ import org.ta4j.core.indicators.numeric.oscillators.UltimateOscillatorIndicator
 import org.ta4j.core.indicators.numeric.oscillators.vortex.VortexFacade
 import org.ta4j.core.indicators.numeric.volume.ForceIndexIndicator
 import org.ta4j.core.indicators.numeric.volume.IIIIndicator
+import org.ta4j.core.indicators.numeric.volume.AnchoredVWAPIndicator
 import org.ta4j.core.indicators.numeric.volume.MVWAPIndicator
 import org.ta4j.core.indicators.numeric.volume.MoneyFlowIndexIndicator
 import org.ta4j.core.indicators.numeric.volume.NVIIndicator
@@ -140,6 +143,12 @@ object Indicators {
 
     @JvmStatic
     fun vwap(barCount: Int) = extended().vwap(barCount)
+
+    @JvmStatic
+    fun anchoredVwap(anchorTime: Instant) = extended().anchoredVwap(anchorTime)
+
+    @JvmStatic
+    fun anchoredVwap(anchorSignal: BooleanIndicator) = extended().anchoredVwap(anchorSignal)
 
     @JvmStatic
     fun mvwap(vwapBarCount: Int, mvwapBarCount: Int) = extended().mvwap(vwapBarCount, mvwapBarCount)
@@ -293,6 +302,12 @@ object Indicators {
         fun fisher(barCount: Int = 10) = FisherIndicator(numFactory, barCount)
 
         fun vwap(barCount: Int) = VWAPIndicator(numFactory, barCount)
+
+        /** VWAP of the typical price accumulated from the first bar beginning at or after [anchorTime]. */
+        fun anchoredVwap(anchorTime: Instant) = AnchoredVWAPIndicator(typicalPrice(), volume(), anchorTime)
+
+        /** VWAP of the typical price restarted on every bar where [anchorSignal] is true. */
+        fun anchoredVwap(anchorSignal: BooleanIndicator) = AnchoredVWAPIndicator(typicalPrice(), volume(), anchorSignal)
 
         fun mvwap(vwapBarCount: Int, mvwapBarCount: Int) = MVWAPIndicator(numFactory, vwapBarCount, mvwapBarCount)
 
