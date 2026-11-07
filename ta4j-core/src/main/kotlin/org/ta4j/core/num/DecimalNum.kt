@@ -436,37 +436,47 @@ class DecimalNum : Num {
 
 
     override fun pow(n: Num): Num {
-        // There is no BigDecimal.pow(BigDecimal). We could do:
-        // double Math.pow(double delegate.doubleValue(), double n)
-        // But that could overflow any of the three doubles.
-        // Instead perform:
-        // x^(a+b) = x^a * x^b
-        // Where:
-        // n = a+b
-        // a is a whole number (make sure it doesn't overflow int)
-        // remainder 0 <= b < 1
-        // So:
-        // x^a uses DecimalNum ((DecimalNum) x).pow(int a) cannot overflow Num
-        // x^b uses double Math.pow(double x, double b) cannot overflow double because b
-        // < 1.
+        if (n.isNaN || !n.doubleValue().isFinite()) {
+            return NaN
+        }
+        if (isZero && n.isNegative) {
+            return NaN
+        }
+        val decimalN = n as? DecimalNum ?: valueOf(n.toString(), mathContext)
+
+        // There is no BigDecimal.pow(BigDecimal), and double Math.pow could overflow.
+        // Instead use x^(a+b) = x^a * x^b, where a is the whole part of n (BigDecimal.pow(int))
+        // and 0 <= |b| < 1 is the fraction (double pow, which cannot overflow because |b| < 1).
         // As suggested: https://stackoverflow.com/a/3590314
-
-        // get n = a+b, same precision as n
-
-        val aplusb = ((n as DecimalNum).delegate)
-        // get the remainder 0 <= b < 1, looses precision as double
+        val aplusb = decimalN.delegate
         val b = aplusb.remainder(BigDecimal.ONE)
-        // bDouble looses precision
-        val bDouble = b.toDouble()
-        // get the whole number a
-        val a = aplusb.subtract(b)
-        // convert a to an int, fails on overflow
-        val aInt = a.intValueExact()
-        // use BigDecimal pow(int)
-        val xpowa = delegate.pow(aInt)
-        // use double pow(double, double)
-        val xpowb = delegate.toDouble().pow(bDouble)
-        // use PrecisionNum.multiply(PrecisionNum)
+        val aInt = aplusb.subtract(b).intValueExact()
+
+        // a fractional power of a negative base is undefined
+        if (delegate.signum() < 0 && b.signum() != 0) {
+            return NaN
+        }
+
+        // x^a at working precision plus guard digits; the result is rounded to mathContext anyway
+        val precision = mathContext.precision
+        val xpowa = if (precision == 0) {
+            // BigDecimal.pow rejects negative exponents without a finite context
+            if (aInt >= 0) {
+                delegate.pow(aInt)
+            } else {
+                BigDecimal.ONE.divide(
+                    delegate.pow(Math.negateExact(aInt)),
+                    MathContext(DEFAULT_PRECISION, mathContext.roundingMode)
+                )
+            }
+        } else {
+            delegate.pow(aInt, MathContext(precision + POW_GUARD_DIGITS, mathContext.roundingMode))
+        }
+
+        val xpowb = delegate.toDouble().pow(b.toDouble())
+        if (!xpowb.isFinite()) {
+            return NaN
+        }
         val result = xpowa.multiply(BigDecimal.valueOf(xpowb))
         return DecimalNum(result, mathContext)
     }
@@ -476,6 +486,7 @@ class DecimalNum : Num {
         private val EXPONENT_PATTERN: Pattern = Pattern.compile("E\\d+")
 
         const val DEFAULT_PRECISION: Int = 20
+        private const val POW_GUARD_DIGITS = 10
         private val log: Logger = LoggerFactory.getLogger(DecimalNum::class.java)
 
         /**
