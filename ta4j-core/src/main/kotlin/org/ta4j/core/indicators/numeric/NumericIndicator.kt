@@ -54,6 +54,8 @@ import org.ta4j.core.indicators.numeric.oscillators.ConnorsRSIIndicator
 import org.ta4j.core.indicators.numeric.oscillators.SchaffTrendCycleIndicator
 import org.ta4j.core.indicators.numeric.oscillators.StochasticIndicator
 import org.ta4j.core.indicators.numeric.oscillators.TrueStrengthIndexIndicator
+import org.ta4j.core.indicators.numeric.filters.KalmanFilterIndicator
+import org.ta4j.core.indicators.numeric.filters.KinematicKalmanFilterIndicator
 import org.ta4j.core.indicators.numeric.statistics.CusumIndicator
 import org.ta4j.core.indicators.numeric.statistics.EwmaVarianceIndicator
 import org.ta4j.core.indicators.numeric.statistics.HurstExponentIndicator
@@ -435,6 +437,14 @@ abstract class NumericIndicator protected constructor(
 
 
     fun covariance(indicator: NumericIndicator, barCount: Int) = CovarianceIndicator(this, indicator, barCount)
+
+    /** Smooths this indicator with a scalar Kalman filter. */
+    fun kalman(processNoise: Number = 1e-4, measurementNoise: Number = 1e-3) =
+        KalmanFilterIndicator(this, processNoise, measurementNoise)
+
+    /** Smooths this indicator with a constant-velocity Kalman filter. */
+    fun kinematicKalman(processNoise: Number = 1e-4, measurementNoise: Number = 1e-3) =
+        KinematicKalmanFilterIndicator(this, processNoise, measurementNoise)
 
     /** Spearman's rank correlation with [other] over the last [barCount] bars. */
     fun spearman(other: NumericIndicator, barCount: Int) = SpearmanRankCorrelationIndicator(this, other, barCount)

@@ -8,6 +8,8 @@ import org.ta4j.core.indicators.bool.fractal.FractalHighIndicator
 import org.ta4j.core.indicators.bool.fractal.FractalLowIndicator
 import org.ta4j.core.indicators.bool.fractal.RecentFractalSwingIndicator
 import org.ta4j.core.indicators.numeric.oscillators.MACDVIndicator
+import org.ta4j.core.indicators.numeric.volatility.CompressionIndicator
+import org.ta4j.core.indicators.numeric.volatility.SqueezeProIndicator
 import org.ta4j.core.indicators.numeric.oscillators.VolatilityNormalizedMACDIndicator
 import org.ta4j.core.indicators.numeric.oscillators.billwilliams.AlligatorFacade
 import org.ta4j.core.indicators.numeric.oscillators.billwilliams.MarketFacilitationIndexIndicator
@@ -256,6 +258,13 @@ object Indicators {
     fun alligator() = extended().alligator()
 
     @JvmStatic
+    fun squeezePro(barCount: Int = 20) = extended().squeezePro(barCount)
+
+    @JvmStatic
+    fun compression(barCount: Int = 20, percentileBarCount: Int = barCount) =
+        extended().compression(barCount, percentileBarCount)
+
+    @JvmStatic
     fun marketFacilitationIndex() = extended().marketFacilitationIndex()
 
     @JvmStatic
@@ -440,6 +449,26 @@ object Indicators {
         /** Close-price MACD divided by ATR and scaled by 100 (Spiroglou's MACD-V). */
         fun volatilityNormalizedMacd(fastBarCount: Int = 12, slowBarCount: Int = 26, atrBarCount: Int = 26) =
             VolatilityNormalizedMACDIndicator(closePrice(), atr(atrBarCount), fastBarCount, slowBarCount)
+
+        fun squeezePro(
+            barCount: Int = 20,
+            bollingerK: Number = 2,
+            keltnerHigh: Number = 1,
+            keltnerMid: Number = 1.5,
+            keltnerLow: Number = 2,
+        ) = SqueezeProIndicator(numFactory, barCount, bollingerK, keltnerHigh, keltnerMid, keltnerLow)
+
+        /** Compression of ATR %, Bollinger bandwidth and Donchian width % over [barCount] bars. */
+        fun compression(barCount: Int = 20, percentileBarCount: Int = barCount): CompressionIndicator {
+            val close = closePrice()
+            val donchian = donchianChannel(barCount)
+            return CompressionIndicator(
+                atrPercent = atr(barCount).dividedBy(close).multipliedBy(100),
+                bollingerWidth = BollingerBandFacade(close, barCount, 2).bandwidth,
+                donchianWidth = donchian.upper.minus(donchian.lower).dividedBy(donchian.middle).multipliedBy(100),
+                percentileBarCount = percentileBarCount,
+            )
+        }
 
         /** Bill Williams Alligator on the median price with the classic 13/8, 8/5, 5/3 settings. */
         fun alligator() = AlligatorFacade(medianPrice())
