@@ -10,7 +10,6 @@ import org.ta4j.core.events.CandleReceived
 import org.ta4j.core.events.MarketEvent
 import org.ta4j.core.num.Num
 import org.ta4j.core.num.NumFactory
-import org.ta4j.core.num.NumFactoryProvider.defaultNumFactory
 
 /**
  * Enter and hold criterion, returned in decimal format.
@@ -27,7 +26,6 @@ import org.ta4j.core.num.NumFactoryProvider.defaultNumFactory
 class EnterAndHoldReturnCriterion(
     private val marketEvents: List<MarketEvent>,
     private val tradeType: TradeType,
-    private val numFactory: NumFactory = defaultNumFactory,
 ) : AnalysisCriterion {
 
     companion object {
@@ -40,21 +38,21 @@ class EnterAndHoldReturnCriterion(
 
     override fun calculate(position: Position): Num {
         if (marketEvents.isEmpty()) {
-            return defaultNumFactory.one()
+            return position.numFactory.one()
         }
 
-        return calculate()
+        return calculate(position.numFactory)
     }
 
     override fun calculate(tradingRecord: TradingRecord): Num {
         if (marketEvents.isEmpty()) {
-            return defaultNumFactory.one()
+            return tradingRecord.numFactory.one()
         }
 
-        return calculate()
+        return calculate(tradingRecord.numFactory)
     }
 
-    private fun calculate(): Num {
+    private fun calculate(numFactory: NumFactory): Num {
         val firstPrice = (marketEvents.first { it is CandleReceived } as CandleReceived).closePrice
         val lastPrice = (marketEvents.last { it is CandleReceived } as CandleReceived).closePrice
 

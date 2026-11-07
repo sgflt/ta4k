@@ -9,9 +9,10 @@ import org.ta4j.core.num.Num
 
 interface ExternalCriterionTest {
 
-    fun getMarketEvents(): List<MarketEvent>
+    val marketEvents: List<MarketEvent>
 
     fun getFinalCriterionValue(vararg params: Any): Num
 
-    fun getTradingRecord(): TradingRecord
+    /** Reads a new trading record from the external source. */
+    fun readTradingRecord(): TradingRecord
 }

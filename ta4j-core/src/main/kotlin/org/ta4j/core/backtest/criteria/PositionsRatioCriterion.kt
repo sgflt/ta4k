@@ -7,7 +7,6 @@ import org.ta4j.core.backtest.Position
 import org.ta4j.core.backtest.TradingRecord
 import org.ta4j.core.backtest.criteria.AnalysisCriterion.PositionFilter
 import org.ta4j.core.num.Num
-import org.ta4j.core.num.NumFactoryProvider.defaultNumFactory
 
 /**
  * Calculates the percentage of losing or winning positions, returned in decimal
@@ -32,7 +31,7 @@ class PositionsRatioCriterion(private val positionFilter: PositionFilter) : Anal
 
     override fun calculate(tradingRecord: TradingRecord): Num {
         val numberOfPositions = numberOfPositionsCriterion.calculate(tradingRecord)
-        return numberOfPositions / defaultNumFactory.numOf(tradingRecord.positionCount)
+        return numberOfPositions / tradingRecord.numFactory.numOf(tradingRecord.positionCount)
     }
 
     companion object {

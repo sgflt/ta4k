@@ -36,7 +36,7 @@ class Position @JvmOverloads constructor(
 
     /** The cost model for holding the asset  */
     private val holdingCostModel: CostModel = ZeroCostModel,
-    internal val numFactory: NumFactory,
+    val numFactory: NumFactory,
 ) : BarListener {
     /** The entry trade  */
     var entry: Trade? = null
@@ -113,20 +113,15 @@ class Position @JvmOverloads constructor(
         get() = entry == null && exit == null
 
 
-    /**
-     * @return true if position is closed and [.getProfit] > 0
-     */
-    fun hasProfit(): Boolean {
-        return profit.isPositive
-    }
+    /** True if the position is closed and [profit] > 0. */
+    @get:JvmName("hasProfit")
+    val hasProfit: Boolean
+        get() = profit.isPositive
 
-
-    /**
-     * @return true if position is closed and [.getProfit] < 0
-     */
-    fun hasLoss(): Boolean {
-        return profit.isNegative
-    }
+    /** True if the position is closed and [profit] < 0. */
+    @get:JvmName("hasLoss")
+    val hasLoss: Boolean
+        get() = profit.isNegative
 
 
     val profit: Num

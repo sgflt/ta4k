@@ -6,7 +6,6 @@ package org.ta4j.core.backtest.criteria
 import org.ta4j.core.backtest.Position
 import org.ta4j.core.backtest.TradingRecord
 import org.ta4j.core.num.Num
-import org.ta4j.core.num.NumFactoryProvider.defaultNumFactory
 
 /**
  * Number of break even position criterion.
@@ -14,15 +13,15 @@ import org.ta4j.core.num.NumFactoryProvider.defaultNumFactory
 class NumberOfBreakEvenPositionsCriterion : AnalysisCriterion {
     override fun calculate(position: Position): Num {
         return if (isBreakEvenPosition(position))
-            defaultNumFactory.one()
+            position.numFactory.one()
         else
-            defaultNumFactory.zero()
+            position.numFactory.zero()
     }
 
 
     override fun calculate(tradingRecord: TradingRecord): Num {
         val numberOfBreakEvenTrades = tradingRecord.positions.count(::isBreakEvenPosition)
-        return defaultNumFactory.numOf(numberOfBreakEvenTrades)
+        return tradingRecord.numFactory.numOf(numberOfBreakEvenTrades)
     }
 
 

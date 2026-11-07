@@ -109,7 +109,7 @@ object AILiveTradingExample {
 
             // Print market update
             println("📊 Candle #$candleCount | Price: $${"%.2f".format(currentPrice)}")
-            println("   ${dataGenerator.getMarketSummary()}")
+            println("   ${dataGenerator.marketSummary}")
             println(
                 "   📈 OHLCV: O=${"%.2f".format(candle.openPrice)} " +
                         "H=${"%.2f".format(candle.highPrice)} " +
@@ -170,7 +170,7 @@ object AILiveTradingExample {
 
             // Print AI sentiment occasionally
             if (candleCount % 10 == 0) {
-                println("🧠 Market Sentiment: ${aiService.getMarketSentiment()}")
+                println("🧠 Market Sentiment: ${aiService.sampleMarketSentiment()}")
             }
 
             println()

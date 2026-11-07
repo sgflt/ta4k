@@ -18,14 +18,7 @@ class XLSCriterionTest(
     private val numFactory: NumFactory,
 ) : ExternalCriterionTest {
 
-    private var cachedSeries: List<MarketEvent>? = null
-
-    override fun getMarketEvents(): List<MarketEvent> {
-        if (cachedSeries == null) {
-            cachedSeries = XlsTestsUtils.getMarketEvents(clazz, fileName)
-        }
-        return cachedSeries!!
-    }
+    override val marketEvents: List<MarketEvent> by lazy { XlsTestsUtils.getMarketEvents(clazz, fileName) }
 
     override fun getFinalCriterionValue(vararg params: Any): Num {
         return XlsTestsUtils.getFinalCriterionValue(
@@ -37,7 +30,7 @@ class XLSCriterionTest(
         )!!
     }
 
-    override fun getTradingRecord(): TradingRecord {
+    override fun readTradingRecord(): TradingRecord {
         return XlsTestsUtils.getTradingRecord(clazz, fileName, statesColumn, numFactory)
     }
 }

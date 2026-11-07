@@ -79,7 +79,7 @@ class AITradingStrategyFactory(
 
         override val isSatisfied: Boolean
             get() {
-                if (!isDataAvailable()) {
+                if (!isDataAvailable) {
                     return false
                 }
 
@@ -106,10 +106,7 @@ class AITradingStrategyFactory(
                 return recommendation.action == targetAction && recommendation.confidence > 0.5
             }
 
-        private fun isDataAvailable(): Boolean {
-            return rsi.isStable
-                    && sma.isStable
-                    && atr.isStable
-        }
+        private val isDataAvailable: Boolean
+            get() = rsi.isStable && sma.isStable && atr.isStable
     }
 }

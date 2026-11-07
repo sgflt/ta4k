@@ -30,7 +30,7 @@ open class BackTestTradingRecord(
     private val transactionCostModel: CostModel = ZeroCostModel,
     /** The cost model for holding asset (e.g. borrowing).  */
     private val holdingCostModel: CostModel = ZeroCostModel,
-    private val numFactory: NumFactory,
+    override val numFactory: NumFactory,
     /** Whether to record equity per bar for return-series criteria; costs one point per bar. */
     recordEquityCurve: Boolean = true,
 ) : TradingRecord, RuntimeContext {

@@ -75,7 +75,7 @@ internal class SMAIndicatorTest {
         val xlsContext = MarketEventTestContext()
         xlsContext.withNumFactory(numFactory)
         val xls = XLSIndicatorTest(javaClass, "SMA.xls", 6, numFactory)
-        xlsContext.withMarketEvents(xls.getMarketEvents())
+        xlsContext.withMarketEvents(xls.marketEvents)
 
         val actualIndicator = closePrice().sma(barCount)
         val expectedIndicator = xls.getIndicator(barCount)

@@ -7,7 +7,6 @@ import org.ta4j.core.backtest.Position
 import org.ta4j.core.backtest.TradingRecord
 import org.ta4j.core.backtest.criteria.AnalysisCriterion
 import org.ta4j.core.num.Num
-import org.ta4j.core.num.NumFactoryProvider.defaultNumFactory
 
 /**
  * Base class for criteria that sum the net profit of consecutive closed positions
@@ -37,7 +36,7 @@ abstract class AbstractConsecutivePnlCriterion : AnalysisCriterion {
     }
 
     override fun calculate(tradingRecord: TradingRecord): Num {
-        val zero = tradingRecord.positions.firstOrNull()?.numFactory?.zero() ?: defaultNumFactory.zero()
+        val zero = tradingRecord.numFactory.zero()
         var current = zero
         var best = zero
         for (position in tradingRecord.positions) {

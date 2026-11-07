@@ -371,6 +371,6 @@ object XlsTestsUtils {
         numFactory: NumFactory,
     ): TradingRecord {
         val sheet = getSheet(clazz, fileName)
-        return MockTradingRecord(XlsTestsUtils.getValues(sheet, column, numFactory))
+        return MockTradingRecord(XlsTestsUtils.getValues(sheet, column, numFactory), numFactory)
     }
 }

@@ -7,7 +7,6 @@ import org.ta4j.core.backtest.Position
 import org.ta4j.core.backtest.TradingRecord
 import org.ta4j.core.backtest.criteria.AnalysisCriterion
 import org.ta4j.core.num.Num
-import org.ta4j.core.num.NumFactoryProvider.defaultNumFactory
 
 /**
  * Standard deviation criterion in percentage (also known as Coefficient of
@@ -66,7 +65,7 @@ class RelativeStandardDeviationCriterion : AnalysisCriterion {
 
     override fun calculate(tradingRecord: TradingRecord): Num {
         if (tradingRecord.positions.isEmpty()) {
-            return defaultNumFactory.zero()
+            return tradingRecord.numFactory.zero()
         }
         val average = averageCriterion.calculate(tradingRecord)
         return standardDeviationCriterion.calculate(tradingRecord) / average

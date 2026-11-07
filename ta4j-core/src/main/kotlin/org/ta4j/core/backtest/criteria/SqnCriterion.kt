@@ -8,7 +8,6 @@ import org.ta4j.core.backtest.TradingRecord
 import org.ta4j.core.backtest.criteria.helpers.StandardDeviationCriterion
 import org.ta4j.core.backtest.criteria.pnl.ProfitLossCriterion
 import org.ta4j.core.num.Num
-import org.ta4j.core.num.NumFactoryProvider.defaultNumFactory
 
 /**
  * The SQN ("System Quality Number") Criterion.
@@ -32,7 +31,7 @@ class SqnCriterion @JvmOverloads constructor(
     override fun calculate(position: Position): Num {
         val stdDevPnl = standardDeviationCriterion.calculate(position)
         if (stdDevPnl.isZero) {
-            return defaultNumFactory.zero()
+            return position.numFactory.zero()
         }
         // SQN = (Average (PnL) / StdDev(PnL)) * SquareRoot(NumberOfTrades)
         val numberOfPositions = numberOfPositionsCriterion.calculate(position)
@@ -44,19 +43,19 @@ class SqnCriterion @JvmOverloads constructor(
 
     override fun calculate(tradingRecord: TradingRecord): Num {
         if (tradingRecord.positions.isEmpty()) {
-            return defaultNumFactory.zero()
+            return tradingRecord.numFactory.zero()
         }
         val stdDevPnl = standardDeviationCriterion.calculate(tradingRecord)
         if (stdDevPnl.isZero) {
-            return defaultNumFactory.zero()
+            return tradingRecord.numFactory.zero()
         }
 
         var numberOfPositions = numberOfPositionsCriterion.calculate(tradingRecord)
         val pnl = criterion.calculate(tradingRecord)
         val avgPnl = pnl / numberOfPositions
-        if (nPositions != null && numberOfPositions > defaultNumFactory.hundred()
+        if (nPositions != null && numberOfPositions > tradingRecord.numFactory.hundred()
         ) {
-            numberOfPositions = defaultNumFactory.numOf(nPositions)
+            numberOfPositions = tradingRecord.numFactory.numOf(nPositions)
         }
         // SQN = (Average (PnL) / StdDev(PnL)) * SquareRoot(NumberOfTrades)
         return avgPnl / stdDevPnl * numberOfPositions.sqrt()

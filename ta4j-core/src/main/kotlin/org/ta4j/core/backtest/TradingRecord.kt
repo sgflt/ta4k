@@ -7,6 +7,7 @@ import java.time.Instant
 import org.ta4j.core.TradeType
 import org.ta4j.core.backtest.analysis.EquityPoint
 import org.ta4j.core.num.Num
+import org.ta4j.core.num.NumFactory
 
 /**
  * A `TradingRecord` holds the full history/record of a trading session
@@ -24,6 +25,9 @@ interface TradingRecord {
      * session
      */
     val startingType: TradeType
+
+    /** Number factory of the record's prices and amounts. */
+    val numFactory: NumFactory
 
     /**
      * @return the name of the TradingRecord

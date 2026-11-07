@@ -37,7 +37,7 @@ abstract class AbstractStopRule(
 
     final override val isSatisfied: Boolean
         get() {
-            val satisfied = isTriggered()
+            val satisfied = isTriggered
             traceIsSatisfied(satisfied)
             return satisfied
         }
@@ -63,15 +63,16 @@ abstract class AbstractStopRule(
      */
     protected fun distanceFrom(referencePrice: Num): Num = distance.distanceFrom(referencePrice)
 
-    private fun isTriggered(): Boolean {
-        val entry = openEntry() ?: return false
-        val stopPrice = stopPrice(entry) ?: return false
-        val currentPrice = priceIndicator.value
-        if (currentPrice.isNaN) {
-            return false
+    private val isTriggered: Boolean
+        get() {
+            val entry = openEntry() ?: return false
+            val stopPrice = stopPrice(entry) ?: return false
+            val currentPrice = priceIndicator.value
+            if (currentPrice.isNaN) {
+                return false
+            }
+            return stopType.isTriggered(entry.type, stopPrice, currentPrice)
         }
-        return stopType.isTriggered(entry.type, stopPrice, currentPrice)
-    }
 
     private fun openEntry(): Trade? =
         runtimeContext.getValue(currentPositionResolver)

@@ -16,14 +16,7 @@ class XLSIndicatorTest(
     private val numFactory: NumFactory,
 ) : ExternalIndicatorTest {
 
-    private var cachedSeries: List<MarketEvent>? = null
-
-    override fun getMarketEvents(): List<MarketEvent> {
-        if (cachedSeries == null) {
-            cachedSeries = XlsTestsUtils.getMarketEvents(clazz, fileName)
-        }
-        return cachedSeries!!
-    }
+    override val marketEvents: List<MarketEvent> by lazy { XlsTestsUtils.getMarketEvents(clazz, fileName) }
 
     override fun getIndicator(vararg params: Any): MockIndicator {
         return XlsTestsUtils.getIndicator(

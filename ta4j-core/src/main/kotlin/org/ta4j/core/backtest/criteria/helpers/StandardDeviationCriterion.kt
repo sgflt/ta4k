@@ -7,7 +7,6 @@ import org.ta4j.core.backtest.Position
 import org.ta4j.core.backtest.TradingRecord
 import org.ta4j.core.backtest.criteria.AnalysisCriterion
 import org.ta4j.core.num.Num
-import org.ta4j.core.num.NumFactoryProvider.defaultNumFactory
 
 /**
  * Standard deviation criterion.
@@ -59,7 +58,7 @@ class StandardDeviationCriterion : AnalysisCriterion {
 
     override fun calculate(tradingRecord: TradingRecord): Num {
         if (tradingRecord.positions.isEmpty()) {
-            return defaultNumFactory.zero()
+            return tradingRecord.numFactory.zero()
         }
         return this.varianceCriterion.calculate(tradingRecord).sqrt()
     }

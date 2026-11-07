@@ -57,8 +57,8 @@ internal class PositionTest {
 
         val position = context.tradingRecord.lastPosition!!
         assertNumEquals(numFactory.numOf(10), position.profit)
-        assertThat(position.hasProfit()).isTrue()
-        assertThat(position.hasLoss()).isFalse()
+        assertThat(position.hasProfit).isTrue()
+        assertThat(position.hasLoss).isFalse()
     }
 
     @ParameterizedTest
@@ -74,8 +74,8 @@ internal class PositionTest {
 
         val position = context.tradingRecord.lastPosition!!
         assertNumEquals(numFactory.numOf(10), position.profit)
-        assertThat(position.hasProfit()).isTrue()
-        assertThat(position.hasLoss()).isFalse()
+        assertThat(position.hasProfit).isTrue()
+        assertThat(position.hasLoss).isFalse()
     }
 
     @ParameterizedTest
@@ -144,8 +144,8 @@ internal class PositionTest {
 
         val position = context.tradingRecord.lastPosition!!
         assertNumEquals(numFactory.zero(), position.profit)
-        assertThat(position.hasProfit()).isFalse()
-        assertThat(position.hasLoss()).isFalse()
+        assertThat(position.hasProfit).isFalse()
+        assertThat(position.hasLoss).isFalse()
     }
 
     @Test

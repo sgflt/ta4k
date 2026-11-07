@@ -6,23 +6,22 @@ package org.ta4j.core.backtest.criteria
 import org.ta4j.core.backtest.Position
 import org.ta4j.core.backtest.TradingRecord
 import org.ta4j.core.num.Num
-import org.ta4j.core.num.NumFactoryProvider.defaultNumFactory
 
 /**
  * Number of closed losing positions criterion.
  */
 class NumberOfLosingPositionsCriterion : AnalysisCriterion {
     override fun calculate(position: Position): Num {
-        return if (position.hasLoss())
-            defaultNumFactory.one()
+        return if (position.hasLoss)
+            position.numFactory.one()
         else
-            defaultNumFactory.zero()
+            position.numFactory.zero()
     }
 
 
     override fun calculate(tradingRecord: TradingRecord): Num {
         val numberOfLosingPositions =
-            tradingRecord.positions.count { it.hasLoss() }
-        return defaultNumFactory.numOf(numberOfLosingPositions)
+            tradingRecord.positions.count { it.hasLoss }
+        return tradingRecord.numFactory.numOf(numberOfLosingPositions)
     }
 }

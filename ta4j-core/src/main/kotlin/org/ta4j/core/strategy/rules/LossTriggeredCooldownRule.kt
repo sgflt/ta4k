@@ -48,7 +48,7 @@ class LossTriggeredCooldownRule(
 
     private fun evaluate(): Boolean {
         val lastPosition = lastRelevantClosedPosition() ?: return true
-        if (!lastPosition.hasLoss()) {
+        if (!lastPosition.hasLoss) {
             return true
         }
         if (resetRule?.isSatisfied == true) {

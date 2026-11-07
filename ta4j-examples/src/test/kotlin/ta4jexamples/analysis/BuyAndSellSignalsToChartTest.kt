@@ -73,7 +73,7 @@ class BuyAndSellSignalsToChartTest {
             assertThat(jfreeChart.title.text).contains("Buy and Sell Signals")
 
             // Verify price data was processed
-            assertThat(chart.getClosePriceSeries().itemCount).isEqualTo(marketEvents.size)
+            assertThat(chart.copyClosePriceSeries().itemCount).isEqualTo(marketEvents.size)
         }
     }
 
@@ -92,11 +92,11 @@ class BuyAndSellSignalsToChartTest {
             }
 
             // Verify signals were detected (exact count depends on strategy and data)
-            val totalSignals = chart.getBuySignals().size + chart.getSellSignals().size
+            val totalSignals = chart.buySignals.size + chart.sellSignals.size
             assertThat(totalSignals).isGreaterThanOrEqualTo(0) // At least no crash
 
             // Verify price data matches event count
-            assertThat(chart.getClosePriceSeries().itemCount).isEqualTo(marketEvents.size)
+            assertThat(chart.copyClosePriceSeries().itemCount).isEqualTo(marketEvents.size)
         }
     }
 
@@ -114,7 +114,7 @@ class BuyAndSellSignalsToChartTest {
             chart.processEventsWithProgress(marketEvents.take(10), showProgress = false)
 
             // Verify data was processed
-            assertThat(chart.getClosePriceSeries().itemCount).isEqualTo(10)
+            assertThat(chart.copyClosePriceSeries().itemCount).isEqualTo(10)
 
             // Test chart creation
             val jfreeChart = chart.createChart()
@@ -135,7 +135,7 @@ class BuyAndSellSignalsToChartTest {
             chart.processEventsWithProgress(marketEvents.take(15), showProgress = false)
 
             // Verify all events were processed
-            assertThat(chart.getClosePriceSeries().itemCount).isEqualTo(15)
+            assertThat(chart.copyClosePriceSeries().itemCount).isEqualTo(15)
         }
     }
 
@@ -177,7 +177,7 @@ class BuyAndSellSignalsToChartTest {
             }
 
             // Verify data was processed
-            assertThat(chart.getClosePriceSeries().itemCount).isEqualTo(20)
+            assertThat(chart.copyClosePriceSeries().itemCount).isEqualTo(20)
 
             // Test chart creation
             val jfreeChart = chart.createChart()
@@ -206,7 +206,7 @@ class BuyAndSellSignalsToChartTest {
             assertThat(jfreeChart.xyPlot.datasetCount).isGreaterThan(0)
 
             // Verify series data
-            assertThat(chart.getClosePriceSeries().itemCount).isEqualTo(20)
+            assertThat(chart.copyClosePriceSeries().itemCount).isEqualTo(20)
         }
     }
 
@@ -226,7 +226,7 @@ class BuyAndSellSignalsToChartTest {
             }
 
             // Verify data was processed
-            assertThat(chart.getClosePriceSeries().itemCount).isEqualTo(15)
+            assertThat(chart.copyClosePriceSeries().itemCount).isEqualTo(15)
 
             // Test chart creation
             val jfreeChart = chart.createChart()

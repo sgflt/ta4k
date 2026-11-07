@@ -7,7 +7,6 @@ import org.ta4j.core.backtest.Position
 import org.ta4j.core.backtest.TradingRecord
 import org.ta4j.core.backtest.criteria.AnalysisCriterion
 import org.ta4j.core.num.Num
-import org.ta4j.core.num.NumFactoryProvider.defaultNumFactory
 
 /**
  * Loss criterion with trading costs (= Gross loss) or without ( = Net loss).
@@ -30,15 +29,15 @@ class LossCriterion
     override fun calculate(position: Position): Num {
         if (position.isClosed) {
             val loss = if (this.excludeCosts) position.grossProfit else position.profit
-            return if (loss.isNegative) loss else defaultNumFactory.zero()
+            return if (loss.isNegative) loss else position.numFactory.zero()
         }
-        return defaultNumFactory.zero()
+        return position.numFactory.zero()
     }
 
 
     override fun calculate(tradingRecord: TradingRecord): Num {
         return tradingRecord.positions
             .filter { it.isClosed }
-            .fold(defaultNumFactory.zero()) { total, position -> total + calculate(position) }
+            .fold(tradingRecord.numFactory.zero()) { total, position -> total + calculate(position) }
     }
 }

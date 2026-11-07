@@ -10,7 +10,7 @@ import org.ta4j.core.backtest.strategy.BackTestTradingRecord
 import org.ta4j.core.events.CandleReceived
 import org.ta4j.core.events.MarketEvent
 import org.ta4j.core.num.Num
-import org.ta4j.core.num.NumFactoryProvider
+import org.ta4j.core.num.NumFactory
 
 /**
  * Versus "enter and hold" criterion, returned in decimal format.
@@ -34,25 +34,23 @@ class VersusEnterAndHoldCriterion(
     AnalysisCriterion {
 
     override fun calculate(position: Position): Num {
-        val fakeRecord = createEnterAndHoldTradingRecord()
+        val fakeRecord = createEnterAndHoldTradingRecord(position.numFactory)
         return criterion.calculate(position) / criterion.calculate(fakeRecord)
     }
 
     override fun calculate(tradingRecord: TradingRecord): Num {
         val positions = tradingRecord.positions
-        val fakeRecord = createEnterAndHoldTradingRecord(
-        )
+        val fakeRecord = createEnterAndHoldTradingRecord(tradingRecord.numFactory)
 
         if (positions.isEmpty()) {
             // No positions case - compare 1 (no change) vs buy-and-hold from start to end
-            return NumFactoryProvider.defaultNumFactory.one() / criterion.calculate(fakeRecord)
+            return tradingRecord.numFactory.one() / criterion.calculate(fakeRecord)
         }
 
         return criterion.calculate(tradingRecord) / criterion.calculate(fakeRecord)
     }
 
-    private fun createEnterAndHoldTradingRecord(): TradingRecord {
-        val numFactory = NumFactoryProvider.defaultNumFactory
+    private fun createEnterAndHoldTradingRecord(numFactory: NumFactory): TradingRecord {
         val fakeRecord = BackTestTradingRecord(
             startingType = tradeType,
             numFactory = numFactory,

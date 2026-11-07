@@ -8,7 +8,7 @@ import org.ta4j.core.mocks.MockIndicator
 
 interface ExternalIndicatorTest {
 
-    fun getMarketEvents(): List<MarketEvent>
+    val marketEvents: List<MarketEvent>
 
     fun getIndicator(vararg params: Any): MockIndicator
 }

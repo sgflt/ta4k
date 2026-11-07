@@ -45,8 +45,8 @@ class ChartRenderer(
     private val priceTimeSeries = TimeSeries("Close Price")
 
     // Signal collections - thread-safe
-    private val buySignals = ConcurrentLinkedQueue<SignalData>()
-    private val sellSignals = ConcurrentLinkedQueue<SignalData>()
+    private val pendingBuySignals = ConcurrentLinkedQueue<SignalData>()
+    private val pendingSellSignals = ConcurrentLinkedQueue<SignalData>()
 
     // Update queues for thread-safe operations
     private val priceUpdates = ConcurrentLinkedQueue<PriceUpdate>()
@@ -79,7 +79,7 @@ class ChartRenderer(
      */
     fun addBuySignal(time: Instant, price: Double) {
         val signalData = SignalData(time, price)
-        buySignals.offer(signalData)
+        pendingBuySignals.offer(signalData)
 
         if (enableLiveUpdates) {
             signalUpdates.offer(SignalUpdate(signalData, true))
@@ -92,7 +92,7 @@ class ChartRenderer(
      */
     fun addSellSignal(time: Instant, price: Double) {
         val signalData = SignalData(time, price)
-        sellSignals.offer(signalData)
+        pendingSellSignals.offer(signalData)
 
         if (enableLiveUpdates) {
             signalUpdates.offer(SignalUpdate(signalData, false))
@@ -259,18 +259,18 @@ class ChartRenderer(
      * Add all existing signals to chart
      */
     private fun addAllExistingSignals() {
-        buySignals.forEach { signal ->
+        pendingBuySignals.forEach { signal ->
             addBuyMarkerToChart(signal.time, signal.price)
         }
-        sellSignals.forEach { signal ->
+        pendingSellSignals.forEach { signal ->
             addSellMarkerToChart(signal.time, signal.price)
         }
     }
 
     /**
-     * Get copy of price series for testing
+     * Copy of the price series for testing; applies pending live updates first.
      */
-    fun getPriceSeriesCopy(): TimeSeries {
+    fun copyPriceSeries(): TimeSeries {
         // In live mode, process ALL pending updates first for accurate testing
         if (enableLiveUpdates) {
             javax.swing.SwingUtilities.invokeAndWait { 
@@ -291,25 +291,19 @@ class ChartRenderer(
         }
     }
 
-    /**
-     * Get buy signals count
-     */
-    fun getBuySignalsCount(): Int = buySignals.size
+    val buySignalsCount: Int
+        get() = pendingBuySignals.size
 
-    /**
-     * Get sell signals count
-     */
-    fun getSellSignalsCount(): Int = sellSignals.size
+    val sellSignalsCount: Int
+        get() = pendingSellSignals.size
 
-    /**
-     * Get all buy signals
-     */
-    fun getBuySignals(): List<SignalData> = buySignals.toList()
+    /** Snapshot of all buy signals. */
+    val buySignals: List<SignalData>
+        get() = pendingBuySignals.toList()
 
-    /**
-     * Get all sell signals
-     */
-    fun getSellSignals(): List<SignalData> = sellSignals.toList()
+    /** Snapshot of all sell signals. */
+    val sellSignals: List<SignalData>
+        get() = pendingSellSignals.toList()
 
     /**
      * Force chart update - useful at end of processing

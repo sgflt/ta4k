@@ -7,7 +7,6 @@ import org.ta4j.core.backtest.Position
 import org.ta4j.core.backtest.TradingRecord
 import org.ta4j.core.backtest.criteria.AnalysisCriterion
 import org.ta4j.core.num.Num
-import org.ta4j.core.num.NumFactoryProvider.defaultNumFactory
 
 /**
  * Net profit and loss in percentage criterion (relative PnL, excludes trading
@@ -23,27 +22,27 @@ class ProfitLossPercentageCriterion : AnalysisCriterion {
 
     override fun calculate(position: Position): Num {
         if (!position.isClosed) {
-            return defaultNumFactory.zero()
+            return position.numFactory.zero()
         }
 
-        val entry = position.entry ?: return defaultNumFactory.zero()
+        val entry = position.entry ?: return position.numFactory.zero()
         val entryValue = entry.value * entry.amount
 
         val profit = position.profit
 
-        return profit / entryValue * defaultNumFactory.hundred()
+        return profit / entryValue * position.numFactory.hundred()
     }
 
     override fun calculate(tradingRecord: TradingRecord): Num {
         val closedPositions = tradingRecord.positions.filter { it.isClosed }
 
         if (closedPositions.isEmpty()) {
-            return defaultNumFactory.zero()
+            return tradingRecord.numFactory.zero()
         }
 
         // Calculate total invested capital and total profit
-        var totalInvested = defaultNumFactory.zero()
-        var totalProfit = defaultNumFactory.zero()
+        var totalInvested = tradingRecord.numFactory.zero()
+        var totalProfit = tradingRecord.numFactory.zero()
 
         for (position in closedPositions) {
             val entry = position.entry!!
@@ -55,10 +54,10 @@ class ProfitLossPercentageCriterion : AnalysisCriterion {
 
         // Avoid division by zero
         if (totalInvested.isZero) {
-            return defaultNumFactory.zero()
+            return tradingRecord.numFactory.zero()
         }
 
         // Calculate overall percentage: (total_profit / total_invested) * 100
-        return totalProfit / totalInvested * defaultNumFactory.hundred()
+        return totalProfit / totalInvested * tradingRecord.numFactory.hundred()
     }
 }

@@ -9,7 +9,6 @@ import org.ta4j.core.backtest.TradingRecord
 import org.ta4j.core.backtest.criteria.pnl.ReturnCriterion
 import org.ta4j.core.num.Num
 import org.ta4j.core.num.NumFactory
-import org.ta4j.core.num.NumFactoryProvider.defaultNumFactory
 
 /**
  * Calculates the average return per bar criterion, returned in decimal format.
@@ -34,9 +33,9 @@ class AverageReturnPerBarCriterion(private val numFactory: NumFactory, averaging
         // considered, leading to inaccuracies in the calculation.
         // Therefore we need to use "pow" to accurately capture the compounding effect.
         return if (bars.isZero)
-            defaultNumFactory.one()
+            position.numFactory.one()
         else
-            this.grossReturn.calculate(position).pow(defaultNumFactory.one() / bars)
+            this.grossReturn.calculate(position).pow(position.numFactory.one() / bars)
     }
 
 

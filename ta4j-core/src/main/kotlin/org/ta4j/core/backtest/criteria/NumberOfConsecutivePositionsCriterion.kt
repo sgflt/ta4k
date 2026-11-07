@@ -7,7 +7,6 @@ import org.ta4j.core.backtest.Position
 import org.ta4j.core.backtest.TradingRecord
 import org.ta4j.core.backtest.criteria.AnalysisCriterion.PositionFilter
 import org.ta4j.core.num.Num
-import org.ta4j.core.num.NumFactoryProvider.defaultNumFactory
 
 /**
  * Number of maximum consecutive winning or losing positions criterion.
@@ -20,9 +19,9 @@ class NumberOfConsecutivePositionsCriterion
  */(private val positionFilter: PositionFilter?) : AnalysisCriterion {
     override fun calculate(position: Position): Num {
         return if (isConsecutive(position))
-            defaultNumFactory.one()
+            position.numFactory.one()
         else
-            defaultNumFactory.zero()
+            position.numFactory.zero()
     }
 
 
@@ -45,7 +44,7 @@ class NumberOfConsecutivePositionsCriterion
             maxConsecutive = consecutives
         }
 
-        return defaultNumFactory.numOf(maxConsecutive)
+        return tradingRecord.numFactory.numOf(maxConsecutive)
     }
 
     private fun isConsecutive(position: Position): Boolean {

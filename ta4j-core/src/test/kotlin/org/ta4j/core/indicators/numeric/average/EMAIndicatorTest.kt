@@ -62,7 +62,7 @@ internal class EMAIndicatorTest {
     fun testExternalData(numFactory: NumFactory) {
         val xls = XLSIndicatorTest(this.javaClass, "EMA.xls", 6, numFactory)
         val xlsContext = MarketEventTestContext()
-        xlsContext.withMarketEvents(xls.getMarketEvents())
+        xlsContext.withMarketEvents(xls.marketEvents)
 
         val indicator = Indicators.closePrice().ema(1)
         val expectedIndicator = xls.getIndicator(1)
@@ -76,7 +76,7 @@ internal class EMAIndicatorTest {
     fun testExternalDataBarCount3(numFactory: NumFactory) {
         val xls = XLSIndicatorTest(this.javaClass, "EMA.xls", 6, numFactory)
         val xlsContext = MarketEventTestContext()
-        xlsContext.withMarketEvents(xls.getMarketEvents())
+        xlsContext.withMarketEvents(xls.marketEvents)
 
         val indicator = Indicators.closePrice().ema(3)
         val expectedIndicator = xls.getIndicator(3)
@@ -90,7 +90,7 @@ internal class EMAIndicatorTest {
     fun testExternalDataBarCount13(numFactory: NumFactory) {
         val xls = XLSIndicatorTest(this.javaClass, "EMA.xls", 6, numFactory)
         val xlsContext = MarketEventTestContext()
-        xlsContext.withMarketEvents(xls.getMarketEvents())
+        xlsContext.withMarketEvents(xls.marketEvents)
 
         val indicator = Indicators.closePrice().ema(13)
         val expectedIndicator = xls.getIndicator(13)

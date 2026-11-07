@@ -6,7 +6,6 @@ package org.ta4j.core.backtest.criteria
 import org.ta4j.core.backtest.Position
 import org.ta4j.core.backtest.TradingRecord
 import org.ta4j.core.num.Num
-import org.ta4j.core.num.NumFactoryProvider.defaultNumFactory
 
 /**
  * Total transaction costs (commissions) paid for entry and exit trades.
@@ -24,7 +23,7 @@ class CommissionsCriterion : AnalysisCriterion {
 
     override fun calculate(tradingRecord: TradingRecord): Num {
         val positions = tradingRecord.positions + listOfNotNull(tradingRecord.currentPosition.takeIf { it.isOpened })
-        val zero = positions.firstOrNull()?.numFactory?.zero() ?: defaultNumFactory.zero()
+        val zero = tradingRecord.numFactory.zero()
         return positions.fold(zero) { total, position -> total + calculate(position) }
     }
 }

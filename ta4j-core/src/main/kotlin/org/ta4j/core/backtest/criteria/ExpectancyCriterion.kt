@@ -7,7 +7,6 @@ import org.ta4j.core.backtest.Position
 import org.ta4j.core.backtest.TradingRecord
 import org.ta4j.core.backtest.criteria.pnl.ProfitLossRatioCriterion
 import org.ta4j.core.num.Num
-import org.ta4j.core.num.NumFactoryProvider.defaultNumFactory
 
 /**
  * Expectancy criterion (also called "Kelly Criterion").
@@ -47,10 +46,10 @@ class ExpectancyCriterion : AnalysisCriterion {
         numberOfAllPositions: Num,
     ): Num {
         if (numberOfAllPositions.isZero || profitLossRatio.isZero) {
-            return defaultNumFactory.zero()
+            return numberOfAllPositions.numFactory.zero()
         }
         // Expectancy = ((1 + AW/AL) * ProbabilityToWinOnePosition) - 1
-        val one = defaultNumFactory.one()
+        val one = numberOfAllPositions.numFactory.one()
         val probabiltyToWinOnePosition = numberOfWinningPositions / numberOfAllPositions
         return (one + profitLossRatio) * probabiltyToWinOnePosition - one
     }

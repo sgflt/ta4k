@@ -25,11 +25,11 @@ internal class ADXIndicatorTest {
         testContext.withNumFactory(numFactory)
         val xlsTest = XLSIndicatorTest(this::class.java, "ADX.xls", 15, numFactory)
 
-        testContext.withMarketEvents(xlsTest.getMarketEvents())
+        testContext.withMarketEvents(xlsTest.marketEvents)
         val indicator = ADXIndicator(numFactory, 1, 1)
 
         testContext.withIndicator(indicator)
-            .fastForward(xlsTest.getMarketEvents().size - 1)
+            .fastForward(xlsTest.marketEvents.size - 1)
             .assertCurrent(100.0)
     }
 
@@ -39,7 +39,7 @@ internal class ADXIndicatorTest {
         testContext.withNumFactory(numFactory)
         val xlsTest = XLSIndicatorTest(this::class.java, "ADX.xls", 15, numFactory)
 
-        testContext.withMarketEvents(xlsTest.getMarketEvents())
+        testContext.withMarketEvents(xlsTest.marketEvents)
         val indicator = ADXIndicator(numFactory, 3, 2)
         val expectedIndicator = xlsTest.getIndicator(3, 2)
 
@@ -53,7 +53,7 @@ internal class ADXIndicatorTest {
         testContext.withNumFactory(numFactory)
         val xlsTest = XLSIndicatorTest(this::class.java, "ADX.xls", 15, numFactory)
 
-        testContext.withMarketEvents(xlsTest.getMarketEvents())
+        testContext.withMarketEvents(xlsTest.marketEvents)
         val indicator = ADXIndicator(numFactory, 13, 8)
         val expectedIndicator = xlsTest.getIndicator(13, 8)
 

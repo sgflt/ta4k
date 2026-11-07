@@ -15,7 +15,6 @@ import org.ta4j.core.backtest.criteria.pnl.LossCriterion
 import org.ta4j.core.backtest.criteria.pnl.ProfitCriterion
 import org.ta4j.core.backtest.criteria.pnl.ProfitLossCriterion
 import org.ta4j.core.backtest.criteria.pnl.ProfitLossPercentageCriterion
-import org.ta4j.core.num.NumFactoryProvider.defaultNumFactory
 
 /**
  * Generates a [PerformanceReport] based on the provided trading record
@@ -31,9 +30,9 @@ class PerformanceReportGenerator : ReportGenerator<PerformanceReport> {
         val netLoss = LossCriterion(false).calculate(tradingRecord)
         val numberOfPositions = NumberOfPositionsCriterion().calculate(tradingRecord)
         val valueAtRisk =
-            ValueAtRiskCriterion(defaultNumFactory, 0.95).calculate(tradingRecord)
+            ValueAtRiskCriterion(tradingRecord.numFactory, 0.95).calculate(tradingRecord)
         val expectedShortfall =
-            ExpectedShortfallCriterion(defaultNumFactory, 0.95).calculate(tradingRecord)
+            ExpectedShortfallCriterion(tradingRecord.numFactory, 0.95).calculate(tradingRecord)
         val minutesInMarket = TimeInTradeCriterion(ChronoUnit.MINUTES).calculate(tradingRecord)
         return PerformanceReport(
             pnl,

@@ -11,7 +11,7 @@ import org.ta4j.core.backtest.Position
 import org.ta4j.core.backtest.Position.PositionValue
 import org.ta4j.core.backtest.TradingRecord
 import org.ta4j.core.num.Num
-import org.ta4j.core.num.NumFactoryProvider.defaultNumFactory
+import org.ta4j.core.num.NumFactory
 
 /**
  * Tracks the portfolio value evolution over time considering all price movements.
@@ -19,6 +19,8 @@ import org.ta4j.core.num.NumFactoryProvider.defaultNumFactory
 class CashFlow {
     /** The portfolio value mapped to timestamps  */
     private val cashFlowValues = TreeMap<Instant, Num>()
+
+    private val numFactory: NumFactory
 
     /** All cash flow values with their timestamps, read-only. */
     val values: NavigableMap<Instant, Num>
@@ -31,6 +33,7 @@ class CashFlow {
      * @param position a single position
      */
     constructor(position: Position) {
+        numFactory = position.numFactory
         if (position.entry != null) {
             calculatePositionValues(position)
         }
@@ -43,6 +46,7 @@ class CashFlow {
      * @param tradingRecord the trading record
      */
     constructor(tradingRecord: TradingRecord) {
+        numFactory = tradingRecord.numFactory
         tradingRecord.positions.filter { it.entry != null }.forEach(::calculatePositionValues)
 
         // Calculate for current open position
@@ -61,7 +65,7 @@ class CashFlow {
      * @return the cash flow value (returns 1 if no value exists for the instant)
      */
     fun getValue(instant: Instant): Num {
-        return cashFlowValues.getOrDefault(instant, defaultNumFactory.one())
+        return cashFlowValues.getOrDefault(instant, numFactory.one())
     }
 
 

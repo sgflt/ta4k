@@ -7,7 +7,6 @@ import org.ta4j.core.backtest.Position
 import org.ta4j.core.backtest.TradingRecord
 import org.ta4j.core.backtest.criteria.AnalysisCriterion
 import org.ta4j.core.num.Num
-import org.ta4j.core.num.NumFactoryProvider.defaultNumFactory
 
 /**
  * Return (in percentage) criterion (includes trading costs), returned in
@@ -49,9 +48,9 @@ class ReturnCriterion : AnalysisCriterion {
     override fun calculate(tradingRecord: TradingRecord): Num {
         val product = tradingRecord.positions
             .map { calculateProfit(it) }
-            .fold(defaultNumFactory.one()) { acc, multiplicand -> acc * multiplicand }
+            .fold(tradingRecord.numFactory.one()) { acc, multiplicand -> acc * multiplicand }
 
-        return product - (if (addBase) defaultNumFactory.zero() else defaultNumFactory.one())
+        return product - (if (addBase) tradingRecord.numFactory.zero() else tradingRecord.numFactory.one())
     }
 
 
@@ -67,8 +66,8 @@ class ReturnCriterion : AnalysisCriterion {
             return position.grossReturn
         }
         return if (this.addBase)
-            defaultNumFactory.one()
+            position.numFactory.one()
         else
-            defaultNumFactory.zero()
+            position.numFactory.zero()
     }
 }

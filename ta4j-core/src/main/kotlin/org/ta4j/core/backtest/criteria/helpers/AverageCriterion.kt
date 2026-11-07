@@ -8,7 +8,6 @@ import org.ta4j.core.backtest.TradingRecord
 import org.ta4j.core.backtest.criteria.AnalysisCriterion
 import org.ta4j.core.backtest.criteria.NumberOfPositionsCriterion
 import org.ta4j.core.num.Num
-import org.ta4j.core.num.NumFactoryProvider.defaultNumFactory
 
 /**
  * Average criterion.
@@ -61,7 +60,7 @@ class AverageCriterion : AnalysisCriterion {
 
     override fun calculate(tradingRecord: TradingRecord): Num {
         if (tradingRecord.positions.isEmpty()) {
-            return defaultNumFactory.zero()
+            return tradingRecord.numFactory.zero()
         }
         val numberOfPositions = numberOfPositionsCriterion.calculate(tradingRecord)
         return criterion.calculate(tradingRecord) / numberOfPositions

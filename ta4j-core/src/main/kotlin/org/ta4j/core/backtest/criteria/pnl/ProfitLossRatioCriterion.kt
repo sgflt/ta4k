@@ -7,7 +7,6 @@ import org.ta4j.core.backtest.Position
 import org.ta4j.core.backtest.TradingRecord
 import org.ta4j.core.backtest.criteria.AnalysisCriterion
 import org.ta4j.core.num.Num
-import org.ta4j.core.num.NumFactoryProvider.defaultNumFactory
 
 /**
  * Ratio gross profit and loss criterion = Average gross profit (includes
@@ -23,12 +22,12 @@ class ProfitLossRatioCriterion : AnalysisCriterion {
         val averageProfit = this.averageProfitCriterion.calculate(position!!)
         if (averageProfit.isZero) {
             // only loosing positions means a ratio of 0
-            return defaultNumFactory.zero()
+            return position.numFactory.zero()
         }
         val averageLoss = this.averageLossCriterion.calculate(position)
         if (averageLoss.isZero) {
             // only winning positions means a ratio of 1
-            return defaultNumFactory.one()
+            return position.numFactory.one()
         }
         return averageProfit / averageLoss
     }
@@ -38,12 +37,12 @@ class ProfitLossRatioCriterion : AnalysisCriterion {
         val averageProfit = this.averageProfitCriterion.calculate(tradingRecord)
         if (averageProfit.isZero) {
             // only loosing positions means a ratio of 0
-            return defaultNumFactory.zero()
+            return tradingRecord.numFactory.zero()
         }
         val averageLoss = this.averageLossCriterion.calculate(tradingRecord)
         if (averageLoss.isZero) {
             // only winning positions means a ratio of 1
-            return defaultNumFactory.one()
+            return tradingRecord.numFactory.one()
         }
         return averageProfit / averageLoss.abs()
     }

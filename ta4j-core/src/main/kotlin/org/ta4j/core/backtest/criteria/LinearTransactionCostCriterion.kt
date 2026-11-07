@@ -8,7 +8,6 @@ import org.ta4j.core.backtest.Trade
 import org.ta4j.core.backtest.TradingRecord
 import org.ta4j.core.backtest.criteria.pnl.ReturnCriterion
 import org.ta4j.core.num.Num
-import org.ta4j.core.num.NumFactoryProvider.defaultNumFactory
 
 /**
  * A linear transaction cost criterion.
@@ -45,13 +44,13 @@ class LinearTransactionCostCriterion @JvmOverloads constructor(
 
 
     override fun calculate(position: Position): Num {
-        return getTradeCost(position, defaultNumFactory.numOf(this.initialAmount))
+        return getTradeCost(position, position.numFactory.numOf(this.initialAmount))
     }
 
 
     override fun calculate(tradingRecord: TradingRecord): Num {
-        var totalCosts = defaultNumFactory.zero()
-        var tradedAmount = defaultNumFactory.numOf(this.initialAmount)
+        var totalCosts = tradingRecord.numFactory.zero()
+        var tradedAmount = tradingRecord.numFactory.numOf(this.initialAmount)
 
         for (position in tradingRecord.positions) {
             val tradeCost = getTradeCost(position, tradedAmount)
@@ -97,7 +96,7 @@ class LinearTransactionCostCriterion @JvmOverloads constructor(
      * @return the absolute total cost of all trades in the position
      */
     private fun getTradeCost(position: Position?, initialAmount: Num): Num {
-        var totalTradeCost = defaultNumFactory.zero()
+        var totalTradeCost = initialAmount.numFactory.zero()
         if (position != null && position.entry != null) {
             totalTradeCost = getTradeCost(position.entry, initialAmount)
             if (position.exit != null) {

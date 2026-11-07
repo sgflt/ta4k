@@ -7,7 +7,6 @@ import org.ta4j.core.backtest.Position
 import org.ta4j.core.backtest.TradingRecord
 import org.ta4j.core.backtest.criteria.AnalysisCriterion
 import org.ta4j.core.num.Num
-import org.ta4j.core.num.NumFactoryProvider.defaultNumFactory
 
 /**
  * Base class for criteria reporting the most extreme net profit of a single closed position.
@@ -30,7 +29,7 @@ abstract class AbstractPositionExtremePnlCriterion : AnalysisCriterion {
         if (position.isClosed) position.profit else position.numFactory.zero()
 
     override fun calculate(tradingRecord: TradingRecord): Num {
-        val zero = tradingRecord.positions.firstOrNull()?.numFactory?.zero() ?: defaultNumFactory.zero()
+        val zero = tradingRecord.numFactory.zero()
         return tradingRecord.positions
             .filter { it.isClosed }
             .map { it.profit }

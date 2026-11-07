@@ -17,7 +17,7 @@ class LinearTransactionCostCriterionTest {
     @MethodSource("org.ta4j.core.NumFactoryTestSource#numFactories")
     fun externalData(numFactory: NumFactory) {
         val xls = XLSCriterionTest(this.javaClass, "LTC.xls", 16, 6, numFactory)
-        val tradingRecord = xls.getTradingRecord()
+        val tradingRecord = xls.readTradingRecord()
 
         // Skip test if XLS file doesn't contain trading data
         if (tradingRecord.positions.isEmpty()) {

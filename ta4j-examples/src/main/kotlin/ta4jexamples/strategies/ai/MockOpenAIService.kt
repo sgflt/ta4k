@@ -121,7 +121,7 @@ class MockOpenAIService {
     /**
      * Simulates sentiment analysis from news/social media
      */
-    fun getMarketSentiment(): String {
+    fun sampleMarketSentiment(): String {
         val sentiments = listOf(
             "Bullish sentiment detected in social media discussions",
             "Neutral market sentiment with mixed opinions",

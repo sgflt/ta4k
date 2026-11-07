@@ -7,7 +7,6 @@ import org.ta4j.core.backtest.Position
 import org.ta4j.core.backtest.TradingRecord
 import org.ta4j.core.backtest.criteria.AnalysisCriterion
 import org.ta4j.core.num.Num
-import org.ta4j.core.num.NumFactoryProvider.defaultNumFactory
 
 /**
  * Profit criterion with trading costs (= Gross profit) or without ( = Net
@@ -31,19 +30,16 @@ class ProfitCriterion
     override fun calculate(position: Position): Num {
         if (position.isClosed) {
             val profit = if (this.excludeCosts) position.grossProfit else position.profit
-            return if (profit.isPositive) profit else defaultNumFactory.zero()
+            return if (profit.isPositive) profit else position.numFactory.zero()
         }
-        return defaultNumFactory.zero()
+        return position.numFactory.zero()
     }
 
 
     override fun calculate(tradingRecord: TradingRecord): Num {
         return tradingRecord.positions
             .filter { it.isClosed }
-            .sumOf { calculate(it) }
+            .fold(tradingRecord.numFactory.zero()) { total, position -> total + calculate(position) }
     }
-
-    private fun Iterable<Position>.sumOf(selector: (Position) -> Num): Num =
-        fold(defaultNumFactory.zero()) { sum, element -> sum + selector(element) }
 }
 

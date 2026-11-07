@@ -7,7 +7,6 @@ import java.time.temporal.ChronoUnit
 import org.ta4j.core.backtest.Position
 import org.ta4j.core.backtest.TradingRecord
 import org.ta4j.core.num.Num
-import org.ta4j.core.num.NumFactoryProvider.defaultNumFactory
 
 /**
  * Time in market criterion.
@@ -19,10 +18,10 @@ import org.ta4j.core.num.NumFactoryProvider.defaultNumFactory
 class TimeInTradeCriterion(private val unit: ChronoUnit) : AnalysisCriterion {
     override fun calculate(position: Position): Num {
         if (position.isClosed) {
-            return defaultNumFactory.numOf(position.getTimeInTrade(this.unit))
+            return position.numFactory.numOf(position.getTimeInTrade(this.unit))
         }
 
-        return defaultNumFactory.zero()
+        return position.numFactory.zero()
     }
 
 
@@ -30,7 +29,7 @@ class TimeInTradeCriterion(private val unit: ChronoUnit) : AnalysisCriterion {
         // FIXME it adds overlapping periods
         return tradingRecord.positions
             .filter { it.isClosed }
-            .fold(defaultNumFactory.zero()) { total, position -> total + calculate(position) }
+            .fold(tradingRecord.numFactory.zero()) { total, position -> total + calculate(position) }
     }
 
     companion object {

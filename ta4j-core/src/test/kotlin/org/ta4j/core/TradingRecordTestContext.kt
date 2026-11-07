@@ -79,8 +79,6 @@ class TradingRecordTestContext(
         reinitalizeTradingRecord()
     }
 
-    fun getTradingRecord(): TradingRecord = this.tradingRecord
-
     val runtimeContext: RuntimeContext
         get() = this.tradingRecord
 
@@ -92,8 +90,6 @@ class TradingRecordTestContext(
     fun enter(amount: Double): Operation = EnterOperation(amount)
 
     fun exit(amount: Double): Operation = ExitOperation(amount)
-
-    private fun getNumFactory(): NumFactory = numFactory
 
     val barSeries: BacktestBarSeries
         get() = requireNotNull(marketEvenTestContext) { "MarketEventTestContext must be set to access barSeries" }.barSeries
@@ -154,7 +150,7 @@ class TradingRecordTestContext(
             tradingRecord.enter(
                 bar.endTime,
                 bar.closePrice,
-                getNumFactory().numOf(amount)
+                numFactory.numOf(amount)
             )
 
             // add bar to positions history
@@ -165,9 +161,9 @@ class TradingRecordTestContext(
 
         override fun at(price: Double): TradingRecordTestContext {
             tradingRecord.enter(
-                getSimulatedTime(),
-                getNumFactory().numOf(price),
-                getNumFactory().numOf(amount)
+                nextSimulatedTime(),
+                numFactory.numOf(price),
+                numFactory.numOf(amount)
             )
             return this@TradingRecordTestContext
         }
@@ -183,7 +179,7 @@ class TradingRecordTestContext(
             tradingRecord.exit(
                 bar.endTime,
                 bar.closePrice,
-                getNumFactory().numOf(amount)
+                numFactory.numOf(amount)
             )
 
             // add bar to positions history
@@ -194,14 +190,14 @@ class TradingRecordTestContext(
 
         override fun at(price: Double): TradingRecordTestContext {
             tradingRecord.exit(
-                getSimulatedTime(),
-                getNumFactory().numOf(price),
-                getNumFactory().numOf(amount)
+                nextSimulatedTime(),
+                numFactory.numOf(price),
+                numFactory.numOf(amount)
             )
             return this@TradingRecordTestContext
         }
     }
 
-    private fun getSimulatedTime(): Instant =
+    private fun nextSimulatedTime(): Instant =
         Instant.MIN.plus(resolution.duration.multipliedBy((simulationTime++).toLong()))
 }

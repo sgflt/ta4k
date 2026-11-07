@@ -6,7 +6,6 @@ package org.ta4j.core.backtest.criteria
 import org.ta4j.core.backtest.Position
 import org.ta4j.core.backtest.TradingRecord
 import org.ta4j.core.num.Num
-import org.ta4j.core.num.NumFactoryProvider.defaultNumFactory
 
 /**
  * Number of position criterion.
@@ -39,11 +38,11 @@ class NumberOfPositionsCriterion : AnalysisCriterion {
 
 
     override fun calculate(position: Position): Num {
-        return defaultNumFactory.one()
+        return position.numFactory.one()
     }
 
 
     override fun calculate(tradingRecord: TradingRecord): Num {
-        return defaultNumFactory.numOf(tradingRecord.positionCount)
+        return tradingRecord.numFactory.numOf(tradingRecord.positionCount)
     }
 }

@@ -146,18 +146,17 @@ class MockMarketDataGenerator(
         )
     }
     
-    /**
-     * Gets current market conditions summary
-     */
-    fun getMarketSummary(): String {
-        val trend = if (trendDirection > 0) "BULLISH" else "BEARISH"
-        val vol = when {
-            volatility > 0.05 -> "HIGH"
-            volatility < 0.015 -> "LOW"
-            else -> "NORMAL"
+    /** Current market conditions summary. */
+    val marketSummary: String
+        get() {
+            val trend = if (trendDirection > 0) "BULLISH" else "BEARISH"
+            val vol = when {
+                volatility > 0.05 -> "HIGH"
+                volatility < 0.015 -> "LOW"
+                else -> "NORMAL"
+            }
+            return "Market: $trend trend (strength: ${"%.1f".format(trendStrength * 100)}%), " +
+                   "Volatility: $vol (${"%.2f".format(volatility * 100)}%), " +
+                   "Price: ${"%.2f".format(currentPrice)}"
         }
-        return "Market: $trend trend (strength: ${"%.1f".format(trendStrength * 100)}%), " +
-               "Volatility: $vol (${"%.2f".format(volatility * 100)}%), " +
-               "Price: ${"%.2f".format(currentPrice)}"
-    }
 }

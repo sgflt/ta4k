@@ -140,13 +140,13 @@ class BuyAndSellSignalsToChart(
             }
 
             if (showProgress && (index + 1) % 20 == 0) {
-                println("Processed ${index + 1}/${marketEvents.size} events - Buy: ${chartRenderer.getBuySignalsCount()}, Sell: ${chartRenderer.getSellSignalsCount()}")
+                println("Processed ${index + 1}/${marketEvents.size} events - Buy: ${chartRenderer.buySignalsCount}, Sell: ${chartRenderer.sellSignalsCount}")
             }
         }
 
         if (showProgress) {
             println("Completed processing all ${marketEvents.size} market events.")
-            println("Total signals detected - Buy: ${chartRenderer.getBuySignalsCount()}, Sell: ${chartRenderer.getSellSignalsCount()}")
+            println("Total signals detected - Buy: ${chartRenderer.buySignalsCount}, Sell: ${chartRenderer.sellSignalsCount}")
         }
     }
 
@@ -159,10 +159,10 @@ class BuyAndSellSignalsToChart(
         }
     }
 
-    // Getter methods for testing
-    fun getClosePriceSeries() = chartRenderer.getPriceSeriesCopy()
-    fun getBuySignals() = chartRenderer.getBuySignals().map { it.time to it.price }
-    fun getSellSignals() = chartRenderer.getSellSignals().map { it.time to it.price }
+    // For testing
+    fun copyClosePriceSeries() = chartRenderer.copyPriceSeries()
+    val buySignals get() = chartRenderer.buySignals.map { it.time to it.price }
+    val sellSignals get() = chartRenderer.sellSignals.map { it.time to it.price }
 
     // Force chart update
     fun forceChartUpdate() = chartRenderer.forceUpdate()
@@ -243,7 +243,7 @@ class BuyAndSellSignalsToChart(
                         signalChart.forceChartUpdate()
 
                         println("LiveTradingBuilder-based signal detection completed!")
-                        println("Final stats - Buy: ${signalChart.getBuySignals().size}, Sell: ${signalChart.getSellSignals().size}")
+                        println("Final stats - Buy: ${signalChart.buySignals.size}, Sell: ${signalChart.sellSignals.size}")
                         println("Press Enter to continue...")
                         readLine()
                     }
@@ -263,8 +263,8 @@ class BuyAndSellSignalsToChart(
                         }
 
                         // Display the chart with all signals
-                        val priceDataPoints = signalChart.getClosePriceSeries().itemCount
-                        val totalSignals = signalChart.getBuySignals().size + signalChart.getSellSignals().size
+                        val priceDataPoints = signalChart.copyClosePriceSeries().itemCount
+                        val totalSignals = signalChart.buySignals.size + signalChart.sellSignals.size
                         println("Displaying chart with $priceDataPoints data points and $totalSignals signals...")
 
                         if (priceDataPoints == 0) {

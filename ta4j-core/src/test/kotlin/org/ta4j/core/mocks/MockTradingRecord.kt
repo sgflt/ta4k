@@ -6,10 +6,11 @@ package org.ta4j.core.mocks
 import org.ta4j.core.TradeType
 import org.ta4j.core.backtest.strategy.BackTestTradingRecord
 import org.ta4j.core.num.Num
+import org.ta4j.core.num.NumFactory
 import org.ta4j.core.num.NumFactoryProvider
 
-class MockTradingRecord(states: List<Num>) :
-    BackTestTradingRecord(startingType = TradeType.BUY, numFactory = NumFactoryProvider.defaultNumFactory) {
+class MockTradingRecord(states: List<Num>, numFactory: NumFactory = NumFactoryProvider.defaultNumFactory) :
+    BackTestTradingRecord(startingType = TradeType.BUY, numFactory = numFactory) {
     /*
         * Constructor. Builds a TradingRecord from a list of states. Initial state
         * value is zero. Then at each index where the state value changes, the
