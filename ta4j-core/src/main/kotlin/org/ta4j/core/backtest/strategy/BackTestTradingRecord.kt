@@ -11,6 +11,8 @@ import org.ta4j.core.api.series.Bar
 import org.ta4j.core.backtest.Position
 import org.ta4j.core.backtest.Trade
 import org.ta4j.core.backtest.TradingRecord
+import org.ta4j.core.backtest.analysis.EquityCurve
+import org.ta4j.core.backtest.analysis.EquityPoint
 import org.ta4j.core.backtest.analysis.cost.CostModel
 import org.ta4j.core.backtest.analysis.cost.ZeroCostModel
 import org.ta4j.core.backtest.strategy.runtime.RuntimeContextKeys
@@ -31,7 +33,14 @@ open class BackTestTradingRecord(
     /** The cost model for holding asset (e.g. borrowing).  */
     private val holdingCostModel: CostModel = ZeroCostModel,
     private val numFactory: NumFactory,
+    /** Whether to record equity per bar for return-series criteria; costs one point per bar. */
+    recordEquityCurve: Boolean = true,
 ) : TradingRecord, RuntimeContext {
+    private val equityRecorder = if (recordEquityCurve) EquityCurve() else null
+
+    override val equityCurve: List<EquityPoint>
+        get() = equityRecorder?.points ?: emptyList()
+
     /** The recorded trades.  */
     private val trades = mutableListOf<Trade>()
 
@@ -144,6 +153,7 @@ open class BackTestTradingRecord(
         // Storing the position if closed
         if (currentPosition.isClosed == true) {
             positions.add(currentPosition)
+            equityRecorder?.onPositionClosed(currentPosition)
             _currentPosition = Position(startingType, transactionCostModel, holdingCostModel, numFactory)
         }
     }
@@ -165,6 +175,7 @@ open class BackTestTradingRecord(
 
         this.currentTime = bar.endTime
         this.currentPrice = bar.closePrice
+        equityRecorder?.record(bar.endTime, bar.closePrice, currentPosition)
     }
 
 

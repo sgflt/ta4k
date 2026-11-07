@@ -5,6 +5,7 @@ package org.ta4j.core.backtest
 
 import java.time.Instant
 import org.ta4j.core.TradeType
+import org.ta4j.core.backtest.analysis.EquityPoint
 import org.ta4j.core.num.Num
 
 /**
@@ -109,6 +110,12 @@ interface TradingRecord {
 
     // TODO   /**
     val isEmpty: Boolean
+
+    /**
+     * Equity at the end of every bar, flat periods included. Empty when the record does not track it.
+     */
+    val equityCurve: List<EquityPoint>
+        get() = emptyList()
 
     //     * @param series the bar series, not null
     //     * @return the {@link #getStartIndex()} if not null and greater than

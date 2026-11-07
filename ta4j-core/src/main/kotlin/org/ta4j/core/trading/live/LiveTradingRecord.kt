@@ -20,10 +20,13 @@ class LiveTradingRecord(
     transactionCostModel: CostModel = ZeroCostModel,
     holdingCostModel: CostModel = ZeroCostModel,
     name: String = "live",
+    /** Off by default: a live session would grow the curve without bound. */
+    recordEquityCurve: Boolean = false,
 ) : BackTestTradingRecord(
     startingType = startingType,
     name = name,
     transactionCostModel = transactionCostModel,
     holdingCostModel = holdingCostModel,
     numFactory = numFactory,
+    recordEquityCurve = recordEquityCurve,
 )
