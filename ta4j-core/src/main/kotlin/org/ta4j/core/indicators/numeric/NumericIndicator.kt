@@ -44,6 +44,9 @@ import org.ta4j.core.indicators.numeric.oscillators.CMOIndicator
 import org.ta4j.core.indicators.numeric.oscillators.DPOIndicator
 import org.ta4j.core.indicators.numeric.oscillators.MACDIndicator
 import org.ta4j.core.indicators.numeric.oscillators.RAVIIndicator
+import org.ta4j.core.indicators.bool.renko.RenkoDownIndicator
+import org.ta4j.core.indicators.bool.renko.RenkoUpIndicator
+import org.ta4j.core.indicators.bool.renko.RenkoXIndicator
 import org.ta4j.core.indicators.numeric.oscillators.TrueStrengthIndexIndicator
 import org.ta4j.core.indicators.numeric.oscillators.aroon.AroonDownIndicator
 import org.ta4j.core.indicators.numeric.oscillators.aroon.AroonUpIndicator
@@ -425,6 +428,15 @@ abstract class NumericIndicator protected constructor(
      * @return length of the current run of rising (positive) or falling (negative) values
      */
     fun streak() = StreakIndicator(this)
+
+    /** True after [brickCount] consecutive bullish Renko bricks of size [pointSize]. */
+    fun renkoUp(pointSize: Number, brickCount: Int) = RenkoUpIndicator(this, pointSize, brickCount)
+
+    /** True after [brickCount] consecutive bearish Renko bricks of size [pointSize]. */
+    fun renkoDown(pointSize: Number, brickCount: Int) = RenkoDownIndicator(this, pointSize, brickCount)
+
+    /** True after [brickCount] consecutive Renko bricks of size [pointSize] in either direction. */
+    fun renkoX(pointSize: Number, brickCount: Int) = RenkoXIndicator(this, pointSize, brickCount)
 
     fun dpo(barCount: Int) = DPOIndicator(numFactory, this, barCount)
 
