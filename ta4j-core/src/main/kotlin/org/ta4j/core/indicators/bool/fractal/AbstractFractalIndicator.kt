@@ -8,6 +8,7 @@ import org.ta4j.core.indicators.bool.BooleanIndicator
 import org.ta4j.core.indicators.numeric.NumericIndicator
 import org.ta4j.core.num.NaN
 import org.ta4j.core.num.Num
+import org.ta4j.core.num.NumFactory
 
 /**
  * Bill Williams fractal confirmation.
@@ -19,10 +20,15 @@ import org.ta4j.core.num.Num
 abstract class AbstractFractalIndicator(
     private val price: NumericIndicator,
     private val precedingBars: Int,
-    private val followingBars: Int,
+    /** Bars between the pivot and the bar that confirms it. */
+    val followingBars: Int,
 ) : BooleanIndicator() {
 
     private val window = ArrayDeque<Num>(precedingBars + followingBars + 1)
+
+    /** Number factory of the watched price. */
+    val numFactory: NumFactory
+        get() = price.numFactory
 
     /** Price of the pivot confirmed on this bar, NaN when there is none. */
     var pivotPrice: Num = NaN

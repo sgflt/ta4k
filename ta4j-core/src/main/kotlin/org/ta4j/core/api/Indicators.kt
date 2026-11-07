@@ -11,6 +11,8 @@ import org.ta4j.core.indicators.numeric.supportresistance.BounceCountResistanceI
 import org.ta4j.core.indicators.numeric.supportresistance.BounceCountSupportIndicator
 import org.ta4j.core.indicators.numeric.supportresistance.PriceClusterResistanceIndicator
 import org.ta4j.core.indicators.numeric.supportresistance.PriceClusterSupportIndicator
+import org.ta4j.core.indicators.numeric.supportresistance.TrendLineResistanceIndicator
+import org.ta4j.core.indicators.numeric.supportresistance.TrendLineSupportIndicator
 import org.ta4j.core.indicators.numeric.supportresistance.VolumeProfileKDEIndicator
 import org.ta4j.core.indicators.numeric.swing.ZigZagIndicator
 import org.ta4j.core.indicators.bool.fractal.FractalLowIndicator
@@ -284,6 +286,14 @@ object Indicators {
     fun volumeProfile(lookback: Int, bandwidth: Number) = extended().volumeProfile(lookback, bandwidth)
 
     @JvmStatic
+    fun trendLineSupport(lookback: Int = 200, surroundingBars: Int = 3) =
+        extended().trendLineSupport(lookback, surroundingBars)
+
+    @JvmStatic
+    fun trendLineResistance(lookback: Int = 200, surroundingBars: Int = 3) =
+        extended().trendLineResistance(lookback, surroundingBars)
+
+    @JvmStatic
     fun zigZag(reversalAmount: Number) = extended().zigZag(reversalAmount)
 
     @JvmStatic
@@ -527,6 +537,14 @@ object Indicators {
         /** Gaussian KDE volume profile of the close price over the last [lookback] bars. */
         fun volumeProfile(lookback: Int, bandwidth: Number) =
             VolumeProfileKDEIndicator(closePrice(), volume(), lookback, bandwidth)
+
+        /** Support line through fractal swing lows ([surroundingBars] on each side) of the last [lookback] bars. */
+        fun trendLineSupport(lookback: Int = 200, surroundingBars: Int = 3) =
+            TrendLineSupportIndicator(fractalLow(surroundingBars, surroundingBars), lookback)
+
+        /** Resistance line through fractal swing highs ([surroundingBars] on each side) of the last [lookback] bars. */
+        fun trendLineResistance(lookback: Int = 200, surroundingBars: Int = 3) =
+            TrendLineResistanceIndicator(fractalHigh(surroundingBars, surroundingBars), lookback)
 
         /** ZigZag on high/low confirmed by close, ignoring moves smaller than [reversalAmount] price units. */
         fun zigZag(reversalAmount: Number) = zigZag(ConstantNumericIndicator(numFactory.numOf(reversalAmount)))
