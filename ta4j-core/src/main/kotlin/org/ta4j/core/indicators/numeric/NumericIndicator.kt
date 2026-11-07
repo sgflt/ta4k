@@ -54,7 +54,12 @@ import org.ta4j.core.indicators.numeric.oscillators.ConnorsRSIIndicator
 import org.ta4j.core.indicators.numeric.oscillators.SchaffTrendCycleIndicator
 import org.ta4j.core.indicators.numeric.oscillators.StochasticIndicator
 import org.ta4j.core.indicators.numeric.oscillators.TrueStrengthIndexIndicator
+import org.ta4j.core.indicators.numeric.statistics.CusumIndicator
+import org.ta4j.core.indicators.numeric.statistics.EwmaVarianceIndicator
+import org.ta4j.core.indicators.numeric.statistics.HurstExponentIndicator
+import org.ta4j.core.indicators.numeric.statistics.KendallTauIndicator
 import org.ta4j.core.indicators.numeric.statistics.PercentRankIndicator
+import org.ta4j.core.indicators.numeric.statistics.SpearmanRankCorrelationIndicator
 import org.ta4j.core.indicators.numeric.oscillators.aroon.AroonDownIndicator
 import org.ta4j.core.indicators.numeric.oscillators.aroon.AroonUpIndicator
 import org.ta4j.core.indicators.numeric.risk.UlcerIndexIndicator
@@ -430,6 +435,23 @@ abstract class NumericIndicator protected constructor(
 
 
     fun covariance(indicator: NumericIndicator, barCount: Int) = CovarianceIndicator(this, indicator, barCount)
+
+    /** Spearman's rank correlation with [other] over the last [barCount] bars. */
+    fun spearman(other: NumericIndicator, barCount: Int) = SpearmanRankCorrelationIndicator(this, other, barCount)
+
+    /** Kendall's tau-b rank correlation with [other] over the last [barCount] bars. */
+    fun kendallTau(other: NumericIndicator, barCount: Int) = KendallTauIndicator(this, other, barCount)
+
+    /** Rolling Hurst exponent over the last [barCount] values. */
+    fun hurst(barCount: Int, maximumLag: Int = minOf(10, barCount - 1)) =
+        HurstExponentIndicator(this, barCount, maximumLag)
+
+    /** Exponentially weighted variance seeded from the first [barCount] values. */
+    fun ewmaVariance(barCount: Int, decayFactor: Double = 0.94) = EwmaVarianceIndicator(this, barCount, decayFactor)
+
+    /** One-sided CUSUM of shortfalls below [targetMean]. */
+    fun cusum(targetMean: Number, allowance: Number, outlierClipFactor: Number = 3.0, scaleDecay: Number = 0.94) =
+        CusumIndicator(this, targetMean, allowance, outlierClipFactor, scaleDecay)
 
     fun distance() = DistanceFromMAIndicator(numFactory, this)
 
