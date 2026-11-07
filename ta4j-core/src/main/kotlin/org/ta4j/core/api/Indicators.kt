@@ -7,6 +7,11 @@ import org.ta4j.core.indicators.bool.BooleanIndicator
 import org.ta4j.core.indicators.bool.fractal.FractalHighIndicator
 import org.ta4j.core.indicators.bool.trend.DownTrendIndicator
 import org.ta4j.core.indicators.bool.trend.UpTrendIndicator
+import org.ta4j.core.indicators.numeric.supportresistance.BounceCountResistanceIndicator
+import org.ta4j.core.indicators.numeric.supportresistance.BounceCountSupportIndicator
+import org.ta4j.core.indicators.numeric.supportresistance.PriceClusterResistanceIndicator
+import org.ta4j.core.indicators.numeric.supportresistance.PriceClusterSupportIndicator
+import org.ta4j.core.indicators.numeric.supportresistance.VolumeProfileKDEIndicator
 import org.ta4j.core.indicators.numeric.swing.ZigZagIndicator
 import org.ta4j.core.indicators.bool.fractal.FractalLowIndicator
 import org.ta4j.core.indicators.bool.fractal.RecentFractalSwingIndicator
@@ -262,6 +267,23 @@ object Indicators {
     fun alligator() = extended().alligator()
 
     @JvmStatic
+    fun bounceCountSupport(lookback: Int, bucketSize: Number) = extended().bounceCountSupport(lookback, bucketSize)
+
+    @JvmStatic
+    fun bounceCountResistance(lookback: Int, bucketSize: Number) =
+        extended().bounceCountResistance(lookback, bucketSize)
+
+    @JvmStatic
+    fun priceClusterSupport(lookback: Int, tolerance: Number) = extended().priceClusterSupport(lookback, tolerance)
+
+    @JvmStatic
+    fun priceClusterResistance(lookback: Int, tolerance: Number) =
+        extended().priceClusterResistance(lookback, tolerance)
+
+    @JvmStatic
+    fun volumeProfile(lookback: Int, bandwidth: Number) = extended().volumeProfile(lookback, bandwidth)
+
+    @JvmStatic
     fun zigZag(reversalAmount: Number) = extended().zigZag(reversalAmount)
 
     @JvmStatic
@@ -485,6 +507,26 @@ object Indicators {
                 percentileBarCount = percentileBarCount,
             )
         }
+
+        /** Close price where the market turned up most often in the last [lookback] bars. */
+        fun bounceCountSupport(lookback: Int, bucketSize: Number) =
+            BounceCountSupportIndicator(closePrice(), lookback, bucketSize)
+
+        /** Close price where the market turned down most often in the last [lookback] bars. */
+        fun bounceCountResistance(lookback: Int, bucketSize: Number) =
+            BounceCountResistanceIndicator(closePrice(), lookback, bucketSize)
+
+        /** Close price cluster with the most volume in the last [lookback] bars, ties to the lower price. */
+        fun priceClusterSupport(lookback: Int, tolerance: Number) =
+            PriceClusterSupportIndicator(closePrice(), volume(), lookback, tolerance)
+
+        /** Close price cluster with the most volume in the last [lookback] bars, ties to the higher price. */
+        fun priceClusterResistance(lookback: Int, tolerance: Number) =
+            PriceClusterResistanceIndicator(closePrice(), volume(), lookback, tolerance)
+
+        /** Gaussian KDE volume profile of the close price over the last [lookback] bars. */
+        fun volumeProfile(lookback: Int, bandwidth: Number) =
+            VolumeProfileKDEIndicator(closePrice(), volume(), lookback, bandwidth)
 
         /** ZigZag on high/low confirmed by close, ignoring moves smaller than [reversalAmount] price units. */
         fun zigZag(reversalAmount: Number) = zigZag(ConstantNumericIndicator(numFactory.numOf(reversalAmount)))
