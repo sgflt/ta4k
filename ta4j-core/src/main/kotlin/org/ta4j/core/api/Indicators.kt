@@ -42,6 +42,7 @@ import org.ta4j.core.indicators.numeric.trend.ParabolicSARIndicator
 import org.ta4j.core.indicators.numeric.volume.AccumulationDistributionIndicator
 import org.ta4j.core.indicators.numeric.volume.ChaikinMoneyFlowIndicator
 import org.ta4j.core.indicators.numeric.volume.ChaikinOscillatorIndicator
+import org.ta4j.core.indicators.bool.candles.CandlePatterns
 import org.ta4j.core.indicators.numeric.oscillators.UltimateOscillatorIndicator
 import org.ta4j.core.indicators.numeric.oscillators.vortex.VortexFacade
 import org.ta4j.core.indicators.numeric.volume.ForceIndexIndicator
@@ -213,6 +214,10 @@ object Indicators {
 
     @JvmStatic
     fun iii() = extended().iii()
+
+    /** Candlestick patterns: hammer, morning star, kickers, ... */
+    @JvmStatic
+    val candlePatterns = CandlePatterns
 
     /** Ultimate Oscillator (Larry Williams). */
     fun ultimateOscillator(shortPeriod: Int = 7, middlePeriod: Int = 14, longPeriod: Int = 28) =
