@@ -4,6 +4,7 @@
 package org.ta4j.core.indicators.numeric
 
 import java.time.Instant
+import org.ta4j.core.TradeType
 import org.ta4j.core.api.Indicator
 import org.ta4j.core.api.series.Bar
 import org.ta4j.core.indicators.bool.IsHighestIndicator
@@ -63,6 +64,7 @@ import org.ta4j.core.strategy.rules.FixedAmountStopGainRule
 import org.ta4j.core.strategy.rules.FixedAmountStopLossRule
 import org.ta4j.core.strategy.rules.OverIndicatorRule
 import org.ta4j.core.strategy.rules.OverOrEqualIndicatorRule
+import org.ta4j.core.strategy.rules.RiskRewardRatioRule
 import org.ta4j.core.strategy.rules.StopLossRule
 import org.ta4j.core.strategy.rules.TakeProfitRule
 import org.ta4j.core.strategy.rules.TrailingFixedAmountStopGainRule
@@ -491,6 +493,23 @@ abstract class NumericIndicator protected constructor(
     fun isLessThanOrEqualRule(other: NumericIndicator) = UnderOrEqualIndicatorRule(this, other)
 
     fun isLessThanOrEqualRule(n: Number) = isLessThanOrEqualRule(createConstant(n))
+
+    /**
+     * Treats `this` as the planned entry price.
+     *
+     * @param stop planned stop price
+     * @param target planned target price
+     * @param minRiskReward minimum accepted reward / risk ratio
+     * @param tradeType direction of the planned trade
+     *
+     * @return [RiskRewardRatioRule] for the planned trade
+     */
+    fun riskRewardRatioRule(
+        stop: NumericIndicator,
+        target: NumericIndicator,
+        minRiskReward: Number,
+        tradeType: TradeType = TradeType.BUY,
+    ) = RiskRewardRatioRule(this, stop, target, tradeType, numFactory.numOf(minRiskReward))
 
 
     /**
