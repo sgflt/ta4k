@@ -156,8 +156,8 @@ class MockMarketDataGenerator(
             volatility < 0.015 -> "LOW"
             else -> "NORMAL"
         }
-        return "Market: $trend trend (strength: ${String.format("%.1f", trendStrength * 100)}%), " +
-               "Volatility: $vol (${String.format("%.2f", volatility * 100)}%), " +
-               "Price: ${String.format("%.2f", currentPrice)}"
+        return "Market: $trend trend (strength: ${"%.1f".format(trendStrength * 100)}%), " +
+               "Volatility: $vol (${"%.2f".format(volatility * 100)}%), " +
+               "Price: ${"%.2f".format(currentPrice)}"
     }
 }

@@ -4,6 +4,7 @@
 package org.ta4j.core.strategy.optimization
 
 import java.util.concurrent.ThreadLocalRandom
+import kotlin.math.roundToLong
 import org.ta4j.core.strategy.configuration.Parameter
 import org.ta4j.core.strategy.configuration.StrategyConfiguration
 
@@ -47,7 +48,7 @@ class StrategyConfigurationGenerator(parameterDescriptors: List<ParameterDescrip
                     + (ThreadLocalRandom.current().nextDouble() - 0.5) * 2 * range.step)
 
         // Ensure value stays within allowed range
-        val cappedValue = Math.clamp(roundToStep(newValue, range.step), range.min, range.max)
+        val cappedValue = roundToStep(newValue, range.step).coerceIn(range.min, range.max)
         return Parameter(current.name, cappedValue)
     }
 
@@ -60,6 +61,6 @@ class StrategyConfigurationGenerator(parameterDescriptors: List<ParameterDescrip
 
 
     private fun roundToStep(value: Double, step: Double): Double {
-        return Math.round(value / step) * step
+        return (value / step).roundToLong() * step
     }
 }

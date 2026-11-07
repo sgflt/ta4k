@@ -112,7 +112,7 @@ internal class ExecutionModelsTest {
         val signal = candle(100.0)
         manager.createOrder(OperationType.ENTER, signal, numFactory.one())
         manager.createOrder(OperationType.ENTER, signal, numFactory.one())
-        assertThat(manager.getPendingOrderCount()).isEqualTo(1)
+        assertThat(manager.pendingOrderCount).isEqualTo(1)
     }
 
     @ParameterizedTest
@@ -124,14 +124,14 @@ internal class ExecutionModelsTest {
         val signal = candle(100.0)
         manager.createOrder(OperationType.ENTER, signal, numFactory.one())
         manager.processPendingOrders(signal)
-        assertThat(manager.getPendingOrderCount()).isEqualTo(1) // never on the signal bar
+        assertThat(manager.pendingOrderCount).isEqualTo(1) // never on the signal bar
 
         manager.processPendingOrders(candle(100.0, 100.5, 99.0, 100.2)) // stop not reached
         assertThat(record.currentPosition.isNew).isTrue()
 
         manager.processPendingOrders(candle(100.5, 103.0, 100.0, 102.5))
         assertNumEquals(101.0, record.currentPosition.entry!!.pricePerAsset)
-        assertThat(manager.getPendingOrderCount()).isZero()
+        assertThat(manager.pendingOrderCount).isZero()
     }
 
     @ParameterizedTest
@@ -153,7 +153,7 @@ internal class ExecutionModelsTest {
         manager.createOrder(OperationType.ENTER, candle(100.0), numFactory.one())
         manager.processPendingOrders(candle(103.0, 104.0, 102.5, 103.5)) // never trades at or below 102
         assertThat(record.currentPosition.isNew).isTrue()
-        assertThat(manager.getPendingOrderCount()).isZero()
+        assertThat(manager.pendingOrderCount).isZero()
     }
 
     @ParameterizedTest

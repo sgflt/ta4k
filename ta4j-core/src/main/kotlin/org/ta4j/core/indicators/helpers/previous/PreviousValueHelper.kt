@@ -3,7 +3,6 @@
  */
 package org.ta4j.core.indicators.helpers.previous
 
-import java.util.*
 import org.ta4j.core.api.Indicator
 import org.ta4j.core.api.series.Bar
 
@@ -11,7 +10,7 @@ import org.ta4j.core.api.series.Bar
  * Returns the (n-th) previous value of an indicator.
  */
 internal class PreviousValueHelper<T>(private val indicator: Indicator<T>, private val n: Int) : Indicator<T?> {
-    private val previousValues = LinkedList<T>()
+    private val previousValues = ArrayDeque<T>()
     override var value: T? = null
         private set
     override val lag = n

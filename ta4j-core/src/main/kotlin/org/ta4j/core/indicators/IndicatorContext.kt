@@ -3,7 +3,7 @@
  */
 package org.ta4j.core.indicators
 
-import java.util.*
+import java.util.UUID
 import kotlin.collections.Map.Entry
 import org.ta4j.core.api.Indicator
 import org.ta4j.core.api.callback.BarListener

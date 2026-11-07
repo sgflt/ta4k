@@ -30,6 +30,6 @@ class XorRule(
 
 
     override fun toString(): String {
-        return String.format("XorRule[%s, %s] => %s", this.rule1, this.rule2, isSatisfied)
+        return "XorRule[$rule1, $rule2] => $isSatisfied"
     }
 }

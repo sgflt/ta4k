@@ -6,7 +6,6 @@ package org.ta4j.core.num
 import java.math.BigDecimal
 import java.math.MathContext
 import java.math.RoundingMode
-import java.util.*
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 import kotlin.math.pow
@@ -267,7 +266,7 @@ class DecimalNum : Num {
         // Use simple bit-shifting for initial estimate
         var scientificStr = value.round(MathContext(1, RoundingMode.HALF_UP))
             .toString()
-            .uppercase(Locale.getDefault())
+            .uppercase()
 
         var exponent = 0
         val matcher: Matcher = SCIENTIFIC_NOTATION_PATTERN.matcher(scientificStr)
@@ -407,7 +406,7 @@ class DecimalNum : Num {
 
 
     override fun hashCode(): Int {
-        return Objects.hash(delegate)
+        return delegate.hashCode()
     }
 
 

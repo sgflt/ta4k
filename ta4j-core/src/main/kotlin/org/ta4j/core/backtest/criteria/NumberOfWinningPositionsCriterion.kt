@@ -22,7 +22,7 @@ class NumberOfWinningPositionsCriterion : AnalysisCriterion {
 
     override fun calculate(tradingRecord: TradingRecord): Num {
         val numberOfWinningPositions =
-            tradingRecord.positions.stream().filter({ obj: Position? -> obj!!.hasProfit() }).count()
+            tradingRecord.positions.count { it.hasProfit() }
         return defaultNumFactory.numOf(numberOfWinningPositions)
     }
 }

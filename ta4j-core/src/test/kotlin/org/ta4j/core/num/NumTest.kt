@@ -7,7 +7,7 @@ import java.io.IOException
 import java.math.BigDecimal
 import java.math.MathContext
 import java.math.RoundingMode.HALF_UP
-import java.util.*
+import java.util.Properties
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Test

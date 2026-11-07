@@ -5,7 +5,6 @@ package org.ta4j.core.mocks
 
 import java.time.Duration
 import java.time.Instant
-import java.util.stream.DoubleStream
 import org.ta4j.core.events.CandleReceived
 import org.ta4j.core.events.MarketEvent
 import org.ta4j.core.indicators.TimeFrame
@@ -18,7 +17,7 @@ import org.ta4j.core.utils.TimeFrameMapping.getDuration
 class MockMarketEventBuilder {
     private var startTime: Instant = Instant.ofEpochMilli(-1)
     private var defaultData = false
-    private var candleEvents = ArrayList<CandleReceived>()
+    private var candleEvents = mutableListOf<CandleReceived>()
     private var candlesProduced = 0
     private var candleDuration = getDuration(TimeFrame.DAY)
     private var timeFrame = TimeFrame.DAY
@@ -36,7 +35,7 @@ class MockMarketEventBuilder {
      *
      * @return this
      */
-    fun withCandlePrices(data: MutableList<Double?>): MockMarketEventBuilder = apply {
+    fun withCandlePrices(data: List<Double>): MockMarketEventBuilder = apply {
         data.forEach { d ->
             val startTime = startTime.plus(candleDuration.multipliedBy(createCandleSerialNumber().toLong()))
             candleEvents.add(
@@ -44,7 +43,7 @@ class MockMarketEventBuilder {
                     timeFrame,
                     startTime,
                     startTime.plus(candleDuration),
-                    d!!,
+                    d,
                     d,
                     d,
                     d,
@@ -63,7 +62,7 @@ class MockMarketEventBuilder {
      * @return this
      */
     fun withCandlePrices(vararg data: Double): MockMarketEventBuilder = apply {
-        withCandlePrices(DoubleStream.of(*data).boxed().toList())
+        withCandlePrices(data.toList())
     }
 
 

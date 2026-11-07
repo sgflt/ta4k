@@ -3,7 +3,6 @@
  */
 package org.ta4j.core.strategy
 
-import java.util.function.BooleanSupplier
 import org.ta4j.core.TradeType
 import org.ta4j.core.indicators.TimeFrame
 import org.ta4j.core.strategy.rules.AndRule
@@ -79,10 +78,10 @@ interface Rule {
             tradeType: TradeType? = null,
         ): Rule = LossTriggeredCooldownRule(cooldownBars, timeFrame, runtimeContext, resetRule, tradeType)
 
-        fun of(rule: BooleanSupplier): Rule {
+        fun of(rule: () -> Boolean): Rule {
             return object : Rule {
                 override val isSatisfied: Boolean
-                    get() = rule.asBoolean
+                    get() = rule()
             }
         }
     }

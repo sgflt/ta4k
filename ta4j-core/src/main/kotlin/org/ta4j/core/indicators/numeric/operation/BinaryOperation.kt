@@ -3,7 +3,6 @@
  */
 package org.ta4j.core.indicators.numeric.operation
 
-import java.util.function.BinaryOperator
 import org.ta4j.core.api.series.Bar
 import org.ta4j.core.indicators.numeric.ConstantNumericIndicator
 import org.ta4j.core.indicators.numeric.NumericIndicator
@@ -19,12 +18,12 @@ import org.ta4j.core.num.Num
  * it doesn't cache.
  */
 class BinaryOperation private constructor(
-    private val operator: BinaryOperator<Num>,
+    private val operator: (Num, Num) -> Num,
     private val left: NumericIndicator,
     private val right: NumericIndicator,
 ) : NumericIndicator(left.numFactory) {
 
-    private fun calculate() = operator.apply(left.value, right.value)
+    private fun calculate() = operator(left.value, right.value)
 
     override fun updateState(bar: Bar) {
         left.onBar(bar)

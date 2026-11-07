@@ -6,7 +6,7 @@ package ta4jexamples.indicators
 import java.awt.Color
 import java.lang.Thread.sleep
 import java.time.Instant
-import java.util.*
+import java.util.Date
 import kotlin.random.Random.Default.nextBoolean
 import org.jfree.chart.ChartFactory
 import org.jfree.chart.ChartPanel

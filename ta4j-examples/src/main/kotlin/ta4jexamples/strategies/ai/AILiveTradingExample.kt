@@ -76,7 +76,7 @@ object AILiveTradingExample {
 
         println("✅ LiveTrading initialized successfully!")
         println("⏰ Time Frame: ${timeFrame.name}")
-        println("💰 Initial Balance: $${String.format("%.2f", initialBalance)}")
+        println("💰 Initial Balance: $${"%.2f".format(initialBalance)}")
         println("\n🔄 Starting market simulation...\n")
 
         // Generate initial candles to warm up indicators
@@ -108,14 +108,14 @@ object AILiveTradingExample {
             val currentPrice = candle.closePrice
 
             // Print market update
-            println("📊 Candle #$candleCount | Price: $${String.format("%.2f", currentPrice)}")
+            println("📊 Candle #$candleCount | Price: $${"%.2f".format(currentPrice)}")
             println("   ${dataGenerator.getMarketSummary()}")
             println(
-                "   📈 OHLCV: O=${String.format("%.2f", candle.openPrice)} " +
-                        "H=${String.format("%.2f", candle.highPrice)} " +
-                        "L=${String.format("%.2f", candle.lowPrice)} " +
-                        "C=${String.format("%.2f", currentPrice)} " +
-                        "V=${String.format("%.0f", candle.volume)}"
+                "   📈 OHLCV: O=${"%.2f".format(candle.openPrice)} " +
+                        "H=${"%.2f".format(candle.highPrice)} " +
+                        "L=${"%.2f".format(candle.lowPrice)} " +
+                        "C=${"%.2f".format(currentPrice)} " +
+                        "V=${"%.0f".format(candle.volume)}"
             )
 
             // Check for trading signals
@@ -130,9 +130,9 @@ object AILiveTradingExample {
                 val entered = tradingState.tradingRecord.enter(Instant.now(), entryPrice, shares)
 
                 if (entered) {
-                    println("🟢 ENTRY SIGNAL - Opening position at $${String.format("%.2f", currentPrice)}")
-                    println("   💰 Investment: $${String.format("%.2f", investmentAmount)}")
-                    println("   📊 Shares: ${String.format("%.6f", shares.doubleValue())}")
+                    println("🟢 ENTRY SIGNAL - Opening position at $${"%.2f".format(currentPrice)}")
+                    println("   💰 Investment: $${"%.2f".format(investmentAmount)}")
+                    println("   📊 Shares: ${"%.6f".format(shares.doubleValue())}")
                     println("   📊 Bar Index: ${tradingState.barIndex}")
                 }
             }
@@ -150,20 +150,14 @@ object AILiveTradingExample {
                     if (profit > 0) {
                         println(
                             "🟢 EXIT SIGNAL - Closing position at $${
-                                String.format(
-                                    "%.2f",
-                                    currentPrice
-                                )
-                            } | PROFIT: $${String.format("%.2f", profit)}"
+                                "%.2f".format(currentPrice)
+                            } | PROFIT: $${"%.2f".format(profit)}"
                         )
                     } else {
                         println(
                             "🔴 EXIT SIGNAL - Closing position at $${
-                                String.format(
-                                    "%.2f",
-                                    currentPrice
-                                )
-                            } | LOSS: $${String.format("%.2f", profit)}"
+                                "%.2f".format(currentPrice)
+                            } | LOSS: $${"%.2f".format(profit)}"
                         )
                     }
 
@@ -207,16 +201,16 @@ object AILiveTradingExample {
 
         if (totalPositions > 0) {
             val winRate = (winningPositions.toDouble() / totalPositions) * 100
-            println("   Win Rate: ${String.format("%.1f", winRate)}%")
+            println("   Win Rate: ${"%.1f".format(winRate)}%")
         }
 
         val totalPnL = (totalReturn - 1.0) * initialBalance
-        println("   Total P&L: $${String.format("%.2f", totalPnL)}")
+        println("   Total P&L: $${"%.2f".format(totalPnL)}")
         val finalBalance = initialBalance * totalReturn
-        println("   Final Balance: $${String.format("%.2f", finalBalance)}")
+        println("   Final Balance: $${"%.2f".format(finalBalance)}")
         val returnPercentage = (totalReturn - 1.0) * 100
-        println("   Total Return: ${String.format("%.2f", returnPercentage)}%")
-        println("   Max Drawdown: ${String.format("%.2f", maxDrawdown * 100)}%")
+        println("   Total Return: ${"%.2f".format(returnPercentage)}%")
+        println("   Max Drawdown: ${"%.2f".format(maxDrawdown * 100)}%")
 
         // Performance evaluation
         println("\n📈 PERFORMANCE EVALUATION:")
@@ -231,8 +225,8 @@ object AILiveTradingExample {
         if (tradingRecord.currentPosition.isOpened) {
             println("\n⚠️ OPEN POSITION DETECTED:")
             val lastEntry = tradingRecord.lastEntry
-            println("   Entry Price: $${String.format("%.2f", lastEntry?.netPrice?.doubleValue() ?: 0.0)}")
-            println("   Position Size: $${String.format("%.2f", lastEntry?.amount?.doubleValue() ?: 0.0)}")
+            println("   Entry Price: $${"%.2f".format(lastEntry?.netPrice?.doubleValue() ?: 0.0)}")
+            println("   Position Size: $${"%.2f".format(lastEntry?.amount?.doubleValue() ?: 0.0)}")
         }
 
         println("\n🤖 AI TRADING INSIGHTS:")

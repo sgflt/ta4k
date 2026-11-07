@@ -5,7 +5,7 @@ package org.ta4j.core.backtest
 
 import java.time.Duration
 import java.time.Instant
-import java.util.*
+import java.util.Random
 import kotlin.math.max
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.params.ParameterizedTest
@@ -67,7 +67,7 @@ internal class BacktestExecutorTest {
 
     private val marketEvents: MutableList<MarketEvent>
         get() {
-            val events = ArrayList<MarketEvent>()
+            val events = mutableListOf<MarketEvent>()
             var marketEvent = generateEvent()
             events.add(marketEvent)
             for (i in 0..9999) {

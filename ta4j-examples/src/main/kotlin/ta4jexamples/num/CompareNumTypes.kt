@@ -84,10 +84,7 @@ object CompareNumTypes {
         val end = System.currentTimeMillis()
 
         println(
-            String.format(
-                "[%s]\n    -Time:   %s ms.\n    -Average: %s \n    -Bars:   %s\n ",
-                series.symbol, (end - start), average, series.barCount
-            )
+            "[%s]\n    -Time:   %s ms.\n    -Average: %s \n    -Bars:   %s\n ".format(series.symbol, (end - start), average, series.barCount)
         )
 
         return average

@@ -5,7 +5,8 @@ package org.ta4j.core.backtest
 
 import java.time.Instant
 import java.time.temporal.ChronoUnit
-import java.util.*
+import java.util.NavigableMap
+import java.util.TreeMap
 import org.ta4j.core.TradeType
 import org.ta4j.core.api.callback.BarListener
 import org.ta4j.core.api.series.Bar
@@ -53,7 +54,7 @@ class Position @JvmOverloads constructor(
 
 
     override fun hashCode(): Int {
-        return Objects.hash(entry, exit)
+        return 31 * entry.hashCode() + exit.hashCode()
     }
 
 

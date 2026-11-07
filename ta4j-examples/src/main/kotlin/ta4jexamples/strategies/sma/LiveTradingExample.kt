@@ -70,7 +70,7 @@ object LiveTradingExample {
 
         println("\nResults:")
         println("Total trades: $totalPositions")
-        println("Final balance: ${String.format("%.2f", finalBalance)}")
-        println("Return: ${String.format("%.2f", returnPercentage)}%")
+        println("Final balance: ${"%.2f".format(finalBalance)}")
+        println("Return: ${"%.2f".format(returnPercentage)}%")
     }
 }

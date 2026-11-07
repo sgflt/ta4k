@@ -4,7 +4,7 @@
 package org.ta4j.core.backtest.analysis
 
 import java.time.Instant
-import java.util.*
+import java.util.NavigableMap
 import org.ta4j.core.backtest.Position
 import org.ta4j.core.backtest.TradingRecord
 import org.ta4j.core.num.Num

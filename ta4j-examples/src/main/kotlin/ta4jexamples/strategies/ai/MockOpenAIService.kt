@@ -46,7 +46,7 @@ class MockOpenAIService {
                 TradingRecommendation(
                     TradingAction.HOLD,
                     0.45,  // Reduced confidence to allow other signals through
-                    "High volatility detected (ATR: ${String.format("%.2f%%", atrPercentage * 100)}). Avoiding trades until market stabilizes."
+                    "High volatility detected (ATR: ${"%.2f%%".format(atrPercentage * 100)}). Avoiding trades until market stabilizes."
                 )
             }
             
@@ -59,7 +59,7 @@ class MockOpenAIService {
                 TradingRecommendation(
                     TradingAction.BUY,
                     confidence,
-                    "RSI indicates oversold condition (${String.format("%.2f", rsiValue)}). Strong buy opportunity."
+                    "RSI indicates oversold condition (${"%.2f".format(rsiValue)}). Strong buy opportunity."
                 )
             }
             
@@ -72,7 +72,7 @@ class MockOpenAIService {
                 TradingRecommendation(
                     TradingAction.SELL,
                     confidence,
-                    "RSI shows overbought condition (${String.format("%.2f", rsiValue)}). Sell signal detected."
+                    "RSI shows overbought condition (${"%.2f".format(rsiValue)}). Sell signal detected."
                 )
             }
             

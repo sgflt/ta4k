@@ -7,7 +7,7 @@ import java.awt.BasicStroke
 import java.awt.Color
 import java.awt.GridLayout
 import java.time.Instant
-import java.util.*
+import java.util.Date
 import javax.swing.SwingUtilities
 import org.jfree.chart.ChartPanel
 import org.jfree.chart.JFreeChart

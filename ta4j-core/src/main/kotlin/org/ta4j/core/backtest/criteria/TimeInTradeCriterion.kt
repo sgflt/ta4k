@@ -27,14 +27,10 @@ class TimeInTradeCriterion(private val unit: ChronoUnit) : AnalysisCriterion {
 
 
     override fun calculate(tradingRecord: TradingRecord): Num {
+        // FIXME it adds overlapping periods
         return tradingRecord.positions
-            .stream()
-            .filter(Position::isClosed)
-            .map(this::calculate)
-            .reduce(
-                defaultNumFactory.zero(),
-                { obj: Num, augend: Num -> obj.plus(augend) }
-            ) // FIXME it adds overlapping periods
+            .filter { it.isClosed }
+            .fold(defaultNumFactory.zero()) { total, position -> total + calculate(position) }
     }
 
     companion object {

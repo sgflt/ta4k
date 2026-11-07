@@ -22,7 +22,7 @@ class NumberOfLosingPositionsCriterion : AnalysisCriterion {
 
     override fun calculate(tradingRecord: TradingRecord): Num {
         val numberOfLosingPositions =
-            tradingRecord.positions.stream().filter({ obj: Position? -> obj!!.hasLoss() }).count()
+            tradingRecord.positions.count { it.hasLoss() }
         return defaultNumFactory.numOf(numberOfLosingPositions)
     }
 }

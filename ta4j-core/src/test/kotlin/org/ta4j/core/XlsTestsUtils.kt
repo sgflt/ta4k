@@ -7,8 +7,6 @@ import java.io.IOException
 import java.math.BigDecimal
 import java.time.Duration
 import java.time.Instant
-import java.util.*
-import java.util.function.DoubleConsumer
 import java.util.zip.DataFormatException
 import org.apache.poi.hssf.usermodel.HSSFWorkbook
 import org.apache.poi.ss.usermodel.CellValue
@@ -79,9 +77,7 @@ object XlsTestsUtils {
             if (evaluator.evaluate(row.getCell(0)).formatAsString().contains("Param")) {
                 // stream parameters into the second column of subsequent rows
                 // overwrites data section if there is not a large enough gap
-                Arrays.stream<Num?>(params)
-                    .mapToDouble { obj: Num? -> obj!!.doubleValue() }
-                    .forEach(DoubleConsumer { d: Double -> iterator.next().getCell(1).setCellValue(d) })
+                params.forEach { iterator.next().getCell(1).setCellValue(it!!.doubleValue()) }
                 return
             }
         }
@@ -126,7 +122,7 @@ object XlsTestsUtils {
      */
     @Throws(DataFormatException::class)
     private fun getMarketEvents(sheet: Sheet): List<MarketEvent> {
-        val candleEvents = ArrayList<MarketEvent>()
+        val candleEvents = mutableListOf<MarketEvent>()
         val evaluator = sheet.workbook.creationHelper.createFormulaEvaluator()
         val rows = getData(sheet)
         var minInterval = Int.Companion.MAX_VALUE
@@ -236,7 +232,7 @@ object XlsTestsUtils {
     </Num> */
     @Throws(DataFormatException::class)
     private fun getValues(sheet: Sheet, column: Int, numFactory: NumFactory): MutableList<Num> {
-        val values = ArrayList<Num>()
+        val values = mutableListOf<Num>()
         val evaluator = sheet.workbook.creationHelper.createFormulaEvaluator()
         // get all of the data from the data section of the sheet
         val rows = getData(sheet)
@@ -271,7 +267,7 @@ object XlsTestsUtils {
         val evaluator = sheet.workbook.creationHelper.createFormulaEvaluator()
         val iterator = sheet.rowIterator()
         var noHeader = true
-        val rows: MutableList<Row> = ArrayList<Row>()
+        val rows = mutableListOf<Row>()
         // iterate through all rows of the sheet
         while (iterator.hasNext()) {
             val row = iterator.next()

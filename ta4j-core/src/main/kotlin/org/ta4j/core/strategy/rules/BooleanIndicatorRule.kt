@@ -25,6 +25,6 @@ class BooleanIndicatorRule
 
 
     override fun toString(): String {
-        return String.format("BoolIndRule[%s] => %s", this.indicator, this.indicator.value)
+        return "BoolIndRule[$indicator] => ${indicator.value}"
     }
 }

@@ -3,7 +3,6 @@
  */
 package org.ta4j.core.indicators.numeric.statistics
 
-import java.util.*
 import org.ta4j.core.api.series.Bar
 import org.ta4j.core.indicators.numeric.NumericIndicator
 import org.ta4j.core.num.Num
@@ -18,7 +17,7 @@ class CovarianceIndicator(
 ) : NumericIndicator(
     indicator1.numFactory
 ) {
-    private val window: Queue<XY> = LinkedList<XY>()
+    private val window = ArrayDeque<XY>()
     private var sumX: Num
     private var sumXY: Num
     private var sumY: Num
@@ -43,10 +42,10 @@ class CovarianceIndicator(
         val y = indicator2.value
 
         val newValue = XY(x, y)
-        window.offer(newValue)
+        window.addLast(newValue)
 
         if (window.size > barCount) {
-            val polled = window.poll()
+            val polled = window.removeFirst()
             removeOldPoint(polled)
         }
 

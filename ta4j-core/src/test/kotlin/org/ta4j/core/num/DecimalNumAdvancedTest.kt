@@ -3,6 +3,7 @@
  */
 package org.ta4j.core.num
 
+import kotlin.math.E
 import java.math.MathContext
 import java.math.RoundingMode
 import org.assertj.core.api.Assertions.assertThat
@@ -16,7 +17,7 @@ internal class DecimalNumAdvancedTest {
     @DisplayName("Test logarithmic operations")
     fun shouldCalculateLogarithms() {
         val one = valueOf("1", TEST_CONTEXT)
-        val e = valueOf(Math.E, TEST_CONTEXT)
+        val e = valueOf(E, TEST_CONTEXT)
 
         assertThat(one.log()).hasToString("0")
         assertThat(e.log().delegate.toDouble()).isCloseTo(1.0, Offset.offset<Double?>(1e-10))

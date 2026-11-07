@@ -38,9 +38,7 @@ class LossCriterion
 
     override fun calculate(tradingRecord: TradingRecord): Num {
         return tradingRecord.positions
-            .stream()
-            .filter(Position::isClosed)
-            .map(this::calculate)
-            .reduce(defaultNumFactory.zero(), { obj: Num, augend: Num -> obj.plus(augend) })
+            .filter { it.isClosed }
+            .fold(defaultNumFactory.zero()) { total, position -> total + calculate(position) }
     }
 }

@@ -36,6 +36,6 @@ class NotRule
 
 
     override fun toString(): String {
-        return String.format("NotRule[%s] => %s", this.ruleToNegate, isSatisfied)
+        return "NotRule[$ruleToNegate] => $isSatisfied"
     }
 }

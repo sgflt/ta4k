@@ -6,7 +6,6 @@ package org.ta4j.core.backtest
 import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
-import java.util.*
 import org.ta4j.core.api.callback.BarListener
 import org.ta4j.core.api.series.Bar
 import org.ta4j.core.api.series.BarBuilderFactory
@@ -44,9 +43,9 @@ class BacktestBarSeries internal constructor(
      *
      * @return the raw bar data
      */
-    val barData: MutableList<BacktestBar> = ArrayList<BacktestBar>()
-    private val barBuilderFactory: BarBuilderFactory = Objects.requireNonNull<BarBuilderFactory>(barBuilderFactory)
-    private val barListeners: MutableList<BarListener> = ArrayList<BarListener>(1).apply { addAll(barListeners) }
+    val barData: MutableList<BacktestBar> = mutableListOf()
+    private val barBuilderFactory: BarBuilderFactory = barBuilderFactory
+    private val barListeners: MutableList<BarListener> = barListeners.toMutableList()
 
     /**
      * Where we are located now
@@ -162,11 +161,8 @@ class BacktestBarSeries internal constructor(
      * Exceeding bars are removed.
      *
      * @param bar the bar to be added
-     *
-     * @throws NullPointerException if `bar` is `null`
      */
     override fun addBar(bar: Bar) {
-        Objects.requireNonNull<Bar?>(bar, "bar must not be null")
         require(bar is BacktestBar) { "Wrong bar type: " + bar.closePrice.name }
 
         if (barData.isNotEmpty()) {

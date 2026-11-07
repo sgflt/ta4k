@@ -4,7 +4,9 @@
 package org.ta4j.core.backtest.analysis
 
 import java.time.Instant
-import java.util.*
+import java.util.Collections
+import java.util.NavigableMap
+import java.util.TreeMap
 import org.ta4j.core.backtest.Position
 import org.ta4j.core.backtest.Trade
 import org.ta4j.core.backtest.TradingRecord
@@ -23,8 +25,11 @@ import org.ta4j.core.num.NumFactory
  * This implementation does not track price fluctuations between entry and exit.
  */
 class RealizedCashFlow {
-    /** The cash flow values mapped to timestamps  */
-    private val values: NavigableMap<Instant, Num>
+    private val cashFlowValues = TreeMap<Instant, Num>()
+
+    /** The cash flow values mapped to timestamps, read-only. */
+    val values: NavigableMap<Instant, Num>
+        get() = Collections.unmodifiableNavigableMap(cashFlowValues)
 
     /** The num factory for creating numbers  */
     private val numFactory: NumFactory
@@ -38,11 +43,10 @@ class RealizedCashFlow {
      */
     constructor(numFactory: NumFactory, position: Position) {
         this.numFactory = numFactory
-        values = TreeMap<Instant, Num>()
 
         // Initialize with base value 1
         if (position.entry != null) {
-            values.put(position.entry!!.whenExecuted, numFactory.one())
+            cashFlowValues[position.entry!!.whenExecuted] = numFactory.one()
         }
 
         calculate(position)
@@ -57,26 +61,18 @@ class RealizedCashFlow {
      */
     constructor(numFactory: NumFactory, tradingRecord: TradingRecord) {
         this.numFactory = numFactory
-        values = TreeMap<Instant, Num>()
 
         // Initialize with base value 1 at first trade
         if (tradingRecord.positions.isNotEmpty()) {
             val firstTrade: Trade? = tradingRecord.positions.first().entry
             if (firstTrade != null) {
-                values.put(firstTrade.whenExecuted, numFactory.one())
+                cashFlowValues[firstTrade.whenExecuted] = numFactory.one()
             }
         }
 
         calculate(tradingRecord)
     }
 
-
-    /**
-     * @return all cash flow values with their timestamps
-     */
-    fun getValues(): NavigableMap<Instant?, Num?> {
-        return TreeMap<Instant?, Num?>(values)
-    }
 
 
     /**
@@ -103,18 +99,18 @@ class RealizedCashFlow {
      */
     fun getValue(instant: Instant): Num {
         // If we have a value at this exact instant, return it
-        if (values.containsKey(instant)) {
-            return values[instant]!!
+        if (cashFlowValues.containsKey(instant)) {
+            return cashFlowValues[instant]!!
         }
 
         // Get the last entry before this instant
-        val lastEntry = values.floorEntry(instant)
+        val lastEntry = cashFlowValues.floorEntry(instant)
         if (lastEntry == null) {
             return numFactory.one()
         }
 
         // Get the next entry after this instant
-        val nextEntry = values.ceilingEntry(instant)
+        val nextEntry = cashFlowValues.ceilingEntry(instant)
         if (nextEntry == null) {
             return lastEntry.value!!
         }
@@ -144,11 +140,11 @@ class RealizedCashFlow {
 
         // Get the value at entry and multiply by ratio for exit value
         val entryValue = getValue(entry.whenExecuted)
-        values.put(exit.whenExecuted, entryValue * ratio)
+        cashFlowValues[exit.whenExecuted] = entryValue * ratio
     }
 
 
-    private fun calculateOpenPosition(position: Position, evaluationTime: Instant?) {
+    private fun calculateOpenPosition(position: Position, evaluationTime: Instant) {
         val isLongTrade = position.entry!!.isBuy
         val entry = position.entry
         val entryTime = entry!!.whenExecuted
@@ -159,13 +155,13 @@ class RealizedCashFlow {
 
         // Record initial value
         val entryValue = getValue(entryTime)
-        values.put(entryTime, entryValue)
+        cashFlowValues[entryTime] = entryValue
 
         // Record value at evaluation time with holding costs
         val currentPrice = entry.pricePerAsset
         val adjustedPrice: Num = addCost(currentPrice, holdingCost, isLongTrade)
         val ratio = calculateRatio(isLongTrade, entryPrice, adjustedPrice)
-        values.put(evaluationTime, entryValue * ratio)
+        cashFlowValues[evaluationTime] = entryValue * ratio
     }
 
 
@@ -178,12 +174,11 @@ class RealizedCashFlow {
         if (currentPosition.isOpened) {
             // Use the latest timestamp from the trading record
             val latestTime =
-                tradingRecord.positions.asSequence()
+                tradingRecord.positions
                     .filter { it.isClosed }
-                    .map { it.exit?.whenExecuted }
-                    .filterNotNull()
+                    .mapNotNull { it.exit?.whenExecuted }
                     .maxOrNull()
-                    ?: currentPosition.entry?.whenExecuted
+                    ?: currentPosition.entry!!.whenExecuted
 
             calculateOpenPosition(currentPosition, latestTime)
         }

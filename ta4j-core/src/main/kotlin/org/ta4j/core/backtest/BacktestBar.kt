@@ -6,7 +6,6 @@ package org.ta4j.core.backtest
 import java.math.BigDecimal
 import java.time.Duration
 import java.time.Instant
-import java.util.function.Function
 import org.ta4j.core.api.series.Bar
 import org.ta4j.core.indicators.TimeFrame
 import org.ta4j.core.num.Num
@@ -42,8 +41,8 @@ data class BacktestBar(
      * @param price the actual price per asset
      * @param numFunction the numbers precision
      */
-    fun addPrice(price: String, numFunction: Function<Number?, Num?>) {
-        addPrice(numFunction.apply(BigDecimal(price))!!)
+    fun addPrice(price: String, numFunction: (Number) -> Num) {
+        addPrice(numFunction(BigDecimal(price)))
     }
 
 
@@ -54,8 +53,8 @@ data class BacktestBar(
      * @param price the actual price per asset
      * @param numFunction the numbers precision
      */
-    fun addPrice(price: Number?, numFunction: Function<Number?, Num?>) {
-        addPrice(numFunction.apply(price)!!)
+    fun addPrice(price: Number, numFunction: (Number) -> Num) {
+        addPrice(numFunction(price))
     }
 
 

@@ -3,7 +3,6 @@
  */
 package org.ta4j.core.indicators.numeric.statistics
 
-import java.util.*
 import org.ta4j.core.api.series.Bar
 import org.ta4j.core.indicators.numeric.NumericIndicator
 import org.ta4j.core.num.NaN
@@ -31,10 +30,10 @@ class PearsonCorrelationIndicator(
     private fun calculate(): Num {
         val x = indicator1.value
         val y = indicator2.value
-        window.offer(XY(x, y))
+        window.addLast(XY(x, y))
 
         if (window.size > barCount) {
-            removeOldValue(window.poll())
+            removeOldValue(window.removeFirst())
         }
 
         sx += x

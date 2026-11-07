@@ -3,7 +3,6 @@
  */
 package org.ta4j.core.indicators.numeric.operation
 
-import java.util.function.UnaryOperator
 import org.ta4j.core.api.series.Bar
 import org.ta4j.core.indicators.numeric.NumericIndicator
 import org.ta4j.core.num.Num
@@ -14,14 +13,14 @@ import org.ta4j.core.num.Num
  * There may be other unary operations on Num that could be added here.
  */
 class UnaryOperation private constructor(
-    private val operator: UnaryOperator<Num>,
+    private val operator: (Num) -> Num,
     private val operand: NumericIndicator,
 ) : NumericIndicator(
     operand.numFactory
 ) {
     private fun calculate(): Num {
         val n = operand.value
-        return operator.apply(n)
+        return operator(n)
     }
 
 

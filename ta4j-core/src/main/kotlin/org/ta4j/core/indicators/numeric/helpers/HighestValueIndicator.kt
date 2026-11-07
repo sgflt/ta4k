@@ -3,7 +3,6 @@
  */
 package org.ta4j.core.indicators.numeric.helpers
 
-import java.util.*
 import org.ta4j.core.api.series.Bar
 import org.ta4j.core.indicators.numeric.NumericIndicator
 import org.ta4j.core.indicators.numeric.candles.price.HighPriceIndicator
@@ -27,7 +26,7 @@ class HighestValueIndicator(
 
     /** circular array  */
     private val window = arrayOfNulls<Num>(barCount)
-    private val deque = LinkedList<Int>()
+    private val deque = ArrayDeque<Int>()
     private var barsPassed = 0
 
 
@@ -36,25 +35,25 @@ class HighestValueIndicator(
 
         if (barsPassed >= barCount) {
             val outgoingIndex = (barsPassed - barCount) % barCount
-            if (deque.isNotEmpty() && deque.peekFirst() == outgoingIndex) {
-                deque.pollFirst()
+            if (deque.isNotEmpty() && deque.first() == outgoingIndex) {
+                deque.removeFirst()
             }
         }
 
         val currentValue = indicator.value
         window[actualIndex] = currentValue
 
-        while (deque.isNotEmpty() && (window[deque.peekLast()]!! < currentValue
-                    || window[deque.peekLast()]!!.isNaN
+        while (deque.isNotEmpty() && (window[deque.last()]!! < currentValue
+                    || window[deque.last()]!!.isNaN
                     )
         ) {
-            deque.pollLast()
+            deque.removeLast()
         }
 
-        deque.offerLast(actualIndex)
+        deque.addLast(actualIndex)
         barsPassed++
 
-        return window[deque.peekFirst()!!]!!
+        return window[deque.first()]!!
     }
 
 

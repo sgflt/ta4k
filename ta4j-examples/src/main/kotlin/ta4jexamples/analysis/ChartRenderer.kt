@@ -3,10 +3,11 @@
  */
 package ta4jexamples.analysis
 
+import kotlin.math.PI
 import java.awt.Color
 import java.awt.Font
 import java.time.Instant
-import java.util.*
+import java.util.Date
 import java.util.concurrent.ConcurrentLinkedQueue
 import javax.swing.SwingUtilities
 import org.jfree.chart.ChartFactory
@@ -212,10 +213,10 @@ class ChartRenderer(
             // Green upward arrow at exact price level
             val timeValue = Day(Date.from(time)).firstMillisecond.toDouble()
             val buyArrow = XYPointerAnnotation(
-                "BUY \$${String.format("%.2f", price)}",
+                "BUY \$${"%.2f".format(price)}",
                 timeValue,
                 price,
-                Math.PI / 2 // Point upward (90 degrees)
+                PI / 2 // Point upward (90 degrees)
             ).apply {
                 setArrowPaint(Color.GREEN)
                 setArrowStroke(java.awt.BasicStroke(2.0f))
@@ -237,10 +238,10 @@ class ChartRenderer(
             // Red downward arrow at exact price level
             val timeValue = Day(Date.from(time)).firstMillisecond.toDouble()
             val sellArrow = XYPointerAnnotation(
-                "SELL \$${String.format("%.2f", price)}",
+                "SELL \$${"%.2f".format(price)}",
                 timeValue,
                 price,
-                -Math.PI / 2 // Point downward (-90 degrees)
+                -PI / 2 // Point downward (-90 degrees)
             ).apply {
                 setArrowPaint(Color.RED)
                 setArrowStroke(java.awt.BasicStroke(2.0f))

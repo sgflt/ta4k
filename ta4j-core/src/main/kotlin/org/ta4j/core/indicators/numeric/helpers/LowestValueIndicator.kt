@@ -3,7 +3,6 @@
  */
 package org.ta4j.core.indicators.numeric.helpers
 
-import java.util.*
 import org.ta4j.core.api.series.Bar
 import org.ta4j.core.indicators.numeric.NumericIndicator
 import org.ta4j.core.indicators.numeric.candles.price.LowPriceIndicator
@@ -26,7 +25,7 @@ class LowestValueIndicator(
 
     /** circular array  */
     private val window: Array<Num?> // TODO CircularNumArray
-    private val deque: Deque<Int> = LinkedList()
+    private val deque = ArrayDeque<Int>()
     private var barsPassed = 0
 
 
@@ -46,8 +45,8 @@ class LowestValueIndicator(
 
         if (barsPassed >= barCount) {
             val outgoingIndex = (barsPassed - barCount) % barCount
-            if (deque.isNotEmpty() && deque.peekFirst() == outgoingIndex) {
-                deque.pollFirst()
+            if (deque.isNotEmpty() && deque.first() == outgoingIndex) {
+                deque.removeFirst()
             }
         }
 
@@ -60,17 +59,17 @@ class LowestValueIndicator(
 
         while (
             deque.isNotEmpty()
-            && (window[deque.peekLast()]!! > currentValue
-                    || window[deque.peekLast()]!!.isNaN
+            && (window[deque.last()]!! > currentValue
+                    || window[deque.last()]!!.isNaN
                     )
         ) {
-            deque.pollLast()
+            deque.removeLast()
         }
 
-        deque.offerLast(actualIndex)
+        deque.addLast(actualIndex)
         barsPassed++
 
-        return window[deque.peekFirst()!!]!!
+        return window[deque.first()]!!
     }
 
 

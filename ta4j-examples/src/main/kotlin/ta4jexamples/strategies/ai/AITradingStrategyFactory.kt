@@ -97,10 +97,7 @@ class AITradingStrategyFactory(
                 println("🤖 AI Analysis: ${recommendation.reasoning}")
                 println(
                     "📊 Recommendation: ${recommendation.action} (Confidence: ${
-                        String.format(
-                            "%.1f",
-                            recommendation.confidence * 100
-                        )
+                        "%.1f".format(recommendation.confidence * 100)
                     }%)"
                 )
 

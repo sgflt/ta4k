@@ -3,6 +3,7 @@
  */
 package org.ta4j.core.indicators.numeric.statistics
 
+import kotlin.math.sign
 import org.ta4j.core.api.series.Bar
 import org.ta4j.core.indicators.numeric.NumericIndicator
 import org.ta4j.core.num.NaN
@@ -108,8 +109,8 @@ class KendallTauIndicator(first: NumericIndicator, second: NumericIndicator, bar
         var secondTies = 0L
         for (i in 0 until firstValues.size - 1) {
             for (j in i + 1 until firstValues.size) {
-                val firstComparison = firstValues[i].compareTo(firstValues[j]).sign()
-                val secondComparison = secondValues[i].compareTo(secondValues[j]).sign()
+                val firstComparison = firstValues[i].compareTo(firstValues[j]).sign
+                val secondComparison = secondValues[i].compareTo(secondValues[j]).sign
                 when {
                     firstComparison == 0 && secondComparison == 0 -> Unit
                     firstComparison == 0 -> ++firstTies
@@ -125,8 +126,6 @@ class KendallTauIndicator(first: NumericIndicator, second: NumericIndicator, bar
         return numFactory.numOf(concordant - discordant) /
             (numFactory.numOf(firstPairs) * numFactory.numOf(secondPairs)).sqrt()
     }
-
-    private fun Int.sign() = Integer.signum(this)
 
     override fun toString() = "KendallTau($barCount) => $value"
 }

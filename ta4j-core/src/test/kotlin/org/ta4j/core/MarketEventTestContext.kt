@@ -6,7 +6,6 @@ package org.ta4j.core
 import java.time.Duration
 import java.time.Instant
 import java.time.temporal.ChronoUnit
-import java.util.*
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.data.Offset
 import org.slf4j.Logger
@@ -36,7 +35,7 @@ import org.ta4j.core.utils.TimeFrameMapping
  * Events are replayed to bar series that refreshes indicator context by created bar.
  */
 class MarketEventTestContext {
-    lateinit var marketEvents: Queue<MarketEvent>
+    lateinit var marketEvents: ArrayDeque<MarketEvent>
         private set
     private val indicatorContext: IndicatorContext = IndicatorContext.empty(timeFrame = TimeFrame.DAY)
 
@@ -56,7 +55,7 @@ class MarketEventTestContext {
      * @return this
      */
     fun withCandlePrices(vararg prices: Double): MarketEventTestContext = apply {
-        marketEvents = LinkedList(
+        marketEvents = ArrayDeque(
             MockMarketEventBuilder()
                 .withStartTime(startTime)
                 .withCandleDuration(candleDuration)
@@ -66,12 +65,12 @@ class MarketEventTestContext {
     }
 
     fun withMarketEvents(marketEvents: List<MarketEvent>): MarketEventTestContext = apply {
-        this.marketEvents = LinkedList(marketEvents)
+        this.marketEvents = ArrayDeque(marketEvents)
     }
 
 
     fun withDefaultMarketEvents(): MarketEventTestContext = apply {
-        marketEvents = LinkedList(MockMarketEventBuilder().withDefaultData().build())
+        marketEvents = ArrayDeque(MockMarketEventBuilder().withDefaultData().build())
     }
 
 
@@ -118,7 +117,7 @@ class MarketEventTestContext {
     fun advance(): Boolean {
         log.trace("\t ### advance")
 
-        val marketEvent = marketEvents.poll()
+        val marketEvent = marketEvents.removeFirstOrNull()
         if (marketEvent == null) {
             return false
         }

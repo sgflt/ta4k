@@ -3,6 +3,7 @@
  */
 package org.ta4j.core.indicators.numeric.statistics
 
+import kotlin.math.sqrt
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
@@ -26,9 +27,9 @@ class ZScoreIndicatorTest {
         context.advance()
         context.advance()
         context.advance() // window 10, 10, 13: mean 11, sample sd sqrt(3)
-        assertNumEquals(2.0 / Math.sqrt(3.0), zScore.value)
+        assertNumEquals(2.0 / sqrt(3.0), zScore.value)
         context.advance() // window 10, 13, 13: mean 12, sample sd sqrt(3)
-        assertNumEquals(1.0 / Math.sqrt(3.0), zScore.value)
+        assertNumEquals(1.0 / sqrt(3.0), zScore.value)
         context.advance() // constant window, sd 0
         assertThat(zScore.value.isNaN).isTrue()
 

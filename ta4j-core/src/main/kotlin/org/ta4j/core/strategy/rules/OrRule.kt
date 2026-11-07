@@ -34,6 +34,6 @@ class OrRule(
 
 
     override fun toString(): String {
-        return String.format("OrRule[%s, %s] => %s", this.rule1, this.rule2, isSatisfied)
+        return "OrRule[$rule1, $rule2] => $isSatisfied"
     }
 }

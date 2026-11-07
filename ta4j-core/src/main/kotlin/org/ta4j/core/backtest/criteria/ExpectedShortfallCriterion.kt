@@ -34,9 +34,7 @@ class ExpectedShortfallCriterion
         }
         // TODO extract ReturnType to parameter
         val returns = Returns(numFactory, position, Returns.ReturnType.ARITHMETIC)
-        val returnValues = returns.values.stream()
-            .filter { num: Num? -> !num!!.isZero }  // Remove zero returns
-            .toList()
+        val returnValues = returns.values.filterNot { it.isZero }
 
         log.debug("Position returns (excluding zeros): {}", returnValues)
         return calculateExpectedShortfall(returnValues)
@@ -50,15 +48,13 @@ class ExpectedShortfallCriterion
         }
 
         val returns = Returns(numFactory, tradingRecord, Returns.ReturnType.ARITHMETIC)
-        val returnValues = returns.values.stream()
-            .filter { num: Num? -> !num!!.isZero }  // Remove zero returns
-            .toList()
+        val returnValues = returns.values.filterNot { it.isZero }
 
         log.debug("Trading record returns (excluding zeros): {}", returnValues)
         return calculateExpectedShortfall(returnValues)
     }
 
-    private fun calculateExpectedShortfall(returns: MutableList<Num>): Num {
+    private fun calculateExpectedShortfall(returns: List<Num>): Num {
         log.debug("Calculating ES for returns: {}", returns)
 
         if (returns.isEmpty()) {
@@ -67,13 +63,11 @@ class ExpectedShortfallCriterion
         }
 
         // Sort returns in ascending order (worst to best)
-        val sortedReturns = returns.stream()
-            .sorted()
-            .toList()
+        val sortedReturns = returns.sorted()
         log.debug("Sorted returns: {}", sortedReturns)
 
         // Calculate number of returns to include (round up to ensure we take at least one)
-        val numberOfReturns = max(1.0, ceil(sortedReturns.size * (1 - confidenceLevel)).toInt().toDouble()).toInt()
+        val numberOfReturns = max(1, ceil(sortedReturns.size * (1 - confidenceLevel)).toInt())
         log.debug(
             "Taking {} lowest returns (confidence level: {}, total returns: {})",
             numberOfReturns, confidenceLevel, sortedReturns.size
@@ -82,7 +76,7 @@ class ExpectedShortfallCriterion
         // Calculate average of values below threshold (worst returns)
         var sum = numFactory.zero()
         for (i in 0..<numberOfReturns) {
-            sum = sum.plus(sortedReturns[i])
+            sum += sortedReturns[i]
             log.debug(
                 "Adding return at index {}: {}, running sum: {}",
                 i,

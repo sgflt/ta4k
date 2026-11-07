@@ -21,11 +21,7 @@ class NumberOfBreakEvenPositionsCriterion : AnalysisCriterion {
 
 
     override fun calculate(tradingRecord: TradingRecord): Num {
-        val numberOfBreakEvenTrades = tradingRecord.positions
-            .stream()
-            .filter(Position::isClosed)
-            .filter({ position: Position -> this.isBreakEvenPosition(position) })
-            .count()
+        val numberOfBreakEvenTrades = tradingRecord.positions.count(::isBreakEvenPosition)
         return defaultNumFactory.numOf(numberOfBreakEvenTrades)
     }
 

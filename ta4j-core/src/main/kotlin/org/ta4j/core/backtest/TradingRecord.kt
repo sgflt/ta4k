@@ -108,7 +108,6 @@ interface TradingRecord {
      */
     val lastExit: Trade?
 
-    // TODO   /**
     val isEmpty: Boolean
 
     /**
@@ -116,23 +115,4 @@ interface TradingRecord {
      */
     val equityCurve: List<EquityPoint>
         get() = emptyList()
-
-    //     * @param series the bar series, not null
-    //     * @return the {@link #getStartIndex()} if not null and greater than
-    //     *         {@link BarSeries#getBeginIndex()}, otherwise
-    //     *         {@link BarSeries#getBeginIndex()}
-    //     */
-    //    default int getStartIndex(BarSeries series) {
-    //        return getStartIndex() == null ? series.getBeginIndex() : Math.max(getStartIndex(), series.getBeginIndex());
-    //    }
-    //
-    //    /**
-    //     * @param series the bar series, not null
-    //     * @return the {@link #getEndIndex()} if not null and less than
-    //     *         {@link BarSeries#getEndIndex()}, otherwise
-    //     *         {@link BarSeries#getEndIndex()}
-    //     */
-    //    default int getEndIndex(BarSeries series) {
-    //        return getEndIndex() == null ? series.getEndIndex() : Math.min(getEndIndex(), series.getEndIndex());
-    //    }
 }

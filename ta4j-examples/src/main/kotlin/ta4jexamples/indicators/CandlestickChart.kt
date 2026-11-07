@@ -5,7 +5,7 @@ package ta4jexamples.indicators
 
 import java.awt.Color
 import java.time.Instant
-import java.util.*
+import java.util.Date
 import javax.swing.SwingUtilities
 import org.jfree.chart.ChartFactory
 import org.jfree.chart.ChartPanel

@@ -25,8 +25,7 @@ internal data class LightweightBar(
     override val volume: Num,
 ) : Bar {
     override fun toString(): String {
-        return String.format(
-            "{end time: %1s, close price: %2\$f, open price: %3\$f, low price: %4\$f, high price: %5\$f, volume: %6\$f}",
+        return "{end time: %1s, close price: %2\$f, open price: %3\$f, low price: %4\$f, high price: %5\$f, volume: %6\$f}".format(
             this.endTime.atZone(ZoneId.systemDefault()),
             this.closePrice.doubleValue(),
             this.openPrice.doubleValue(),

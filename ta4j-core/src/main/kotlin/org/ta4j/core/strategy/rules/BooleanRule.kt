@@ -21,7 +21,7 @@ class BooleanRule
 
 
     override fun toString(): String {
-        return String.format("BoolRule[%s] => %s", this.satisfied, isSatisfied)
+        return "BoolRule[$satisfied] => $isSatisfied"
     }
 
     companion object {

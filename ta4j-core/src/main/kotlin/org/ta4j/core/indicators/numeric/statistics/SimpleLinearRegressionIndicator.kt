@@ -3,7 +3,6 @@
  */
 package org.ta4j.core.indicators.numeric.statistics
 
-import java.util.*
 import org.ta4j.core.api.series.Bar
 import org.ta4j.core.indicators.numeric.NumericIndicator
 import org.ta4j.core.num.Num
@@ -47,7 +46,7 @@ class SimpleLinearRegressionIndicator @JvmOverloads constructor(
      */
     private fun calculateRegressionLine() {
         if (window.size == barCount) {
-            with(window.remove()) {
+            with(window.removeFirst()) {
                 sumX -= x
                 sumY -= y
                 sumXX -= x * x
@@ -57,7 +56,7 @@ class SimpleLinearRegressionIndicator @JvmOverloads constructor(
 
         val x = numFactory.numOf(barsPassed)
         val y = indicator.value
-        window.offer(XY(x, y))
+        window.addLast(XY(x, y))
 
         sumX += x
         sumY += y

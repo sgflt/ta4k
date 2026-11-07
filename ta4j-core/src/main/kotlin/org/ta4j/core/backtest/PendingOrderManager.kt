@@ -72,10 +72,9 @@ class PendingOrderManager(
         }
     }
 
-    /**
-     * @return the number of orders waiting for execution
-     */
-    fun getPendingOrderCount(): Int = pendingOrders.size
+    /** Number of orders waiting for execution. */
+    val pendingOrderCount: Int
+        get() = pendingOrders.size
 
     private fun sideOf(operation: OperationType): TradeType =
         if (operation == OperationType.ENTER) tradingRecord.startingType else tradingRecord.startingType.complementType()
