@@ -20,9 +20,9 @@ strategies. The project is transitioning from Java to Kotlin and uses Gradle for
 
 ### Development Environment
 
-- **Java Version**: 21+ required
-- **Kotlin Version**: 2.1.20
-- **Gradle Version**: 8.14.2
+- **Java Version**: JDK 25 for building (bytecode targets Java 21)
+- **Kotlin Version**: 2.4.21
+- **Gradle Version**: 9.9.0
 - **Module structure**: Multi-module Gradle project with ta4j-core, ta4j-examples, ta4j-csv, and ta4j-jdbc modules
 - **Version Catalog**: Dependencies managed via `gradle/libs.versions.toml`
 
