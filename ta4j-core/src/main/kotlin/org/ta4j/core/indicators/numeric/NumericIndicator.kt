@@ -28,9 +28,11 @@ import org.ta4j.core.indicators.numeric.helpers.DistanceFromMAIndicator
 import org.ta4j.core.indicators.numeric.helpers.GainIndicator
 import org.ta4j.core.indicators.numeric.helpers.HighestValueIndicator
 import org.ta4j.core.indicators.numeric.helpers.LossIndicator
+import org.ta4j.core.indicators.numeric.helpers.LogReturnIndicator
 import org.ta4j.core.indicators.numeric.helpers.LowestValueIndicator
 import org.ta4j.core.indicators.numeric.helpers.RatioIndicator
 import org.ta4j.core.indicators.numeric.helpers.RunningTotalIndicator
+import org.ta4j.core.indicators.numeric.helpers.StreakIndicator
 import org.ta4j.core.indicators.numeric.momentum.CoppockCurveIndicator
 import org.ta4j.core.indicators.numeric.momentum.KSTIndicator
 import org.ta4j.core.indicators.numeric.momentum.ATRIndicator
@@ -408,6 +410,16 @@ abstract class NumericIndicator protected constructor(
      */
     @JvmOverloads
     fun previous(barCount: Int = 1) = PreviousNumericValueIndicator(numFactory, this, barCount)
+
+    /**
+     * @return natural log return of `this` over [barCount] bars
+     */
+    fun logReturn(barCount: Int = 1) = LogReturnIndicator(this, barCount)
+
+    /**
+     * @return length of the current run of rising (positive) or falling (negative) values
+     */
+    fun streak() = StreakIndicator(this)
 
     fun dpo(barCount: Int) = DPOIndicator(numFactory, this, barCount)
 
