@@ -27,5 +27,9 @@ interface ExecutionTrigger {
      * @return the execution price, or null if price cannot be determined
      */
     fun getExecutionPrice(event: MarketEvent, numFactory: NumFactory): Num?
-}
 
+    /**
+     * @return true if the order should be dropped unfilled
+     */
+    fun isExpired(event: MarketEvent): Boolean = false
+}

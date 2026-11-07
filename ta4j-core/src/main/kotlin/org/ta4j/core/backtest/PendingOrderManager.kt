@@ -4,53 +4,55 @@
 package org.ta4j.core.backtest
 
 import java.time.Instant
+import org.ta4j.core.TradeType
+import org.ta4j.core.backtest.execution.OrderTriggerFactory
+import org.ta4j.core.backtest.execution.PositionSizer
+import org.ta4j.core.backtest.execution.SlippageModel
 import org.ta4j.core.events.MarketEvent
 import org.ta4j.core.num.Num
 import org.ta4j.core.num.NumFactory
 
 /**
- * Manages the execution of trade orders based on the configured execution mode.
+ * Turns strategy signals into fills.
  *
- * Handles both immediate execution (CURRENT_CLOSE) and delayed execution (NEXT_OPEN)
- * through a pending order system.
+ * Each signal becomes a pending order whose [ExecutionTrigger] (from [orderTriggerFactory]) decides
+ * when and at what price it fills. Fills get [slippageModel] applied; entries are sized by
+ * [positionSizer] when set, exits close the whole open amount.
  */
 class PendingOrderManager(
     private val tradingRecord: TradingRecord,
-    private val executionMode: ExecutionMode,
     private val numFactory: NumFactory,
+    private val orderTriggerFactory: OrderTriggerFactory,
+    private val slippageModel: SlippageModel = SlippageModel.NONE,
+    private val positionSizer: PositionSizer? = null,
 ) {
+    constructor(tradingRecord: TradingRecord, executionMode: ExecutionMode, numFactory: NumFactory) :
+        this(tradingRecord, numFactory, OrderTriggerFactory.of(executionMode))
+
     private val pendingOrders = mutableListOf<PendingOrder>()
 
 
     /**
-     * Creates and queues a trade order based on the execution mode.
-     * All orders go through the unified queuing system.
+     * Queues an order for [operation], unless one of the same type is already pending.
      *
-     * @param operation the type of operation (ENTER or EXIT)
-     * @param amount the trade amount
+     * @param amount amount used when no position sizer is configured
      */
     fun createOrder(operation: OperationType, event: MarketEvent, amount: Num) {
-
-        val trigger = when (executionMode) {
-            ExecutionMode.CURRENT_CLOSE -> CurrentBarTrigger()
-            ExecutionMode.NEXT_OPEN -> NextBarOpenTrigger(event.beginTime)
+        if (operation == OperationType.NOOP || pendingOrders.any { it.type == operation }) {
+            return
         }
-
         pendingOrders.add(
             PendingOrder(
                 type = operation,
                 amount = amount,
-                trigger = trigger,
+                trigger = orderTriggerFactory.create(sideOf(operation), event, numFactory),
                 createdAt = Instant.now()
             )
         )
     }
 
     /**
-     * Processes all pending orders against the given market event.
-     * Orders that should be executed are executed and removed from the pending list.
-     *
-     * @param event the market event to check against pending orders
+     * Fills pending orders whose trigger fires on [event] and drops expired ones.
      */
     fun processPendingOrders(event: MarketEvent) {
         val iterator = pendingOrders.iterator()
@@ -61,30 +63,36 @@ class PendingOrderManager(
                 if (executionPrice != null) {
                     executePendingOrder(order, event, executionPrice)
                     iterator.remove()
+                    continue
                 }
+            }
+            if (order.trigger.isExpired(event)) {
+                iterator.remove()
             }
         }
     }
 
     /**
-     * Gets the current number of pending orders.
-     *
      * @return the number of orders waiting for execution
      */
     fun getPendingOrderCount(): Int = pendingOrders.size
 
+    private fun sideOf(operation: OperationType): TradeType =
+        if (operation == OperationType.ENTER) tradingRecord.startingType else tradingRecord.startingType.complementType()
+
     private fun executePendingOrder(order: PendingOrder, event: MarketEvent, executionPrice: Num) {
+        val fillPrice = slippageModel.apply(sideOf(order.type), executionPrice)
         when (order.type) {
             OperationType.ENTER -> tradingRecord.enter(
                 event.beginTime,
-                executionPrice,
-                order.amount
+                fillPrice,
+                positionSizer?.size(fillPrice, tradingRecord) ?: order.amount
             )
 
             OperationType.EXIT -> tradingRecord.exit(
                 event.beginTime,
-                executionPrice,
-                order.amount
+                fillPrice,
+                tradingRecord.currentPosition.entry?.amount ?: order.amount
             )
 
             OperationType.NOOP -> {}

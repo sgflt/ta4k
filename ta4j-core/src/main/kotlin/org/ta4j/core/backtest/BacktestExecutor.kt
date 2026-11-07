@@ -45,6 +45,9 @@ class BacktestExecutor internal constructor(private val configuration: BacktestC
             marketEvents,
             marketEventHandler
         )
+        if (configuration.closeOpenPositionAtEnd) {
+            marketEventHandler.closeOpenPosition(marketEvents)
+        }
         return marketEventHandler.tradingStatement
     }
 
@@ -104,9 +107,11 @@ class BacktestExecutor internal constructor(private val configuration: BacktestC
 
             this.runtimeContext = runtimeContext
             this.pendingOrderManager = PendingOrderManager(
-                strategy.tradeRecord,
-                configuration.executionMode,
-                configuration.numFactory
+                tradingRecord = strategy.tradeRecord,
+                numFactory = configuration.numFactory,
+                orderTriggerFactory = configuration.orderTriggerFactory,
+                slippageModel = configuration.slippageModel,
+                positionSizer = configuration.positionSizer,
             )
             tickListeners.add(strategy)
             tickListeners.add(runtimeContext)
@@ -180,6 +185,19 @@ class BacktestExecutor internal constructor(private val configuration: BacktestC
             // TODO
         }
 
+
+        /** Exits a position left open at the close of the last candle, with slippage applied. */
+        fun closeOpenPosition(marketEvents: List<MarketEvent>) {
+            val record = strategy.tradeRecord
+            val position = record.currentPosition
+            if (!position.isOpened) {
+                return
+            }
+            val lastCandle = marketEvents.filterIsInstance<CandleReceived>().maxByOrNull { it.beginTime } ?: return
+            val close = configuration.numFactory.numOf(lastCandle.closePrice)
+            val price = configuration.slippageModel.apply(record.startingType.complementType(), close)
+            record.exit(lastCandle.endTime, price, position.entry!!.amount)
+        }
 
         val tradingStatement
             get() = TradingStatementGenerator().generate(strategy)
