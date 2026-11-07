@@ -20,7 +20,7 @@ strategies. The project is transitioning from Java to Kotlin and uses Gradle for
 
 ### Development Environment
 
-- **Java Version**: JDK 25 for building (bytecode targets Java 21)
+- **Java Version**: JDK 25 (source and bytecode target)
 - **Kotlin Version**: 2.4.21
 - **Gradle Version**: 9.9.0
 - **Module structure**: Multi-module Gradle project with ta4j-core, ta4j-examples, ta4j-csv, and ta4j-jdbc modules
