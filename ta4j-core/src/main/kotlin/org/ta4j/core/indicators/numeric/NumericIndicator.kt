@@ -73,9 +73,13 @@ import org.ta4j.core.num.NaN
 import org.ta4j.core.num.Num
 import org.ta4j.core.num.NumFactory
 import org.ta4j.core.strategy.RuntimeContext
+import org.ta4j.core.strategy.rules.FixedAmountStopGainRule
+import org.ta4j.core.strategy.rules.FixedAmountStopLossRule
 import org.ta4j.core.strategy.rules.OverIndicatorRule
 import org.ta4j.core.strategy.rules.StopLossRule
 import org.ta4j.core.strategy.rules.TakeProfitRule
+import org.ta4j.core.strategy.rules.TrailingFixedAmountStopGainRule
+import org.ta4j.core.strategy.rules.TrailingFixedAmountStopLossRule
 import org.ta4j.core.strategy.rules.TrailingStopGainRule
 import org.ta4j.core.strategy.rules.TrailingStopLossRule
 import org.ta4j.core.strategy.rules.UnderIndicatorRule
@@ -531,6 +535,42 @@ abstract class NumericIndicator protected constructor(
      */
     fun trailingStopGainRule(gainPercentage: Number, runtimeContext: RuntimeContext) =
         TrailingStopGainRule(this, numFactory.numOf(gainPercentage), runtimeContext)
+
+    /**
+     * @param lossAmount price distance below (long) or above (short) the entry price that closes the position
+     * @param runtimeContext context providing the open position
+     *
+     * @return [FixedAmountStopLossRule] watching `this` price
+     */
+    fun fixedAmountStopLossRule(lossAmount: Number, runtimeContext: RuntimeContext) =
+        FixedAmountStopLossRule(this, numFactory.numOf(lossAmount), runtimeContext)
+
+    /**
+     * @param gainAmount price distance above (long) or below (short) the entry price that closes the position
+     * @param runtimeContext context providing the open position
+     *
+     * @return [FixedAmountStopGainRule] watching `this` price
+     */
+    fun fixedAmountStopGainRule(gainAmount: Number, runtimeContext: RuntimeContext) =
+        FixedAmountStopGainRule(this, numFactory.numOf(gainAmount), runtimeContext)
+
+    /**
+     * @param lossAmount price retracement from the best price since entry that closes the position
+     * @param runtimeContext context providing the open position
+     *
+     * @return [TrailingFixedAmountStopLossRule] watching `this` price
+     */
+    fun trailingFixedAmountStopLossRule(lossAmount: Number, runtimeContext: RuntimeContext) =
+        TrailingFixedAmountStopLossRule(this, numFactory.numOf(lossAmount), runtimeContext)
+
+    /**
+     * @param gainAmount price gain that arms the stop and retracement that then closes the position
+     * @param runtimeContext context providing the open position
+     *
+     * @return [TrailingFixedAmountStopGainRule] watching `this` price
+     */
+    fun trailingFixedAmountStopGainRule(gainAmount: Number, runtimeContext: RuntimeContext) =
+        TrailingFixedAmountStopGainRule(this, numFactory.numOf(gainAmount), runtimeContext)
 
     fun isLowest(barCount: Int) = IsLowestIndicator(this, barCount)
 

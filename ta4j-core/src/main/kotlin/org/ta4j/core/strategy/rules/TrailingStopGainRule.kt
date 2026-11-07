@@ -22,7 +22,6 @@
  */
 package org.ta4j.core.strategy.rules
 
-import org.ta4j.core.backtest.Trade
 import org.ta4j.core.indicators.numeric.NumericIndicator
 import org.ta4j.core.num.Num
 import org.ta4j.core.strategy.RuntimeContext
@@ -46,18 +45,13 @@ class TrailingStopGainRule(
     indicator: NumericIndicator,
     val gainPercentage: Num,
     runtimeContext: RuntimeContext,
-) : AbstractTrailingStopRule(indicator, runtimeContext, StopDistance.percentage(gainPercentage)) {
+) : AbstractTrailingStopGainRule(indicator, runtimeContext, StopDistance.percentage(gainPercentage)) {
 
     constructor(
         indicator: NumericIndicator,
         gainPercentage: Double,
         runtimeContext: RuntimeContext,
     ) : this(indicator, indicator.numFactory.numOf(gainPercentage), runtimeContext)
-
-    override fun isArmed(entry: Trade, referencePrice: Num): Boolean {
-        val activationPrice = StopType.GAIN.stopPrice(entry.type, entry.netPrice, distanceFrom(entry.netPrice))
-        return StopType.GAIN.isTriggered(entry.type, activationPrice, referencePrice)
-    }
 
     override fun toString(): String {
         return "TrailingStopGainRule[${gainPercentage.doubleValue()}%] => $isSatisfied"
