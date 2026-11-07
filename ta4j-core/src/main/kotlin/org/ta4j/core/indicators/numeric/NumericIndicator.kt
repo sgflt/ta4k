@@ -57,6 +57,7 @@ import org.ta4j.core.strategy.RuntimeContext
 import org.ta4j.core.strategy.rules.FixedAmountStopGainRule
 import org.ta4j.core.strategy.rules.FixedAmountStopLossRule
 import org.ta4j.core.strategy.rules.OverIndicatorRule
+import org.ta4j.core.strategy.rules.OverOrEqualIndicatorRule
 import org.ta4j.core.strategy.rules.StopLossRule
 import org.ta4j.core.strategy.rules.TakeProfitRule
 import org.ta4j.core.strategy.rules.TrailingFixedAmountStopGainRule
@@ -64,6 +65,7 @@ import org.ta4j.core.strategy.rules.TrailingFixedAmountStopLossRule
 import org.ta4j.core.strategy.rules.TrailingStopGainRule
 import org.ta4j.core.strategy.rules.TrailingStopLossRule
 import org.ta4j.core.strategy.rules.UnderIndicatorRule
+import org.ta4j.core.strategy.rules.UnderOrEqualIndicatorRule
 
 /**
  * NumericIndicator is a fluent class. It provides
@@ -460,6 +462,10 @@ abstract class NumericIndicator protected constructor(
 
     fun isGreaterThanRule(n: Number) = isGreaterThanRule(createConstant(n))
 
+    fun isGreaterThanOrEqualRule(other: NumericIndicator) = OverOrEqualIndicatorRule(this, other)
+
+    fun isGreaterThanOrEqualRule(n: Number) = isGreaterThanOrEqualRule(createConstant(n))
+
 
     /**
      * @param other the other indicator
@@ -472,6 +478,10 @@ abstract class NumericIndicator protected constructor(
     fun isLessThanRule(other: NumericIndicator) = UnderIndicatorRule(this, other)
 
     fun isLessThanRule(n: Number) = isLessThanRule(createConstant(n))
+
+    fun isLessThanOrEqualRule(other: NumericIndicator) = UnderOrEqualIndicatorRule(this, other)
+
+    fun isLessThanOrEqualRule(n: Number) = isLessThanOrEqualRule(createConstant(n))
 
 
     /**

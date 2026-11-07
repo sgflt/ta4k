@@ -8,47 +8,27 @@ import org.ta4j.core.indicators.numeric.NumericIndicator
 import org.ta4j.core.num.Num
 
 /**
- * A rule that monitors when one [indicator][Indicator] is over another.
+ * Satisfied when the value of the first indicator is strictly greater than the value of the second one.
  *
- *
- *
- * Satisfied when the value of the first [indicator][Indicator] is strictly
- * greater than the value of the second one.
+ * @param first the first indicator
+ * @param second the second indicator
  */
 class OverIndicatorRule(
-    /** The first indicator.  */
-    private val first: NumericIndicator,
-    /** The second indicator.  */
-    private val second: NumericIndicator,
-) : AbstractRule() {
+    first: NumericIndicator,
+    second: NumericIndicator,
+) : AbstractIndicatorComparisonRule(first, second, "OverRule") {
+
     /**
-     * Constructor.
-     *
      * @param indicator the indicator
      * @param threshold the threshold
      */
-    constructor(indicator: NumericIndicator, threshold: Number) : this(
-        indicator,
-        indicator.numFactory.numOf(threshold)
-    )
-
+    constructor(indicator: NumericIndicator, threshold: Number) : this(indicator, indicator.numFactory.numOf(threshold))
 
     /**
-     * Constructor.
-     *
      * @param indicator the indicator
      * @param threshold the threshold
      */
     constructor(indicator: NumericIndicator, threshold: Num) : this(indicator, ConstantNumericIndicator(threshold))
 
-
-    override val isSatisfied: Boolean
-        get() {
-            val satisfied = first.isGreaterThan(second)
-            traceIsSatisfied(satisfied)
-            return satisfied
-        }
-
-
-    override fun toString() = "OverRule[$first, $second] => ${isSatisfied}"
+    override fun compare(firstValue: Num, secondValue: Num) = firstValue > secondValue
 }
