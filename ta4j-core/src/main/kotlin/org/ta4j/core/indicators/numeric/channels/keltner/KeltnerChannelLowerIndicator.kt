@@ -3,7 +3,7 @@
  */
 package org.ta4j.core.indicators.numeric.channels.keltner
 
-import org.ta4j.core.api.Indicators.atr
+import org.ta4j.core.api.Indicators
 import org.ta4j.core.api.series.Bar
 import org.ta4j.core.indicators.numeric.NumericIndicator
 import org.ta4j.core.indicators.numeric.momentum.ATRIndicator
@@ -37,7 +37,7 @@ class KeltnerChannelLowerIndicator private constructor(
         middle: KeltnerChannelMiddleIndicator,
         ratio: Double,
         barCountATR: Int,
-    ) : this(numFactory, middle, atr(barCountATR), ratio)
+    ) : this(numFactory, middle, Indicators.extended(numFactory).atr(barCountATR), ratio)
 
 
     private fun calculate(): Num {

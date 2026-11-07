@@ -3,7 +3,7 @@
  */
 package org.ta4j.core.indicators.numeric.oscillators
 
-import org.ta4j.core.api.Indicators.medianPrice
+import org.ta4j.core.api.Indicators
 import org.ta4j.core.api.series.Bar
 import org.ta4j.core.indicators.numeric.NumericIndicator
 import org.ta4j.core.num.NumFactory
@@ -15,7 +15,7 @@ import org.ta4j.core.num.NumFactory
 ) */
 class AwesomeOscillatorIndicator @JvmOverloads constructor(
     numFactory: NumFactory,
-    indicator: NumericIndicator = medianPrice(),
+    indicator: NumericIndicator = Indicators.extended(numFactory).medianPrice(),
     shortBarCount: Int = 5,
     longBarCount: Int = 34,
 ) : NumericIndicator(numFactory) {

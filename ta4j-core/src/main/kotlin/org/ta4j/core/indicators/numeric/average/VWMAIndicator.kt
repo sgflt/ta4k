@@ -30,7 +30,7 @@ class VWMAIndicator(
     private val barCount: Int,
 ) : NumericIndicator(numFactory) {
 
-    private val volumeIndicator = Indicators.volume()
+    private val volumeIndicator = Indicators.extended(numFactory).volume()
     private val weighteedPriceSum = BinaryOperation.product(priceIndicator, volumeIndicator)
     private val volumeWeightedIndicator = BinaryOperation.quotient(
         weighteedPriceSum.sma(barCount),

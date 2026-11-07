@@ -19,10 +19,10 @@ class ChandelierExitLongIndicator @JvmOverloads constructor(
     barCount: Int = 22,
     k: Double = 3.0,
 ) : BooleanIndicator() {
-    private val high = Indicators.highPrice().highest(barCount)
-    private val atr = Indicators.atr(barCount)
+    private val high = Indicators.extended(numFactory).highPrice().highest(barCount)
+    private val atr = Indicators.extended(numFactory).atr(barCount)
     private val k = numFactory.numOf(k)
-    private val close = Indicators.closePrice()
+    private val close = Indicators.extended(numFactory).closePrice()
 
     private fun calculate(): Boolean = close.isLessThan(high.value.minus(atr.value.times(k)).doubleValue())
 

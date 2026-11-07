@@ -3,7 +3,7 @@
  */
 package org.ta4j.core.indicators.numeric.oscillators.aroon
 
-import org.ta4j.core.api.Indicators.highPrice
+import org.ta4j.core.api.Indicators
 import org.ta4j.core.api.series.Bar
 import org.ta4j.core.indicators.numeric.NumericIndicator
 import org.ta4j.core.indicators.numeric.helpers.HighestValueIndicator
@@ -18,7 +18,7 @@ import org.ta4j.core.num.NumFactory
  */
 class AroonUpIndicator(
     numFactory: NumFactory,
-    private val highIndicator: NumericIndicator = highPrice(),
+    private val highIndicator: NumericIndicator = Indicators.extended(numFactory).highPrice(),
     private val barCount: Int,
 ) :
     NumericIndicator(numFactory) {

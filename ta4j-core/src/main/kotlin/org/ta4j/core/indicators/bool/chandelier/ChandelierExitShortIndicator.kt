@@ -19,10 +19,10 @@ class ChandelierExitShortIndicator @JvmOverloads constructor(
     barCount: Int = 22,
     k: Double = 3.0,
 ) : BooleanIndicator() {
-    private val low = Indicators.lowPrice().lowest(barCount)
-    private val atr = Indicators.atr(barCount)
+    private val low = Indicators.extended(numFactory).lowPrice().lowest(barCount)
+    private val atr = Indicators.extended(numFactory).atr(barCount)
     private val k = numFactory.numOf(k)
-    private val close = Indicators.closePrice()
+    private val close = Indicators.extended(numFactory).closePrice()
 
     private fun calculate(): Boolean {
         val threshold = low.value + atr.value * k

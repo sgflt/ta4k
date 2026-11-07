@@ -3,7 +3,7 @@
  */
 package org.ta4j.core.indicators.numeric.oscillators
 
-import org.ta4j.core.api.Indicators.awesomeOscillator
+import org.ta4j.core.api.Indicators
 import org.ta4j.core.api.series.Bar
 import org.ta4j.core.indicators.numeric.NumericIndicator
 import org.ta4j.core.num.Num
@@ -17,7 +17,7 @@ class AccelerationDecelerationIndicator @JvmOverloads constructor(
     shortBarCount: Int = 5,
     longBarCount: Int = 34,
 ) : NumericIndicator(numFactory) {
-    private val awesome = awesomeOscillator(shortBarCount, longBarCount)
+    private val awesome = Indicators.extended(numFactory).awesomeOscillator(shortBarCount, longBarCount)
     private val sma = awesome.sma(shortBarCount)
 
 

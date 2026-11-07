@@ -3,9 +3,7 @@
  */
 package org.ta4j.core.indicators.numeric.oscillators
 
-import org.ta4j.core.api.Indicators.closePrice
-import org.ta4j.core.api.Indicators.highPrice
-import org.ta4j.core.api.Indicators.lowPrice
+import org.ta4j.core.api.Indicators
 import org.ta4j.core.api.series.Bar
 import org.ta4j.core.indicators.numeric.NumericIndicator
 import org.ta4j.core.indicators.numeric.candles.price.HighPriceIndicator
@@ -41,10 +39,10 @@ class StochasticOscillatorKIndicator(
      */
     constructor(numFactory: NumFactory, barCount: Int) : this(
         numFactory,
-        closePrice(),
+        Indicators.extended(numFactory).closePrice(),
         barCount,
-        highPrice(),
-        lowPrice()
+        Indicators.extended(numFactory).highPrice(),
+        Indicators.extended(numFactory).lowPrice()
     )
 
 

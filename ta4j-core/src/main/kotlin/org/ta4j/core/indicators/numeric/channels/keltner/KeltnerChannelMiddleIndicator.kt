@@ -3,7 +3,7 @@
  */
 package org.ta4j.core.indicators.numeric.channels.keltner
 
-import org.ta4j.core.api.Indicators.typicalPrice
+import org.ta4j.core.api.Indicators
 import org.ta4j.core.api.series.Bar
 import org.ta4j.core.indicators.numeric.NumericIndicator
 import org.ta4j.core.num.NumFactory
@@ -16,7 +16,7 @@ import org.ta4j.core.num.NumFactory
  */
 class KeltnerChannelMiddleIndicator(
     numFactory: NumFactory,
-    indicator: NumericIndicator = typicalPrice(),
+    indicator: NumericIndicator = Indicators.extended(numFactory).typicalPrice(),
     barCountEMA: Int,
 ) :
     NumericIndicator(numFactory) {

@@ -3,8 +3,9 @@
  */
 package org.ta4j.core.indicators.numeric.channels.keltner
 
-import org.ta4j.core.api.Indicators.atr
-import org.ta4j.core.api.Indicators.closePrice
+import org.ta4j.core.num.NumFactoryProvider
+import org.ta4j.core.num.NumFactory
+import org.ta4j.core.api.Indicators
 import org.ta4j.core.indicators.numeric.NumericIndicator
 import org.ta4j.core.indicators.numeric.average.EMAIndicator
 
@@ -18,7 +19,12 @@ import org.ta4j.core.indicators.numeric.average.EMAIndicator
  * not cached, although they may be wrapped around cached objects. Overall there
  * is less caching and probably better performance.
  */
-class KeltnerChannelFacade(emaCount: Int, atrCount: Int, k: Number) {
+class KeltnerChannelFacade(
+    emaCount: Int,
+    atrCount: Int,
+    k: Number,
+    numFactory: NumFactory = NumFactoryProvider.defaultNumFactory,
+) {
     private val middle: EMAIndicator
     private val upper: NumericIndicator
     private val lower: NumericIndicator
@@ -33,8 +39,8 @@ class KeltnerChannelFacade(emaCount: Int, atrCount: Int, k: Number) {
      * channel
      */
     init {
-        val price = closePrice()
-        val atr = atr(atrCount)
+        val price = Indicators.extended(numFactory).closePrice()
+        val atr = Indicators.extended(numFactory).atr(atrCount)
         this.middle = price.ema(emaCount)
         this.upper = this.middle.plus(atr.multipliedBy(k))
         this.lower = this.middle.minus(atr.multipliedBy(k))

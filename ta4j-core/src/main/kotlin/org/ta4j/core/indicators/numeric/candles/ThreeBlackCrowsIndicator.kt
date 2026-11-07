@@ -3,7 +3,7 @@
  */
 package org.ta4j.core.indicators.numeric.candles
 
-import org.ta4j.core.api.Indicators.lowerShadow
+import org.ta4j.core.api.Indicators
 import org.ta4j.core.api.series.Bar
 import org.ta4j.core.indicators.bool.BooleanIndicator
 import org.ta4j.core.indicators.helpers.previous.PreviousNumericValueIndicator
@@ -39,7 +39,7 @@ class ThreeBlackCrowsIndicator(numFactory: NumFactory, barCount: Int, factor: Do
      * lower shadow
      */
     init {
-        val lowerShadowIndicator = lowerShadow()
+        val lowerShadowIndicator = Indicators.extended(numFactory).lowerShadow()
         lowerShadows.addLast(lowerShadowIndicator.previous(3))
         lowerShadows.addLast(lowerShadowIndicator.previous(2))
         lowerShadows.addLast(lowerShadowIndicator.previous())

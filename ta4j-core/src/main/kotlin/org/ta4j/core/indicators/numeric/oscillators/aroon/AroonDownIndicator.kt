@@ -3,7 +3,7 @@
  */
 package org.ta4j.core.indicators.numeric.oscillators.aroon
 
-import org.ta4j.core.api.Indicators.lowPrice
+import org.ta4j.core.api.Indicators
 import org.ta4j.core.api.series.Bar
 import org.ta4j.core.indicators.numeric.NumericIndicator
 import org.ta4j.core.indicators.numeric.helpers.LowestValueIndicator
@@ -52,7 +52,7 @@ class AroonDownIndicator(
      * @param numFactory the bar numFactory
      * @param barCount the time frame
      */
-    constructor(numFactory: NumFactory, barCount: Int) : this(numFactory, lowPrice(), barCount)
+    constructor(numFactory: NumFactory, barCount: Int) : this(numFactory, Indicators.extended(numFactory).lowPrice(), barCount)
 
     private fun calculate(): Num {
         val currentLow = lowIndicator.value
